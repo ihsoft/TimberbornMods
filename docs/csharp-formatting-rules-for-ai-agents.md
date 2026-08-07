@@ -75,6 +75,16 @@ project would otherwise derive an inconsistent root from its project or assembly
 
 * * *
 
+## Using directives
+
+Remove unused `using` directives whenever a C# file is changed. Do not leave obsolete imports, aliases, or former
+nested-type imports for a later cleanup pass.
+
+Include the complete `using` block in the final per-file audit after moving types, changing namespaces, or extracting
+nested types.
+
+* * *
+
 ## Application entry points
 
 Executable C# applications must keep all application functionality in named classes. Do not implement an application
@@ -93,19 +103,23 @@ the class structure with top-level statements.
 
 ## Access modifiers
 
-Do not write access modifiers unless they are required.
+Use access modifiers to express type and module ownership. Do not minimize them mechanically.
 
-Prefer:
+Leave application-owned top-level types implicitly `internal`; do not write the redundant `internal` modifier. Declare
+a top-level type `public` only when it forms an intentional API for consumers outside the assembly.
 
-    static class Helper {
-      static void DoWork() {
+Within an internal application type, use `public` members for the contract used by other application modules. Use
+`internal` on a member only when a specific assembly-level technical boundary requires it. Keep implementation details
+owned by one class private or omit the modifier when the language default expresses the intended privacy.
+
+For example:
+
+    sealed class MapArchiveAnalyzer {
+      public void Analyze(string path) {
+        AnalyzeArchive(path);
       }
-    }
 
-Avoid:
-
-    internal static class Helper {
-      private static void DoWork() {
+      void AnalyzeArchive(string path) {
       }
     }
 
@@ -165,10 +179,12 @@ The audit should cover the repository style contracts that are easy to miss duri
 
   * source header,
   * namespace and project `RootNamespace`,
+  * unused imports and aliases,
   * explicit application class and entry point for executable projects,
   * top-level, helper, DTO, and nested-type ownership and placement,
+  * domain-specific names for shared types,
   * field and constant placement,
-  * minimal access modifiers,
+  * access modifiers that express application and module boundaries,
   * wrapped declarations, calls, expressions, and collection initializers,
   * raw string literals,
   * final line length.
@@ -176,7 +192,12 @@ The audit should cover the repository style contracts that are easy to miss duri
 Build a type inventory as well as a file inventory. A DTO or helper used only by the class that creates and owns it
 should normally be nested in that owner instead of remaining as an unrelated top-level type. Place nested types near
 the top of the owning class, after important class-level constants and fields, so the class structure is visible before
-its behavior. Preserve a top-level type when it has genuine independent ownership or reuse.
+its behavior.
+
+A DTO or container consumed by multiple application modules has independent ownership and should normally be a
+top-level type, even when only one module creates it. Give shared top-level containers domain-specific names that remain
+meaningful outside the producer and do not collide with unrelated concepts. Preserve the project's established domain
+vocabulary; examples illustrate the naming principle and must not be promoted into required identifiers.
 
 If files or folders move during the refactor, re-check every affected namespace and the project's `RootNamespace`
 against the final organization. Compilation proves that names resolve; it does not prove that types were left in the
@@ -523,6 +544,14 @@ which target format or parser.
 
 Private and internal members do not need XML documentation by default, but add it when a helper defines a subtle
 contract that future maintainers are likely to misuse.
+
+For a DTO or container whose values need separate semantic explanation, prefer explicit read-only properties and place
+the documentation on those properties. Do not force important member documentation onto positional-constructor
+parameters when that makes the data model harder to read.
+
+Keep a positional record or record struct compact when the container is obvious and its parameter names fully explain
+the values. Do not expand a simple container into boilerplate properties merely to follow the more explicit form used
+by a different, less obvious DTO.
 
 * * *
 
