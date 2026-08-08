@@ -39,7 +39,7 @@ on:
         type: number
         default: 3600
       map_analysis_parallelism:
-        description: Maximum parallelism for cached payload analysis
+        description: Maximum parallelism for cached payload analysis and manifest publication
         required: false
         type: number
         default: 4
@@ -47,12 +47,12 @@ on:
         description: Download requests per anonymous Steam session; zero disables reconnects
         required: false
         type: number
-        default: 250
+        default: 200
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
         type: number
-        default: 100
+        default: 500
   workflow_dispatch:
     inputs:
       job_timeout_minutes:
@@ -91,7 +91,7 @@ on:
         type: number
         default: 3600
       map_analysis_parallelism:
-        description: Maximum parallelism for cached payload analysis
+        description: Maximum parallelism for cached payload analysis and manifest publication
         required: false
         type: number
         default: 4
@@ -99,12 +99,12 @@ on:
         description: Download requests per anonymous Steam session; zero disables reconnects
         required: false
         type: number
-        default: 250
+        default: 200
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
         type: number
-        default: 100
+        default: 500
   schedule:
     - cron: "17 0-23/3 * * *"
     - cron: "47 1-23/3 * * *"
@@ -267,7 +267,7 @@ jobs:
             --slow-mode-delay-seconds ${STEAM_SLOW_MODE_DELAY_SECONDS:-40} \
             --time-budget-seconds ${MAP_INDEX_TIME_BUDGET_SECONDS:-3600} \
             --max-analysis-parallelism ${MAP_ANALYSIS_PARALLELISM:-4} \
-            --steam-reconnect-after-downloads ${STEAM_RECONNECT_AFTER_DOWNLOADS:-250} \
+            --steam-reconnect-after-downloads ${STEAM_RECONNECT_AFTER_DOWNLOADS:-200} \
             --stop-request-file "$STOP_REQUEST_FILE"
 
       - name: Build public search artifacts
@@ -305,7 +305,7 @@ jobs:
           PAYLOAD_CACHE_PRUNE_MAX_VERSIONS: ${{ inputs.payload_cache_prune_max_versions }}
         run: |
           package_path="/users/ihsoft/packages/container/timberborn-workshop-payload-cache"
-          prune_limit="${PAYLOAD_CACHE_PRUNE_MAX_VERSIONS:-100}"
+          prune_limit="${PAYLOAD_CACHE_PRUNE_MAX_VERSIONS:-500}"
           version_ids=$(gh api --paginate "$package_path/versions?per_page=100" \
             --jq '.[] | select((.metadata.container.tags // []) | length == 0) | .id' \
             | head -n "$prune_limit")

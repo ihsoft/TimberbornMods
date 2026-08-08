@@ -3,6 +3,7 @@
 // License: Public Domain
 
 #nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -42,16 +43,19 @@ sealed class OciPayloadCache : IDisposable {
   readonly string _workDirectory;
   readonly Dictionary<string, CatalogEntry> _catalog;
   readonly HashSet<string> _dirtyShards = [];
+  readonly int _maximumParallelism;
   bool _catalogDirty;
   int _flushFailures;
   int _prunedMaps;
   int _prunedVersions;
   int _writeFailures;
 
-  OciPayloadCache(string repository, string workDirectory, Dictionary<string, CatalogEntry> catalog) {
+  OciPayloadCache(
+      string repository, string workDirectory, Dictionary<string, CatalogEntry> catalog, int maximumParallelism) {
     _repository = repository;
     _workDirectory = workDirectory;
     _catalog = catalog;
+    _maximumParallelism = maximumParallelism;
   }
 
   public int Count => _catalog.Count;
@@ -70,7 +74,7 @@ sealed class OciPayloadCache : IDisposable {
   /// <summary>Number of downloaded payloads that could not be stored after all registry attempts.</summary>
   public int WriteFailures => _writeFailures;
 
-  public static OciPayloadCache? CreateFromEnvironment() {
+  public static OciPayloadCache? CreateFromEnvironment(int maximumParallelism = 1) {
     var repository = Environment.GetEnvironmentVariable("MAP_PAYLOAD_CACHE_OCI_REPOSITORY");
     if (string.IsNullOrWhiteSpace(repository)) {
       Console.WriteLine("Payload OCI cache is not configured; continuing without it.");
@@ -91,7 +95,7 @@ sealed class OciPayloadCache : IDisposable {
           ?? throw new InvalidDataException("OCI payload cache catalog could not be parsed.");
     }
     Console.WriteLine($"Payload OCI cache connected; found {catalog.Count} cached map versions.");
-    return new OciPayloadCache(repository, workDirectory, catalog);
+    return new OciPayloadCache(repository, workDirectory, catalog, maximumParallelism);
   }
 
   public bool Contains(string publishedFileId, string? updatedAtUtc) {
@@ -200,20 +204,22 @@ sealed class OciPayloadCache : IDisposable {
       var config = JsonSerializer.Deserialize<OciDescriptor>(configResult.Output)
           ?? throw new InvalidDataException("oras blob push returned no config descriptor.");
 
-      foreach (var shard in _dirtyShards.Order()) {
-        var layers = _catalog.Where(pair => pair.Value.Shard == shard).OrderBy(pair => pair.Key)
-            .Select(pair => new OciDescriptor(
-                PayloadMediaType, pair.Value.Digest, pair.Value.Size,
-                new Dictionary<string, string> {
-                    ["org.opencontainers.image.title"] = pair.Key,
-                    ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
-                })).ToList();
-        var manifest = new OciManifest(2, ManifestMediaType, ArtifactType, config, layers);
-        var manifestPath = Path.Combine(_workDirectory, $"{shard}.manifest.json");
-        File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest));
-        RunRegistryWriteWithRetry(
-            ["manifest", "push", $"{_repository}:{shard}", manifestPath], $"payload cache manifest {shard}");
-        Console.WriteLine($"Published payload cache manifest {shard} with {layers.Count} map versions.");
+      var manifestErrors = new ConcurrentQueue<Exception>();
+      Parallel.ForEach(_dirtyShards.Order(), new ParallelOptions {
+        MaxDegreeOfParallelism = _maximumParallelism,
+      }, shard => {
+        try {
+          PublishShardManifest(shard, config);
+        } catch (Exception exception) {
+          manifestErrors.Enqueue(exception);
+        }
+      });
+      if (!manifestErrors.IsEmpty) {
+        manifestErrors.TryPeek(out var firstError);
+        throw new PayloadCacheException(
+            $"Failed to publish {manifestErrors.Count} payload cache shard manifests. "
+            + $"First error: {firstError?.Message}",
+            new AggregateException(manifestErrors));
       }
 
       var catalogPath = Path.Combine(_workDirectory, "catalog.json");
@@ -232,6 +238,22 @@ sealed class OciPayloadCache : IDisposable {
           $"Payload cache publication failed; continuing with map metadata output: {exception.Message}");
       return false;
     }
+  }
+
+  void PublishShardManifest(string shard, OciDescriptor config) {
+    var layers = _catalog.Where(pair => pair.Value.Shard == shard).OrderBy(pair => pair.Key)
+        .Select(pair => new OciDescriptor(
+            PayloadMediaType, pair.Value.Digest, pair.Value.Size,
+            new Dictionary<string, string> {
+                ["org.opencontainers.image.title"] = pair.Key,
+                ["com.ihsoft.timberborn.sha256"] = pair.Value.Sha256,
+            })).ToList();
+    var manifest = new OciManifest(2, ManifestMediaType, ArtifactType, config, layers);
+    var manifestPath = Path.Combine(_workDirectory, $"{shard}.manifest.json");
+    File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest));
+    RunRegistryWriteWithRetry(
+        ["manifest", "push", $"{_repository}:{shard}", manifestPath], $"payload cache manifest {shard}");
+    Console.WriteLine($"Published payload cache manifest {shard} with {layers.Count} map versions.");
   }
 
   public void Dispose() {

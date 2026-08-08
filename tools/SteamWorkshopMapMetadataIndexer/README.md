@@ -48,7 +48,7 @@ refill only the missing cache entries instead of downloading the same maps as un
 After reading a complete Workshop snapshot, the analyzer removes every cache-catalog entry whose map ID is absent from
 that snapshot. Only affected shard manifests and the catalog are republished; no payload download or analysis is
 needed. After the public artifacts are prepared, the workflow also deletes untagged superseded GHCR package versions
-up to the configured per-run limit, which defaults to 100. A larger limit can be supplied explicitly for temporary
+up to the configured per-run limit, which defaults to 500. A larger limit can be supplied explicitly for temporary
 backlog-cleanup runs. Current tagged catalog and shard versions remain intact. The
 bounded cleanup resumes on later runs and is nonfatal to public-index publication if GitHub Packages temporarily
 rejects listing or deletion.
@@ -57,7 +57,8 @@ Payloads are distributed across 100 stable logical shards using `published_file_
 content-addressed OCI blob; a shard tag is only a small manifest referencing its blobs. Updating or adding a map uploads
 only that map and rewrites the small shard manifest, never the other payload bytes. A separate catalog maps each
 `(published_file_id, updated_at)` version to its shard, OCI digest, size, and SHA-256. The catalog is published last so
-it never points to a shard version that has not been uploaded successfully.
+it never points to a shard version that has not been uploaded successfully. Dirty shard manifests are published in
+parallel up to the configured analysis-parallelism limit; any failed shard prevents catalog publication.
 
 Maps whose analysis version is stale and whose matching payload is cached are always processed first. They do not
 consume `--max-items`, which is the per-run Steam download budget. After cached reanalysis, the analyzer downloads at
@@ -80,7 +81,7 @@ payload is cached or analyzed.
 cooldowns count toward that interval instead of being added to it, while slow mode raises the minimum to its own delay.
 
 `--steam-reconnect-after-downloads` bounds one anonymous Steam session by the number of `DownloadItem` requests and
-defaults to 250; retries count because they issue another download request. Before the next request, the analyzer logs
+defaults to 200; retries count because they issue another download request. Before the next request, the analyzer logs
 off, shuts down and restarts the native Steam game server, logs on anonymously again, reinitializes the Workshop
 directory, and resets request pacing. A reconnect login that returns `k_EResultNoConnection` is retried after 20 and 40
 seconds; another reconnect failure follows the normal circuit-breaker path and stops the payload pass before another
@@ -100,9 +101,9 @@ and manual `workflow_dispatch` runs can override the complete operational config
 | `steam_request_delay_seconds` | 0 | Normal-mode spacing between Steam requests. |
 | `steam_slow_mode_delay_seconds` | 40 | Slow-mode spacing between Steam requests. |
 | `map_index_time_budget_seconds` | 3600 | Budget for cached analysis and Steam payload collection. |
-| `map_analysis_parallelism` | 4 | Parallel workers used for cached payload analysis. |
-| `steam_reconnect_after_downloads` | 250 | Download requests per anonymous Steam session; zero disables reconnects. |
-| `payload_cache_prune_max_versions` | 100 | Maximum superseded GHCR versions deleted after a run. |
+| `map_analysis_parallelism` | 4 | Parallel workers used for cached analysis and shard-manifest publication. |
+| `steam_reconnect_after_downloads` | 200 | Download requests per anonymous Steam session; zero disables reconnects. |
+| `payload_cache_prune_max_versions` | 500 | Maximum superseded GHCR versions deleted after a run. |
 
 Retry counts, retry cooldowns, slow-mode recovery rules, and sequential Steam access remain fixed safety behavior rather
 than run parameters.

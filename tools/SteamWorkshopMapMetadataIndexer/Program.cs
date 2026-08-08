@@ -93,7 +93,7 @@ sealed class MapMetadataIndexer {
           TimeSpan.FromSeconds(ParseInt(values, "--slow-mode-delay-seconds", 15)),
           TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)),
           ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)),
-          ParseInt(values, "--steam-reconnect-after-downloads", 250),
+          ParseInt(values, "--steam-reconnect-after-downloads", 200),
           values.GetValueOrDefault("--stop-request-file"));
       if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
           || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
@@ -131,7 +131,7 @@ sealed class MapMetadataIndexer {
         .ToDictionary(map => map.PublishedFileId, map => previousById[map.PublishedFileId]);
     var processedThisRun = 0;
     var downloadedThisRun = 0;
-    using var payloadCache = OciPayloadCache.CreateFromEnvironment();
+    using var payloadCache = OciPayloadCache.CreateFromEnvironment(options.MaxAnalysisParallelism);
     payloadCache?.PruneExcept(maps.Select(map => map.PublishedFileId).ToHashSet(StringComparer.Ordinal));
     var refreshCandidates = maps
         .Where(map => NeedsRefresh(map, previousById.GetValueOrDefault(map.PublishedFileId)))
