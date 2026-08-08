@@ -7,7 +7,7 @@ on:
         description: Maximum duration of the build job
         required: false
         type: number
-        default: 80
+        default: 180
       map_metadata_max_items:
         description: Maximum number of map payloads to download per run
         required: false
@@ -37,7 +37,7 @@ on:
         description: Time budget for cached analysis and Steam payload collection
         required: false
         type: number
-        default: 3600
+        default: 9600
       map_analysis_parallelism:
         description: Maximum parallelism for cached payload analysis and manifest publication
         required: false
@@ -52,14 +52,14 @@ on:
         description: Maximum number of superseded payload cache versions to prune
         required: false
         type: number
-        default: 500
+        default: 200
   workflow_dispatch:
     inputs:
       job_timeout_minutes:
         description: Maximum duration of the build job
         required: false
         type: number
-        default: 80
+        default: 180
       map_metadata_max_items:
         description: Maximum number of map payloads to download per run
         required: false
@@ -89,7 +89,7 @@ on:
         description: Time budget for cached analysis and Steam payload collection
         required: false
         type: number
-        default: 3600
+        default: 9600
       map_analysis_parallelism:
         description: Maximum parallelism for cached payload analysis and manifest publication
         required: false
@@ -104,10 +104,9 @@ on:
         description: Maximum number of superseded payload cache versions to prune
         required: false
         type: number
-        default: 500
+        default: 200
   schedule:
-    - cron: "17 0-23/3 * * *"
-    - cron: "47 1-23/3 * * *"
+    - cron: "17 */4 * * *"
 
 permissions:
   contents: read
@@ -122,7 +121,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ fromJSON(format('{0}', inputs.job_timeout_minutes || 80)) }}
+    timeout-minutes: ${{ fromJSON(format('{0}', inputs.job_timeout_minutes || 180)) }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
@@ -265,7 +264,7 @@ jobs:
             --request-timeout-seconds ${STEAM_REQUEST_TIMEOUT_SECONDS:-120} \
             --request-delay-seconds ${STEAM_REQUEST_DELAY_SECONDS:-0} \
             --slow-mode-delay-seconds ${STEAM_SLOW_MODE_DELAY_SECONDS:-40} \
-            --time-budget-seconds ${MAP_INDEX_TIME_BUDGET_SECONDS:-3600} \
+            --time-budget-seconds ${MAP_INDEX_TIME_BUDGET_SECONDS:-9600} \
             --max-analysis-parallelism ${MAP_ANALYSIS_PARALLELISM:-4} \
             --steam-reconnect-after-downloads ${STEAM_RECONNECT_AFTER_DOWNLOADS:-200} \
             --stop-request-file "$STOP_REQUEST_FILE"
@@ -305,7 +304,7 @@ jobs:
           PAYLOAD_CACHE_PRUNE_MAX_VERSIONS: ${{ inputs.payload_cache_prune_max_versions }}
         run: |
           package_path="/users/ihsoft/packages/container/timberborn-workshop-payload-cache"
-          prune_limit="${PAYLOAD_CACHE_PRUNE_MAX_VERSIONS:-500}"
+          prune_limit="${PAYLOAD_CACHE_PRUNE_MAX_VERSIONS:-200}"
           version_ids=$(gh api --paginate "$package_path/versions?per_page=100" \
             --jq '.[] | select((.metadata.container.tags // []) | length == 0) | .id' \
             | head -n "$prune_limit")

@@ -48,7 +48,7 @@ refill only the missing cache entries instead of downloading the same maps as un
 After reading a complete Workshop snapshot, the analyzer removes every cache-catalog entry whose map ID is absent from
 that snapshot. Only affected shard manifests and the catalog are republished; no payload download or analysis is
 needed. After the public artifacts are prepared, the workflow also deletes untagged superseded GHCR package versions
-up to the configured per-run limit, which defaults to 500. A larger limit can be supplied explicitly for temporary
+up to the configured per-run limit, which defaults to 200. A larger limit can be supplied explicitly for temporary
 backlog-cleanup runs. Current tagged catalog and shard versions remain intact. The
 bounded cleanup resumes on later runs and is nonfatal to public-index publication if GitHub Packages temporarily
 rejects listing or deletion.
@@ -94,16 +94,16 @@ and manual `workflow_dispatch` runs can override the complete operational config
 
 | Input | Default | Purpose |
 |---|---:|---|
-| `job_timeout_minutes` | 80 | Hard GitHub Actions limit for the build job. |
+| `job_timeout_minutes` | 180 | Hard GitHub Actions limit for the build job. |
 | `map_metadata_max_items` | 500 | Maximum Steam payload downloads in one run. |
 | `map_payload_max_download_bytes` | 50000000 | Maximum accepted size of one payload. |
 | `steam_request_timeout_seconds` | 120 | Callback timeout for metadata and payload Steam requests. |
 | `steam_request_delay_seconds` | 0 | Normal-mode spacing between Steam requests. |
 | `steam_slow_mode_delay_seconds` | 40 | Slow-mode spacing between Steam requests. |
-| `map_index_time_budget_seconds` | 3600 | Budget for cached analysis and Steam payload collection. |
+| `map_index_time_budget_seconds` | 9600 | Budget for cached analysis and Steam payload collection. |
 | `map_analysis_parallelism` | 4 | Parallel workers used for cached analysis and shard-manifest publication. |
 | `steam_reconnect_after_downloads` | 200 | Download requests per anonymous Steam session; zero disables reconnects. |
-| `payload_cache_prune_max_versions` | 500 | Maximum superseded GHCR versions deleted after a run. |
+| `payload_cache_prune_max_versions` | 200 | Maximum superseded GHCR versions deleted after a run. |
 
 Retry counts, retry cooldowns, slow-mode recovery rules, and sequential Steam access remain fixed safety behavior rather
 than run parameters.
