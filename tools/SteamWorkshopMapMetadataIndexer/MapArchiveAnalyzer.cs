@@ -10,20 +10,24 @@ using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
 namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 9;
+  public const int AnalysisVersion = 10;
   const long MaxWorldJsonBytes = 250_000_000;
 
   public MapArchiveAnalysis Analyze(ZipArchive archive) {
     using var world = ReadWorld(archive);
     var dimensions = ReadDimensions(world.RootElement, archive);
     var water = new WaterMapDecoder().Decode(world.RootElement, dimensions.Width, dimensions.Height);
+    var waterFeatures = new WaterFeatureDiagnostics().Analyze(water);
     var landArea = checked(dimensions.Width * dimensions.Height) - water.OpenWaterTileCount;
     var classifications = new Dictionary<string, JsonElement>() {
         [ForestDensityClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
             new ForestDensityClassifier().Analyze(world.RootElement, landArea)),
-        [WaterFormClassifier.FeatureKey] = JsonSerializer.SerializeToElement(new WaterFormClassifier().Analyze(water)),
+        [WaterFormClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
+            new WaterFormClassifier().Classify(water, waterFeatures)),
         [SettlementSpaceClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
             new SettlementSpaceClassifier().Analyze(water)),
+        [IslandClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
+            new IslandClassifier().Analyze(water, waterFeatures)),
     };
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }

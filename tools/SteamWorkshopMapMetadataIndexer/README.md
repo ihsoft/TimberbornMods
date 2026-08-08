@@ -176,6 +176,11 @@ space. A dominant neighboring-height band may make disconnected dry regions a `p
 one of `little_space`, `much_space`, `plain`, `terraces`, or `plateau`; the result also reports `core_count` and the
 capacity shares `plain_share`, `terrace_share`, `plateau_share`, and `mixed_share`.
 
+The `islands` classifier publishes a descending array of projected dry-land areas. It ignores terrain height within an
+island, rejects land without a sufficiently wide interior, and uses water topology to distinguish exterior water from
+lakes. River cuts can be merged back into one land family so a river does not automatically split an island. An empty
+array means the payload was analyzed and no useful islands were found; a missing key means the value is unknown.
+
 ## Output record
 
 The JSONL output retains:
@@ -197,8 +202,9 @@ classifications, and a diagnostic `analysis_error`; consumers must not treat the
 `tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py` publishes classifications in merged search records as
 `map_classifications`. Consumers must tolerate additional classifier keys and result fields.
 
-Reviewed real-map water inputs are stored as compressed decoded fixtures in the focused test project. They preserve
-the classifier inputs without redistributing complete Workshop payloads or requiring Steam during regression tests.
+Reviewed real-map water and island inputs are stored as compressed decoded fixtures in the focused test project. They
+preserve the classifier inputs without redistributing complete Workshop payloads or requiring Steam during regression
+tests.
 
 The production invocation and numeric Steam/resource limits remain authoritative in
 `.github/workflows/workshop-search-index.yml`.

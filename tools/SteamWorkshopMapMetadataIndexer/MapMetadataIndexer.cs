@@ -442,7 +442,10 @@ sealed class MapMetadataIndexer {
         || previous.SourceUpdatedAtUtc != map.UpdatedAtUtc
         || previous.AnalysisVersion != MapArchiveAnalyzer.AnalysisVersion
         || previous.MapWidth < 1 || previous.MapHeight < 1
-        || previous.Classifications?.ContainsKey(ForestDensityClassifier.FeatureKey) != true;
+        || previous.Classifications?.ContainsKey(ForestDensityClassifier.FeatureKey) != true
+        || previous.Classifications?.ContainsKey(WaterFormClassifier.FeatureKey) != true
+        || previous.Classifications?.ContainsKey(SettlementSpaceClassifier.FeatureKey) != true
+        || previous.Classifications?.ContainsKey(IslandClassifier.FeatureKey) != true;
   }
 
   static DateTimeOffset ParseTimestamp(string? value) {

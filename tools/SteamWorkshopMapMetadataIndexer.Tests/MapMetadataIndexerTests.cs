@@ -18,6 +18,7 @@ static class MapMetadataIndexerTests {
   static readonly WaterFeatureDiagnostics WaterDiagnostics = new();
   static readonly WaterFormClassifier WaterClassifier = new();
   static readonly SettlementSpaceClassifier SettlementClassifier = new();
+  static readonly IslandClassifier IslandClassifier = new();
   static readonly List<(string Name, Action Test)> Tests = [
       ("Archive analysis counts log trees unless explicitly dead", CountsOnlyLivingLogTrees),
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
@@ -39,6 +40,7 @@ static class MapMetadataIndexerTests {
       ("Settlement-space classifier keeps separated terrain levels distinct", KeepsDistinctTerrainLevels),
       ("Settlement-space classifier excludes open water", ExcludesOpenWaterFromSettlementSpace),
       ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
+      ("Island classifier preserves reviewed Workshop map baselines", PreservesIslandMapBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
       ("Steam pacing applies the configured normal delay between requests", AppliesNormalSteamRequestDelay),
@@ -129,6 +131,8 @@ static class MapMetadataIndexerTests {
     Assert.Equal(0, forest.GetProperty("level").GetInt32());
     var water = analysis.Classifications[WaterFormClassifier.FeatureKey];
     Assert.Equal("none", water.GetProperty("water_form").GetString());
+    var islands = analysis.Classifications[IslandClassifier.FeatureKey];
+    Assert.Equal(0, islands.GetArrayLength());
   }
 
   static void UsesExpectedForestBands() {
@@ -455,6 +459,22 @@ static class MapMetadataIndexerTests {
       var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
       var result = SettlementClassifier.Analyze(map);
       Assert.Equal(expectedType, result.SpaceType);
+    }
+  }
+
+  static void PreservesIslandMapBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Islands");
+    var expected = new Dictionary<string, int[]>() {
+      ["5-islands-3538483995.json.gz"] = [11_122, 6_923, 1_968, 1_518, 637],
+      ["forbidden-island-3484077181.json.gz"] = [989, 887, 874, 872, 583, 514, 314, 275],
+      ["spectacle-island-3752828444.json.gz"] = [13_681, 1_010, 564],
+      ["the-archipelago-3673227389.json.gz"] = [5_250],
+      ["the-water-maze-3719678554.json.gz"] = [634],
+    };
+    foreach (var (fixtureName, expectedAreas) in expected) {
+      var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
+      var actualAreas = IslandClassifier.Analyze(map);
+      Assert.Equal(string.Join(",", expectedAreas), string.Join(",", actualAreas));
     }
   }
 

@@ -51,6 +51,11 @@ and `space_type`. Only sufficiently wide, dry terrain regions contribute non-ove
 type is one of `little_space`, `much_space`, `plain`, `terraces`, or `plateau`. A plain may contain disconnected regions or
 regions on neighboring heights, including land separated by open water.
 
+The `islands` result is a descending array of integer projected dry-land areas. Terrain height does not affect an
+island's area. River-separated pieces may be merged into one island, while land surrounded by a lake is not treated as
+an island. An empty array means the map was analyzed and no useful islands were found. A missing `islands` key means
+the value is unknown and must not be interpreted as an empty result.
+
 ## Anonymous execution boundary
 
 The recurring pipeline requires no Steam account, API key, repository secret, local Steam client, or running game.

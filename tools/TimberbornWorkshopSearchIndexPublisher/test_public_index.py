@@ -66,6 +66,7 @@ class PublicIndexContractTest(unittest.TestCase):
                         "mixed_share": 0.1,
                         "space_type": "terraces",
                     },
+                    "islands": [1024, 256],
                 },
                 "collection_state": "fetched",
             }])
@@ -84,6 +85,7 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertIsInstance(manifest["schema_version"], int)
             self.assertEqual(CANONICAL_DATA_FILES, set(manifest["files"]))
             self.assertEqual(1, manifest["map_settlement_space_known"])
+            self.assertEqual(1, manifest["map_islands_known"])
 
             with gzip.open(output / "workshop-items.jsonl.gz", "rt", encoding="utf-8") as stream:
                 public_workshop_records = [json.loads(line) for line in stream]
@@ -109,6 +111,10 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(
                 "terraces",
                 consumer_records[0]["map_classifications"]["settlement_space"]["space_type"],
+            )
+            self.assertEqual(
+                [1024, 256],
+                consumer_records[0]["map_classifications"]["islands"],
             )
 
     def test_publishes_unsupported_state_without_fake_dimensions(self) -> None:
