@@ -79,6 +79,11 @@ payload is cached or analyzed.
 `--request-delay-seconds` sets the minimum delay between sequential map payload requests and defaults to zero. Retry
 cooldowns count toward that interval instead of being added to it, while slow mode raises the minimum to its own delay.
 
+`--steam-reconnect-after-downloads` bounds one anonymous Steam session by the number of `DownloadItem` requests and
+defaults to 250; retries count because they issue another download request. Before the next request, the analyzer logs
+off, logs on anonymously again, reinitializes the Workshop directory, and resets request pacing. Zero disables planned
+reconnects. A reconnect failure follows the normal circuit-breaker path and stops the payload pass before another map.
+
 ## Workflow inputs
 
 Scheduled runs use the defaults declared in `.github/workflows/workshop-search-index.yml`. Both reusable workflow calls
@@ -94,7 +99,7 @@ and manual `workflow_dispatch` runs can override the complete operational config
 | `steam_slow_mode_delay_seconds` | 40 | Slow-mode spacing between Steam requests. |
 | `map_index_time_budget_seconds` | 3600 | Budget for cached analysis and Steam payload collection. |
 | `map_analysis_parallelism` | 4 | Parallel workers used for cached payload analysis. |
-| `stop_request_poll_seconds` | 30 | Interval for checking a graceful stop request. |
+| `steam_reconnect_after_downloads` | 250 | Download requests per anonymous Steam session; zero disables reconnects. |
 | `payload_cache_prune_max_versions` | 100 | Maximum superseded GHCR versions deleted after a run. |
 
 Retry counts, retry cooldowns, slow-mode recovery rules, and sequential Steam access remain fixed safety behavior rather
@@ -124,6 +129,8 @@ short-lived `GITHUB_TOKEN` and existing `contents: read` permission. After it se
 creates a runner-local stop file. The analyzer sees that file before the next map, flushes the payload-cache catalog,
 writes the complete metadata checkpoint, and allows the normal artifact and Pages steps to finish. A request for
 another run ID is ignored, so the tracked value does not need a cleanup commit.
+
+The repository-file poll interval is fixed at 30 seconds and is not an indexing-workload parameter.
 
 The stop is cooperative rather than immediate. A request already in progress, its retry cooldown, or slow-mode delay
 finishes before the analyzer checks the stop file between maps.

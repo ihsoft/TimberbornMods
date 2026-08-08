@@ -67,4 +67,10 @@ sealed class SteamRequestPacer(
     _consecutiveSuccessfulRequests = 0;
     _log("Steam slow mode ended after consecutive successful requests.");
   }
+
+  public void ResetForNewSession() {
+    SlowModeActive = false;
+    _consecutiveSuccessfulRequests = 0;
+    _requestStarted = false;
+  }
 }

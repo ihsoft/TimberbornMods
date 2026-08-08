@@ -48,6 +48,8 @@ static class Program {
       ("Steam Fail is transient in normal and slow modes", TreatsFailAsTransientInEveryMode),
       ("Unsupported maps are excluded from payload cache population", ExcludesUnsupportedMapsFromCachePopulation),
       ("Stop requests are detected through the configured file", DetectsStopRequestFile),
+      ("Steam reconnect threshold counts download requests", AppliesSteamReconnectThreshold),
+      ("Steam reconnect resets request pacing", ResetsSteamPacingForReconnect),
   ];
 
   static int Main() {
@@ -71,6 +73,27 @@ static class Program {
     } finally {
       File.Delete(path);
     }
+  }
+
+  static void AppliesSteamReconnectThreshold() {
+    Assert.False(SteamReconnectPolicy.ShouldReconnect(249, 250));
+    Assert.True(SteamReconnectPolicy.ShouldReconnect(250, 250));
+    Assert.True(SteamReconnectPolicy.ShouldReconnect(251, 250));
+    Assert.False(SteamReconnectPolicy.ShouldReconnect(500, 0));
+  }
+
+  static void ResetsSteamPacingForReconnect() {
+    var delays = new List<TimeSpan>();
+    var pacer = new SteamRequestPacer(delays.Add, _ => { }, slowModeDelay: TimeSpan.FromSeconds(40));
+    pacer.WaitBeforeRequest(TimeSpan.Zero);
+    pacer.RecordTransientFailure("k_EResultBusy");
+
+    pacer.ResetForNewSession();
+    pacer.WaitBeforeRequest(TimeSpan.Zero);
+
+    Assert.False(pacer.SlowModeActive);
+    Assert.Equal(0, pacer.ConsecutiveSuccessfulRequests);
+    Assert.Equal(0, delays.Count);
   }
 
   static void CountsOnlyLivingLogTrees() {

@@ -43,11 +43,11 @@ on:
         required: false
         type: number
         default: 4
-      stop_request_poll_seconds:
-        description: Interval for checking a graceful stop request
+      steam_reconnect_after_downloads:
+        description: Download requests per anonymous Steam session; zero disables reconnects
         required: false
         type: number
-        default: 30
+        default: 250
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
@@ -95,11 +95,11 @@ on:
         required: false
         type: number
         default: 4
-      stop_request_poll_seconds:
-        description: Interval for checking a graceful stop request
+      steam_reconnect_after_downloads:
+        description: Download requests per anonymous Steam session; zero disables reconnects
         required: false
         type: number
-        default: 30
+        default: 250
       payload_cache_prune_max_versions:
         description: Maximum number of superseded payload cache versions to prune
         required: false
@@ -221,17 +221,13 @@ jobs:
           STEAM_SLOW_MODE_DELAY_SECONDS: ${{ inputs.steam_slow_mode_delay_seconds }}
           MAP_INDEX_TIME_BUDGET_SECONDS: ${{ inputs.map_index_time_budget_seconds }}
           MAP_ANALYSIS_PARALLELISM: ${{ inputs.map_analysis_parallelism }}
-          STOP_REQUEST_POLL_SECONDS: ${{ inputs.stop_request_poll_seconds }}
+          STEAM_RECONNECT_AFTER_DOWNLOADS: ${{ inputs.steam_reconnect_after_downloads }}
           STOP_REQUEST_FILE: ${{ runner.temp }}/workshop-index-stop-requested
           STOP_REQUEST_REPOSITORY_PATH: .github/workshop-search-index-stop
           GH_TOKEN: ${{ github.token }}
         working-directory: ${{ runner.temp }}/steamcmd
         run: |
-          stop_poll_seconds="${STOP_REQUEST_POLL_SECONDS:-30}"
-          if [ "$stop_poll_seconds" -lt 1 ]; then
-            echo "stop_request_poll_seconds must be positive." >&2
-            exit 2
-          fi
+          stop_poll_seconds=30
 
           monitor_stop_request() {
             while true; do
@@ -271,6 +267,7 @@ jobs:
             --slow-mode-delay-seconds ${STEAM_SLOW_MODE_DELAY_SECONDS:-40} \
             --time-budget-seconds ${MAP_INDEX_TIME_BUDGET_SECONDS:-3600} \
             --max-analysis-parallelism ${MAP_ANALYSIS_PARALLELISM:-4} \
+            --steam-reconnect-after-downloads ${STEAM_RECONNECT_AFTER_DOWNLOADS:-250} \
             --stop-request-file "$STOP_REQUEST_FILE"
 
       - name: Build public search artifacts

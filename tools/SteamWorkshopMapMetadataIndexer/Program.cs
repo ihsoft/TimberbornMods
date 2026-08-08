@@ -45,10 +45,29 @@ sealed class MapMetadataIndexer {
     public EResult Result { get; } = result;
   }
 
+  sealed class SteamDownloadSession(
+      Options options, string workshopDirectory, SteamRequestPacer requestPacer) {
+    int _downloadRequestsSinceLogin;
+
+    public void PrepareDownloadRequest() {
+      if (SteamReconnectPolicy.ShouldReconnect(
+          _downloadRequestsSinceLogin, options.SteamReconnectAfterDownloads)) {
+        Console.WriteLine(
+            $"Reconnecting anonymous Steam session after {_downloadRequestsSinceLogin} download requests.");
+        ReconnectAnonymously(options.RequestTimeout);
+        InitializeWorkshopDirectory(workshopDirectory);
+        requestPacer.ResetForNewSession();
+        _downloadRequestsSinceLogin = 0;
+        Console.WriteLine("Anonymous Steam session reconnected.");
+      }
+      _downloadRequestsSinceLogin++;
+    }
+  }
+
   sealed record Options(
       string Snapshot, string? PreviousResults, string Output, string WorkshopDirectory, int MaxDownloadItems,
       ulong MaxDownloadBytes, TimeSpan RequestTimeout, TimeSpan RequestDelay, TimeSpan SlowModeDelay,
-      TimeSpan TimeBudget, int MaxAnalysisParallelism, string? StopRequestFile) {
+      TimeSpan TimeBudget, int MaxAnalysisParallelism, int SteamReconnectAfterDownloads, string? StopRequestFile) {
 
     public static Options Parse(string[] args) {
       var values = new Dictionary<string, string>();
@@ -67,13 +86,14 @@ sealed class MapMetadataIndexer {
           TimeSpan.FromSeconds(ParseInt(values, "--slow-mode-delay-seconds", 15)),
           TimeSpan.FromSeconds(ParseInt(values, "--time-budget-seconds", 7200)),
           ParseInt(values, "--max-analysis-parallelism", Math.Min(Environment.ProcessorCount, 4)),
+          ParseInt(values, "--steam-reconnect-after-downloads", 250),
           values.GetValueOrDefault("--stop-request-file"));
       if (options.MaxDownloadItems < 0 || options.MaxDownloadBytes < 1
           || options.RequestTimeout <= TimeSpan.Zero || options.RequestTimeout > TimeSpan.FromMinutes(10)
           || options.RequestDelay < TimeSpan.Zero || options.RequestDelay > TimeSpan.FromMinutes(1)
           || options.SlowModeDelay <= TimeSpan.Zero || options.SlowModeDelay > TimeSpan.FromMinutes(5)
           || options.TimeBudget < TimeSpan.Zero || options.MaxAnalysisParallelism < 1
-          || options.MaxAnalysisParallelism > 16) {
+          || options.MaxAnalysisParallelism > 16 || options.SteamReconnectAfterDownloads < 0) {
         throw new ArgumentOutOfRangeException(nameof(args), "Invalid numeric option.");
       }
       return options;
@@ -198,14 +218,13 @@ sealed class MapMetadataIndexer {
         ConnectAnonymously(options.RequestTimeout);
         var workshopDirectory = Path.GetFullPath(options.WorkshopDirectory);
         Directory.CreateDirectory(workshopDirectory);
-        if (!SteamGameServerUGC.BInitWorkshopForGameServer(new DepotId_t(AppId), workshopDirectory)) {
-          throw new InvalidOperationException("Steam rejected the explicit game-server Workshop directory.");
-        }
+        InitializeWorkshopDirectory(workshopDirectory);
 
         Console.WriteLine(
             $"Anonymous Steam session connected; reading {downloadCandidates.Count} download-required map payloads.");
         var requestPacer = new SteamRequestPacer(
             Thread.Sleep, normalModeDelay: options.RequestDelay, slowModeDelay: options.SlowModeDelay);
+        var downloadSession = new SteamDownloadSession(options, workshopDirectory, requestPacer);
         for (var index = 0; index < downloadCandidates.Count; index++) {
           if (StopRequestMonitor.IsStopRequested(options.StopRequestFile)) {
             Console.WriteLine($"Graceful stop requested after {index} / {downloadCandidates.Count} Steam maps.");
@@ -219,7 +238,7 @@ sealed class MapMetadataIndexer {
           var map = downloadCandidates[index];
           try {
             var (analysis, downloaded) = ReadAndAnalyzeMapWithTransientRetry(
-                map, options, payloadCache, requestPacer);
+                map, options, payloadCache, requestPacer, downloadSession);
             if (downloaded) {
               downloadedThisRun++;
             }
@@ -281,14 +300,17 @@ sealed class MapMetadataIndexer {
   }
 
   (MapArchiveAnalysis Analysis, bool Downloaded) ReadAndAnalyzeMapWithTransientRetry(
-      MapItem map, Options options, OciPayloadCache? payloadCache, SteamRequestPacer requestPacer) {
+      MapItem map, Options options, OciPayloadCache? payloadCache, SteamRequestPacer requestPacer,
+      SteamDownloadSession downloadSession) {
     var cachedPayload = payloadCache?.TryRead(map.PublishedFileId, map.UpdatedAtUtc, options.MaxDownloadBytes);
     if (cachedPayload is not null) {
       return (AnalyzePayload(new MemoryStream(cachedPayload, writable: false)), false);
     }
+    ValidateDeclaredPayloadSize(map, options.MaxDownloadBytes);
     var retryDelays = new[] { TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40) };
     var delayAlreadyApplied = TimeSpan.Zero;
     for (var attempt = 0; ; attempt++) {
+      downloadSession.PrepareDownloadRequest();
       requestPacer.WaitBeforeRequest(delayAlreadyApplied);
       try {
         var analysis = DownloadAndAnalyzeMap(map, options, payloadCache);
@@ -326,14 +348,6 @@ sealed class MapMetadataIndexer {
   MapArchiveAnalysis DownloadAndAnalyzeMap(
       MapItem map, Options options, OciPayloadCache? payloadCache) {
     var itemId = new PublishedFileId_t(ulong.Parse(map.PublishedFileId));
-    if (map.PayloadSizeBytes < 0) {
-      throw new UnsupportedMapPayloadException(
-          $"Workshop declared an invalid payload size: {map.PayloadSizeBytes}.");
-    }
-    if ((ulong) map.PayloadSizeBytes > options.MaxDownloadBytes) {
-      throw new UnsupportedMapPayloadException(
-          $"Declared payload is {map.PayloadSizeBytes} bytes; limit is {options.MaxDownloadBytes} bytes.");
-    }
     var completed = false;
     DownloadItemResult_t response = default;
     using var callback = Callback<DownloadItemResult_t>.CreateGameServer(result => {
@@ -374,6 +388,17 @@ sealed class MapMetadataIndexer {
     } catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException
         or JsonException or IOException or UnauthorizedAccessException) {
       throw new UnsupportedMapPayloadException(exception.Message, exception);
+    }
+  }
+
+  static void ValidateDeclaredPayloadSize(MapItem map, ulong maxDownloadBytes) {
+    if (map.PayloadSizeBytes < 0) {
+      throw new UnsupportedMapPayloadException(
+          $"Workshop declared an invalid payload size: {map.PayloadSizeBytes}.");
+    }
+    if ((ulong) map.PayloadSizeBytes > maxDownloadBytes) {
+      throw new UnsupportedMapPayloadException(
+          $"Declared payload is {map.PayloadSizeBytes} bytes; limit is {maxDownloadBytes} bytes.");
     }
   }
 
@@ -480,6 +505,18 @@ sealed class MapMetadataIndexer {
     WaitForCallback(() => connected || connectFailure != EResult.k_EResultNone, "anonymous server login", timeout);
     if (!connected) {
       throw new InvalidOperationException($"Anonymous server login failed: {connectFailure}.");
+    }
+  }
+
+  static void ReconnectAnonymously(TimeSpan timeout) {
+    SteamGameServer.LogOff();
+    WaitForCallback(() => !SteamGameServer.BLoggedOn(), "anonymous server logoff", timeout);
+    ConnectAnonymously(timeout);
+  }
+
+  static void InitializeWorkshopDirectory(string workshopDirectory) {
+    if (!SteamGameServerUGC.BInitWorkshopForGameServer(new DepotId_t(AppId), workshopDirectory)) {
+      throw new InvalidOperationException("Steam rejected the explicit game-server Workshop directory.");
     }
   }
 
