@@ -81,8 +81,10 @@ cooldowns count toward that interval instead of being added to it, while slow mo
 
 `--steam-reconnect-after-downloads` bounds one anonymous Steam session by the number of `DownloadItem` requests and
 defaults to 250; retries count because they issue another download request. Before the next request, the analyzer logs
-off, logs on anonymously again, reinitializes the Workshop directory, and resets request pacing. Zero disables planned
-reconnects. A reconnect failure follows the normal circuit-breaker path and stops the payload pass before another map.
+off, shuts down and restarts the native Steam game server, logs on anonymously again, reinitializes the Workshop
+directory, and resets request pacing. A reconnect login that returns `k_EResultNoConnection` is retried after 20 and 40
+seconds; another reconnect failure follows the normal circuit-breaker path and stops the payload pass before another
+map. Zero disables planned reconnects.
 
 ## Workflow inputs
 

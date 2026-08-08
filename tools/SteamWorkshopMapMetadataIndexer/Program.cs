@@ -17,6 +17,8 @@ static class Program {
 
 sealed class MapMetadataIndexer {
   const uint AppId = 1062090;
+  static readonly TimeSpan SteamReconnectShutdownDelay = TimeSpan.FromSeconds(1);
+  static readonly TimeSpan[] SteamReconnectRetryDelays = [TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(40)];
 
   sealed record MapItem(string PublishedFileId, string? UpdatedAtUtc, long PayloadSizeBytes);
 
@@ -42,6 +44,11 @@ sealed class MapMetadataIndexer {
 
   sealed class SteamPayloadRequestException(string operation, EResult result)
       : Exception($"{operation} returned {result}.") {
+    public EResult Result { get; } = result;
+  }
+
+  sealed class SteamServerConnectException(EResult result)
+      : Exception($"Anonymous server login failed: {result}.") {
     public EResult Result { get; } = result;
   }
 
@@ -207,10 +214,10 @@ sealed class MapMetadataIndexer {
         return 2;
       }
 
-      var initResult = GameServer.InitEx(
-          0, 0, 0, EServerMode.eServerModeNoAuthentication, "workshop-map-metadata-indexer", out var initError);
-      if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK) {
-        Console.Error.WriteLine($"Steam game-server initialization failed: {initResult}: {initError}");
+      try {
+        InitializeGameServer();
+      } catch (Exception exception) {
+        Console.Error.WriteLine(exception.Message);
         return 3;
       }
 
@@ -504,14 +511,46 @@ sealed class MapMetadataIndexer {
     SteamGameServer.LogOnAnonymous();
     WaitForCallback(() => connected || connectFailure != EResult.k_EResultNone, "anonymous server login", timeout);
     if (!connected) {
-      throw new InvalidOperationException($"Anonymous server login failed: {connectFailure}.");
+      throw new SteamServerConnectException(connectFailure);
     }
   }
 
   static void ReconnectAnonymously(TimeSpan timeout) {
     SteamGameServer.LogOff();
-    WaitForCallback(() => !SteamGameServer.BLoggedOn(), "anonymous server logoff", timeout);
-    ConnectAnonymously(timeout);
+    GameServer.Shutdown();
+    Console.WriteLine(
+        $"Steam game server stopped; waiting {SteamReconnectShutdownDelay.TotalSeconds:0} second before restart.");
+    Thread.Sleep(SteamReconnectShutdownDelay);
+
+    for (var attempt = 0; ; attempt++) {
+      InitializeGameServer();
+      try {
+        ConnectAnonymously(timeout);
+        return;
+      } catch (SteamServerConnectException exception)
+          when (exception.Result == EResult.k_EResultNoConnection
+              && attempt < SteamReconnectRetryDelays.Length) {
+        GameServer.Shutdown();
+        var retryDelay = SteamReconnectRetryDelays[attempt];
+        Console.WriteLine(
+            $"Anonymous Steam reconnect failed transiently with {exception.Result}; "
+            + $"retrying in {retryDelay.TotalSeconds:0} seconds "
+            + $"({attempt + 1} / {SteamReconnectRetryDelays.Length}).");
+        Thread.Sleep(retryDelay);
+      } catch {
+        GameServer.Shutdown();
+        throw;
+      }
+    }
+  }
+
+  static void InitializeGameServer() {
+    var initResult = GameServer.InitEx(
+        0, 0, 0, EServerMode.eServerModeNoAuthentication, "workshop-map-metadata-indexer", out var initError);
+    if (initResult != ESteamAPIInitResult.k_ESteamAPIInitResult_OK) {
+      throw new InvalidOperationException(
+          $"Steam game-server initialization failed: {initResult}: {initError}");
+    }
   }
 
   static void InitializeWorkshopDirectory(string workshopDirectory) {
