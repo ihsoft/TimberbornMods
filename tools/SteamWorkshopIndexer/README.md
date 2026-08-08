@@ -32,14 +32,12 @@ search, not ground truth for terrain classification.
 ## Periodic job behavior
 
 Every run creates a complete snapshot refresh, removing records no longer present in the public Workshop catalog.
-Steam returns at most 50 results per page. The indexer checks that the reported total remains stable, rejects duplicate
-IDs, and publishes output only after it has processed exactly the reported number of result positions. An item-level
+Steam returns at most 50 results per page. If Steam reports a different total on a later page, the indexer logs a
+warning and continues against the latest reported total; a later run will converge on items missed while the live
+catalog was changing. Duplicate IDs caused by an item moving between pages are logged and skipped. The indexer
+publishes output after it has reached the latest reported number of result positions. An item-level
 `k_EResultFileNotFound` is logged and omitted because Steam can briefly retain an unavailable item in an otherwise
 successful query page. The summary reports the number of such omissions as `skipped_unavailable`.
-
-If the reported total changes or an item moves between pages and appears twice during collection, the partial snapshot
-is discarded and collection restarts from page 1. At most three such restarts are attempted before the run fails, so a
-continuously changing or inconsistent listing cannot keep the job alive indefinitely.
 
 ## Request controls
 

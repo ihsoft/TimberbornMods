@@ -13,17 +13,15 @@ namespace IgorZ.MapBrowser.WorkshopIndexing;
 sealed class WorkshopIndexer {
   const uint AppId = 1062090;
   const uint MaximumPages = 200;
-  const int MaximumSnapshotRestarts = 3;
   const int MaximumTransientRetries = 2;
-
-  sealed class SnapshotChangedException(string message) : Exception(message);
 
   sealed record QueryAttempt(
       EResult Result, bool IoFailure, ESteamAPICallFailure ApiFailure, bool LoggedOn, bool CachedData,
       uint Returned, uint TotalMatching, uint SkippedUnavailable, List<RawWorkshopRecord> Items);
 
   sealed record PageResult(
-      uint TotalMatching, uint ResultsProcessed, uint SkippedUnavailable, List<RawWorkshopRecord> Items);
+      uint TotalMatching, uint ResultsProcessed, uint SkippedUnavailable, bool CachedData,
+      List<RawWorkshopRecord> Items);
 
   sealed record SnapshotResult(
       uint TotalMatching, uint PagesProcessed, uint SkippedUnavailable, List<WorkshopRecord> Items);
@@ -55,7 +53,7 @@ sealed class WorkshopIndexer {
 
       try {
         ConnectAnonymously(options.RequestTimeout);
-        var records = CollectStableSnapshot(options.RequestTimeout);
+        var records = CollectSnapshot(options.RequestTimeout);
         var outputPath = Path.GetFullPath(options.OutputPath);
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         WriteJsonLines(outputPath, records.Items);
@@ -73,18 +71,6 @@ sealed class WorkshopIndexer {
     }
   }
 
-  SnapshotResult CollectStableSnapshot(TimeSpan timeout) {
-    for (var restart = 0; ; restart++) {
-      try {
-        return CollectSnapshot(timeout);
-      } catch (SnapshotChangedException exception) when (restart < MaximumSnapshotRestarts) {
-        Console.WriteLine(
-            $"{exception.Message} Restarting the Workshop snapshot from page 1 "
-            + $"({restart + 1} / {MaximumSnapshotRestarts}).");
-      }
-    }
-  }
-
   SnapshotResult CollectSnapshot(TimeSpan timeout) {
     var rawRecords = new List<RawWorkshopRecord>();
     var seenIds = new HashSet<string>();
@@ -96,24 +82,27 @@ sealed class WorkshopIndexer {
       var result = QueryPageWithRetry(page, timeout);
       expectedTotal ??= result.TotalMatching;
       if (result.TotalMatching != expectedTotal) {
-        throw new SnapshotChangedException(
+        Console.Error.WriteLine(
             $"Workshop total changed while collecting the snapshot: {expectedTotal} to "
-            + $"{result.TotalMatching} on page {page}.");
+            + $"{result.TotalMatching} on page {page}; cached={result.CachedData}. Continuing with the new total.");
+        expectedTotal = result.TotalMatching;
       }
       // Steam's total counts result positions, including unavailable items that we intentionally do not publish.
       resultsProcessed = checked(resultsProcessed + result.ResultsProcessed);
       skippedUnavailable = checked(skippedUnavailable + result.SkippedUnavailable);
       foreach (var item in result.Items) {
         if (!seenIds.Add(item.PublishedFileId)) {
-          throw new SnapshotChangedException(
-              $"Workshop item {item.PublishedFileId} appeared more than once while collecting the snapshot.");
+          Console.Error.WriteLine(
+              $"Skipping duplicate Workshop item {item.PublishedFileId} on page {page}; "
+              + "a later snapshot will converge after the live catalog stabilizes.");
+          continue;
         }
         rawRecords.Add(item);
       }
       pagesProcessed++;
       Console.WriteLine(
           $"Page {page}: {result.Items.Count} items, {result.SkippedUnavailable} unavailable; "
-          + $"processed {resultsProcessed} / {expectedTotal}.");
+          + $"processed {resultsProcessed} / {expectedTotal}; cached={result.CachedData}.");
       if (resultsProcessed >= expectedTotal) {
         break;
       }
@@ -121,9 +110,14 @@ sealed class WorkshopIndexer {
         throw new InvalidDataException($"Workshop page {page} was empty before the expected total was collected.");
       }
     }
-    if (expectedTotal is null || resultsProcessed != expectedTotal) {
+    if (expectedTotal is null || resultsProcessed < expectedTotal) {
       throw new InvalidDataException(
           $"Incomplete Workshop snapshot: processed {resultsProcessed} / {expectedTotal ?? 0} results.");
+    }
+    if (resultsProcessed > expectedTotal) {
+      Console.Error.WriteLine(
+          $"Workshop snapshot processed {resultsProcessed} positions for the latest reported total "
+          + $"of {expectedTotal}; continuing with the collected results.");
     }
     return new SnapshotResult(
         expectedTotal.Value, pagesProcessed, skippedUnavailable,
@@ -134,7 +128,8 @@ sealed class WorkshopIndexer {
     for (var retry = 0; ; retry++) {
       var result = QueryPage(page, timeout);
       if (!result.IoFailure && result.Result == EResult.k_EResultOK) {
-        return new PageResult(result.TotalMatching, result.Returned, result.SkippedUnavailable, result.Items);
+        return new PageResult(
+            result.TotalMatching, result.Returned, result.SkippedUnavailable, result.CachedData, result.Items);
       }
       var diagnostic = FormatFailure(page, result);
       if (!IsTransient(result.Result) || retry >= MaximumTransientRetries) {
