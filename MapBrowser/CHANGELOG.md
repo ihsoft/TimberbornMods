@@ -4,3 +4,4 @@
 * [Feature] Find Workshop maps by keywords, forest density, water form, and available settlement space, then subscribe from search results or map details without restarting the game.
 * [Feature] Manage maps from one browser by unsubscribing from Workshop maps or permanently deleting local map files.
 * [Fix] Workshop maps removed from Steam are marked unavailable instead of offering an endlessly failing subscription.
+* [Fix] The map browser keeps its screen-relative size when search filters change the result list.

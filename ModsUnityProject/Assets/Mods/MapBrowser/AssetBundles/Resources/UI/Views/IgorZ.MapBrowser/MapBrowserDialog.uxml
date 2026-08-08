@@ -3,7 +3,7 @@
     <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle" />
     <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle" />
     <engine:VisualElement class="content-row-centered">
-        <engine:Instance template="NamedBoxTemplate" style="width: 1200px; height: 820px; max-width: 94%; max-height: 92%;">
+        <engine:Instance template="NamedBoxTemplate" style="flex-shrink: 0;">
             <AttributeOverrides element-name="Header" text="Map Browser" text-loc-key="IgorZ.MapBrowser.Dialog.Header" />
             <engine:VisualElement name="TabButtons" style="flex-direction: row; flex-wrap: wrap; margin-bottom: 8px; flex-shrink: 0;">
                 <Timberborn.CoreUI.NineSliceButton name="InstalledTabButton" text="Installed" class="button-game game-text-small" style="margin-right: 6px; padding: 2px 10px;" />

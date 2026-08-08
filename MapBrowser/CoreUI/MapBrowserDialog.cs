@@ -58,6 +58,9 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
   const int CurrentMapAnalysisVersion = 9;
+  const float DialogHeightRatio = 0.80f;
+  const float DialogMaxWidthRatio = 0.94f;
+  const float DialogWidthToHeightRatio = 1200f / 820f * 1.30f;
   const double WaterCoveredRatio = 0.40;
   const double WaterCoveredBoundaryRatio = 0.50;
   static readonly Regex MapSizePrefixRegex = new(
@@ -102,6 +105,8 @@ sealed class MapBrowserDialog : AbstractDialog {
   Label _pageLabel;
   Button _previousPageButton;
   Button _nextPageButton;
+  VisualElement _dialogBox;
+  VisualElement _panelRoot;
   int _pageIndex;
   int _pageSize = 50;
 
@@ -136,6 +141,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     }
 
     base.Show();
+    InitializeDialogSize();
     InitializeModes();
     _list = Root.Q2<ListView>("InstalledMapsList");
     _visibleMaps = _installedMaps;
@@ -158,6 +164,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     _metadataService.MetadataChanged -= OnMetadataChanged;
     _subscriptionService.DownloadProgressChanged -= OnDownloadProgressChanged;
     _subscriptionService.DownloadCompleted -= OnDownloadCompleted;
+    _panelRoot.UnregisterCallback<GeometryChangedEvent>(OnPanelGeometryChanged);
     _list = null;
     _visibleMaps = null;
     _searchText = null;
@@ -166,6 +173,8 @@ sealed class MapBrowserDialog : AbstractDialog {
     _modeHeading = null;
     _installedTab = null;
     _searchTab = null;
+    _dialogBox = null;
+    _panelRoot = null;
     _installedMaps.Clear();
     _searchMatches.Clear();
     _searchResults.Clear();
@@ -173,6 +182,33 @@ sealed class MapBrowserDialog : AbstractDialog {
     _unavailableWorkshopIds.Clear();
     _searchFilters.Clear();
     base.Close();
+  }
+
+  void InitializeDialogSize() {
+    _dialogBox = Root.Q2<VisualElement>("NamedBoxTemplate");
+    _panelRoot = Root.panel.visualTree;
+    _panelRoot.RegisterCallback<GeometryChangedEvent>(OnPanelGeometryChanged);
+    ApplyDialogSize(_panelRoot.resolvedStyle.width, _panelRoot.resolvedStyle.height);
+  }
+
+  void OnPanelGeometryChanged(GeometryChangedEvent evt) {
+    ApplyDialogSize(evt.newRect.width, evt.newRect.height);
+  }
+
+  void ApplyDialogSize(float panelWidth, float panelHeight) {
+    if (panelWidth <= 0 || panelHeight <= 0 || float.IsNaN(panelWidth) || float.IsNaN(panelHeight)) {
+      return;
+    }
+
+    var height = panelHeight * DialogHeightRatio;
+    var width = Math.Min(height * DialogWidthToHeightRatio, panelWidth * DialogMaxWidthRatio);
+    // Exact lengths keep ListView virtualization from making the dialog follow the filtered content size.
+    _dialogBox.style.width = width;
+    _dialogBox.style.minWidth = width;
+    _dialogBox.style.maxWidth = width;
+    _dialogBox.style.height = height;
+    _dialogBox.style.minHeight = height;
+    _dialogBox.style.maxHeight = height;
   }
 
   void InitializeModes() {
