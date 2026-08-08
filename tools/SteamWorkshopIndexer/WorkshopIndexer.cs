@@ -13,7 +13,10 @@ namespace IgorZ.MapBrowser.WorkshopIndexing;
 sealed class WorkshopIndexer {
   const uint AppId = 1062090;
   const uint MaximumPages = 200;
+  const int MaximumSnapshotRestarts = 3;
   const int MaximumTransientRetries = 2;
+
+  sealed class SnapshotChangedException(string message) : Exception(message);
 
   sealed record QueryAttempt(
       EResult Result, bool IoFailure, ESteamAPICallFailure ApiFailure, bool LoggedOn, bool CachedData,
@@ -52,7 +55,7 @@ sealed class WorkshopIndexer {
 
       try {
         ConnectAnonymously(options.RequestTimeout);
-        var records = CollectSnapshot(options.RequestTimeout);
+        var records = CollectStableSnapshot(options.RequestTimeout);
         var outputPath = Path.GetFullPath(options.OutputPath);
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         WriteJsonLines(outputPath, records.Items);
@@ -70,6 +73,18 @@ sealed class WorkshopIndexer {
     }
   }
 
+  SnapshotResult CollectStableSnapshot(TimeSpan timeout) {
+    for (var restart = 0; ; restart++) {
+      try {
+        return CollectSnapshot(timeout);
+      } catch (SnapshotChangedException exception) when (restart < MaximumSnapshotRestarts) {
+        Console.WriteLine(
+            $"{exception.Message} Restarting the Workshop snapshot from page 1 "
+            + $"({restart + 1} / {MaximumSnapshotRestarts}).");
+      }
+    }
+  }
+
   SnapshotResult CollectSnapshot(TimeSpan timeout) {
     var rawRecords = new List<RawWorkshopRecord>();
     var seenIds = new HashSet<string>();
@@ -81,7 +96,7 @@ sealed class WorkshopIndexer {
       var result = QueryPageWithRetry(page, timeout);
       expectedTotal ??= result.TotalMatching;
       if (result.TotalMatching != expectedTotal) {
-        throw new InvalidDataException(
+        throw new SnapshotChangedException(
             $"Workshop total changed while collecting the snapshot: {expectedTotal} to "
             + $"{result.TotalMatching} on page {page}.");
       }
@@ -90,7 +105,8 @@ sealed class WorkshopIndexer {
       skippedUnavailable = checked(skippedUnavailable + result.SkippedUnavailable);
       foreach (var item in result.Items) {
         if (!seenIds.Add(item.PublishedFileId)) {
-          throw new InvalidDataException($"Workshop item {item.PublishedFileId} appeared more than once.");
+          throw new SnapshotChangedException(
+              $"Workshop item {item.PublishedFileId} appeared more than once while collecting the snapshot.");
         }
         rawRecords.Add(item);
       }

@@ -37,6 +37,10 @@ IDs, and publishes output only after it has processed exactly the reported numbe
 `k_EResultFileNotFound` is logged and omitted because Steam can briefly retain an unavailable item in an otherwise
 successful query page. The summary reports the number of such omissions as `skipped_unavailable`.
 
+If the reported total changes or an item moves between pages and appears twice during collection, the partial snapshot
+is discarded and collection restarts from page 1. At most three such restarts are attempted before the run fails, so a
+continuously changing or inconsistent listing cannot keep the job alive indefinitely.
+
 ## Request controls
 
 - `--output <jsonl>` changes the snapshot location.
