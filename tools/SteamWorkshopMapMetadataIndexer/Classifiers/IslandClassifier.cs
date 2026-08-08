@@ -12,9 +12,12 @@ sealed class IslandClassifier {
   const int MaximumNarrowRiverWidth = 5;
   const double MinimumBoundaryWaterBodyRatio = 0.2;
   const double MinimumDominantShorelineRatio = 0.4;
+  const double MinimumEnclosingWaterToIslandRatio = 0.5;
   const double MinimumExternalWaterBoundaryRatio = 0.2;
 
   sealed record WaterBodyMeasurement(int Index, double MapBoundaryRatio);
+
+  sealed record DominantWaterMeasurement(double ShorelineRatio, int Area, int ContactEdges);
 
   sealed class IslandAnalyzer {
     sealed record ParentMeasurement(
@@ -49,11 +52,11 @@ sealed class IslandClassifier {
           _dryComponents, _waterFeatures.RiverCandidateMask, _externalWater,
           _map.Width, _map.Height, _requiredCoreRadius, MaximumNarrowRiverWidth);
       var parents = parentComponents.Select((cells, index) => MeasureParent(index, cells)).ToList();
-      var dominantShorelineRatios = MeasureDominantShorelineRatios(
+      var dominantWaterByParent = MeasureDominantWater(
           FindComponents(_openWater, _map.Width, _map.Height), parents);
       return parents
           .Select(parent => (Original: parent, Trimmed: TrimBoundaryContamination(parent)))
-          .Where(candidate => IsIslandFamily(candidate.Original, candidate.Trimmed, dominantShorelineRatios))
+          .Where(candidate => IsIslandFamily(candidate.Original, candidate.Trimmed, dominantWaterByParent))
           .Select(candidate => candidate.Trimmed.DryArea)
           .OrderByDescending(area => area)
           .ToList();
@@ -77,8 +80,14 @@ sealed class IslandClassifier {
 
     bool IsIslandFamily(
         ParentMeasurement parent, ParentMeasurement trimmed,
-        IReadOnlyDictionary<int, double> dominantShorelineRatios) {
+        IReadOnlyDictionary<int, DominantWaterMeasurement> dominantWaterByParent) {
       if (parent.MaximumInteriorRadius < _requiredCoreRadius) {
+        return false;
+      }
+      var dominantWater = dominantWaterByParent.GetValueOrDefault(parent.Index);
+      var hasVisualWaterSupport = parent.ExternalWaterBoundaryRatio >= MinimumExternalWaterBoundaryRatio
+          || dominantWater is not null && dominantWater.Area >= trimmed.DryArea * MinimumEnclosingWaterToIslandRatio;
+      if (!hasVisualWaterSupport) {
         return false;
       }
       if (!parent.TouchesBoundary) {
@@ -92,7 +101,7 @@ sealed class IslandClassifier {
       }
       // A land family merged through rivers may touch the frame only through unrelated mainland fragments. The
       // shoreline fallback is valid only when trimming those fragments leaves a useful enclosed island behind.
-      return dominantShorelineRatios.GetValueOrDefault(parent.Index) >= MinimumDominantShorelineRatio
+      return dominantWater?.ShorelineRatio >= MinimumDominantShorelineRatio
           && !trimmed.TouchesBoundary
           && trimmed.MaximumInteriorRadius >= _requiredCoreRadius;
     }
@@ -156,7 +165,7 @@ sealed class IslandClassifier {
           index, landEdges + mapEdges > 0 ? (double) mapEdges / (landEdges + mapEdges) : 0);
     }
 
-    IReadOnlyDictionary<int, double> MeasureDominantShorelineRatios(
+    IReadOnlyDictionary<int, DominantWaterMeasurement> MeasureDominantWater(
         IReadOnlyList<List<int>> waterComponents, IReadOnlyList<ParentMeasurement> parents) {
       var parentByCell = Enumerable.Repeat(-1, _openWater.Length).ToArray();
       foreach (var parent in parents) {
@@ -166,7 +175,7 @@ sealed class IslandClassifier {
           }
         }
       }
-      var result = new Dictionary<int, double>();
+      var result = new Dictionary<int, DominantWaterMeasurement>();
       foreach (var waterComponent in waterComponents) {
         var contacts = new Dictionary<int, int>();
         foreach (var cell in waterComponent) {
@@ -190,7 +199,11 @@ sealed class IslandClassifier {
         var totalContacts = contacts.Values.Sum();
         foreach (var (parent, contactEdges) in contacts) {
           var ratio = totalContacts > 0 ? (double) contactEdges / totalContacts : 0;
-          result[parent] = Math.Max(result.GetValueOrDefault(parent), ratio);
+          result.TryGetValue(parent, out var current);
+          result[parent] = new DominantWaterMeasurement(
+              Math.Max(current?.ShorelineRatio ?? 0, ratio),
+              current is null || contactEdges > current.ContactEdges ? waterComponent.Count : current.Area,
+              Math.Max(current?.ContactEdges ?? 0, contactEdges));
         }
       }
       return result;

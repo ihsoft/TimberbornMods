@@ -53,8 +53,9 @@ regions on neighboring heights, including land separated by open water.
 
 The `islands` result is a descending array of integer projected dry-land areas. Terrain height does not affect an
 island's area. River-separated pieces may be merged into one island, while land surrounded by a lake is not treated as
-an island. An empty array means the map was analyzed and no useful islands were found. A missing `islands` key means
-the value is unknown and must not be interpreted as an empty result.
+an island. Internal water must also be substantial relative to the enclosed land, so a narrow moat does not turn most
+of a map into an island. An empty array means the map was analyzed and no useful islands were found. A missing
+`islands` key means the value is unknown and must not be interpreted as an empty result.
 
 ## Anonymous execution boundary
 

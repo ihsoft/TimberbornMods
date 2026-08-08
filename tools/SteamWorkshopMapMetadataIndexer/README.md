@@ -178,8 +178,10 @@ capacity shares `plain_share`, `terrace_share`, `plateau_share`, and `mixed_shar
 
 The `islands` classifier publishes a descending array of projected dry-land areas. It ignores terrain height within an
 island, rejects land without a sufficiently wide interior, and uses water topology to distinguish exterior water from
-lakes. River cuts can be merged back into one land family so a river does not automatically split an island. An empty
-array means the payload was analyzed and no useful islands were found; a missing key means the value is unknown.
+lakes. River cuts can be merged back into one land family so a river does not automatically split an island. Land
+surrounded only by internal water also needs a meaningful water area, preventing a narrow moat from turning most of a
+map into an island. An empty array means the payload was analyzed and no useful islands were found; a missing key means
+the value is unknown.
 
 ## Output record
 

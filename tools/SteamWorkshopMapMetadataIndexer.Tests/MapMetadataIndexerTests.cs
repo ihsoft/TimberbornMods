@@ -465,6 +465,7 @@ static class MapMetadataIndexerTests {
   static void PreservesIslandMapBaselines() {
     var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Islands");
     var expected = new Dictionary<string, int[]>() {
+      ["1-3588134831.json.gz"] = [],
       ["5-islands-3538483995.json.gz"] = [11_122, 6_923, 1_968, 1_518, 637],
       ["forbidden-island-3484077181.json.gz"] = [989, 887, 874, 872, 583, 514, 314, 275],
       ["spectacle-island-3752828444.json.gz"] = [13_681, 1_010, 564],
