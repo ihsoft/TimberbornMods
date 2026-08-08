@@ -14,6 +14,14 @@ receive a mod-specific source or license header merely because nearby tools belo
 tool-specific attribution contract when one is already established; do not invent or copy a license declaration during
 a style cleanup.
 
+## Executable C# Tool Structure
+
+Every executable C# tool uses a thin `Program.cs` loader and a separate main application class. `Program` owns raw CLI
+argument and flag parsing, creates typed parameters or options, and launches the application; the application must not
+accept `string[] args`. An executable test project's `Program.cs` only launches a test-suite class declared in a
+separate module. Follow the complete application-entry-point contract in
+`docs/csharp-formatting-rules-for-ai-agents.md`.
+
 ## Repository Coordination
 
 Use `repository-coordination.psm1` for tracked tools that need exclusive ownership of a shared local resource. Do not

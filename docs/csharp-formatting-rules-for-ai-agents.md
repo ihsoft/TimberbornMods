@@ -99,6 +99,14 @@ Keep a separate loader thin. Argument handling may begin there, but substantive 
 DTOs, and business logic belong to the application or feature classes. A short executable does not justify replacing
 the class structure with top-level statements.
 
+Executable repository tools use the loader shape consistently. Keep `Program.cs` as a thin composition and launch
+module, and declare the main application class in a separate file/module. `Program` owns raw CLI argument and flag
+parsing when needed, converts them into typed parameters or an options object, and passes those values to the
+application. The application class must not accept or parse `string[] args`.
+
+For an executable test project, keep `Program.cs` limited to launching a test-suite class declared in a separate
+file/module. Test discovery, registration, and execution logic belong to that suite rather than the loader.
+
 * * *
 
 ## Access modifiers
