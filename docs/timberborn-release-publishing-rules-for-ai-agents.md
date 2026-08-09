@@ -86,6 +86,16 @@ package source, or a shared release-critical dependency used by the artifact. If
 ambiguous, or later changes affect its release inputs, stop and obtain an explicit commit selection or prepare a new
 release commit before final preflight.
 
+Before marking the report ready, compare every tracked release-critical input used by the build or publication with the
+selected release-preparation commit. Final preflight must fail when implementation, package source, changelog, version
+metadata, Unity manifest data, platform descriptions, or other tracked release inputs differ in the working tree. Do
+not build or publish from those uncommitted values and then tag the older commit. Commit the complete release
+preparation, select that commit, and rerun final preflight.
+
+The unified preflight report must record the selected commit and the checked release-critical path set or equivalent
+evidence that those inputs match it. `tools/publish-release.ps1` must re-check that invariant before its first public
+change and fail on drift; a warning or interactive "continue anyway" prompt is not sufficient for this condition.
+
 When publishing includes an explicitly authorized platform-state transition, the final preflight report must capture
 the action and exact target state for each platform, including Steam visibility and Mod.IO page publication. Publishing
 must consume that recorded intent rather than infer it from local metadata or make a new publish-time choice. Stop if
@@ -178,7 +188,13 @@ For the target mod, treat these uncommitted changes as a red flag:
 For any mod release, also treat uncommitted changes in `TimberDev` or `TimberDev.Tests` as a red flag because
 TimberDev is shared by many mods.
 
-When red-flag changes are present:
+Uncommitted tracked release-critical inputs are a hard stop for final preflight and publication, not an overridable red
+flag. This includes changes that affect the selected mod's implementation, package contents, changelog, version
+metadata, manifest, platform descriptions, package construction, or release-tool behavior. Preliminary investigation
+may report such changes, but a publish-ready report must not capture values absent from the selected committed
+revision. User authorization to publish does not substitute for committing the release preparation.
+
+When other red-flag changes are present but do not affect the committed release snapshot:
 
 1. Stop before upload.
 2. List the specific files or file groups.
