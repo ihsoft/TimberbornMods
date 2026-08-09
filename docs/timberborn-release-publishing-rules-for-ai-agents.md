@@ -785,6 +785,10 @@ The announcement contains only the release title and exact changelog section. Do
 Release link, or other acquisition instructions; subscribers in the dedicated mod channel already know where to obtain
 the current version.
 
+Format the release title as the neutral Markdown heading `# <display mod name> v<Version>`, followed by a blank line.
+Render each top-level changelog item as a Markdown `-` bullet for Discord, even when the source changelog uses `*`.
+Changing the bullet marker is formatting only; preserve the changelog item text exactly.
+
 With `-Prepare`, the helper may copy the message to the local clipboard and open the tracked direct mod channel for the
 user. The user reviews and sends the message manually. Never automate a normal Discord user account, send the message,
 or treat opening the channel as evidence that an announcement was posted.
