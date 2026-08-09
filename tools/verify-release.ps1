@@ -319,12 +319,26 @@ function Get-ReleaseGitSnapshot(
         throw "Changes after release commit $commit alter release-critical paths: $($laterCriticalChanges -join ', '). Pass the correct -ReleaseCommit or prepare a new release commit."
     }
 
+    $workingTreeCriticalChanges = @(Invoke-Git (@("diff", "--name-only", $commit, "--") + $CriticalPaths))
+    if ($workingTreeCriticalChanges.Count -gt 0) {
+        throw "Tracked release-critical paths differ from selected release commit ${commit}: $($workingTreeCriticalChanges -join ', '). Commit release preparation before final preflight."
+    }
+
+    $criticalPathEvidence = @($CriticalPaths | ForEach-Object {
+        [ordered]@{
+            Path = [string]$_
+            WorkingTreeMatchesReleaseCommit = $true
+        }
+    })
+
     return [ordered]@{
         HeadAtPreflight = $head
         ReleaseCommit = $commit
         IdentityPaths = [string[]]$IdentityPaths
         CriticalPaths = [string[]]$CriticalPaths
         LaterCriticalChanges = [string[]]$laterCriticalChanges
+        WorkingTreeCriticalChanges = [string[]]$workingTreeCriticalChanges
+        CriticalPathEvidence = $criticalPathEvidence
     }
 }
 
@@ -565,14 +579,16 @@ if ($CorrectiveReplacement) {
 }
 
 $report = [ordered]@{
-    SchemaVersion = 2
+    SchemaVersion = 3
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     RepoRoot = $repoRoot
     GitHead = $gitSnapshot.HeadAtPreflight
     ReleaseCommit = $gitSnapshot.ReleaseCommit
     ReleaseIdentityPaths = $gitSnapshot.IdentityPaths
     ReleaseCriticalPaths = $gitSnapshot.CriticalPaths
+    ReleaseCriticalPathEvidence = $gitSnapshot.CriticalPathEvidence
     LaterReleaseCriticalChanges = $gitSnapshot.LaterCriticalChanges
+    WorkingTreeReleaseCriticalChanges = $gitSnapshot.WorkingTreeCriticalChanges
     CorrectiveReplacement = $correctiveSnapshot
     GitStatus = [string[]]$gitStatus
     ModName = $ModName

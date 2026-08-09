@@ -127,7 +127,7 @@ $reportPath = Resolve-RepoPath $PreflightReportPath
 Assert-PathExists $reportPath "Preflight report"
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
 
-if ([int]$report.SchemaVersion -ne 2) {
+if ([int]$report.SchemaVersion -ne 3) {
     throw "Unsupported preflight report schema version: $($report.SchemaVersion)"
 }
 
@@ -183,6 +183,15 @@ if ($criticalPaths.Count -eq 0) {
 $laterCriticalChanges = @(Invoke-Git (@("diff", "--name-only", "$releaseCommit..$currentHead", "--") + $criticalPaths))
 if ($laterCriticalChanges.Count -gt 0) {
     throw "Changes after recorded release commit $releaseCommit alter release-critical paths: $($laterCriticalChanges -join ', ')."
+}
+$workingTreeCriticalChanges = @(Invoke-Git (@("diff", "--name-only", $releaseCommit, "--") + $criticalPaths))
+if ($workingTreeCriticalChanges.Count -gt 0) {
+    throw "Tracked release-critical paths differ from recorded release commit ${releaseCommit}: $($workingTreeCriticalChanges -join ', '). Stop before any public change."
+}
+$pathEvidence = @($report.ReleaseCriticalPathEvidence | ForEach-Object { [string]$_.Path })
+if ($pathEvidence.Count -ne $criticalPaths.Count -or
+    @($criticalPaths | Where-Object { $_ -notin $pathEvidence }).Count -gt 0) {
+    throw "Preflight report is missing release-critical path evidence for the current release scope."
 }
 
 $releaseConfigPath = [string]$report.ReleaseConfigPath
