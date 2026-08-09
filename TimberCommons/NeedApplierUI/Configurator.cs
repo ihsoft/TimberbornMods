@@ -4,6 +4,8 @@
 
 using Bindito.Core;
 using Timberborn.EntityPanelSystem;
+using Timberborn.NeedApplication;
+using Timberborn.TemplateInstantiation;
 
 namespace IgorZ.TimberCommons.NeedApplierUI;
 
@@ -19,6 +21,14 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<InjuryProbabilityFragment>().AsSingleton();
+    containerDefinition.Bind<WorkshopInjuryStatistics>().AsTransient();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
+  }
+
+  static TemplateModule ProvideTemplateModule() {
+    var builder = new TemplateModule.Builder();
+    builder.AddDecorator<WorkshopRandomNeedApplierSpec, WorkshopInjuryStatistics>();
+    return builder.Build();
   }
 }

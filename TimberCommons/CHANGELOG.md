@@ -1,4 +1,5 @@
 # v1.21.1 (TBD)
+* [Feature] Show how many workers were injured at each workplace yesterday.
 * [Fix] The displayed daily injury probability was calculated incorrectly.
 
 # v1.21.0 (July 17th, 2026)

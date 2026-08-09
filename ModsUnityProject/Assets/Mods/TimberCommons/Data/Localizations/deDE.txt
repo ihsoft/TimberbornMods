@@ -19,6 +19,7 @@ IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,Wasserstand am Ausgan
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,Schließen ab Ausgangstiefe: {0},
 IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,Aktueller Durchfluss: {0},Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve.
 IgorZ.TimberCommons.InjuryProbability,Verletzungsrisiko: {0} pro Stunde,
+IgorZ.TimberCommons.InjuriesYesterday,"Gestern verletzt: {0}",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,Anzeige Zeit und Dauer,
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,Versorgungsdauer als Tage/Stunden anzeigen,
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,Wachstumsdauer als Tage/Stunden anzeigen,

@@ -20,6 +20,7 @@ IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Close above depth
 IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Current flow: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Injury probability: {0} every hour",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Injury probability: {0} during the day",
+IgorZ.TimberCommons.InjuriesYesterday,"Injured yesterday: {0}",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Time and duration representation",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Show 'supply lasts' as days/hours",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Show grow time as days/hours",

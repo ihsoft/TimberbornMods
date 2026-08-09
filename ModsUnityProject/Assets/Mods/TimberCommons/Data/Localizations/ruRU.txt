@@ -20,6 +20,7 @@ IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Останови�
 IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Текущий поток: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Вероятность ранения: {0} каждый час",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Вероятность ранения: {0} в течение дня",
+IgorZ.TimberCommons.InjuriesYesterday,"Ранено вчера: {0}",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Формат времени и продолжительности",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Показывать 'запаса хватит' в формате дни/часы",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Показывать время роста в формате дни/часы",
