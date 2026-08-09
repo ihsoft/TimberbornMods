@@ -16,7 +16,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
   const double MaximumBottomWidth = 36;
   const double MaximumCyclicEdgeFraction = 0.4;
   const double MaximumEngineeredDirectionChangeFraction = 0.05;
-  const double MaximumEngineeredWidthVariation = 0.1;
+  const double MaximumEngineeredWidthVariation = 0.12;
   const double MinimumBankHeight = 3;
   const double MinimumBankSlope = 0.25;
   const double MinimumExternalWaterBodyRatio = 0.4;
@@ -24,6 +24,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
   const double MinimumLengthToWidthRatio = 4;
   const double MinimumMedianBankSlope = 0.75;
   const double MinimumMedianNormalAlignment = 0.7;
+  const double MinimumSpatialExtentToLengthRatio = 0.45;
   const int DirectionCount = 16;
   const double RayStep = 0.25;
 
@@ -61,7 +62,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
 
     RemoveSmallComponents(candidateFloor, 8);
     var skeleton = Thin(candidateFloor);
-    var branches = ExtractBranches(skeleton)
+    var branches = ExtractBranches(skeleton, candidateFloor)
         .Where(branch => IsConfinedBranch(branch, sections))
         .Select(branch => new Branch(branch, MeasureDirectionChangeFraction(branch)))
         .ToList();
@@ -81,6 +82,13 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
       double minimumLength) {
     var length = MeasureNetworkDiameter(cells);
     if (length < minimumLength) {
+      return null;
+    }
+    var spanX = cells.Max(cell => cell % _map.Width) - cells.Min(cell => cell % _map.Width) + 1;
+    var spanY = cells.Max(cell => cell / _map.Width) - cells.Min(cell => cell / _map.Width) + 1;
+    var spatialExtent = Math.Sqrt(spanX * spanX + spanY * spanY);
+    if (spatialExtent < length * MinimumSpatialExtentToLengthRatio) {
+      // A path coiled inside a compact basin is not a long valley corridor even if its skeleton is lengthy.
       return null;
     }
     var systemSections = cells.Select(cell => sections[cell]).ToList();
@@ -442,10 +450,10 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
             || network.Contains(x + (y + offsetY) * _map.Width));
   }
 
-  IReadOnlyList<List<int>> ExtractBranches(bool[] skeleton) {
+  IReadOnlyList<List<int>> ExtractBranches(bool[] skeleton, bool[] candidateFloor) {
     var neighbours = new List<int>[skeleton.Length];
     for (var cell = 0; cell < skeleton.Length; cell++) {
-      neighbours[cell] = skeleton[cell] ? GetGraphNeighbours(cell, skeleton) : [];
+      neighbours[cell] = skeleton[cell] ? GetGraphNeighbours(cell, skeleton, candidateFloor) : [];
     }
     var visitedEdges = new HashSet<long>();
     var branches = new List<List<int>>();
@@ -487,7 +495,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     }
   }
 
-  List<int> GetGraphNeighbours(int cell, bool[] mask) {
+  List<int> GetGraphNeighbours(int cell, bool[] mask, bool[] candidateFloor) {
     var result = new List<int>();
     var x = cell % _map.Width;
     var y = cell / _map.Width;
@@ -497,9 +505,15 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
       if (neighbourX < 0 || neighbourX >= _map.Width || neighbourY < 0 || neighbourY >= _map.Height) {
         continue;
       }
-      if (offsetX != 0 && offsetY != 0
-          && (mask[x + offsetX + y * _map.Width] || mask[x + (y + offsetY) * _map.Width])) {
-        continue;
+      if (offsetX != 0 && offsetY != 0) {
+        var horizontal = x + offsetX + y * _map.Width;
+        var vertical = x + (y + offsetY) * _map.Width;
+        if (mask[horizontal] || mask[vertical]
+            || !candidateFloor[horizontal] && !candidateFloor[vertical]) {
+          // A diagonal skeleton step needs support from the original floor mask. Corner-touching basins must not
+          // become one long canyon, while a thinned diagonal corridor still retains its wider source support.
+          continue;
+        }
       }
       var neighbour = neighbourX + neighbourY * _map.Width;
       if (mask[neighbour]) {
