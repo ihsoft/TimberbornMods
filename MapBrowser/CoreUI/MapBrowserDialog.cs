@@ -56,7 +56,7 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string WorkshopUnavailableTooltipLocKey = "IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
-  const int CurrentMapAnalysisVersion = 12;
+  const int CurrentMapAnalysisVersion = 13;
   const float DialogHeightRatio = 0.80f;
   const float DialogMaxWidthRatio = 0.94f;
   const float DialogWidthToHeightRatio = 1200f / 820f * 1.30f;

@@ -82,6 +82,24 @@ sealed class MapClassifications {
   /// </summary>
   [JsonProperty("islands")]
   public List<int> Islands { get; set; }
+
+  /// <summary>Measured canyon systems. An empty list means none were found; <c>null</c> means unknown.</summary>
+  [JsonProperty("canyons")]
+  public List<CanyonClassification> Canyons { get; set; }
+}
+
+sealed class CanyonClassification {
+  /// <summary>Length of the longest connected canyon-floor route, in tiles.</summary>
+  [JsonProperty("length")]
+  public double Length { get; set; }
+
+  /// <summary>Average projected canyon-floor width, in tiles.</summary>
+  [JsonProperty("average_width")]
+  public double AverageWidth { get; set; }
+
+  /// <summary>Median height of the lower opposing bank, in terrain levels.</summary>
+  [JsonProperty("median_bank_height")]
+  public double MedianBankHeight { get; set; }
 }
 
 sealed class ForestDensityClassification {

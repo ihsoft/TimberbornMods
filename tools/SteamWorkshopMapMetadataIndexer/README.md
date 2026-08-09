@@ -184,6 +184,12 @@ surrounded only by internal water also needs a meaningful water area, preventing
 map into an island. An empty array means the payload was analyzed and no useful islands were found; a missing key means
 the value is unknown.
 
+The `canyons` classifier publishes an array of connected canyon systems. Each entry reports the longest connected
+floor route as `length`, projected `average_width`, and `median_bank_height`. The classifier follows terrain topology,
+so saved water is supporting evidence rather than a requirement. It rejects broad valleys, isolated basins,
+map-scale open water, highly cyclic pits, and geometrically perfect trenches. An empty array means the payload was
+analyzed and no canyon was found; a missing key means the value is unknown.
+
 ## Output record
 
 The JSONL output retains:
@@ -202,12 +208,12 @@ analysis_error
 `collection_state` is `fetched`, `stale`, or `unsupported`. Unsupported records have zero dimensions, no
 classifications, and a diagnostic `analysis_error`; consumers must not treat them as known map metadata.
 
-`tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py` publishes classifications in merged search records as
-`map_classifications`. Consumers must tolerate additional classifier keys and result fields.
+`tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py` publishes classifications in merged search
+records as `map_classifications`. Consumers must tolerate additional classifier keys and result fields.
 
-Reviewed real-map water and island inputs are stored as compressed decoded fixtures in the focused test project. They
-preserve the classifier inputs without redistributing complete Workshop payloads or requiring Steam during regression
-tests.
+Reviewed real-map water, island, and canyon inputs are stored as compressed decoded fixtures in the focused test
+project. They preserve the classifier inputs without redistributing complete Workshop payloads or requiring Steam
+during regression tests.
 
 The production invocation and numeric Steam/resource limits remain authoritative in
 `.github/workflows/workshop-search-index.yml`.

@@ -59,6 +59,12 @@ an island. Internal water must also be substantial relative to the enclosed land
 of a map into an island. An empty array means the map was analyzed and no useful islands were found. A missing
 `islands` key means the value is unknown and must not be interpreted as an empty result.
 
+The `canyons` result is an array of connected canyon systems. Each entry contains `length`, `average_width`, and
+`median_bank_height`, measured in projected map tiles and terrain levels. Detection is based on continuous confined
+terrain corridors; saved surface water supports the interpretation but is not required. Broad valleys, isolated
+basins, map-scale open water, highly cyclic pits, and geometrically perfect trenches are rejected. An empty array means
+the map was analyzed and no canyon was found. A missing `canyons` key means the value is unknown.
+
 ## Anonymous execution boundary
 
 The recurring pipeline requires no Steam account, API key, repository secret, local Steam client, or running game.

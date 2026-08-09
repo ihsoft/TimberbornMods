@@ -42,6 +42,8 @@ static class MapMetadataIndexerTests {
       ("Settlement-space classifier excludes open water", ExcludesOpenWaterFromSettlementSpace),
       ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
       ("Island classifier preserves reviewed Workshop map baselines", PreservesIslandMapBaselines),
+      ("Canyon classifier preserves reviewed Workshop map baselines", PreservesCanyonMapBaselines),
+      ("Canyon measurements use stable public field names", UsesStableCanyonFieldNames),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
       ("Steam pacing applies the configured normal delay between requests", AppliesNormalSteamRequestDelay),
@@ -134,6 +136,8 @@ static class MapMetadataIndexerTests {
     Assert.Equal("none", water.GetProperty("water_form").GetString());
     var islands = analysis.Classifications[IslandClassifier.FeatureKey];
     Assert.Equal(0, islands.GetArrayLength());
+    var canyons = analysis.Classifications[CanyonClassifier.FeatureKey];
+    Assert.Equal(0, canyons.GetArrayLength());
   }
 
   static void UsesExpectedForestBands() {
@@ -495,6 +499,54 @@ static class MapMetadataIndexerTests {
       var actualAreas = IslandClassifier.Analyze(map);
       Assert.Equal(string.Join(",", expectedAreas), string.Join(",", actualAreas));
     }
+  }
+
+  static void PreservesCanyonMapBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Canyons");
+    var expected = new Dictionary<string, (double Length, double Width, double BankHeight)[]>() {
+      ["3-canyon-3702980793.json.gz"] = [
+          (285.1, 18.4, 16), (160.3, 19.4, 16), (142.3, 18.5, 16),
+          (122.3, 21.2, 16), (89.5, 17.8, 16),
+      ],
+      ["badwater-canyon-3777391151.json.gz"] = [(43.4, 2.6, 3)],
+      ["canyon-system-3738296211.json.gz"] = [
+          (147, 5.5, 14), (120.7, 5.6, 14), (99.3, 5.7, 14), (92.8, 6.1, 13),
+          (91.3, 5.7, 14), (87.5, 5.9, 14), (65.6, 5.9, 14), (49.4, 5.7, 13),
+      ],
+      ["clearwater-canyon-3683639237.json.gz"] = [
+          (93.7, 3.2, 8), (64.2, 3.2, 10), (47, 3.6, 8),
+      ],
+      ["meandering-river-3753226036.json.gz"] = [],
+      ["mountain-pool-3721128633.json.gz"] = [],
+      ["three-layer-canyons-3745388025.json.gz"] = [
+          (105.2, 8, 8), (101.5, 5, 8), (78.3, 8, 9), (76.2, 6.5, 7),
+          (66.8, 4.3, 7), (57.1, 9.3, 7), (56.7, 7.5, 11), (52.6, 8.5, 10),
+          (52.5, 4.7, 7), (51.4, 5.6, 3), (41.5, 5.1, 7), (41.2, 4.9, 7),
+      ],
+      ["valley-of-thorns-3758079982.json.gz"] = [],
+      ["water-pit-3700404382.json.gz"] = [],
+    };
+    foreach (var (fixtureName, expectedCanyons) in expected) {
+      var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
+      var actual = new CanyonClassifier(map).Analyze();
+      Assert.Equal(expectedCanyons.Length, actual.Count);
+      for (var index = 0; index < expectedCanyons.Length; index++) {
+        Assert.Equal(expectedCanyons[index].Length, actual[index].Length);
+        Assert.Equal(expectedCanyons[index].Width, actual[index].AverageWidth);
+        Assert.Equal(expectedCanyons[index].BankHeight, actual[index].MedianBankHeight);
+      }
+    }
+    var engineeredMap = WaterRegressionFixture.Read(Path.Combine(
+        AppContext.BaseDirectory, "Fixtures", "Water", "00100-3652824726.json.gz"));
+    Assert.Equal(0, new CanyonClassifier(engineeredMap).Analyze().Count);
+  }
+
+  static void UsesStableCanyonFieldNames() {
+    var json = System.Text.Json.JsonSerializer.SerializeToElement(
+        new CanyonClassification(80.5, 6.2, 9));
+    Assert.Equal(80.5, json.GetProperty("length").GetDouble());
+    Assert.Equal(6.2, json.GetProperty("average_width").GetDouble());
+    Assert.Equal(9.0, json.GetProperty("median_bank_height").GetDouble());
   }
 
   static void BuildsStablePayloadCacheKey() {
