@@ -40,6 +40,7 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Bewege den Mauszeiger über den Indikator, um das Verletzungsrisiko anzuzeigen.",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Anzeigen, wie viele Arbeiter gestern verletzt wurden",
 IgorZ.TimberCommons.Settings.ModUIPatchesSection,Mod-UI-Patches,
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,Dialog für Mod-Abweichungen beim Laden verbessern,
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Fügt Steuerelemente hinzu, mit denen fehlende Mods direkt aus der Ladewarnung aktiviert werden können.

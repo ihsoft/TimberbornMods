@@ -42,6 +42,7 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показыва�
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Показывать вероятность за целый день",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Показывать, сколько работников было ранено вчера",
 IgorZ.TimberCommons.Settings.ModUIPatchesSection,"UI-патчи модов",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Улучшать диалог несовпадения модов при загрузке",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Добавляет элементы управления для включения недостающих модов прямо из предупреждения загрузки.
@@ -55,7 +56,7 @@ IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"Включ�
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
-но это может повлиять на производительность игры."
+но это может повлиять на производительность игры.",
 TimberDev_Utils.Settings.DebugSection,"Отладка и устранение неполадок",
 =,=,"Keep UI compact! Strings that line-wrap break UI"
 Mechanical.NetworkPower,Генерация/потребление в сети: {0} / {1},{0} stands for supply amount {1} stands for demand amount followed by PowerSymbol

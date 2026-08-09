@@ -17,6 +17,8 @@ sealed class InjuryProbabilitySettings : BaseSettings<InjuryProbabilitySettings>
       "IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip";
   const string ShowDailyProbabilityLocKey =
       "IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability";
+  const string ShowInjuryStatisticsLocKey =
+      "IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics";
 
   protected override string ModId => Configurator.ModId;
 
@@ -37,6 +39,10 @@ sealed class InjuryProbabilitySettings : BaseSettings<InjuryProbabilitySettings>
   public static bool ShowDailyProbability { get; private set; } = true;
   public ModSetting<bool> ShowDailyProbabilityInternal { get; } = new(
       true, ModSettingDescriptor.CreateLocalized(ShowDailyProbabilityLocKey));
+
+  public static bool ShowInjuryStatistics { get; private set; } = true;
+  public ModSetting<bool> ShowInjuryStatisticsInternal { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized(ShowInjuryStatisticsLocKey));
 
   // ReSharper restore MemberCanBePrivate.Global
   #endregion
@@ -62,6 +68,7 @@ sealed class InjuryProbabilitySettings : BaseSettings<InjuryProbabilitySettings>
     InstallSettingCallback(ShowInFragmentInternal, v => ShowInFragment = v);
     InstallSettingCallback(ShowAvatarHintInternal, v => ShowAvatarHint = v);
     InstallSettingCallback(ShowDailyProbabilityInternal, v => ShowDailyProbability = v);
+    InstallSettingCallback(ShowInjuryStatisticsInternal, v => ShowInjuryStatistics = v);
   }
 
   #endregion

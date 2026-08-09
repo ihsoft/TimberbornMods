@@ -37,6 +37,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   WorkshopInjuryStatistics _injuryStatistics;
   bool _indicatorAttached;
   int _displayedInjuriesYesterday = -1;
+  bool _displayedShowInjuryStatistics;
 
   InjuryProbabilityFragment(
       UiFactory uiFactory, ITooltipRegistrar tooltipRegistrar, EffectProbabilityService effectProbabilityService) {
@@ -87,7 +88,10 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
 
   /// <inheritdoc/>
   public void UpdateFragment() {
-    if (_injuryStatistics != null && _injuryStatistics.InjuriesYesterday != _displayedInjuriesYesterday) {
+    if (_injuryStatistics != null
+        && (InjuryProbabilitySettings.ShowInjuryStatistics != _displayedShowInjuryStatistics
+            || InjuryProbabilitySettings.ShowInjuryStatistics
+            && _injuryStatistics.InjuriesYesterday != _displayedInjuriesYesterday)) {
       UpdateInjuryProbability();
     }
   }
@@ -127,9 +131,13 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
       pctLocKey = InjuryProbabilityDailyLocKey;
     }
     var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###%}</color>";
-    _displayedInjuriesYesterday = _injuryStatistics.InjuriesYesterday;
-    var injuriesYesterdayText = _uiFactory.T(InjuriesYesterdayLocKey, _displayedInjuriesYesterday);
-    _injuryProbabilityText = $"{_uiFactory.T(pctLocKey, coloredText)}\n{injuriesYesterdayText}";
+    _displayedShowInjuryStatistics = InjuryProbabilitySettings.ShowInjuryStatistics;
+    _injuryProbabilityText = _uiFactory.T(pctLocKey, coloredText);
+    if (_displayedShowInjuryStatistics) {
+      _displayedInjuriesYesterday = _injuryStatistics.InjuriesYesterday;
+      var injuriesYesterdayText = _uiFactory.T(InjuriesYesterdayLocKey, _displayedInjuriesYesterday);
+      _injuryProbabilityText = $"{_injuryProbabilityText}\n{injuriesYesterdayText}";
+    }
     _injuryProbabilityLabel.text = _injuryProbabilityText;
 
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: InjuryProbabilitySettings.ShowAvatarHint);

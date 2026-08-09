@@ -1,4 +1,7 @@
-# v1.21.1 (TBD)
+# v1.22.0 (TBD)
+* [Feature] Allow hiding yesterday's workplace injury statistics, as requested by Todor Alin.
+
+# v1.21.1 (August 8th, 2026)
 * [Feature] Show how many workers were injured at each workplace yesterday.
 * [Fix] The displayed daily injury probability was calculated incorrectly.
 

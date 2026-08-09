@@ -42,6 +42,7 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Show injury proba
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Show indicator on the building avatar",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Hover over the indicator to see the injury probability",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Show daily probabilities",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Show how many workers were injured yesterday",
 IgorZ.TimberCommons.Settings.ModUIPatchesSection,"Mod UI patches",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Enhance the save-load mod mismatch dialog",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Adds controls for enabling missing mods directly from the save-load warning.
