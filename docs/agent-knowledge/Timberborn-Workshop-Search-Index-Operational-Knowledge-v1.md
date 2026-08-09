@@ -98,6 +98,24 @@ are:
 Other Steam/UGC failures still stop the pass before another payload request is sent. Preserve the previous usable result
 as stale when the current workflow supports that fallback.
 
+### Cached payload analysis concurrency
+
+Keep Steam payload downloads sequential. Worker parallelism applies only to decoding and classifying payloads that are
+already cached locally; it does not authorize concurrent Steam UGC requests.
+
+Diagnose cached-analysis concurrency from the resolved worker setting, the startup message that reports the worker
+limit, timestamps, and elapsed throughput. Progress messages pass through a shared serialized logging boundary, so
+their one-line order is not evidence that analysis itself is single-threaded.
+
+Treat the cached-analysis worker count as a bounded tuning parameter rather than assuming that more workers are faster.
+After a major classifier or allocation-profile change, benchmark a representative cached corpus at several worker
+counts and compare elapsed throughput together with CPU use, allocation pressure, garbage collection, and memory
+behavior. Fix dominant per-map CPU or allocation hotspots before trying to compensate by increasing parallelism.
+
+Record benchmark results with the machine or runner environment and classifier/code version that produced them. Do not
+promote a workstation-specific optimum into an unconditional repository rule or hosted-runner default; CPU saturation,
+memory bandwidth, garbage collection, and classifier behavior can move the optimum or make additional workers slower.
+
 The workflow files are authoritative for the current numeric limits. When a reviewed limit changes, update nearby
 technical documentation in the same change; do not maintain a second independent table of numbers here.
 
@@ -133,7 +151,8 @@ Choose validation according to the changed ownership surface:
 - For Steam integration changes, use bounded read-only probes before a corpus run.
 - For workflow, anonymous runtime, network, cache, concurrency, or Pages changes, run the manual GitHub-hosted workflow
   that exercises the real runner environment.
-- For load-control changes, verify the intended bound and the stop behavior, not only successful throughput.
+- For load-control or cached-analysis worker changes, verify the intended bound, stop behavior, and representative
+  elapsed throughput; do not judge concurrency from serialized progress lines alone.
 
 A green workflow job is necessary but not sufficient evidence of a healthy corpus. Inspect the published manifest and
 logs for item and map coverage, fetched/reused/missing/stale counts, payload request failures, analysis and schema
