@@ -86,7 +86,8 @@ $descriptionPaths = @(
 )
 $channelUrl = Get-DiscordChannelUrl $descriptionPaths
 $notes = Get-ChangeNotes $changesPath $Version
-$message = "$displayName v$Version has been released!`r`n`r`n$notes"
+$discordNotes = $notes -replace '(?m)^\* ', '- '
+$message = "# $displayName v$Version`r`n`r`n$discordNotes"
 
 if ($message.Length -gt 2000) {
     throw "Discord release message is $($message.Length) characters; review it manually before posting because " +
