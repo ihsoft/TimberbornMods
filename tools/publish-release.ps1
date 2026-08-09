@@ -18,6 +18,7 @@ param(
     [switch] $SkipPlatformTags,
     [switch] $SkipGitTag,
     [switch] $SkipGitHubRelease,
+    [switch] $SkipDiscordHandoff,
     [switch] $ReplaceExistingGitHubAsset,
     [switch] $CorrectiveReplacement
 )
@@ -297,6 +298,27 @@ if (-not $SkipGitHubRelease) {
     Invoke-ReleaseStep "GitHub release publish" "publish-github-release.ps1" $githubArgs.ToArray()
 }
 
+if (-not $SkipDiscordHandoff -and -not $SkipGitHubRelease) {
+    $discordArgs = New-Object System.Collections.Generic.List[string]
+    $discordArgs.Add("-ModName")
+    $discordArgs.Add($modName)
+    $discordArgs.Add("-Version")
+    $discordArgs.Add($modVersion)
+    $discordArgs.Add("-Repository")
+    $discordArgs.Add($Repository)
+    $discordArgs.Add("-Prepare")
+    try {
+        Invoke-ReleaseStep "Discord release handoff" "prepare-discord-release-message.ps1" $discordArgs.ToArray()
+    }
+    catch {
+        Write-Warning (
+            "Release publishing succeeded, but the Discord handoff could not be prepared: $($_.Exception.Message)")
+    }
+}
+elseif (-not $SkipDiscordHandoff) {
+    Write-Warning "Discord handoff skipped because the GitHub release step was skipped."
+}
+
 Write-Host ""
 Write-Host "Release publish completed for $modName v$modVersion."
-Write-Host "Issue closing and Wiki handoff remain explicit follow-up steps."
+Write-Host "Discord message sending, issue closing, and Wiki handoff remain explicit follow-up steps."
