@@ -32,6 +32,7 @@ static class MapMetadataIndexerTests {
       ("River diagnostics exclude shallow lake shores", ExcludesLakeShoreFromRiverCandidates),
       ("River diagnostics exclude deep lake cores", ExcludesDeepLakeCoreFromRiverCandidates),
       ("Water coverage requires a broad surface behind the wet boundary", ReportsBroadBoundaryWaterRatio),
+      ("Water coverage reports dominant connected surfaces", ReportsLargestWaterBodyRatio),
       ("Shallow lake diagnostics require a two-dimensional core", RequiresTwoDimensionalShallowLakeCore),
       ("Lake diagnostics allow a readable basin to cross the map edge", AllowsLakeAcrossMapEdge),
       ("Water classifier preserves reviewed Workshop map baselines", PreservesWaterMapBaselines),
@@ -298,6 +299,23 @@ static class MapMetadataIndexerTests {
       depths[x] = 1;
     }
     Assert.True(WaterFormClassifier.GetBroadBoundaryWaterRatio(map) < 0.50);
+  }
+
+  static void ReportsLargestWaterBodyRatio() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Water");
+    var badTideOcean = WaterClassifier.Analyze(WaterRegressionFixture.Read(
+        Path.Combine(fixtures, "bad-tide-ocean-3749624511.json.gz")));
+    var atlantis = WaterClassifier.Analyze(WaterRegressionFixture.Read(
+        Path.Combine(fixtures, "atlantis-in-trouble-3359016566.json.gz")));
+    var lakes = WaterClassifier.Analyze(WaterRegressionFixture.Read(
+        Path.Combine(fixtures, "112-3742639403.json.gz")));
+
+    Assert.True(badTideOcean.LargestWaterBodyRatio >= 0.64);
+    Assert.True(badTideOcean.BroadBoundaryWaterRatio < 0.50);
+    Assert.True(atlantis.LargestWaterBodyRatio >= 0.45);
+    Assert.True(atlantis.BroadBoundaryWaterRatio < 0.02);
+    Assert.True(lakes.OpenWaterRatio > 0.45);
+    Assert.True(lakes.LargestWaterBodyRatio < 0.31);
   }
 
   static void RequiresTwoDimensionalShallowLakeCore() {

@@ -42,9 +42,11 @@ The `forest_density` result contains `live_tree_count`, `coverage_ratio`, and an
 It counts initial entities that yield logs unless they are explicitly marked dead, and divides the count by land area
 after open surface-water tiles are excluded. Its fixed bands are `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 
-The `water` result contains `open_water_tiles`, `open_water_ratio`, `lake_count`, and `water_form`. The form is one of
-`none`, `rivers`, `lakes`, or `rivers_and_lakes`. Consumers can derive water-covered searches directly from
-`open_water_ratio`, for example with a threshold greater than `0.4`.
+The `water` result contains `open_water_tiles`, `open_water_ratio`, `broad_boundary_water_ratio`,
+`largest_water_body_ratio`, `lake_count`, and `water_form`. The largest-water-body ratio is the share of the full map
+occupied by the largest four-way-connected open-water body. The form is one of `none`, `rivers`, `lakes`, or
+`rivers_and_lakes`. A water-covered search uses open water above 40 percent plus either broad water on at least half
+the perimeter or a largest connected water body covering at least 45 percent of the map.
 
 The `settlement_space` result contains `core_count`, `plain_share`, `terrace_share`, `plateau_share`, `mixed_share`,
 and `space_type`. Only sufficiently wide, dry terrain regions contribute non-overlapping capacity cores. The searchable

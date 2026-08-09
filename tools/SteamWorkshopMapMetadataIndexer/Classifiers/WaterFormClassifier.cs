@@ -25,8 +25,50 @@ sealed class WaterFormClassifier {
     var riverTiles = features.RiverCandidateTileCount;
     var lakeCount = features.LakeCount + features.ShallowLakeCount;
     return new WaterClassification(
-        water.OpenWaterTileCount, water.OpenWaterRatio, GetBroadBoundaryWaterRatio(water), lakeCount,
+        water.OpenWaterTileCount, water.OpenWaterRatio, GetBroadBoundaryWaterRatio(water),
+        GetLargestWaterBodyRatio(water), lakeCount,
         GetWaterForm(water.OpenWaterTileCount, lakeCount, lakeTiles, riverTiles));
+  }
+
+  public static double GetLargestWaterBodyRatio(DecodedWaterMap water) {
+    if (water.SurfaceDepths.Length == 0) {
+      return 0;
+    }
+
+    var visited = new bool[water.SurfaceDepths.Length];
+    var largestArea = 0;
+    for (var start = 0; start < water.SurfaceDepths.Length; start++) {
+      if (visited[start] || water.SurfaceDepths[start] <= 0) {
+        continue;
+      }
+
+      var area = 0;
+      var pending = new Queue<int>();
+      pending.Enqueue(start);
+      visited[start] = true;
+      while (pending.TryDequeue(out var cell)) {
+        area++;
+        var x = cell % water.Width;
+        var y = cell / water.Width;
+        Visit(x - 1, y);
+        Visit(x + 1, y);
+        Visit(x, y - 1);
+        Visit(x, y + 1);
+
+        void Visit(int neighbourX, int neighbourY) {
+          if (neighbourX < 0 || neighbourX >= water.Width || neighbourY < 0 || neighbourY >= water.Height) {
+            return;
+          }
+          var neighbour = neighbourX + neighbourY * water.Width;
+          if (!visited[neighbour] && water.SurfaceDepths[neighbour] > 0) {
+            visited[neighbour] = true;
+            pending.Enqueue(neighbour);
+          }
+        }
+      }
+      largestArea = Math.Max(largestArea, area);
+    }
+    return (double) largestArea / water.SurfaceDepths.Length;
   }
 
   public static double GetBroadBoundaryWaterRatio(DecodedWaterMap water) {

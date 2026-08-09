@@ -158,11 +158,12 @@ Coverage is the living-tree count divided by land area after open surface-water 
 does not reduce land area. Levels `0` through `4` use the fixed bands `<5%`, `5–20%`, `20–35%`, `35–50%`, and `>50%`.
 
 The `water` classifier decodes serialized surface-water columns and excludes water below the highest terrain surface.
-It reports `open_water_tiles`, `open_water_ratio`, `lake_count`, and a searchable `water_form`: `none`, `rivers`,
-`lakes`, or `rivers_and_lakes`. Water form combines local surface-level segmentation, boundary throughput, flow
-coherence, shape, and the relative amount attributed to lake basins and river channels. It always chooses a concrete
-form; internal ambiguous diagnostic regions are not published as a search value. Consumers can derive a
-water-covered query directly from `open_water_ratio`, for example with a threshold greater than `0.4`.
+It reports `open_water_tiles`, `open_water_ratio`, `broad_boundary_water_ratio`, `largest_water_body_ratio`,
+`lake_count`, and a searchable `water_form`: `none`, `rivers`, `lakes`, or `rivers_and_lakes`. Water form combines
+local surface-level segmentation, boundary throughput, flow coherence, shape, and the relative amount attributed to
+lake basins and river channels. It always chooses a concrete form; internal ambiguous diagnostic regions are not
+published as a search value. Consumers can identify water-covered maps when open water exceeds 40 percent and either
+broad water occupies at least half the perimeter or one connected water body occupies at least 45 percent of the map.
 For water reaching the map edge, a lake also needs a meaningful visible shoreline with exterior, edge-connected land.
 Shorelines formed mostly by enclosed islands do not make the surrounding water a lake. A readable lake may still
 extend beyond one edge of the map.

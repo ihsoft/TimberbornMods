@@ -9,10 +9,12 @@ namespace IgorZ.MapBrowser.WorkshopMapIndexing.Classifiers;
 /// <summary>Search-facing summary of open surface water and its dominant form.</summary>
 sealed record WaterClassification {
   public WaterClassification(
-      int openWaterTiles, double openWaterRatio, double broadBoundaryWaterRatio, int lakeCount, string waterForm) {
+      int openWaterTiles, double openWaterRatio, double broadBoundaryWaterRatio, double largestWaterBodyRatio,
+      int lakeCount, string waterForm) {
     OpenWaterTiles = openWaterTiles;
     OpenWaterRatio = openWaterRatio;
     BroadBoundaryWaterRatio = broadBoundaryWaterRatio;
+    LargestWaterBodyRatio = largestWaterBodyRatio;
     LakeCount = lakeCount;
     WaterForm = waterForm;
   }
@@ -31,6 +33,10 @@ sealed record WaterClassification {
   /// </summary>
   [JsonPropertyName("broad_boundary_water_ratio")]
   public double BroadBoundaryWaterRatio { get; }
+
+  /// <summary>Share of the full map occupied by the largest four-way-connected open-water body.</summary>
+  [JsonPropertyName("largest_water_body_ratio")]
+  public double LargestWaterBodyRatio { get; }
 
   /// <summary>Number of recognized deep and shallow lake basins.</summary>
   [JsonPropertyName("lake_count")]

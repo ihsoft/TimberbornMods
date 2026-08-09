@@ -10,7 +10,7 @@ using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
 namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 11;
+  public const int AnalysisVersion = 12;
   const long MaxWorldJsonBytes = 250_000_000;
 
   public MapArchiveAnalysis Analyze(ZipArchive archive) {
