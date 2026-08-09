@@ -19,6 +19,9 @@
       <Compile Include="..\TimberCommons\Common\ISupplyLeftProvider.cs">
         <Link>TimberCommons\Common\ISupplyLeftProvider.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\NeedApplierUI\InjuryProbabilityCalculator.cs">
+        <Link>TimberCommons\NeedApplierUI\InjuryProbabilityCalculator.cs</Link>
+      </Compile>
       <Compile Include="..\TimberCommons\IrrigationSystem\IrrigationTower.cs">
         <Link>TimberCommons\IrrigationSystem\IrrigationTower.cs</Link>
       </Compile>

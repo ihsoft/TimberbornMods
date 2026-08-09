@@ -8,6 +8,8 @@ static class Program {
       ("GrowthRateModifier combines strongest boost and moderator", GrowthRateModifierTests.CombinesModifiers),
       ("GrowthRateModifier recalculates after unregister", GrowthRateModifierTests.RecalculatesAfterUnregister),
       ("GrowthRateModifier ignores inactive growables", GrowthRateModifierTests.IgnoresInactiveGrowables),
+      ("InjuryProbabilityCalculator calculates probability of at least one daily injury",
+          InjuryProbabilityCalculatorTests.CalculatesProbabilityOfAtLeastOneDailyInjury),
       ("GoodConsumingIrrigationTower scales consumption from coverage",
           GoodConsumingIrrigationTowerTests.ScalesConsumptionFromCoverage),
       ("GoodConsumingIrrigationTower toggles consumption from coverage",

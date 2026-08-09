@@ -1,3 +1,6 @@
+# v1.21.1 (TBD)
+* [Fix] The displayed daily injury probability was calculated incorrectly.
+
 # v1.21.0 (July 17th, 2026)
 * [Feature] Show the faction logo and localized faction name on saved-game previews.
 

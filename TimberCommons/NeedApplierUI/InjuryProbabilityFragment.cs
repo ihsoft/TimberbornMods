@@ -114,11 +114,7 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     _injuryProbabilityAvatarHint.style.color = color;
     var pctLocKey = InjuryProbabilityLocKey;
     if (InjuryProbabilitySettings.ShowDailyProbability) {
-      var dailyProbability = probabilityPct;
-      for (var i = 1; i < 24; i++) {
-        dailyProbability *= Mathf.Pow(1f + probabilityPct, i);
-      }
-      probabilityPct = dailyProbability;
+      probabilityPct = InjuryProbabilityCalculator.CalculateDailyProbability(probabilityPct);
       pctLocKey = InjuryProbabilityDailyLocKey;
     }
     var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###%}</color>";
