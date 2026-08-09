@@ -31,7 +31,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
   sealed record Branch(
       IReadOnlyList<int> Cells, double DirectionChangeFraction);
 
-  sealed record CrossSection(
+  readonly record struct CrossSection(
       double FloorWidth, double LeftBankHeight, double RightBankHeight,
       double LeftSlope, double RightSlope, double DirectionX, double DirectionY) {
     public double BankHeight => Math.Min(LeftBankHeight, RightBankHeight);
@@ -39,9 +39,10 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
 
   sealed record NetworkTopology(int EndpointCount, int CycleRank, double CyclicEdgeFraction);
 
-  sealed record RayMeasurement(
+  readonly record struct RayMeasurement(
       bool IsValid, double FloorDistance, double BankHeight, double BankSlope);
 
+  static readonly (double X, double Y)[] CrossSectionDirections = CreateCrossSectionDirections();
   static readonly (int X, int Y)[] NeighbourOffsets = [
       (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1),
   ];
@@ -54,9 +55,9 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     var sections = new Dictionary<int, CrossSection>();
     for (var cell = 0; cell < candidateFloor.Length; cell++) {
       var section = MeasureBestCrossSection(cell);
-      if (section is not null && IsCanyonSection(section)) {
+      if (section is CrossSection measuredSection && IsCanyonSection(measuredSection)) {
         candidateFloor[cell] = true;
-        sections[cell] = section;
+        sections[cell] = measuredSection;
       }
     }
 
@@ -189,10 +190,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
 
   CrossSection? MeasureBestCrossSection(int cell) {
     CrossSection? best = null;
-    for (var directionIndex = 0; directionIndex < DirectionCount; directionIndex++) {
-      var angle = Math.PI * directionIndex / DirectionCount;
-      var directionX = Math.Cos(angle);
-      var directionY = Math.Sin(angle);
+    foreach (var (directionX, directionY) in CrossSectionDirections) {
       var left = MeasureRay(cell, directionX, directionY);
       var right = MeasureRay(cell, -directionX, -directionY);
       if (!left.IsValid || !right.IsValid) {
@@ -202,9 +200,14 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
           left.FloorDistance + right.FloorDistance,
           left.BankHeight, right.BankHeight, left.BankSlope, right.BankSlope,
           directionX, directionY);
-      if (best is null || section.FloorWidth < best.FloorWidth
-          || Math.Abs(section.FloorWidth - best.FloorWidth) < 0.01
-          && section.BankHeight > best.BankHeight) {
+      if (best is null) {
+        best = section;
+        continue;
+      }
+      var bestSection = best.Value;
+      if (section.FloorWidth < bestSection.FloorWidth
+          || Math.Abs(section.FloorWidth - bestSection.FloorWidth) < 0.01
+          && section.BankHeight > bestSection.BankHeight) {
         best = section;
       }
     }
@@ -215,7 +218,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     var startX = cell % _map.Width + 0.5;
     var startY = cell / _map.Width + 0.5;
     var floorHeight = _map.TerrainHeights[cell];
-    var visited = new HashSet<int>();
+    var lastSample = -1;
     var firstRiseDistance = double.NaN;
     var maximumHeight = double.NegativeInfinity;
     var maximumHeightDistance = double.NaN;
@@ -226,9 +229,11 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
         return new RayMeasurement(false, 0, 0, 0);
       }
       var sample = x + y * _map.Width;
-      if (!visited.Add(sample)) {
+      // A straight ray is monotonic on both axes, so it can only repeat the cell visited immediately before it.
+      if (sample == lastSample) {
         continue;
       }
+      lastSample = sample;
       var height = _map.TerrainHeights[sample];
       if (double.IsNaN(firstRiseDistance)) {
         if (height < floorHeight) {
@@ -253,6 +258,15 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     var bankHeight = maximumHeight - floorHeight;
     var bankRun = Math.Max(0.5, maximumHeightDistance - firstRiseDistance + 0.5);
     return new RayMeasurement(true, firstRiseDistance, bankHeight, bankHeight / bankRun);
+  }
+
+  static (double X, double Y)[] CreateCrossSectionDirections() {
+    var result = new (double X, double Y)[DirectionCount];
+    for (var directionIndex = 0; directionIndex < DirectionCount; directionIndex++) {
+      var angle = Math.PI * directionIndex / DirectionCount;
+      result[directionIndex] = (Math.Cos(angle), Math.Sin(angle));
+    }
+    return result;
   }
 
   static bool IsCanyonSection(CrossSection section) {

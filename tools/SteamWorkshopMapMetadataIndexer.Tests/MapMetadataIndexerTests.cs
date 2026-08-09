@@ -3,6 +3,7 @@
 // License: Public Domain
 
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using IgorZ.MapBrowser.MapAnalysisFixtureGeneration;
 using IgorZ.MapBrowser.WorkshopMapIndexing;
@@ -44,6 +45,7 @@ static class MapMetadataIndexerTests {
       ("Settlement-space classifier preserves reviewed Workshop map baselines", PreservesSettlementSpaceBaselines),
       ("Island classifier preserves reviewed Workshop map baselines", PreservesIslandMapBaselines),
       ("Canyon classifier preserves reviewed Workshop map baselines", PreservesCanyonMapBaselines),
+      ("Canyon ray traversal matches HashSet reference", MatchesCanyonRayHashSetReference),
       ("Canyon measurements use stable public field names", UsesStableCanyonFieldNames),
       ("Mountain classifier preserves reviewed Workshop map baselines", PreservesMountainMapBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
@@ -546,6 +548,122 @@ static class MapMetadataIndexerTests {
     var engineeredMap = WaterRegressionFixture.Read(Path.Combine(
         AppContext.BaseDirectory, "Fixtures", "Water", "00100-3652824726.json.gz"));
     Assert.Equal(0, new CanyonClassifier(engineeredMap).Analyze().Count);
+  }
+
+  static void MatchesCanyonRayHashSetReference() {
+    const int width = 128;
+    const int height = 128;
+    var cases = new (string Name, int Cell, double DirectionX, double DirectionY, int? RiseSample)[] {
+        ("axis-aligned", 64 + 64 * width, 1, 0, 4),
+        ("diagonal", 64 + 64 * width, Math.Sqrt(0.5), Math.Sqrt(0.5), 5),
+        ("near-axis", 64 + 64 * width, Math.Cos(Math.PI / 32), Math.Sin(Math.PI / 32), 6),
+        ("long", 64 + 64 * width, Math.Cos(Math.PI * 15 / 32), Math.Sin(Math.PI * 15 / 32), 35),
+        ("boundary-exit", 1 + 64 * width, -1, 0, null),
+    };
+
+    foreach (var testCase in cases) {
+      var map = CreateCanyonRayTestMap(
+          width, height, testCase.Cell, testCase.DirectionX, testCase.DirectionY, testCase.RiseSample);
+      var classifier = new CanyonClassifier(map);
+      var expected = MeasureRayWithHashSet(
+          map, testCase.Cell, testCase.DirectionX, testCase.DirectionY);
+      var actual = InvokeCanyonMeasureRay(
+          classifier, testCase.Cell, testCase.DirectionX, testCase.DirectionY);
+      Assert.Equal(expected.IsValid, actual.IsValid);
+      Assert.Equal(expected.FloorDistance, actual.FloorDistance);
+      Assert.Equal(expected.BankHeight, actual.BankHeight);
+      Assert.Equal(expected.BankSlope, actual.BankSlope);
+    }
+  }
+
+  static DecodedWaterMap CreateCanyonRayTestMap(
+      int width, int height, int cell, double directionX, double directionY, int? riseSample) {
+    const double maximumRayDistance = 48;
+    const double rayStep = 0.25;
+    const int floorHeight = 10;
+    var terrainHeights = Enumerable.Repeat(floorHeight, width * height).ToArray();
+    if (riseSample is int firstRiseSample) {
+      var startX = cell % width + 0.5;
+      var startY = cell / width + 0.5;
+      var visited = new HashSet<int>();
+      for (var distance = rayStep; distance <= maximumRayDistance; distance += rayStep) {
+        var x = (int) Math.Floor(startX + directionX * distance);
+        var y = (int) Math.Floor(startY + directionY * distance);
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+          break;
+        }
+        var sample = x + y * width;
+        if (!visited.Add(sample) || visited.Count < firstRiseSample) {
+          continue;
+        }
+        terrainHeights[sample] = floorHeight + Math.Min(8, visited.Count - firstRiseSample + 1);
+      }
+    }
+    return new DecodedWaterMap(
+        width, height, terrainHeights, new int[width * height], new float[width * height],
+        new float[width * height], new float[width * height], [], 0, 0);
+  }
+
+  static (bool IsValid, double FloorDistance, double BankHeight, double BankSlope) InvokeCanyonMeasureRay(
+      CanyonClassifier classifier, int cell, double directionX, double directionY) {
+    var method = typeof(CanyonClassifier).GetMethod("MeasureRay", BindingFlags.Instance | BindingFlags.NonPublic)
+        ?? throw new InvalidOperationException("CanyonClassifier.MeasureRay was not found.");
+    var result = method.Invoke(classifier, [cell, directionX, directionY])
+        ?? throw new InvalidOperationException("CanyonClassifier.MeasureRay returned null.");
+    var resultType = result.GetType();
+    return (
+        (bool) resultType.GetProperty("IsValid")!.GetValue(result)!,
+        (double) resultType.GetProperty("FloorDistance")!.GetValue(result)!,
+        (double) resultType.GetProperty("BankHeight")!.GetValue(result)!,
+        (double) resultType.GetProperty("BankSlope")!.GetValue(result)!);
+  }
+
+  static (bool IsValid, double FloorDistance, double BankHeight, double BankSlope) MeasureRayWithHashSet(
+      DecodedWaterMap map, int cell, double directionX, double directionY) {
+    const double bankSearchDistance = 12;
+    const double maximumBottomWidth = 36;
+    const double rayStep = 0.25;
+    var startX = cell % map.Width + 0.5;
+    var startY = cell / map.Width + 0.5;
+    var floorHeight = map.TerrainHeights[cell];
+    var visited = new HashSet<int>();
+    var firstRiseDistance = double.NaN;
+    var maximumHeight = double.NegativeInfinity;
+    var maximumHeightDistance = double.NaN;
+    for (var distance = rayStep; distance <= maximumBottomWidth + bankSearchDistance; distance += rayStep) {
+      var x = (int) Math.Floor(startX + directionX * distance);
+      var y = (int) Math.Floor(startY + directionY * distance);
+      if (x < 0 || x >= map.Width || y < 0 || y >= map.Height) {
+        return (false, 0, 0, 0);
+      }
+      var sample = x + y * map.Width;
+      if (!visited.Add(sample)) {
+        continue;
+      }
+      var height = map.TerrainHeights[sample];
+      if (double.IsNaN(firstRiseDistance)) {
+        if (height < floorHeight) {
+          return (false, 0, 0, 0);
+        }
+        if (height <= floorHeight) {
+          continue;
+        }
+        firstRiseDistance = distance;
+      }
+      if (distance - firstRiseDistance > bankSearchDistance) {
+        break;
+      }
+      if (height > maximumHeight) {
+        maximumHeight = height;
+        maximumHeightDistance = distance;
+      }
+    }
+    if (double.IsNaN(firstRiseDistance) || double.IsNegativeInfinity(maximumHeight)) {
+      return (false, 0, 0, 0);
+    }
+    var bankHeight = maximumHeight - floorHeight;
+    var bankRun = Math.Max(0.5, maximumHeightDistance - firstRiseDistance + 0.5);
+    return (true, firstRiseDistance, bankHeight, bankHeight / bankRun);
   }
 
   static void PreservesMountainMapBaselines() {
