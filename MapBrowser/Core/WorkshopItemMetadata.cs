@@ -76,6 +76,12 @@ sealed class MapClassifications {
 
   [JsonProperty("settlement_space")]
   public SettlementSpaceClassification SettlementSpace { get; set; }
+
+  /// <summary>
+  /// Projected dry-land areas of useful islands. An empty list means none were found; <c>null</c> means unknown.
+  /// </summary>
+  [JsonProperty("islands")]
+  public List<int> Islands { get; set; }
 }
 
 sealed class ForestDensityClassification {
@@ -89,6 +95,9 @@ sealed class WaterClassification {
 
   [JsonProperty("broad_boundary_water_ratio")]
   public double? BroadBoundaryWaterRatio { get; set; }
+
+  [JsonProperty("largest_water_body_ratio")]
+  public double? LargestWaterBodyRatio { get; set; }
 
   [JsonProperty("water_form")]
   public string WaterForm { get; set; }

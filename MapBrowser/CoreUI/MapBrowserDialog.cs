@@ -21,7 +21,6 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
-  const string AnalysisCompactLocKey = "IgorZ.MapBrowser.Analysis.Compact";
   const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
   const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
   const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
@@ -57,12 +56,14 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string WorkshopUnavailableTooltipLocKey = "IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
-  const int CurrentMapAnalysisVersion = 9;
+  const int CurrentMapAnalysisVersion = 12;
   const float DialogHeightRatio = 0.80f;
   const float DialogMaxWidthRatio = 0.94f;
   const float DialogWidthToHeightRatio = 1200f / 820f * 1.30f;
+  const double LargeIslandAreaRatio = 0.07;
   const double WaterCoveredRatio = 0.40;
   const double WaterCoveredBoundaryRatio = 0.50;
+  const double WaterCoveredBodyRatio = 0.45;
   static readonly Regex MapSizePrefixRegex = new(
       @"^\s*(?:[\(\[]\s*)?(?<width>\d{1,4})\s*[xX×]\s*(?<height>\d{1,4})(?:\s*[\)\]])?\s*(?:[-–—:|]\s*)?",
       RegexOptions.Compiled);
@@ -76,6 +77,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     new("forest_density", ["Barren", "Sparse", "ModerateForests", "Forested", "DenseForest"]),
     new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes", "WaterCovered"]),
     new("settlement_space", ["LittleSpace", "MuchSpace", "Plain", "Terraces", "Plateau"]),
+    new("islands", ["NoIslands", "HasIslands", "LargeIslands", "SmallIslands"]),
   ];
 
   readonly MapItemProvider _mapItemProvider;
@@ -503,8 +505,12 @@ sealed class MapBrowserDialog : AbstractDialog {
       if (selectedIndex == 0) {
         continue;
       }
-      if (!TryGetClassificationValue(metadata, filter.Feature, out var value)
-          || value != filter.Values[selectedIndex - 1]) {
+      var selectedValue = filter.Values[selectedIndex - 1];
+      if (filter.Feature == "islands") {
+        if (!MatchesIslands(metadata, selectedValue)) {
+          return false;
+        }
+      } else if (!TryGetClassificationValue(metadata, filter.Feature, out var value) || value != selectedValue) {
         return false;
       }
     }
@@ -556,15 +562,14 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
-    return string.Format(
-        UiFactory.T(AnalysisCompactLocKey), GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
-        GetSettlementSpace(metadata, UiFactory));
+    return string.Join(", ", GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
+        GetSettlementSpace(metadata, UiFactory), GetIslandLevel(metadata, UiFactory));
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
     return string.Format(
         uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
-        GetSettlementSpace(metadata, uiFactory));
+        GetSettlementSpace(metadata, uiFactory), GetIslandLevel(metadata, uiFactory));
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
@@ -608,6 +613,51 @@ sealed class MapBrowserDialog : AbstractDialog {
     return GetLocalizedLevel(levelName, uiFactory);
   }
 
+  static string GetIslandLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var islands = metadata.MapClassifications?.Islands;
+    if (islands == null) {
+      return GetLocalizedLevel(null, uiFactory);
+    }
+    if (islands.Count == 0) {
+      return GetLocalizedLevel("NoIslands", uiFactory);
+    }
+
+    var largeIslandCount = GetLargeIslandCount(metadata, islands);
+    var smallIslandCount = islands.Count - largeIslandCount;
+    var levelName = largeIslandCount > smallIslandCount
+        ? "LargeIslands"
+        : smallIslandCount > largeIslandCount ? "SmallIslands" : "HasIslands";
+    return GetLocalizedLevel(levelName, uiFactory);
+  }
+
+  static bool MatchesIslands(WorkshopItemMetadata metadata, string selectedValue) {
+    var islands = metadata.MapClassifications?.Islands;
+    if (islands == null) {
+      return false;
+    }
+    if (selectedValue == "NoIslands") {
+      return islands.Count == 0;
+    }
+    if (selectedValue == "HasIslands") {
+      return islands.Count > 0;
+    }
+    if (islands.Count == 0) {
+      return false;
+    }
+
+    var largeIslandCount = GetLargeIslandCount(metadata, islands);
+    return selectedValue switch {
+        "LargeIslands" => largeIslandCount > islands.Count - largeIslandCount,
+        "SmallIslands" => largeIslandCount < islands.Count - largeIslandCount,
+        _ => false,
+    };
+  }
+
+  static int GetLargeIslandCount(WorkshopItemMetadata metadata, List<int> islands) {
+    var mapArea = (double)metadata.MapWidth * metadata.MapHeight;
+    return islands.Count(area => area / mapArea >= LargeIslandAreaRatio);
+  }
+
   static string GetLocalizedLevel(string levelName, UiFactory uiFactory) {
     return uiFactory.T(levelName == null ? AnalysisLevelUnknownLocKey : AnalysisLevelLocKeyPrefix + levelName);
   }
@@ -645,7 +695,8 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   static bool IsWaterCovered(WaterClassification water) {
     return water?.OpenWaterRatio > WaterCoveredRatio
-        && water.BroadBoundaryWaterRatio >= WaterCoveredBoundaryRatio;
+        && (water.BroadBoundaryWaterRatio >= WaterCoveredBoundaryRatio
+            || water.LargestWaterBodyRatio >= WaterCoveredBodyRatio);
   }
 
   static void FitDescription(Label label, string fullText) {

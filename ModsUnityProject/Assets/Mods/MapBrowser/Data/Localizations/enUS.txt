@@ -24,26 +24,30 @@ IgorZ.MapBrowser.Action.Unsubscribing,"Unsubscribing...","Temporary button text 
 IgorZ.MapBrowser.Action.WorkshopUnavailable,"No longer available","Status shown when Steam reports that a Workshop map no longer exists or is inaccessible."
 IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,"This map is no longer available on Steam Workshop and cannot be subscribed to.","Tooltip shown when Steam reports that a Workshop map is unavailable."
 =,=,Map analysis
-IgorZ.MapBrowser.Analysis.Compact,"{0}, {1}, {2}","Compact exact map analysis shown in the browser row."
 IgorZ.MapBrowser.Analysis.Full,"Forests: {0}
 Water: {1}
-Space: {2}","Full exact map analysis shown in the details dialog."
+Space: {2}
+{3}","Full exact map analysis shown in the details dialog."
 IgorZ.MapBrowser.Analysis.Level.Barren,"Barren","Very low forest density classification."
 IgorZ.MapBrowser.Analysis.Level.DenseForest,"Dense forest","Very high forest density classification."
 IgorZ.MapBrowser.Analysis.Level.Forested,"Forested","High forest density classification."
+IgorZ.MapBrowser.Analysis.Level.HasIslands,"Has islands","Search for maps with at least one useful island."
 IgorZ.MapBrowser.Analysis.Level.Lakes,"Lakes","Open water is mainly represented by lakes."
+IgorZ.MapBrowser.Analysis.Level.LargeIslands,"Large islands","Search for maps where most useful islands cover at least seven percent of the map."
 IgorZ.MapBrowser.Analysis.Level.LittleSpace,"Little space","Map has fewer than eight settlement-space cores."
 IgorZ.MapBrowser.Analysis.Level.ModerateForests,"Moderate forests","Middle forest density classification."
 IgorZ.MapBrowser.Analysis.Level.MuchSpace,"Much space","Map has sufficient settlement space without a dominant terrain shape."
+IgorZ.MapBrowser.Analysis.Level.NoIslands,"No islands","Search for maps where no useful islands were found."
 IgorZ.MapBrowser.Analysis.Level.NoWater,"No open water","No open water was found on the map."
 IgorZ.MapBrowser.Analysis.Level.Plain,"Plain","Most settlement space is on broad neighboring terrain levels."
 IgorZ.MapBrowser.Analysis.Level.Plateau,"Plateau","A significant share of settlement space is on elevated plateaus."
 IgorZ.MapBrowser.Analysis.Level.Rivers,"Rivers","Open water is mainly represented by rivers."
 IgorZ.MapBrowser.Analysis.Level.RiversAndLakes,"Rivers and lakes","Open water includes both rivers and lakes."
+IgorZ.MapBrowser.Analysis.Level.SmallIslands,"Small islands","Search for maps where most useful islands cover less than seven percent of the map."
 IgorZ.MapBrowser.Analysis.Level.Sparse,"Sparse","Low forest density classification."
 IgorZ.MapBrowser.Analysis.Level.Terraces,"Terraces","A significant share of settlement space is on slope terraces."
 IgorZ.MapBrowser.Analysis.Level.Unknown,"Unknown","Classification value shown when analysis data is missing."
-IgorZ.MapBrowser.Analysis.Level.WaterCovered,"Water-covered","Open water covers more than 40 percent of the map."
+IgorZ.MapBrowser.Analysis.Level.WaterCovered,"Water-covered","Open water covers more than 40 percent of the map and forms an extensive surrounding or connected surface."
 =,=,Map browser
 IgorZ.MapBrowser.Browser.InstalledMaps,"Installed custom maps","Heading above the installed map list."
 IgorZ.MapBrowser.Browser.SearchMaps,"Find Workshop maps","Heading above Workshop search results."
@@ -62,6 +66,7 @@ IgorZ.MapBrowser.Freshness.Stale,"Freshness warning: The map has changed since i
 =,=,Workshop search
 IgorZ.MapBrowser.Search.Any,"Any","Filter option that does not restrict search results."
 IgorZ.MapBrowser.Search.Filter.Forests,"Forests","Label for the forest density search filter."
+IgorZ.MapBrowser.Search.Filter.Islands,"Islands","Label for the island search filter."
 IgorZ.MapBrowser.Search.Filter.SettlementSpace,"Space","Label for the settlement-space search filter."
 IgorZ.MapBrowser.Search.Filter.Water,"Water","Label for the water search filter."
 IgorZ.MapBrowser.Search.Installed,"Installed","Tab button that shows installed maps."

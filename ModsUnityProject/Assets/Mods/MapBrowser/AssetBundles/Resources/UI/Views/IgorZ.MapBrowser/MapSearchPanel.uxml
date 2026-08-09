@@ -9,20 +9,25 @@
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; margin-top: 6px;">
-            <engine:VisualElement name="forest_densityFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+            <engine:VisualElement name="forest_densityFilter" style="flex-direction: row; align-items: center; width: 25%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
                 <Timberborn.CoreUI.LocalizableLabel name="forest_densityLabel" text="Forests" text-loc-key="IgorZ.MapBrowser.Search.Filter.Forests" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
                 <engine:VisualElement style="flex-grow: 1;" />
                 <Timberborn.DropdownSystem.Dropdown name="forest_densityDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
-            <engine:VisualElement name="waterFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
+            <engine:VisualElement name="waterFilter" style="flex-direction: row; align-items: center; width: 25%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
                 <Timberborn.CoreUI.LocalizableLabel name="waterLabel" text="Water" text-loc-key="IgorZ.MapBrowser.Search.Filter.Water" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
                 <engine:VisualElement style="flex-grow: 1;" />
                 <Timberborn.DropdownSystem.Dropdown name="waterDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
-            <engine:VisualElement name="settlement_spaceFilter" style="flex-direction: row; align-items: center; width: 33.333%; min-width: 300px; margin-bottom: 6px;">
+            <engine:VisualElement name="settlement_spaceFilter" style="flex-direction: row; align-items: center; width: 25%; min-width: 300px; padding-right: 12px; margin-bottom: 6px;">
                 <Timberborn.CoreUI.LocalizableLabel name="settlement_spaceLabel" text="Space" text-loc-key="IgorZ.MapBrowser.Search.Filter.SettlementSpace" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
                 <engine:VisualElement style="flex-grow: 1;" />
                 <Timberborn.DropdownSystem.Dropdown name="settlement_spaceDropdown" style="width: 220px; flex-shrink: 0;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="islandsFilter" style="flex-direction: row; align-items: center; width: 25%; min-width: 300px; margin-bottom: 6px;">
+                <Timberborn.CoreUI.LocalizableLabel name="islandsLabel" text="Islands" text-loc-key="IgorZ.MapBrowser.Search.Filter.Islands" class="text--default" style="flex-shrink: 0; margin-right: 5px;" />
+                <engine:VisualElement style="flex-grow: 1;" />
+                <Timberborn.DropdownSystem.Dropdown name="islandsDropdown" style="width: 220px; flex-shrink: 0;" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
