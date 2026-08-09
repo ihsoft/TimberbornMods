@@ -266,6 +266,28 @@ reminder is needed to prevent repeated misses.
 - Localize player-facing text; do not hardcode visible English strings in UI or gameplay messages.
 - Before using reflection or `AccessTools`, check for direct access through publicized game assemblies.
 
+## Task-scoped token budgets
+
+At the start of every new standalone user request, estimate the token budget for that task's analysis and execution.
+Show one concise approximate budget only when the expected work is substantial enough that the estimate could affect
+scope, sequencing, delegation, or the user's expectations. Make clear that it is an estimate, not an exact usage
+measurement.
+
+Do not invent a fixed numeric threshold until repeated task evidence supports one. For now, treat multi-phase work,
+broad repository research, substantial implementation or review, several artifacts, external coordination, or a
+meaningful risk of needing scope reduction or continuation as substantial. Direct answers, small checks or edits,
+status questions, and ordinary clarifications normally do not need a visible budget.
+
+Do not announce a new budget for every turn, clarification, status question, retry, or small follow-up that continues
+the same objective. Those interactions use the existing task budget. Repeat or revise the visible estimate only when the
+scope expands materially, the remaining work no longer fits the original estimate, or the work is explicitly split into
+a new standalone task.
+
+Do not maintain or show a cumulative budget for the whole Codex thread, conversation, or agent session. A task budget
+exists to support decisions about one concrete request, not to act as a running token counter. This communication rule
+does not by itself authorize creating a platform-specific goal or budget object when the environment requires separate
+user authorization for that operation.
+
 ## Portable local paths
 
 Use portable path conventions in repository rules and documentation:
