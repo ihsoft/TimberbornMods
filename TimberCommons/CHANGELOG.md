@@ -1,4 +1,4 @@
-# v1.22.0 (TBD)
+# v1.22.0 (August 9th, 2026)
 * [Feature] Allow hiding yesterday's workplace injury statistics, as requested by Todor Alin.
 
 # v1.21.1 (August 8th, 2026)
