@@ -3,7 +3,6 @@ param(
     [string] $ModName,
 
     [string] $Version = "",
-    [string] $Repository = "ihsoft/TimberbornMods",
     [switch] $Prepare
 )
 
@@ -87,9 +86,7 @@ $descriptionPaths = @(
 )
 $channelUrl = Get-DiscordChannelUrl $descriptionPaths
 $notes = Get-ChangeNotes $changesPath $Version
-$tagName = "${ModName}_${Version}"
-$releaseUrl = "https://github.com/$Repository/releases/tag/$tagName"
-$message = "$displayName v$Version has been released!`r`n`r`n$notes`r`n`r`nDownload and full changelog:`r`n$releaseUrl"
+$message = "$displayName v$Version has been released!`r`n`r`n$notes"
 
 if ($message.Length -gt 2000) {
     throw "Discord release message is $($message.Length) characters; review it manually before posting because " +
