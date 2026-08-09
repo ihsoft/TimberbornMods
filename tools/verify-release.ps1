@@ -158,6 +158,59 @@ function Get-ReleaseHeading([string] $ChangesPath, [string] $Version) {
     return [string]$line
 }
 
+function Get-ReleaseSection([string] $ChangesPath, [string] $Version) {
+    $content = Get-Content -Raw -LiteralPath $ChangesPath
+    $escapedVersion = [regex]::Escape($Version)
+    $pattern = "(?ms)^#\s+v$escapedVersion[^\r\n]*\r?\n(?<body>.*?)(?=^#\s+v|\z)"
+    $match = [regex]::Match($content, $pattern)
+    if (-not $match.Success) {
+        throw "Changelog section for version $Version was not found in $ChangesPath."
+    }
+
+    return $match.Groups["body"].Value
+}
+
+function Assert-ReleaseVersionMatchesChangelog([string] $ChangesPath, [string] $Version) {
+    $section = Get-ReleaseSection $ChangesPath $Version
+    $hasFeature = $section -match "(?m)^\*\s+\[Feature(?:\s+#\d+)?\]"
+    if (-not $hasFeature) {
+        return
+    }
+
+    $content = Get-Content -Raw -LiteralPath $ChangesPath
+    $headings = [regex]::Matches($content, "(?m)^#\s+v(?<version>\d+\.\d+\.\d+|\d+\.\d+)(?:\s+\((?<date>[^)]+)\))?")
+    $currentIndex = -1
+    for ($index = 0; $index -lt $headings.Count; $index++) {
+        if ($headings[$index].Groups["version"].Value -eq $Version) {
+            $currentIndex = $index
+            break
+        }
+    }
+
+    if ($currentIndex -lt 0) {
+        throw "Cannot locate changelog heading for version $Version while validating feature versioning."
+    }
+
+    $previous = $null
+    for ($index = $currentIndex + 1; $index -lt $headings.Count; $index++) {
+        $date = $headings[$index].Groups["date"].Value
+        if (-not [string]::IsNullOrWhiteSpace($date) -and $date -ne "TBD") {
+            $previous = $headings[$index].Groups["version"].Value
+            break
+        }
+    }
+
+    if ($null -eq $previous) {
+        throw "Cannot validate feature version $Version because no previous dated release was found in $ChangesPath."
+    }
+
+    $previousParts = $previous.Split('.') | ForEach-Object { [int]$_ }
+    $expected = "$($previousParts[0]).$($previousParts[1] + 1).0"
+    if ($Version -ne $expected) {
+        throw "Feature release version $Version is invalid for $ChangesPath. A [Feature] entry requires the next minor version $expected after $previous."
+    }
+}
+
 function Invoke-ReleaseStep([string] $Name, [string] $ScriptName, [string[]] $Arguments) {
     Write-Host ""
     Write-Host "== $Name =="
@@ -215,6 +268,7 @@ $changelogHeading = Get-ReleaseHeading $changesPath $modVersion
 if ($changelogHeading -match "\(TBD\)") {
     throw "Changelog heading for $ModName v$modVersion is still marked (TBD). Set and commit the concrete release date before final preflight."
 }
+Assert-ReleaseVersionMatchesChangelog $changesPath $modVersion
 
 function Invoke-Git([string[]] $Arguments) {
     $output = @(& git -C $repoRoot @Arguments 2>&1)
