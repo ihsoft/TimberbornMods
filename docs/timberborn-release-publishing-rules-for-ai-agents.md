@@ -34,6 +34,10 @@ report. It may request required host or network elevation up front when practica
 Issue closing and Wiki handoff remain explicit user-confirmed follow-up steps, not automatic side effects of the
 publish script.
 
+The Discord release handoff is a local preparation step after successful publication. It may copy a proposed message
+and open the target channel, but it must never send through or automate the user's Discord account. It does not depend
+on GitHub Release creation.
+
 This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
 unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
 
@@ -605,6 +609,11 @@ Include a Discord link only when it leads to a dedicated channel for that mod, u
 generic community invite. If no dedicated channel exists, omit the generic invite and add the direct channel link later
 when it becomes available.
 
+For release-announcement handoff, the tracked Steam and Mod.IO descriptions are the source for the mod's direct
+`discord.com/channels/<server>/<channel>` URL. Keep the direct URL consistent across both descriptions. Do not guess a
+channel, choose between conflicting URLs, or substitute a generic invite. Report missing or conflicting metadata and
+propose a reviewed description update when appropriate.
+
 Preserve each platform's existing markup and file style. Steam Workshop descriptions use Steam formatting:
 
 ```text
@@ -765,6 +774,25 @@ to Steam Workshop and Mod.IO.
 
 Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
 publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.
+
+## Discord release handoff
+
+After successful publication, use `tools/prepare-discord-release-message.ps1` to prepare the mod's release announcement
+from the display name and exact released-version changelog section. The unified publish tool invokes this handoff unless
+Discord preparation was explicitly skipped, including when GitHub Release creation was skipped.
+
+The announcement contains only the release title and exact changelog section. Do not append a download link, GitHub
+Release link, or other acquisition instructions; subscribers in the dedicated mod channel already know where to obtain
+the current version.
+
+With `-Prepare`, the helper may copy the message to the local clipboard and open the tracked direct mod channel for the
+user. The user reviews and sends the message manually. Never automate a normal Discord user account, send the message,
+or treat opening the channel as evidence that an announcement was posted.
+
+Do not silently shorten, rewrite, or choose alternate player-facing text to fit Discord's 2000-character limit. If the
+message is over the limit, or the direct channel URL is missing or conflicts between tracked descriptions, report the
+problem and leave the announcement unsent. A Discord handoff failure after verified publication is a post-release
+warning; it must not misreport the already completed release as failed.
 
 ## Wiki handoff after release
 
