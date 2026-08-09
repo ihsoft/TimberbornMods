@@ -219,6 +219,12 @@ Choose the next version from the last published version of that package:
 If an existing `(TBD)` section was started as a patch version and a feature is added before publication, rename the
 pending section to the next minor version because feature scope dominates patch scope.
 
+Before committing any player-visible change, perform a semantic changelog review rather than checking only that an
+entry exists. Compare every new entry category with the top `(TBD)` heading and the package's last dated version, state
+the expected pending package version in the final review, and correct the heading before commit when the categories do
+not match it. A pending section containing any `[Feature]` entry must use the next minor version; a fix-only pending
+section uses the next patch version.
+
 Each package may have its own changelog and version stream. Update the target package changelog, not a repository-wide
 changelog, unless the task explicitly affects repository-wide release notes.
 

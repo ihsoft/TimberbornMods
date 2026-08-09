@@ -365,6 +365,9 @@ not start from them.
   committed change, re-run the applicable submission checklist before committing.
 - For player-visible or user-visible mod behavior changes, this includes re-checking the package changelog rule in
   `docs/timberborn-repository-notes.md`.
+- Re-checking the changelog means comparing every new entry category with the top `(TBD)` heading and the package's last
+  dated version. A changelog entry's presence alone does not close the gate; a feature inside a patch-numbered pending
+  section must promote that section to the next minor version before commit.
 - Do not carry forward only the investigation checklist into the final commit.
 
 ### Real-game validation gate
