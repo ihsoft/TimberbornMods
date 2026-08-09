@@ -19,6 +19,7 @@ static class MapMetadataIndexerTests {
   static readonly WaterFormClassifier WaterClassifier = new();
   static readonly SettlementSpaceClassifier SettlementClassifier = new();
   static readonly IslandClassifier IslandClassifier = new();
+  static readonly MountainClassifier MountainClassifier = new();
   static readonly List<(string Name, Action Test)> Tests = [
       ("Archive analysis counts log trees unless explicitly dead", CountsOnlyLivingLogTrees),
       ("Archive analysis trusts runtime map size over stale metadata", TrustsRuntimeMapSize),
@@ -44,6 +45,7 @@ static class MapMetadataIndexerTests {
       ("Island classifier preserves reviewed Workshop map baselines", PreservesIslandMapBaselines),
       ("Canyon classifier preserves reviewed Workshop map baselines", PreservesCanyonMapBaselines),
       ("Canyon measurements use stable public field names", UsesStableCanyonFieldNames),
+      ("Mountain classifier preserves reviewed Workshop map baselines", PreservesMountainMapBaselines),
       ("Payload cache keys use Workshop ID and canonical update time", BuildsStablePayloadCacheKey),
       ("Payload cache shards use stable Workshop ID modulo", BuildsStablePayloadCacheShard),
       ("Steam pacing applies the configured normal delay between requests", AppliesNormalSteamRequestDelay),
@@ -138,6 +140,8 @@ static class MapMetadataIndexerTests {
     Assert.Equal(0, islands.GetArrayLength());
     var canyons = analysis.Classifications[CanyonClassifier.FeatureKey];
     Assert.Equal(0, canyons.GetArrayLength());
+    var mountains = analysis.Classifications[MountainClassifier.FeatureKey];
+    Assert.Equal(0, mountains.GetArrayLength());
   }
 
   static void UsesExpectedForestBands() {
@@ -539,6 +543,25 @@ static class MapMetadataIndexerTests {
     var engineeredMap = WaterRegressionFixture.Read(Path.Combine(
         AppContext.BaseDirectory, "Fixtures", "Water", "00100-3652824726.json.gz"));
     Assert.Equal(0, new CanyonClassifier(engineeredMap).Analyze().Count);
+  }
+
+  static void PreservesMountainMapBaselines() {
+    var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Mountains");
+    var expected = new Dictionary<string, int[]>() {
+      ["badtide-canyon-3731836991.json.gz"] = [],
+      ["canyons-3768728474.json.gz"] = [14_087],
+      ["mountain-valley-3758840916.json.gz"] = [],
+      ["new-helix-mountain-3680730633.json.gz"] = [48_256, 5_968, 3_010, 2_293, 985, 585, 485, 473, 265],
+      ["new-mountain-range-3682752102.json.gz"] = [22_216, 7_240, 2_258, 1_605, 1_305, 1_159, 914, 512, 348],
+      ["spirall-mountain-3467280054.json.gz"] = [10_600, 3_009, 2_339, 1_520, 757, 475, 420, 265],
+      ["the-ravine-3732577126.json.gz"] = [],
+      ["the-volcano-3724278046.json.gz"] = [],
+    };
+    foreach (var (fixtureName, expectedAreas) in expected) {
+      var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));
+      var actualAreas = MountainClassifier.Analyze(map);
+      Assert.Equal(string.Join(",", expectedAreas), string.Join(",", actualAreas));
+    }
   }
 
   static void UsesStableCanyonFieldNames() {

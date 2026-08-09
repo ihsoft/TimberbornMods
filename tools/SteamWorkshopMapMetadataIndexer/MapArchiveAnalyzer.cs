@@ -10,7 +10,7 @@ using IgorZ.MapBrowser.WorkshopMapIndexing.Decoding;
 namespace IgorZ.MapBrowser.WorkshopMapIndexing;
 
 sealed class MapArchiveAnalyzer {
-  public const int AnalysisVersion = 13;
+  public const int AnalysisVersion = 14;
   const long MaxWorldJsonBytes = 250_000_000;
 
   public MapArchiveAnalysis Analyze(ZipArchive archive) {
@@ -30,6 +30,8 @@ sealed class MapArchiveAnalyzer {
             new IslandClassifier().Analyze(water, waterFeatures)),
         [CanyonClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
             new CanyonClassifier(water).Analyze()),
+        [MountainClassifier.FeatureKey] = JsonSerializer.SerializeToElement(
+            new MountainClassifier().Analyze(water)),
     };
     return new MapArchiveAnalysis(dimensions.Width, dimensions.Height, classifications);
   }

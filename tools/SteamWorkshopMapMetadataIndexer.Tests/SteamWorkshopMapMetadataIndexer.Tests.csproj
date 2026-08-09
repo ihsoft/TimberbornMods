@@ -52,6 +52,9 @@
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\CanyonClassification.cs">
       <Link>CanyonClassification.cs</Link>
     </Compile>
+    <Compile Include="..\SteamWorkshopMapMetadataIndexer\Classifiers\MountainClassifier.cs">
+      <Link>MountainClassifier.cs</Link>
+    </Compile>
     <Compile Include="..\SteamWorkshopMapMetadataIndexer\Decoding\WaterMapDecoder.cs">
       <Link>WaterMapDecoder.cs</Link>
     </Compile>
@@ -98,5 +101,6 @@
     <None Include="Fixtures\Forest\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Fixtures\Islands\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Fixtures\Canyons\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fixtures\Mountains\*.json.gz" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

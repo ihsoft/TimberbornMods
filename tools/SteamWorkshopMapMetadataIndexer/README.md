@@ -190,6 +190,12 @@ so saved water is supporting evidence rather than a requirement. It rejects broa
 map-scale open water, highly cyclic pits, and geometrically perfect trenches. An empty array means the payload was
 analyzed and no canyon was found; a missing key means the value is unknown.
 
+The `mountains` classifier publishes a descending array of non-overlapping projected mountain areas. It separates
+sufficiently prominent summits at their key saddles, absorbs minor peaks that share a base, and rejects candidates
+whose terrain descent is substantially cliff-dominated or primarily outlines a canyon-like enclosed depression. An
+empty array means the payload was analyzed and no useful mountains were found; a missing key means the value is
+unknown.
+
 ## Output record
 
 The JSONL output retains:
@@ -211,9 +217,9 @@ classifications, and a diagnostic `analysis_error`; consumers must not treat the
 `tools/TimberbornWorkshopSearchIndexPublisher/build_public_index.py` publishes classifications in merged search
 records as `map_classifications`. Consumers must tolerate additional classifier keys and result fields.
 
-Reviewed real-map water, island, and canyon inputs are stored as compressed decoded fixtures in the focused test
-project. They preserve the classifier inputs without redistributing complete Workshop payloads or requiring Steam
-during regression tests.
+Reviewed real-map water, island, canyon, and mountain inputs are stored as compressed decoded fixtures in the focused
+test project. They preserve the classifier inputs without redistributing complete Workshop payloads or requiring
+Steam during regression tests.
 
 The production invocation and numeric Steam/resource limits remain authoritative in
 `.github/workflows/workshop-search-index.yml`.

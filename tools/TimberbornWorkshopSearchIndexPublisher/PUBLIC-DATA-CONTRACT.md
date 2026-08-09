@@ -65,6 +65,13 @@ terrain corridors; saved surface water supports the interpretation but is not re
 basins, map-scale open water, highly cyclic pits, and geometrically perfect trenches are rejected. An empty array means
 the map was analyzed and no canyon was found. A missing `canyons` key means the value is unknown.
 
+The `mountains` result is a descending array of non-overlapping projected mountain areas in map tiles. Mountains are
+identified from locally prominent summits and their key saddles. Minor summits on a shared base are absorbed into the
+dominant mountain, while independently prominent summits divide the shared projection without double-counting it.
+Candidates dominated by abrupt terrain edges or by descent into an enclosed canyon-like depression are rejected. An
+empty array means the map was analyzed and no useful mountains were found. A missing `mountains` key means the value
+is unknown.
+
 ## Anonymous execution boundary
 
 The recurring pipeline requires no Steam account, API key, repository secret, local Steam client, or running game.

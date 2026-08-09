@@ -445,7 +445,9 @@ sealed class MapMetadataIndexer {
         || previous.Classifications?.ContainsKey(ForestDensityClassifier.FeatureKey) != true
         || previous.Classifications?.ContainsKey(WaterFormClassifier.FeatureKey) != true
         || previous.Classifications?.ContainsKey(SettlementSpaceClassifier.FeatureKey) != true
-        || previous.Classifications?.ContainsKey(IslandClassifier.FeatureKey) != true;
+        || previous.Classifications?.ContainsKey(IslandClassifier.FeatureKey) != true
+        || previous.Classifications?.ContainsKey(CanyonClassifier.FeatureKey) != true
+        || previous.Classifications?.ContainsKey(MountainClassifier.FeatureKey) != true;
   }
 
   static DateTimeOffset ParseTimestamp(string? value) {
