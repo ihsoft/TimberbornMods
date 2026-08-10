@@ -675,11 +675,13 @@ static class MapMetadataIndexerTests {
   static void PreservesMountainMapBaselines() {
     var fixtures = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Mountains");
     var expected = new Dictionary<string, int[]>() {
+      ["111112223344556677889900-3477833876.json.gz"] = [],
+      ["181602-3450324850.json.gz"] = [],
       ["badtide-canyon-3731836991.json.gz"] = [],
       ["canyons-3768728474.json.gz"] = [14_087],
       ["mountain-valley-3758840916.json.gz"] = [],
-      ["new-helix-mountain-3680730633.json.gz"] = [48_256, 5_968, 3_010, 2_293, 985, 585, 485, 473, 265],
-      ["new-mountain-range-3682752102.json.gz"] = [22_216, 7_240, 2_258, 1_605, 1_305, 1_159, 914, 512, 348],
+      ["new-helix-mountain-3680730633.json.gz"] = [5_968, 3_010, 2_293, 985, 585, 485, 473, 265],
+      ["new-mountain-range-3682752102.json.gz"] = [7_240, 2_258, 1_605, 1_305, 1_159, 995, 914, 512, 348],
       ["spirall-mountain-3467280054.json.gz"] = [10_600, 3_009, 2_339, 1_520, 757, 475, 420, 265],
       ["the-ravine-3732577126.json.gz"] = [],
       ["the-volcano-3724278046.json.gz"] = [],

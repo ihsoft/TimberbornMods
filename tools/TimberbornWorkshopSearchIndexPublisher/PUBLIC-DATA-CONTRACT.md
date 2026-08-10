@@ -27,11 +27,15 @@ tag list contains `Map` and whose payload has been inspected. Titles and descrip
 Merged records retain public title, description, tags, author, timestamps, votes, category evidence, and primary
 `preview_url`. The URL is metadata only; the indexing pipeline does not download or analyze the image. Inspected map
 records may additionally contain `map_width`, `map_height`, `map_analysis_version`,
-`map_metadata_collection_state`, and `map_classifications`.
+`map_analysis_revision`, `map_metadata_collection_state`, and `map_classifications`.
+
+`map_analysis_version` identifies the compatible classification contract understood by consumers. An indexer-only
+change that preserves that contract increments `map_analysis_revision` instead, causing cached payloads to be
+reanalyzed without requiring a consumer update. Records written before revisions were introduced have revision `0`.
 
 `map_metadata_collection_state` may be `fetched`, `stale`, or `unsupported`. An unsupported record can expose
 `map_analysis_error` for diagnostics but does not expose dimensions or classifications. It is retried when its source
-Workshop timestamp or archive analysis version changes.
+Workshop timestamp, archive analysis version, or archive analysis revision changes.
 
 Map dimensions come from the payload's runtime `world.json` map size. `map_metadata.json` is used only as a fallback
 for older payloads that do not serialize that runtime singleton.

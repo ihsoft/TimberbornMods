@@ -24,6 +24,7 @@ sealed class MapMetadataIndexer {
       [property: JsonPropertyName("published_file_id")] string PublishedFileId,
       [property: JsonPropertyName("source_updated_at_utc")] string? SourceUpdatedAtUtc,
       [property: JsonPropertyName("analysis_version")] int AnalysisVersion,
+      [property: JsonPropertyName("analysis_revision")] int AnalysisRevision,
       [property: JsonPropertyName("map_width")] int MapWidth,
       [property: JsonPropertyName("map_height")] int MapHeight,
       [property: JsonPropertyName("classifications")] IReadOnlyDictionary<string, JsonElement>? Classifications,
@@ -217,12 +218,14 @@ sealed class MapMetadataIndexer {
     static MapMetadataRecord CreateFetchedRecord(MapItem map, MapArchiveAnalysis analysis) {
       return new MapMetadataRecord(
           map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+          MapArchiveAnalyzer.AnalysisRevision,
           analysis.Width, analysis.Height, analysis.Classifications, "fetched", null);
     }
 
     static MapMetadataRecord CreateUnsupportedRecord(MapItem map, Exception exception) {
       return new MapMetadataRecord(
           map.PublishedFileId, map.UpdatedAtUtc, MapArchiveAnalyzer.AnalysisVersion,
+          MapArchiveAnalyzer.AnalysisRevision,
           0, 0, null, "unsupported", exception.Message);
     }
 
@@ -435,12 +438,14 @@ sealed class MapMetadataIndexer {
     if (previous is not null
         && previous.CollectionState == "unsupported"
         && previous.SourceUpdatedAtUtc == map.UpdatedAtUtc
-        && previous.AnalysisVersion == MapArchiveAnalyzer.AnalysisVersion) {
+        && previous.AnalysisVersion == MapArchiveAnalyzer.AnalysisVersion
+        && previous.AnalysisRevision == MapArchiveAnalyzer.AnalysisRevision) {
       return false;
     }
     return previous is null || previous.CollectionState == "stale"
         || previous.SourceUpdatedAtUtc != map.UpdatedAtUtc
         || previous.AnalysisVersion != MapArchiveAnalyzer.AnalysisVersion
+        || previous.AnalysisRevision != MapArchiveAnalyzer.AnalysisRevision
         || previous.MapWidth < 1 || previous.MapHeight < 1
         || previous.Classifications?.ContainsKey(ForestDensityClassifier.FeatureKey) != true
         || previous.Classifications?.ContainsKey(WaterFormClassifier.FeatureKey) != true

@@ -11,6 +11,7 @@ sealed class MountainClassifier {
   public const string FeatureKey = "mountains";
   const double MaximumCliffRatio = 0.25;
   const double MaximumEnclosedDepressionRatio = 0.15;
+  const double MaximumLowestContourRatio = 0.80;
   const double MinimumRadialDescentRatio = 0.75;
   const int MinimumProminence = 4;
   const int RayCount = 32;
@@ -23,7 +24,10 @@ sealed class MountainClassifier {
     public int Representative => Cells[0];
   }
 
-  sealed record ShapeMeasurement(double CliffRatio, int LargestEnclosedDepressionArea);
+  sealed record MountainFootprint(int Level, IReadOnlyList<int> Cells);
+
+  sealed record ShapeMeasurement(
+      double CliffRatio, int LargestEnclosedDepressionArea, double LowestContourRatio);
 
   /// <summary>Finds independent mountains and returns their non-overlapping projected areas.</summary>
   public IReadOnlyList<int> Analyze(DecodedWaterMap map) {
@@ -41,25 +45,23 @@ sealed class MountainClassifier {
     var candidates = new List<MountainCandidate>();
     foreach (var peak in peaks) {
       var saddle = FindKeySaddle(peak, peaks, contours, minimumHeight);
-      var prominence = peak.Height - saddle;
-      if (prominence < MinimumProminence) {
+      if (peak.Height - saddle < MinimumProminence) {
         continue;
       }
 
-      // The component immediately above the key saddle is the summit's complete lobe before it joins a higher peak.
-      var footprintLevel = Math.Min(peak.Height, saddle + 1);
-      var contour = contours[footprintLevel];
-      var footprint = contour.Components[contour.OwnerByCell[peak.Representative]];
-      if (footprint.Count < minimumArea) {
+      var footprint = FindFootprint(peak, saddle, contours, map.Width, map.Height);
+      var prominence = peak.Height - (footprint.Level - 1);
+      if (prominence < MinimumProminence || footprint.Cells.Count < minimumArea) {
         continue;
       }
-      var shape = MeasureShape(footprint, terrain, map.Width, map.Height);
+      var shape = MeasureShape(footprint.Cells, terrain, map.Width, map.Height);
       if (shape.CliffRatio > MaximumCliffRatio
-          || shape.LargestEnclosedDepressionArea > footprint.Count * MaximumEnclosedDepressionRatio
+          || shape.LargestEnclosedDepressionArea > footprint.Cells.Count * MaximumEnclosedDepressionRatio
+          || shape.LowestContourRatio > MaximumLowestContourRatio
           || MeasureRadialDescent(peak, prominence, terrain, map.Width, map.Height) < MinimumRadialDescentRatio) {
         continue;
       }
-      candidates.Add(new MountainCandidate(footprint));
+      candidates.Add(new MountainCandidate(footprint.Cells));
     }
 
     // Smaller saddle lobes own their cells first. A dominant mountain then receives the remaining shared base, so
@@ -92,6 +94,40 @@ sealed class MountainClassifier {
       }
     }
     return minimumHeight;
+  }
+
+  static MountainFootprint FindFootprint(
+      Peak peak, int saddle, IReadOnlyDictionary<int, ContourLevel> contours, int width, int height) {
+    // A global maximum has no higher summit to define its saddle, so its first contour can swallow the entire map.
+    // Raise that contour until the summit becomes a bounded landform rather than treating the surrounding terrain as
+    // part of the mountain.
+    for (var level = Math.Min(peak.Height, saddle + 1); level <= peak.Height; level++) {
+      var contour = contours[level];
+      var cells = contour.Components[contour.OwnerByCell[peak.Representative]];
+      if (!TouchesAllMapSides(cells, width, height)) {
+        return new MountainFootprint(level, cells);
+      }
+    }
+    return new MountainFootprint(peak.Height, peak.Cells);
+  }
+
+  static bool TouchesAllMapSides(IReadOnlyList<int> cells, int width, int height) {
+    var left = false;
+    var right = false;
+    var bottom = false;
+    var top = false;
+    foreach (var cell in cells) {
+      var x = cell % width;
+      var y = cell / width;
+      left |= x == 0;
+      right |= x == width - 1;
+      bottom |= y == 0;
+      top |= y == height - 1;
+      if (left && right && bottom && top) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static IReadOnlyList<Peak> FindPeaks(int[] terrain, int width, int height) {
@@ -206,7 +242,9 @@ sealed class MountainClassifier {
         largestDepression = Math.Max(largestDepression, area);
       }
     }
-    return new ShapeMeasurement(cliffRatio, largestDepression);
+    var lowestContour = cells.Min(cell => terrain[cell]);
+    var lowestContourRatio = cells.Count(cell => terrain[cell] == lowestContour) / (double) cells.Count;
+    return new ShapeMeasurement(cliffRatio, largestDepression, lowestContourRatio);
   }
 
   static double MeasureRadialDescent(Peak peak, int prominence, int[] terrain, int width, int height) {

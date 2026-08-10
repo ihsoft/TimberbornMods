@@ -62,6 +62,7 @@ def main() -> int:
         if map_metadata:
             record["map_metadata_collection_state"] = map_metadata.get("collection_state")
             record["map_analysis_version"] = map_metadata.get("analysis_version")
+            record["map_analysis_revision"] = map_metadata.get("analysis_revision", 0)
             if map_metadata.get("analysis_error"):
                 record["map_analysis_error"] = map_metadata["analysis_error"]
             if map_metadata.get("map_width", 0) > 0 and map_metadata.get("map_height", 0) > 0:

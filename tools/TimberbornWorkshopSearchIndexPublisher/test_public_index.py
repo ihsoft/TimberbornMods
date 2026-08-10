@@ -44,6 +44,7 @@ class PublicIndexContractTest(unittest.TestCase):
             write_json_lines(map_metadata, [{
                 "published_file_id": "1",
                 "analysis_version": 1,
+                "analysis_revision": 3,
                 "map_width": 128,
                 "map_height": 128,
                 "classifications": {
@@ -106,6 +107,7 @@ class PublicIndexContractTest(unittest.TestCase):
             self.assertEqual(128, consumer_records[0]["map_width"])
             self.assertEqual(128, consumer_records[0]["map_height"])
             self.assertEqual(1, consumer_records[0]["map_analysis_version"])
+            self.assertEqual(3, consumer_records[0]["map_analysis_revision"])
             self.assertEqual(
                 2,
                 consumer_records[0]["map_classifications"]["forest_density"]["level"],
@@ -162,6 +164,7 @@ class PublicIndexContractTest(unittest.TestCase):
             with gzip.open(output / "search-index.jsonl.gz", "rt", encoding="utf-8") as stream:
                 record = json.loads(next(stream))
             self.assertEqual("unsupported", record["map_metadata_collection_state"])
+            self.assertEqual(0, record["map_analysis_revision"])
             self.assertEqual("unknown terrain format", record["map_analysis_error"])
             self.assertNotIn("map_width", record)
             self.assertNotIn("map_classifications", record)

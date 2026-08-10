@@ -5,12 +5,13 @@ extracts exact map properties. It does not use a Steam account, API key, subscri
 process.
 
 The tool incrementally reuses records from `--previous-results`. A map is analyzed again when its Workshop update
-timestamp changes, its previous result is stale, or `MapArchiveAnalyzer.AnalysisVersion` increases. Steam requests are
-sequential, and the first Steam/UGC request failure stops the pass before another request is sent. A downloaded payload
+timestamp changes, its previous result is stale, or the current analysis version or revision increases. Steam requests
+are sequential, and the first Steam/UGC request failure stops the pass before another request is sent. A downloaded payload
 whose archive or map format cannot be analyzed is recorded as `unsupported`, and processing continues with the next
 map. Payloads whose snapshot-declared or downloaded size exceeds `--max-download-bytes` are handled the same way.
 Current `unsupported` results are excluded from background cache population and retried only after the Workshop item
-or analysis version changes.
+or analysis identity changes. `AnalysisVersion` identifies the consumer-compatible classification contract;
+`AnalysisRevision` forces a cached reanalysis when implementation changes preserve that contract.
 
 The narrow transient `k_EResultBusy`, `k_EResultNoConnection`, and `k_EResultFail` request results, plus timeouts waiting
 for a Steam request callback, are retried twice: first after a 20-second cooldown and then after a 40-second cooldown.
