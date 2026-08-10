@@ -515,6 +515,10 @@ static class MapMetadataIndexerTests {
           (122.3, 21.2, 16), (90.5, 17.6, 16),
       ],
       ["badwater-canyon-3777391151.json.gz"] = [(43.4, 2.6, 3)],
+      ["beaver-captial-3350716809.json.gz"] = [
+          (152.1, 3.3, 3), (84.9, 3.4, 3), (61.7, 1.6, 3),
+          (55.3, 3.8, 3), (48.3, 3.4, 3), (41.9, 3.6, 3),
+      ],
       ["canyon-system-3738296211.json.gz"] = [
           (134.2, 5.5, 14), (117.9, 5.6, 14), (90.4, 6.1, 13), (88.5, 5.7, 14),
           (72.2, 5.7, 14), (65.6, 5.9, 14), (49.4, 5.7, 13), (44, 6.3, 14),
@@ -525,6 +529,7 @@ static class MapMetadataIndexerTests {
       ],
       ["meandering-river-3753226036.json.gz"] = [],
       ["mountain-pool-3721128633.json.gz"] = [],
+      ["mountainside-mines-3352319594.json.gz"] = [],
       ["old-thousand-islands-redux-3674111487.json.gz"] = [],
       ["palace-of-the-witch-architect-3658190661.json.gz"] = [],
       ["three-layer-canyons-3745388025.json.gz"] = [
@@ -534,6 +539,7 @@ static class MapMetadataIndexerTests {
       ],
       ["valley-of-thorns-3758079982.json.gz"] = [],
       ["water-pit-3700404382.json.gz"] = [],
+      ["water-highway-crossing-3523046228.json.gz"] = [],
     };
     foreach (var (fixtureName, expectedCanyons) in expected) {
       var map = WaterRegressionFixture.Read(Path.Combine(fixtures, fixtureName));

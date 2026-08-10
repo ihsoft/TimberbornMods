@@ -21,6 +21,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
   const double MinimumBankSlope = 0.25;
   const double MinimumExternalWaterBodyRatio = 0.4;
   const double MinimumExternalWaterCoverage = 0.8;
+  const double MinimumExposedBankHeight = 0.5;
   const double MinimumLengthToWidthRatio = 4;
   const double MinimumMedianBankSlope = 0.75;
   const double MinimumMedianNormalAlignment = 0.7;
@@ -109,6 +110,14 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     if (observedWaterFraction >= MinimumExternalWaterCoverage
         && dominantWaterBodyRatio >= MinimumExternalWaterBodyRatio) {
       // A narrow spine through a map-scale lake is open water, not a submerged canyon floor.
+      return null;
+    }
+    var medianExposedBankHeight = Percentile(cells
+        .Select(cell => Math.Max(0, sections[cell].BankHeight - _map.SurfaceDepths[cell]))
+        .Order().ToList(), 0.5);
+    if (observedWaterFraction >= MinimumExternalWaterCoverage
+        && medianExposedBankHeight < MinimumExposedBankHeight) {
+      // Water reaching almost to both banks is a deep river channel rather than an exposed canyon floor.
       return null;
     }
 
