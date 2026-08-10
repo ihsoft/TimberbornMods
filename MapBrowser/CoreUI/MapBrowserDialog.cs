@@ -21,7 +21,6 @@ using UnityEngine.UIElements;
 namespace IgorZ.MapBrowser.CoreUI;
 
 sealed class MapBrowserDialog : AbstractDialog {
-  const string AnalysisFullLocKey = "IgorZ.MapBrowser.Analysis.Full";
   const string AnalysisLevelLocKeyPrefix = "IgorZ.MapBrowser.Analysis.Level.";
   const string AnalysisLevelUnknownLocKey = "IgorZ.MapBrowser.Analysis.Level.Unknown";
   const string BrowserInstalledMapsLocKey = "IgorZ.MapBrowser.Browser.InstalledMaps";
@@ -299,8 +298,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     var row = UiFactory.LoadVisualTreeAsset(MapRowAsset);
     var binding = new RowBinding();
     row.userData = binding;
-    var analysis = row.Q2<Label>("Analysis");
-    _tooltipRegistrar.Register(analysis, () => binding.Tooltip);
     var description = row.Q2<Label>("Description");
     description.RegisterCallback<GeometryChangedEvent>(_ => FitDescription(description, binding.Description));
     var actions = row.Q2<VisualElement>("Actions");
@@ -371,7 +368,6 @@ sealed class MapBrowserDialog : AbstractDialog {
     var analysis = row.Q<Label>("Analysis");
     analysis.text = metadata != null ? FormatCompactAnalysis(metadata) : UiFactory.T(SourceLocalLocKey);
     analysis.ToggleDisplayStyle(metadata != null || installedMap.PublishedFileId == null);
-    binding.Tooltip = metadata != null ? FormatAnalysisTooltip(metadata) : null;
     var freshness = row.Q<Label>("Freshness");
     freshness.text = FormatFreshness(installedMap, metadata);
     freshness.ToggleDisplayStyle(
@@ -581,14 +577,9 @@ sealed class MapBrowserDialog : AbstractDialog {
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
-    return string.Format(
-        uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
+    return string.Join("\n", GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
         GetSettlementSpace(metadata, uiFactory), GetIslandLevel(metadata, uiFactory),
         GetCanyonLevel(metadata, uiFactory), GetMountainLevel(metadata, uiFactory));
-  }
-
-  string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
-    return FormatFullAnalysis(metadata, UiFactory);
   }
 
   static string GetForestLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
@@ -1033,7 +1024,6 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   sealed class RowBinding {
     public string Key { get; set; }
-    public string Tooltip { get; set; }
     public string Description { get; set; }
     public InstalledMap Map { get; set; }
     public string ActionText { get; set; }
