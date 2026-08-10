@@ -27,16 +27,21 @@ IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip,"Эта карта больш
 IgorZ.MapBrowser.Analysis.Full,"Леса: {0}
 Вода: {1}
 Место: {2}
-{3}","Full exact map analysis shown in the details dialog."
+{3}
+{4}","Full exact map analysis shown in the details dialog."
 IgorZ.MapBrowser.Analysis.Level.Barren,"Мало леса","Very low forest density classification."
 IgorZ.MapBrowser.Analysis.Level.DenseForest,"Густой лес","Very high forest density classification."
+IgorZ.MapBrowser.Analysis.Level.DeepCanyons,"Глубокие каньоны","Search for maps with a canyon whose median bank height is at least eight terrain levels."
 IgorZ.MapBrowser.Analysis.Level.Forested,"Много леса","High forest density classification."
+IgorZ.MapBrowser.Analysis.Level.HasCanyons,"Есть каньоны","Search for maps with at least one detected canyon."
 IgorZ.MapBrowser.Analysis.Level.HasIslands,"Есть острова","Search for maps with at least one useful island."
 IgorZ.MapBrowser.Analysis.Level.Lakes,"Озёра","Open water is mainly represented by lakes."
 IgorZ.MapBrowser.Analysis.Level.LargeIslands,"Большие острова","Search for maps where most useful islands cover at least seven percent of the map."
 IgorZ.MapBrowser.Analysis.Level.LittleSpace,"Мало места","Map has fewer than eight settlement-space cores."
+IgorZ.MapBrowser.Analysis.Level.LongCanyons,"Длинные каньоны","Search for maps with a canyon at least half as long as the map's longer side."
 IgorZ.MapBrowser.Analysis.Level.ModerateForests,"Средняя лесистость","Middle forest density classification."
 IgorZ.MapBrowser.Analysis.Level.MuchSpace,"Много места","Map has sufficient settlement space without a dominant terrain shape."
+IgorZ.MapBrowser.Analysis.Level.NoCanyons,"Нет каньонов","Search for maps where no canyons were found."
 IgorZ.MapBrowser.Analysis.Level.NoIslands,"Нет островов","Search for maps where no useful islands were found."
 IgorZ.MapBrowser.Analysis.Level.NoWater,"Нет открытой воды","No open water was found on the map."
 IgorZ.MapBrowser.Analysis.Level.Plain,"Равнина","Most settlement space is on broad neighboring terrain levels."
@@ -65,6 +70,7 @@ IgorZ.MapBrowser.Freshness.Missing,"Актуальность: этой карт�
 IgorZ.MapBrowser.Freshness.Stale,"Предупреждение об актуальности: карта изменилась после точного анализа и ещё не была проиндексирована заново.","Warning shown when saved exact map analysis is stale."
 =,=,Workshop search
 IgorZ.MapBrowser.Search.Any,"Неважно","Filter option that does not restrict search results."
+IgorZ.MapBrowser.Search.Filter.Canyons,"Каньоны","Label for the canyon search filter."
 IgorZ.MapBrowser.Search.Filter.Forests,"Леса","Label for the forest density search filter."
 IgorZ.MapBrowser.Search.Filter.Islands,"Острова","Label for the island search filter."
 IgorZ.MapBrowser.Search.Filter.SettlementSpace,"Место","Label for the settlement-space search filter."

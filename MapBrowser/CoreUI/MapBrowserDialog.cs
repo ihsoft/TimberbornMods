@@ -57,10 +57,12 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
   const int CurrentMapAnalysisVersion = 14;
+  const double DeepCanyonBankHeight = 8;
   const float DialogHeightRatio = 0.80f;
   const float DialogMaxWidthRatio = 0.94f;
   const float DialogWidthToHeightRatio = 1200f / 820f * 1.30f;
   const double LargeIslandAreaRatio = 0.07;
+  const double LongCanyonLengthRatio = 0.50;
   const double WaterCoveredRatio = 0.40;
   const double WaterCoveredBoundaryRatio = 0.50;
   const double WaterCoveredBodyRatio = 0.45;
@@ -78,6 +80,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     new("water", ["NoWater", "Rivers", "Lakes", "RiversAndLakes", "WaterCovered"]),
     new("settlement_space", ["LittleSpace", "MuchSpace", "Plain", "Terraces", "Plateau"]),
     new("islands", ["NoIslands", "HasIslands", "LargeIslands", "SmallIslands"]),
+    new("canyons", ["NoCanyons", "HasCanyons", "LongCanyons", "DeepCanyons"]),
   ];
 
   readonly MapItemProvider _mapItemProvider;
@@ -510,6 +513,10 @@ sealed class MapBrowserDialog : AbstractDialog {
         if (!MatchesIslands(metadata, selectedValue)) {
           return false;
         }
+      } else if (filter.Feature == "canyons") {
+        if (!MatchesCanyons(metadata, selectedValue)) {
+          return false;
+        }
       } else if (!TryGetClassificationValue(metadata, filter.Feature, out var value) || value != selectedValue) {
         return false;
       }
@@ -563,13 +570,15 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
     return string.Join(", ", GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
-        GetSettlementSpace(metadata, UiFactory), GetIslandLevel(metadata, UiFactory));
+        GetSettlementSpace(metadata, UiFactory), GetIslandLevel(metadata, UiFactory),
+        GetCanyonLevel(metadata, UiFactory));
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
     return string.Format(
         uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
-        GetSettlementSpace(metadata, uiFactory), GetIslandLevel(metadata, uiFactory));
+        GetSettlementSpace(metadata, uiFactory), GetIslandLevel(metadata, uiFactory),
+        GetCanyonLevel(metadata, uiFactory));
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
@@ -656,6 +665,45 @@ sealed class MapBrowserDialog : AbstractDialog {
   static int GetLargeIslandCount(WorkshopItemMetadata metadata, List<int> islands) {
     var mapArea = (double)metadata.MapWidth * metadata.MapHeight;
     return islands.Count(area => area / mapArea >= LargeIslandAreaRatio);
+  }
+
+  static string GetCanyonLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var canyons = metadata.MapClassifications?.Canyons;
+    if (canyons == null) {
+      return GetLocalizedLevel(null, uiFactory);
+    }
+    if (canyons.Count == 0) {
+      return GetLocalizedLevel("NoCanyons", uiFactory);
+    }
+
+    var levels = new List<string>();
+    if (canyons.Any(canyon => IsLongCanyon(metadata, canyon))) {
+      levels.Add(GetLocalizedLevel("LongCanyons", uiFactory));
+    }
+    if (canyons.Any(canyon => canyon.MedianBankHeight >= DeepCanyonBankHeight)) {
+      levels.Add(GetLocalizedLevel("DeepCanyons", uiFactory));
+    }
+    return levels.Count > 0
+        ? string.Join(", ", levels)
+        : GetLocalizedLevel("HasCanyons", uiFactory);
+  }
+
+  static bool MatchesCanyons(WorkshopItemMetadata metadata, string selectedValue) {
+    var canyons = metadata.MapClassifications?.Canyons;
+    if (canyons == null) {
+      return false;
+    }
+    return selectedValue switch {
+        "NoCanyons" => canyons.Count == 0,
+        "HasCanyons" => canyons.Count > 0,
+        "LongCanyons" => canyons.Any(canyon => IsLongCanyon(metadata, canyon)),
+        "DeepCanyons" => canyons.Any(canyon => canyon.MedianBankHeight >= DeepCanyonBankHeight),
+        _ => false,
+    };
+  }
+
+  static bool IsLongCanyon(WorkshopItemMetadata metadata, CanyonClassification canyon) {
+    return canyon.Length / Math.Max(metadata.MapWidth, metadata.MapHeight) >= LongCanyonLengthRatio;
   }
 
   static string GetLocalizedLevel(string levelName, UiFactory uiFactory) {
