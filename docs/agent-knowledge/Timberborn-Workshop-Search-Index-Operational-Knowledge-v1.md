@@ -146,6 +146,9 @@ Choose validation according to the changed ownership surface:
 
 - For exact archive classifier, stale/reuse, and public-schema generation changes, run focused local tests over
   deterministic fixtures.
+- When optimizing a discrete grid or ray classifier, benchmark arithmetic cost as well as visited-sample count.
+  Preserve the existing discrete sampling lattice with a reference oracle, and explicitly test positive and negative
+  exact-boundary behavior for `Floor`-based traversal.
 - For a frontend or in-game consumer, test the documented schema version, missing optional data, stale records, and
   unknown future fields, feature keys, and labels.
 - For Steam integration changes, use bounded read-only probes before a corpus run.
