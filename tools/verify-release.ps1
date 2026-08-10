@@ -201,6 +201,9 @@ function Assert-ReleaseVersionMatchesChangelog([string] $ChangesPath, [string] $
     }
 
     if ($null -eq $previous) {
+        if ($Version -eq "1.0.0") {
+            return
+        }
         throw "Cannot validate feature version $Version because no previous dated release was found in $ChangesPath."
     }
 
