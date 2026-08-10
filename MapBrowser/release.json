@@ -1,0 +1,27 @@
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/MapBrowser/manifest.json",
+  "ChangesPath": "MapBrowser/CHANGELOG.md",
+  "ReleaseVersion": "1.0.0",
+  "ScriptFileBase": "MapBrowser",
+  "ReadyForPublish": true,
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "_MODS!/MapBrowser",
+    "OutputPath": "_MODS!/MapBrowser_v1.0.0.zip",
+    "MaxAgeDays": 14
+  },
+  "ManifestVersions": {
+    "version-1.1": "1.0.0"
+  },
+  "GameVersionCompatibility": {
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  },
+  "Steam": {
+    "PublishedFileId": "3780949262",
+    "AllowSingleGameVersion": true,
+    "CompatibilityReason": "MapBrowser's first release targets Timberborn 1.1."
+  }
+}
