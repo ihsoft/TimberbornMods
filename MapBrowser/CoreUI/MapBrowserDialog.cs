@@ -56,12 +56,13 @@ sealed class MapBrowserDialog : AbstractDialog {
   const string WorkshopUnavailableTooltipLocKey = "IgorZ.MapBrowser.Action.WorkshopUnavailableTooltip";
   const string FreshnessMissingLocKey = "IgorZ.MapBrowser.Freshness.Missing";
   const string FreshnessStaleLocKey = "IgorZ.MapBrowser.Freshness.Stale";
-  const int CurrentMapAnalysisVersion = 14;
+  const int CurrentMapAnalysisVersion = 15;
   const double DeepCanyonBankHeight = 8;
   const float DialogHeightRatio = 0.80f;
   const float DialogMaxWidthRatio = 0.94f;
   const float DialogWidthToHeightRatio = 1200f / 820f * 1.30f;
   const double LargeIslandAreaRatio = 0.07;
+  const double LargeMountainAreaRatio = 0.07;
   const double LongCanyonLengthRatio = 0.50;
   const double WaterCoveredRatio = 0.40;
   const double WaterCoveredBoundaryRatio = 0.50;
@@ -81,6 +82,7 @@ sealed class MapBrowserDialog : AbstractDialog {
     new("settlement_space", ["LittleSpace", "MuchSpace", "Plain", "Terraces", "Plateau"]),
     new("islands", ["NoIslands", "HasIslands", "LargeIslands", "SmallIslands"]),
     new("canyons", ["NoCanyons", "HasCanyons", "LongCanyons", "DeepCanyons"]),
+    new("mountains", ["NoMountains", "HasMountains", "LargeMountains", "SmallMountains"]),
   ];
 
   readonly MapItemProvider _mapItemProvider;
@@ -517,6 +519,10 @@ sealed class MapBrowserDialog : AbstractDialog {
         if (!MatchesCanyons(metadata, selectedValue)) {
           return false;
         }
+      } else if (filter.Feature == "mountains") {
+        if (!MatchesMountains(metadata, selectedValue)) {
+          return false;
+        }
       } else if (!TryGetClassificationValue(metadata, filter.Feature, out var value) || value != selectedValue) {
         return false;
       }
@@ -571,14 +577,14 @@ sealed class MapBrowserDialog : AbstractDialog {
   string FormatCompactAnalysis(WorkshopItemMetadata metadata) {
     return string.Join(", ", GetForestLevel(metadata, UiFactory), GetWaterForm(metadata, UiFactory),
         GetSettlementSpace(metadata, UiFactory), GetIslandLevel(metadata, UiFactory),
-        GetCanyonLevel(metadata, UiFactory));
+        GetCanyonLevel(metadata, UiFactory), GetMountainLevel(metadata, UiFactory));
   }
 
   internal static string FormatFullAnalysis(WorkshopItemMetadata metadata, UiFactory uiFactory) {
     return string.Format(
         uiFactory.T(AnalysisFullLocKey), GetForestLevel(metadata, uiFactory), GetWaterForm(metadata, uiFactory),
         GetSettlementSpace(metadata, uiFactory), GetIslandLevel(metadata, uiFactory),
-        GetCanyonLevel(metadata, uiFactory));
+        GetCanyonLevel(metadata, uiFactory), GetMountainLevel(metadata, uiFactory));
   }
 
   string FormatAnalysisTooltip(WorkshopItemMetadata metadata) {
@@ -704,6 +710,36 @@ sealed class MapBrowserDialog : AbstractDialog {
 
   static bool IsLongCanyon(WorkshopItemMetadata metadata, CanyonClassification canyon) {
     return canyon.Length / Math.Max(metadata.MapWidth, metadata.MapHeight) >= LongCanyonLengthRatio;
+  }
+
+  static string GetMountainLevel(WorkshopItemMetadata metadata, UiFactory uiFactory) {
+    var mountains = metadata.MapClassifications?.Mountains;
+    if (mountains == null) {
+      return GetLocalizedLevel(null, uiFactory);
+    }
+    if (mountains.Count == 0) {
+      return GetLocalizedLevel("NoMountains", uiFactory);
+    }
+    return GetLocalizedLevel(HasLargeMountain(metadata, mountains) ? "LargeMountains" : "SmallMountains", uiFactory);
+  }
+
+  static bool MatchesMountains(WorkshopItemMetadata metadata, string selectedValue) {
+    var mountains = metadata.MapClassifications?.Mountains;
+    if (mountains == null) {
+      return false;
+    }
+    return selectedValue switch {
+        "NoMountains" => mountains.Count == 0,
+        "HasMountains" => mountains.Count > 0,
+        "LargeMountains" => mountains.Count > 0 && HasLargeMountain(metadata, mountains),
+        "SmallMountains" => mountains.Count > 0 && !HasLargeMountain(metadata, mountains),
+        _ => false,
+    };
+  }
+
+  static bool HasLargeMountain(WorkshopItemMetadata metadata, List<int> mountains) {
+    var mapArea = (double)metadata.MapWidth * metadata.MapHeight;
+    return mountains.Any(area => area / mapArea >= LargeMountainAreaRatio);
   }
 
   static string GetLocalizedLevel(string levelName, UiFactory uiFactory) {

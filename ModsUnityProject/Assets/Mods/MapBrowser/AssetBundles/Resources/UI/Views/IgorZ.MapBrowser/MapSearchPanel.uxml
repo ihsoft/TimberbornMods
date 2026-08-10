@@ -29,6 +29,10 @@
                 <Timberborn.CoreUI.LocalizableLabel name="canyonsLabel" text="Canyons" text-loc-key="IgorZ.MapBrowser.Search.Filter.Canyons" class="text--default" style="margin-right: 3px;"/>
                 <Timberborn.DropdownSystem.Dropdown name="canyonsDropdown" style="width: 170px; flex-shrink: 0;"/>
             </engine:VisualElement>
+            <engine:VisualElement name="mountainsFilter" style="flex-direction: row; align-items: center; margin-bottom: 0; margin-right: 5px;">
+                <Timberborn.CoreUI.LocalizableLabel name="mountainsLabel" text="Mountains" text-loc-key="IgorZ.MapBrowser.Search.Filter.Mountains" class="text--default" style="margin-right: 3px;"/>
+                <Timberborn.DropdownSystem.Dropdown name="mountainsDropdown" style="width: 170px; flex-shrink: 0;"/>
+            </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

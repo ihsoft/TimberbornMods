@@ -86,6 +86,12 @@ sealed class MapClassifications {
   /// <summary>Measured canyon systems. An empty list means none were found; <c>null</c> means unknown.</summary>
   [JsonProperty("canyons")]
   public List<CanyonClassification> Canyons { get; set; }
+
+  /// <summary>
+  /// Non-overlapping projected mountain areas. An empty list means none were found; <c>null</c> means unknown.
+  /// </summary>
+  [JsonProperty("mountains")]
+  public List<int> Mountains { get; set; }
 }
 
 sealed class CanyonClassification {
