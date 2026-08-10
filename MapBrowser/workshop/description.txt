@@ -16,7 +16,7 @@ Use it to inspect installed custom maps, search Workshop maps by keywords and ma
 [h1]Features[/h1]
 [list]
 [*] Browse installed custom maps with Workshop titles, descriptions, previews, galleries, live statistics, and map dimensions.
-[*] Search indexed Workshop maps by keywords, terrain, valleys, water, forests, landform, and layout.
+[*] Search indexed Workshop maps by keywords, forest density, water form, settlement space, islands, canyons, and mountains.
 [*] Subscribe to Workshop maps from search results or map details without restarting the game.
 [*] Unsubscribe from Workshop maps or permanently delete local map files.
 [/list]
