@@ -561,8 +561,10 @@ static class MapMetadataIndexerTests {
     const int height = 128;
     var cases = new (string Name, int Cell, double DirectionX, double DirectionY, int? RiseSample)[] {
         ("axis-aligned", 64 + 64 * width, 1, 0, 4),
+        ("negative-axis-boundary", 64 + 64 * width, -1, 0, 4),
         ("diagonal", 64 + 64 * width, Math.Sqrt(0.5), Math.Sqrt(0.5), 5),
         ("near-axis", 64 + 64 * width, Math.Cos(Math.PI / 32), Math.Sin(Math.PI / 32), 6),
+        ("near-negative-axis", 64 + 64 * width, -Math.Cos(Math.PI / 32), Math.Sin(Math.PI / 32), 6),
         ("long", 64 + 64 * width, Math.Cos(Math.PI * 15 / 32), Math.Sin(Math.PI * 15 / 32), 35),
         ("boundary-exit", 1 + 64 * width, -1, 0, null),
     };

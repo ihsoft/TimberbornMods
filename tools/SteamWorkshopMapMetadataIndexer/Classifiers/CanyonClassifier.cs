@@ -27,6 +27,7 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
   const double MinimumMedianNormalAlignment = 0.7;
   const double MinimumSpatialExtentToLengthRatio = 0.45;
   const int DirectionCount = 16;
+  const double RayBoundaryEpsilon = 1e-10;
   const double RayStep = 0.25;
 
   sealed record Branch(
@@ -227,18 +228,38 @@ sealed class CanyonClassifier(DecodedWaterMap map) {
     var startX = cell % _map.Width + 0.5;
     var startY = cell / _map.Width + 0.5;
     var floorHeight = _map.TerrainHeights[cell];
-    var lastSample = -1;
     var firstRiseDistance = double.NaN;
     var maximumHeight = double.NegativeInfinity;
     var maximumHeightDistance = double.NaN;
-    for (var distance = RayStep; distance <= MaximumBottomWidth + BankSearchDistance; distance += RayStep) {
+    var maximumSampleIndex = (int) ((MaximumBottomWidth + BankSearchDistance) / RayStep);
+    // Floor assigns an exact boundary to the cell on its positive side, so negative rays cross just after it.
+    var nextBoundaryX = directionX == 0
+        ? double.PositiveInfinity
+        : 0.5 / Math.Abs(directionX) + (directionX < 0 ? RayBoundaryEpsilon : 0);
+    var nextBoundaryY = directionY == 0
+        ? double.PositiveInfinity
+        : 0.5 / Math.Abs(directionY) + (directionY < 0 ? RayBoundaryEpsilon : 0);
+    var boundaryDeltaX = directionX == 0 ? double.PositiveInfinity : 1 / Math.Abs(directionX);
+    var boundaryDeltaY = directionY == 0 ? double.PositiveInfinity : 1 / Math.Abs(directionY);
+    var lastSample = -1;
+    for (var sampleIndex = 1; sampleIndex <= maximumSampleIndex;) {
+      var distance = sampleIndex * RayStep;
       var x = (int) Math.Floor(startX + directionX * distance);
       var y = (int) Math.Floor(startY + directionY * distance);
       if (x < 0 || x >= _map.Width || y < 0 || y >= _map.Height) {
         return new RayMeasurement(false, 0, 0, 0);
       }
       var sample = x + y * _map.Width;
-      // A straight ray is monotonic on both axes, so it can only repeat the cell visited immediately before it.
+      var nextSampleIndex = Math.Max(
+          sampleIndex + 1, (int) Math.Ceiling(Math.Min(nextBoundaryX, nextBoundaryY) / RayStep));
+      var nextSampleDistance = nextSampleIndex * RayStep;
+      while (nextBoundaryX <= nextSampleDistance) {
+        nextBoundaryX += boundaryDeltaX;
+      }
+      while (nextBoundaryY <= nextSampleDistance) {
+        nextBoundaryY += boundaryDeltaY;
+      }
+      sampleIndex = nextSampleIndex;
       if (sample == lastSample) {
         continue;
       }
