@@ -21,6 +21,9 @@ Use it to inspect installed custom maps, search Workshop maps by keywords and ma
 [*] Unsubscribe from Workshop maps or permanently delete local map files.
 [/list]
 
+[h1]Community[/h1]
+Join the [url=https://discord.com/channels/558398674389172225/1536285822284988517]MapBrowser Discord channel[/url] for feedback, corrections, and suggestions.
+
 [hr][/hr]
 
 [h1]Source[/h1]
