@@ -691,6 +691,22 @@ the live Mod.IO visible HTML text after upload.
 
 When the user explicitly asks to update a Steam description, prefer `tools/update-steam-description.ps1`. The script
 does a dry run by default, updates only when `-Publish` is passed, and verifies the live Steam description after upload.
+
+For a Private Steam item, a public `GetPublishedFileDetails` result indicating that the item is inaccessible is not
+evidence that the item is absent. Prefer an authenticated owner Steamworks query for identity and description
+verification.
+
+If the owner query is temporarily unavailable and the user explicitly authorized the description update, the updater
+may apply its reviewed generated VDF through an authenticated SteamCMD session. Keep Steam visibility omitted and
+unchanged.
+
+Treat SteamCMD `Committing update...Success` as acknowledgement that Steam accepted the update, not as verification of
+the resulting description. Explicitly report the verification limitation and repeat owner-authenticated or public live
+verification when an appropriate endpoint becomes available.
+
+Keep this fallback inside the repository description updater. Do not normalize hand-written VDFs or ad hoc direct
+SteamCMD commands as the ordinary workflow.
+
 Do not hand-write Steam description VDFs unless the script is unavailable and the user explicitly approves the risk.
 SteamCMD description VDFs are fragile: unescaped double quotes inside multiline `description` values can truncate the
 published description. If a Steam description contains double quotes, replace them or improve and test the escaping
