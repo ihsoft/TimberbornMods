@@ -258,7 +258,6 @@ IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Экспортировать �
 IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Импортировать правила",
 IgorZ.Automation.Scripting.Editor.InvertRuleBtn,"Инвертировать",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
-IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PauseRuleBtn,"Выключить правило",
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
 IgorZ.Automation.Scripting.Editor.GameAutomationConflictNotification,"Игровая автоматизация уже включена.
