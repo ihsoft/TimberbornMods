@@ -28,6 +28,7 @@ class ConditionConstructor : BaseConstructor {
   public readonly ResizableDropdownElement SignalSelector;
   public readonly ResizableDropdownElement OperatorSelector;
   public readonly ArgumentConstructor ValueSelector;
+  public readonly Label ConditionLabel;
 
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
     _lvalueDefinitions = lvalueDef.ToArray();
@@ -42,6 +43,15 @@ class ConditionConstructor : BaseConstructor {
     var op = OperatorSelector.SelectedValue;
     var val = ValueSelector.GetScriptValue();
     return $"({op} (sig {arg}) {val})";
+  }
+
+  public void SetComparison(ComparisonOperator comparisonOperator) {
+    SignalSelector.SelectedValue = (comparisonOperator.Left as SignalOperator)!.SignalName;
+    OperatorSelector.SelectedValue = LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
+    if (comparisonOperator.Right is not ConstantValueExpr constantValue) {
+      throw new InvalidOperationException("Constant value is expected");
+    }
+    ValueSelector.SetScriptValue(constantValue.ValueFn());
   }
 
   #endregion
@@ -69,8 +79,11 @@ class ConditionConstructor : BaseConstructor {
     SignalSelector = uiFactory.CreateSimpleDropdown(SetArgument);
     OperatorSelector = uiFactory.CreateSimpleDropdown();
     ValueSelector = new ArgumentConstructor(uiFactory);
+    ConditionLabel = uiFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
+    ConditionLabel.text = uiFactory.T(ConditionLabelLocKey);
+    ConditionLabel.style.marginRight = 5;
 
-    Root = MakeRow(uiFactory.T(ConditionLabelLocKey), SignalSelector, OperatorSelector, ValueSelector.Root);
+    Root = MakeRow(ConditionLabel, SignalSelector, OperatorSelector, ValueSelector.Root);
   }
 
   void SetArgument(string argument) {

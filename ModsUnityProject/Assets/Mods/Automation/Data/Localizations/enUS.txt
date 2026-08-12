@@ -230,6 +230,8 @@ IgorZ.Automation.Scripting.Expressions.NotOperator,"NOT","NOT operator name to r
 IgorZ.Automation.Scripting.Expressions.ParseError,"PARSE ERROR","String to show when the scriptable condition or action cannot be parsed"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Then",
+IgorZ.Automation.Scripting.Editor.AddAndConditionBtn,"+ and","Button that adds a condition joined with AND"
+IgorZ.Automation.Scripting.Editor.AddOrConditionBtn,"+ or","Button that adds a condition joined with OR"
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Action must be the 'act' operator","A message to show when the action is not an action"
 IgorZ.Automation.Scripting.Editor.ActionArgumentName,"Argument #{0}","The generic name of the action arguments when there is no display name specified"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Add script",

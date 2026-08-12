@@ -31,8 +31,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
   /// <inheritdoc/>
   public void OnRuleRowBtnAction(RuleRow ruleRow) {
     var root = _uiFactory.LoadVisualElement("IgorZ.Automation/ConstructorEditView");
-    var ruleConstructor = new RuleConstructor(_uiFactory);
-    root.Q("RuleConstructor").Add(ruleConstructor.Root);
+    var ruleConstructor = new RuleConstructor(_uiFactory, root.Q2<VisualElement>("RuleConstructor"));
 
     PopulateConstructor(ruleRow.ActiveBuilding, ruleConstructor);
     PopulateCondition(ruleRow, ruleConstructor);
@@ -40,12 +39,12 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
     // Buttons.
     root.Q<Button>("SaveScriptBtn").clicked += () => {
-      var error = ruleConstructor.ConditionConstructor.Validate() ?? ruleConstructor.ActionConstructor.Validate();
+      var error = ruleConstructor.Validate();
       if (error != null) {
         ruleRow.ReportError(error);
         return;
       }
-      ruleRow.ConditionExpression = ToDefaultSyntax(ruleConstructor.ConditionConstructor.GetLispScript(), ruleRow);
+      ruleRow.ConditionExpression = ToDefaultSyntax(ruleConstructor.GetConditionLispScript(), ruleRow);
       ruleRow.ActionExpression = ToDefaultSyntax(ruleConstructor.ActionConstructor.GetLispScript(), ruleRow);
       ruleRow.SwitchToViewMode();
     };
@@ -60,17 +59,17 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedCondition == null || action == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not ComparisonOperator condition) {
+    if (!TryGetConditionEntries(ruleRow.ParsedCondition, out var conditions)) {
       return false;
     }
-    if (condition.Left is not SignalOperator signal || condition.Right is not ConstantValueExpr) {
-      return false;
-    }
-    if (!_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName)
+    if (conditions.Any(x => x.Comparison.Left is not SignalOperator signal
+            || x.Comparison.Right is not ConstantValueExpr
+            || !_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName))
         || !_scriptingService.GetActionNamesForBuilding(ruleRow.ActiveBuilding).Contains(action.FullActionName)) {
       return false;
     }
-    if (signal.Operands.Count != 0 || action.Operands.Any(x => x is not ConstantValueExpr)) {
+    if (conditions.Any(x => ((SignalOperator)x.Comparison.Left).Operands.Count != 0)
+        || action.Operands.Any(x => x is not ConstantValueExpr)) {
       return false;
     }
     return true;
@@ -97,7 +96,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
             Name = (t.ScriptName, t.DisplayName),
             Argument = new ArgumentDefinition(_uiFactory, t.Result),
         });
-    ruleConstructor.ConditionConstructor.SetDefinitions(conditions);
+    ruleConstructor.SetConditionDefinitions(conditions);
 
     var actions = _scriptingService.GetActionNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
@@ -143,17 +142,60 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedCondition == null) {
       return;
     }
-    var conditionConstructor = ruleConstructor.ConditionConstructor;
-    if (ruleRow.ParsedCondition is not ComparisonOperator comparisonOperator) {
-      throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
+    if (!TryGetConditionEntries(ruleRow.ParsedCondition, out var conditions)) {
+      throw new InvalidOperationException("A flat condition chain is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.SelectedValue = (comparisonOperator.Left as SignalOperator)!.SignalName;
-    conditionConstructor.OperatorSelector.SelectedValue =
-        LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
-    if (comparisonOperator.Right is not ConstantValueExpr constantValue) {
-      throw new InvalidOperationException("Constant value is expected");
+    ruleConstructor.SetConditions(conditions);
+  }
+
+  static bool TryGetConditionEntries(
+      BooleanOperator expression, out IReadOnlyList<RuleConstructor.ConditionEntry> conditions) {
+    var result = new List<RuleConstructor.ConditionEntry>();
+    if (expression is ComparisonOperator comparison) {
+      result.Add(new RuleConstructor.ConditionEntry(LogicalOperator.OpType.And, comparison));
+      conditions = result;
+      return true;
     }
-    conditionConstructor.ValueSelector.SetScriptValue(constantValue.ValueFn());
+    if (expression is not LogicalOperator logical || logical.OperatorType == LogicalOperator.OpType.Not) {
+      conditions = null;
+      return false;
+    }
+
+    var topLevelOperands = logical.OperatorType == LogicalOperator.OpType.Or
+        ? FlattenLogicalOperands(logical, LogicalOperator.OpType.Or)
+        : [logical];
+    foreach (var topLevelOperand in topLevelOperands) {
+      var groupOperands = topLevelOperand is LogicalOperator { OperatorType: LogicalOperator.OpType.And } andGroup
+          ? FlattenLogicalOperands(andGroup, LogicalOperator.OpType.And)
+          : [topLevelOperand];
+      var firstInGroup = true;
+      foreach (var operand in groupOperands) {
+        if (operand is not ComparisonOperator groupComparison) {
+          conditions = null;
+          return false;
+        }
+        var joinOperator = result.Count == 0 || !firstInGroup
+            ? LogicalOperator.OpType.And
+            : LogicalOperator.OpType.Or;
+        result.Add(new RuleConstructor.ConditionEntry(joinOperator, groupComparison));
+        firstInGroup = false;
+      }
+    }
+    conditions = result;
+    return result.Count > 0;
+  }
+
+  static IReadOnlyList<IExpression> FlattenLogicalOperands(
+      LogicalOperator expression, LogicalOperator.OpType operatorType) {
+    var result = new List<IExpression>();
+    foreach (var operand in expression.Operands) {
+      if (operand is LogicalOperator nested && nested.OperatorType == operatorType) {
+        result.AddRange(FlattenLogicalOperands(nested, operatorType));
+      } else {
+        result.Add(operand);
+      }
+    }
+    return result;
   }
 
   #endregion
