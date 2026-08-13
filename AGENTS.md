@@ -468,6 +468,9 @@ Stop and ask the user instead of guessing when:
 - project intent or architecture is unclear,
 - the user's request can reasonably mean more than one workflow or scope, especially if one interpretation would publish,
   tag, backfill, delete, rewrite history, edit Wiki pages, change platform metadata, or otherwise affect public state,
+- a short request to revert, restore a previous version, or fix a newly reported defect introduces a mod, entity,
+  symptom, or subject area that does not match the active task. Verify the intended task or thread before changing
+  files; do not infer the rollback target merely from the most recent commit or edit,
 - several reasonable implementation paths remain and the choice would materially affect task scope, public API,
   compatibility, player-visible behavior, persisted data, external state, or the cost of reversing the change,
 - a test reveals a production bug, dead code, missing API, or design mismatch but the user did not ask to fix
