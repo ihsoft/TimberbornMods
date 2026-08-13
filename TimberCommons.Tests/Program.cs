@@ -16,6 +16,8 @@ static class Program {
           DailyInjuryCounterTests.ClearsYesterdayAfterSkippedDay),
       ("DailyInjuryCounter restores saved counts and advances them",
           DailyInjuryCounterTests.RestoresSavedCountsAndAdvancesThem),
+      ("DailyInjuryCounter keeps latest twenty-eight completed days",
+          DailyInjuryCounterTests.KeepsLatestTwentyEightCompletedDays),
       ("GoodConsumingIrrigationTower scales consumption from coverage",
           GoodConsumingIrrigationTowerTests.ScalesConsumptionFromCoverage),
       ("GoodConsumingIrrigationTower toggles consumption from coverage",

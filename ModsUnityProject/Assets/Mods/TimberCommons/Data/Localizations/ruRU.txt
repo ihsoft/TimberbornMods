@@ -20,7 +20,7 @@ IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Останови�
 IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Текущий поток: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Вероятность ранения: {0} каждый час",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Вероятность ранения: {0} в течение дня",
-IgorZ.TimberCommons.InjuriesYesterday,"Ранено вчера: {0}",
+IgorZ.TimberCommons.Injuries,"Ранено: {0} вчера, {1} за 7 дней",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Формат времени и продолжительности",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Показывать 'запаса хватит' в формате дни/часы",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Показывать время роста в формате дни/часы",
@@ -42,7 +42,7 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показыва�
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Показывать вероятность за целый день",
-IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Показывать, сколько работников было ранено вчера",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Показывать историю ранений на рабочих местах",
 IgorZ.TimberCommons.Settings.ModUIPatchesSection,"UI-патчи модов",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Улучшать диалог несовпадения модов при загрузке",
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Добавляет элементы управления для включения недостающих модов прямо из предупреждения загрузки.

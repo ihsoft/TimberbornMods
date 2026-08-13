@@ -3,6 +3,8 @@
 // License: Public Domain
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Timberborn.BaseComponentSystem;
 using Timberborn.NeedApplication;
 using Timberborn.Persistence;
@@ -23,10 +25,19 @@ sealed class WorkshopInjuryStatistics : BaseComponent, IAwakableComponent, IPers
     _dayNightCycle = dayNightCycle;
   }
 
-  public int InjuriesYesterday {
+  public IReadOnlyList<int> InjuryHistory {
     get {
       AdvanceDay();
-      return _counter.InjuriesYesterday;
+      return _counter.InjuryHistory;
+    }
+  }
+
+  public int InjuriesYesterday => InjuryHistory.LastOrDefault();
+  public int InjuriesInLastWeek => InjuryHistory.TakeLast(7).Sum();
+  public int InjuriesToday {
+    get {
+      AdvanceDay();
+      return _counter.InjuriesToday;
     }
   }
 
@@ -54,6 +65,7 @@ sealed class WorkshopInjuryStatistics : BaseComponent, IAwakableComponent, IPers
   static readonly PropertyKey<int> TrackedDayKey = new("TrackedDay");
   static readonly PropertyKey<int> InjuriesTodayKey = new("InjuriesToday");
   static readonly PropertyKey<int> InjuriesYesterdayKey = new("InjuriesYesterday");
+  static readonly ListKey<int> InjuryHistoryKey = new("InjuryHistory");
 
   /// <inheritdoc/>
   public void Save(IEntitySaver entitySaver) {
@@ -61,7 +73,7 @@ sealed class WorkshopInjuryStatistics : BaseComponent, IAwakableComponent, IPers
     var component = entitySaver.GetComponent(ComponentKey);
     component.Set(TrackedDayKey, _counter.TrackedDay);
     component.Set(InjuriesTodayKey, _counter.InjuriesToday);
-    component.Set(InjuriesYesterdayKey, _counter.InjuriesYesterday);
+    component.Set(InjuryHistoryKey, _counter.InjuryHistory.ToList());
   }
 
   /// <inheritdoc/>
@@ -69,8 +81,10 @@ sealed class WorkshopInjuryStatistics : BaseComponent, IAwakableComponent, IPers
     if (!entityLoader.TryGetComponent(ComponentKey, out var component)) {
       return;
     }
-    _counter.Restore(
-        component.Get(TrackedDayKey), component.Get(InjuriesTodayKey), component.Get(InjuriesYesterdayKey));
+    var injuryHistory = component.Has(InjuryHistoryKey)
+        ? component.Get(InjuryHistoryKey)
+        : new List<int> { component.Get(InjuriesYesterdayKey) };
+    _counter.Restore(component.Get(TrackedDayKey), component.Get(InjuriesTodayKey), injuryHistory);
     AdvanceDay();
   }
 
