@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IgorZ.TimberCommons.NeedApplierUI;
+namespace IgorZ.TimberCommons.NeedApplier;
 
 sealed class DailyInjuryCounter {
   public const int HistoryDays = 28;

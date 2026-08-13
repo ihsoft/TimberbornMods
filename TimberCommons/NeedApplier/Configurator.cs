@@ -3,11 +3,12 @@
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberCommons.NeedApplierUI;
 using Timberborn.EntityPanelSystem;
 using Timberborn.NeedApplication;
 using Timberborn.TemplateInstantiation;
 
-namespace IgorZ.TimberCommons.NeedApplierUI;
+namespace IgorZ.TimberCommons.NeedApplier;
 
 [Context("Game")]
 sealed class Configurator : IConfigurator {

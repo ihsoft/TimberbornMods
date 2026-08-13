@@ -4,7 +4,7 @@
 
 using System;
 
-namespace IgorZ.TimberCommons.NeedApplierUI;
+namespace IgorZ.TimberCommons.NeedApplier;
 
 static class InjuryProbabilityCalculator {
   public static float CalculateDailyProbability(float hourlyProbability) {

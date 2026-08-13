@@ -2,7 +2,7 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
-using IgorZ.TimberCommons.NeedApplierUI;
+using IgorZ.TimberCommons.NeedApplier;
 
 namespace TimberCommons.Tests;
 

@@ -11,7 +11,7 @@ using Timberborn.Persistence;
 using Timberborn.TimeSystem;
 using Timberborn.WorldPersistence;
 
-namespace IgorZ.TimberCommons.NeedApplierUI;
+namespace IgorZ.TimberCommons.NeedApplier;
 
 sealed class WorkshopInjuryStatistics : BaseComponent, IAwakableComponent, IPersistentEntity {
   const string InjuryNeedId = "Injury";

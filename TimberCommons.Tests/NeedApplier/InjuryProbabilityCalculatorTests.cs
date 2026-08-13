@@ -1,4 +1,4 @@
-using IgorZ.TimberCommons.NeedApplierUI;
+using IgorZ.TimberCommons.NeedApplier;
 
 namespace TimberCommons.Tests;
 
