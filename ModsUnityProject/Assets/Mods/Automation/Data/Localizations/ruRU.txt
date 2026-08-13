@@ -307,6 +307,8 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль опис
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Текст","Human readable style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Скрипт","Script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псевдо-скрипт","Shortened script style of the rule description."
+IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParentheses,"Показывать необязательные логические скобки","Controls whether nested logical groups are wrapped in parentheses when operator precedence already establishes their evaluation order."
+IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParenthesesTooltip,"Показывать скобки вокруг вложенных групп И и ИЛИ, даже если порядок вычисления понятен без них.","Tooltip for the optional logical parentheses setting."
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions,"Вычислять значение правого аргумента в условиях",
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments,"Вычислять значения в аргументах действий",
 IgorZ.Automation.Settings.EntityPanel.PreventGameAutomationConflicts,"Предотвращать конфликты с игровой автоматизацией",

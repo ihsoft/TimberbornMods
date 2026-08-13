@@ -164,6 +164,9 @@
       <Compile Include="..\Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs">
         <Link>Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\ExpressionDescriber.cs">
+        <Link>Automation\ScriptingEngineUI\ExpressionDescriber.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
       </Compile>

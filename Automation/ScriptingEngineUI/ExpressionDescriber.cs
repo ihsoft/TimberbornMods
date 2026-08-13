@@ -135,9 +135,20 @@ sealed class ExpressionDescriber(ILoc Loc) {
 
     // Resolve the multi-operands operators: (add a b c ...)
     var operands = op.GetReducedOperands();
-    var leftValue = DescribeLeft(operands[0], op);
-    var rightValue = DescribeRight(operands[1], op);
+    var leftValue = DescribeLogicalOperand(operands[0], op, isRightOperand: false);
+    var rightValue = DescribeLogicalOperand(operands[1], op, isRightOperand: true);
     return $"{leftValue} {displayName} {rightValue}";
+  }
+
+  string DescribeLogicalOperand(IExpression operand, LogicalOperator parent, bool isRightOperand) {
+    var value = isRightOperand ? DescribeRight(operand, parent) : DescribeLeft(operand, parent);
+    if (!EntityPanelSettings.ShowOptionalLogicalParentheses
+        || operand is not LogicalOperator { OperatorType: not LogicalOperator.OpType.Not } logicalOperand
+        || logicalOperand.OperatorType == parent.OperatorType
+        || InfixExpressionUtil.ResolvePrecedence(parent) >= InfixExpressionUtil.ResolvePrecedence(operand)) {
+      return value;
+    }
+    return $"({value})";
   }
 
   string DescribeMathOperator(MathOperator op) {

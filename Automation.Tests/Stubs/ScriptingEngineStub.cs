@@ -19,6 +19,18 @@ namespace IgorZ.Automation.Settings {
 
     public static ScriptSyntax DefaultScriptSyntax { get; set; } = ScriptSyntax.Python;
   }
+
+  static class EntityPanelSettings {
+    public static bool EvalValuesInConditions => false;
+    public static bool EvalValuesInActionArguments => false;
+    public static bool ShowOptionalLogicalParentheses { get; set; } = true;
+  }
+}
+
+namespace IgorZ.TimberDev.UI {
+  static class CommonFormats {
+    public static string HighlightRed(string value) => value;
+  }
 }
 
 namespace IgorZ.TimberDev.UI {

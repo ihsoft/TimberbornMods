@@ -87,6 +87,12 @@ static class Program {
       ("ConcatOperator concatenates number and string values", ExpressionTests.ConcatOperatorConcatenatesValues),
       ("Operators reject invalid operands", ExpressionTests.OperatorsRejectInvalidOperands),
 
+      // ScriptingEngineUI
+      ("ExpressionDescriber shows optional logical parentheses",
+          ExpressionDescriberTests.ShowsOptionalLogicalParentheses),
+      ("ExpressionDescriber hides optional logical parentheses",
+          ExpressionDescriberTests.HidesOptionalLogicalParentheses),
+
       // ScriptingEngine.Core
       ("ScriptingService registers and looks up scriptables", ScriptingServiceTests.RegistersAndLooksUpScriptables),
       ("ScriptingService reports unknown scriptables", ScriptingServiceTests.UnknownScriptableReportsParsingError),
