@@ -491,13 +491,24 @@ function Get-AuthenticatedSteamTags([string] $PublishedFileId) {
         $ErrorActionPreference = $previousErrorActionPreference
     }
     if ($queryExitCode -ne 0) {
-        throw "Steam tag query failed.`n$($output -join [Environment]::NewLine)"
+        $publicDetails = Get-SteamDetails $PublishedFileId
+        if ([int]$publicDetails.visibility -ne 0 -or $null -eq $publicDetails.tags) {
+            throw "Steam tag query failed and public Steam details cannot verify a visible item's tags.`n$($output -join [Environment]::NewLine)"
+        }
+        Write-Host "Owner Steamworks tag query unavailable; using verified public Steam details for a visible item."
+        return [pscustomobject]@{
+            Tags = Get-UniqueTags @($publicDetails.tags | ForEach-Object { [string]$_.tag })
+            PublicFallback = $true
+        }
     }
     $line = @($output | ForEach-Object { [string]$_ } | Where-Object { $_ -like "LIVE_TAGS_JSON=*" }) | Select-Object -Last 1
     if ([string]::IsNullOrWhiteSpace($line)) {
         throw "Steam tag query returned no machine-readable tag result."
     }
-    return Get-UniqueTags @(($line.Substring("LIVE_TAGS_JSON=".Length) | ConvertFrom-Json) | ForEach-Object { [string]$_ })
+    return [pscustomobject]@{
+        Tags = Get-UniqueTags @(($line.Substring("LIVE_TAGS_JSON=".Length) | ConvertFrom-Json) | ForEach-Object { [string]$_ })
+        PublicFallback = $false
+    }
 }
 
 if ($Platform -eq "All" -or $Platform -eq "Steam") {
@@ -519,7 +530,8 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
     $vdfPath = Join-Path (Resolve-RepoPath $SteamVdfRoot) "$ModName-tags.vdf"
     Write-SteamTagsVdf $vdfPath $appId $publishedFileId ([string]$workshopData.Name) $targetTags
 
-    $currentTags = Get-AuthenticatedSteamTags $publishedFileId
+    $currentTagResult = Get-AuthenticatedSteamTags $publishedFileId
+    $currentTags = @($currentTagResult.Tags)
     $addTags = Get-AddedTags $targetTags $currentTags
     $removeTags = Get-RemovedTags $targetTags $currentTags
     $alreadySynced = $addTags.Count -eq 0 -and $removeTags.Count -eq 0
@@ -547,9 +559,13 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
             Write-Host "  Local workshop_data.json was updated for Steam."
         }
         if (-not $alreadySynced) {
+            if ($currentTagResult.PublicFallback) {
+                throw "Steam tags differ from target, but only public read-only verification is available. Authenticate the owner Steamworks session before updating tags."
+            }
             Invoke-SteamTagsUpdate $publishedFileId $appId $targetTags
             Start-Sleep -Seconds 2
-            $updatedTags = Get-AuthenticatedSteamTags $publishedFileId
+            $updatedTagResult = Get-AuthenticatedSteamTags $publishedFileId
+            $updatedTags = @($updatedTagResult.Tags)
             $remainingAdds = Get-AddedTags $targetTags $updatedTags
             $remainingRemoves = Get-RemovedTags $targetTags $updatedTags
             if ($remainingAdds.Count -ne 0 -or $remainingRemoves.Count -ne 0) {
