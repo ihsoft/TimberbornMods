@@ -15,8 +15,6 @@ sealed class Configurator : IConfigurator {
   static readonly Type[] Patches = [
       typeof(TileComponentsPatch),
       typeof(TerrainMeshManagerPatch),
-      typeof(NaturalResourceModelPatch),
-      typeof(NaturalResourcesModelTogglerPatch),
       typeof(SelectableObjectRaycasterPatch),
       typeof(BlockObjectPreviewPickerPatch),
   ];

@@ -14,17 +14,45 @@ class TransparentTerrainMeshService {
   }
 }
 
-class NaturalResourceVisibilityService {
+class TransparentBuildingModelService {
   public int ActivateCalls { get; private set; }
 
   public int DeactivateCalls { get; private set; }
 
-  public void Activate() {
-    ActivateCalls++;
-  }
+  public bool IsActive { get; private set; }
 
-  public void Deactivate() {
-    DeactivateCalls++;
+  public bool PassThroughSurfaceObjects => IsActive;
+
+  public void SetActive(bool active) {
+    if (active == IsActive) {
+      return;
+    }
+    IsActive = active;
+    if (active) {
+      ActivateCalls++;
+    } else {
+      DeactivateCalls++;
+    }
+  }
+}
+
+class TransparentNaturalResourceModelService {
+  public int ActivateCalls { get; private set; }
+
+  public int DeactivateCalls { get; private set; }
+
+  public bool IsActive { get; private set; }
+
+  public void SetActive(bool active) {
+    if (active == IsActive) {
+      return;
+    }
+    IsActive = active;
+    if (active) {
+      ActivateCalls++;
+    } else {
+      DeactivateCalls++;
+    }
   }
 }
 

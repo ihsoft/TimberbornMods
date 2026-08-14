@@ -1,0 +1,15 @@
+{
+  "KeyBindingSpec": {
+    "Id": "IgorZ-XRayToggleObjectTransparency",
+    "GroupId": "IgorZ-XRay-BindingsGroupId",
+    "LocKey": "IgorZ.XRay.KeyBinding.ToggleObjectTransparency",
+    "Order": 2,
+    "AllowOtherModifiers": false,
+    "DevModeOnly": false
+  },
+  "PrimaryInputBindingSpec": {
+    "Path": "/Keyboard/h",
+    "InputModifiers": "None",
+    "Unchangeable": false
+  }
+}

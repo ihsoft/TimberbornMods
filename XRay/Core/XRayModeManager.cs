@@ -19,11 +19,34 @@ sealed class XRayModeManager {
   /// <seealso cref="BlockObjectPreviewPickerPatch"/>
   public bool IsActive { get; private set; }
 
+  public bool PassThroughSurfaceObjects =>
+      IsActive && _transparentBuildingModelService.PassThroughSurfaceObjects;
+
+  public void SetObjectTransparencyRequested(bool requested) {
+    _objectTransparencyRequested = requested;
+    ApplyObjectTransparency();
+  }
+
+  public void SynchronizeObjectTransparency() {
+    if (_objectTransparencySynchronizationPending) {
+      _objectTransparencySynchronizationPending = false;
+      return;
+    }
+    ApplyObjectTransparency();
+  }
+
+  void ApplyObjectTransparency() {
+    var active = IsActive && _objectTransparencyRequested;
+    _transparentBuildingModelService.SetActive(active);
+    _transparentNaturalResourceModelService.SetActive(active);
+  }
+
   public void SetActiveMode(bool state) {
     if (state == IsActive) {
       return;
     }
     IsActive = state;
+    _objectTransparencySynchronizationPending = true;
     if (state) {
       SetXRayMode();
     } else {
@@ -36,31 +59,34 @@ sealed class XRayModeManager {
   #region Implementation
 
   readonly TransparentTerrainMeshService _transparentTerrainMeshService;
-  readonly NaturalResourceVisibilityService _naturalResourceVisibilityService;
+  readonly TransparentBuildingModelService _transparentBuildingModelService;
+  readonly TransparentNaturalResourceModelService _transparentNaturalResourceModelService;
   readonly WireframeTerrainMeshService _wireframeTerrainMeshService;
+  bool _objectTransparencyRequested;
+  bool _objectTransparencySynchronizationPending;
 
   // Primarily made for the efficient patches handling.
   internal static XRayModeManager Instance { get; private set; }
 
   XRayModeManager(
       TransparentTerrainMeshService transparentTerrainMeshService,
-      NaturalResourceVisibilityService naturalResourceVisibilityService,
+      TransparentBuildingModelService transparentBuildingModelService,
+      TransparentNaturalResourceModelService transparentNaturalResourceModelService,
       WireframeTerrainMeshService wireframeTerrainMeshService) {
     Instance = this;
     _transparentTerrainMeshService = transparentTerrainMeshService;
-    _naturalResourceVisibilityService = naturalResourceVisibilityService;
+    _transparentBuildingModelService = transparentBuildingModelService;
+    _transparentNaturalResourceModelService = transparentNaturalResourceModelService;
     _wireframeTerrainMeshService = wireframeTerrainMeshService;
   }
 
   void SetXRayMode() {
     _transparentTerrainMeshService.Activate();
-    _naturalResourceVisibilityService.Activate();
     _wireframeTerrainMeshService.Activate();
   }
 
   void ResetXRayMode() {
     _transparentTerrainMeshService.Deactivate();
-    _naturalResourceVisibilityService.Deactivate();
     _wireframeTerrainMeshService.Deactivate();
   }
 

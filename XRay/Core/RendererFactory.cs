@@ -34,10 +34,10 @@ sealed class RendererFactory(IWaterMesh waterMesh) {
   static int? _waterRendererQueue;  // Need to detect only once per game load.
 
   /// <summary>Creates a transparency material with the specified name and color.</summary>
-  public Material CreateTransparencyMaterial(string name, Color color) {
+  public Material CreateTransparencyMaterial(string name, Color color, int renderQueue) {
     var mat = new Material(Shader.Find(UrpUnlitShaderName)) {
         name = name,
-        renderQueue = WaterRendererQueue + 1, // Just after water since we need it to get rendered first.
+        renderQueue = renderQueue,
     };
 
     mat.SetInt(SrcBlendProperty, (int)BlendMode.SrcAlpha);

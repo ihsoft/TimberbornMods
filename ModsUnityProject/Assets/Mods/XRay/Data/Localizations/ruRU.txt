@@ -1,7 +1,13 @@
 ﻿ID,Text,Comment
 IgorZ.XRay.KeyBindingGroup,"Мод X-Ray","The header for the section of the mod settings that allows to customize the key bindings"
+IgorZ.XRay.KeyBinding.ToggleObjectTransparency,"Переключить прозрачность объектов","The binding can be held for temporary transparency or pressed briefly to toggle object transparency"
 IgorZ.XRay.KeyBinding.ToggleMode,"Переключить режим X-Ray","The label for the key binding that toggles the X-Ray mode on and off"
 IgorZ.XRay.KeyBinding.ShowMode,"Показать режим X-Ray","The label for the key binding that shows the X-Ray mode while held down"
+IgorZ.XRay.ObjectTransparencySettings.Header,"Прозрачность объектов","The header for settings that control transparent object models"
+IgorZ.XRay.ObjectTransparencySettings.BuildingColor,"Цвет заливки зданий","The fill color applied to transparent buildings"
+IgorZ.XRay.ObjectTransparencySettings.BuildingTransparency,"Прозрачность зданий","The percentage of transparency applied to buildings"
+IgorZ.XRay.ObjectTransparencySettings.PlantColor,"Цвет заливки растений","The fill color applied to transparent plants"
+IgorZ.XRay.ObjectTransparencySettings.PlantTransparency,"Прозрачность растений","The percentage of transparency applied to plants"
 IgorZ.XRay.MeshSettings.Color.CliffEdge,"Цвет рёбер скал",
 IgorZ.XRay.MeshSettings.Color.Cliff,"Цвет скал",
 IgorZ.XRay.MeshSettings.Color.Grass,"Цвет травы",
@@ -17,8 +23,6 @@ IgorZ.XRay.MeshSettings.ColorSchemaName.Normal,"Обычная","The name of the
 IgorZ.XRay.MeshSettings.GhostModelIntensity,"Прозрачность моделей","The label for the slider that controls the transparency of the models"
 IgorZ.XRay.MeshSettings.Glowing,"Режим свечения","The label for the toggle that enables or disables the glowing effect on the models"
 IgorZ.XRay.MeshSettings.Header,"Внешний вид наложения","The header for the section of the mod settings that allows to customize the overlay appearance"
-IgorZ.XRay.MeshSettings.HideNaturalResources,"Скрывать природные ресурсы","The label for the toggle that hides natural resource models while X-Ray mode is active"
-IgorZ.XRay.MeshSettings.HideNaturalResources.Note,"Скрывать деревья, кусты и посевы, пока включён режим X-Ray.","Tooltip for the toggle that hides natural resources while X-Ray mode is active"
 IgorZ.XRay.MeshSettings.IgnoreVisibleLevel,"Игнорировать срез рельефа","The label for the toggle that makes X-Ray ignore the game's terrain layer visibility cut"
 IgorZ.XRay.MeshSettings.IgnoreVisibleLevel.Note,"Показывать весь меш рельефа в режиме X-Ray, даже если игровой инструмент видимости слоёв скрывает верхние уровни.","Tooltip for the toggle that restores the old X-Ray terrain visibility behavior"
 IgorZ.XRay.MeshSettings.WireframeModeDropdown,"Отображение рельефа","The dropdown label for terrain visualization mode selection"
@@ -28,3 +32,4 @@ IgorZ.XRay.MeshSettings.WireframeMode.Grid,"Каркас","The name of the visua
 IgorZ.XRay.MeshSettings.WireframeMode.Contours,"Контуры","The name of the visualization mode that renders terrain contours"
 IgorZ.XRay.Visibility.Show,"Показывать подземные сооружения","The label for the toggle that enables or disables the visibility of underground structures"
 IgorZ.XRay.Visibility.Hide,"Скрывать подземные сооружения","The label for the toggle that enables or disables the visibility of underground buildings"
+IgorZ.XRay.Visibility.ObjectTransparencyTooltip,"Прозрачность объектов: кликни или зажми","The tooltip instruction shown before the object transparency key binding"

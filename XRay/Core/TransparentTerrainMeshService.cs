@@ -253,7 +253,7 @@ class TransparentTerrainMeshService : IPostLoadableSingleton {
     var color = _meshSettings.GlowingEdges.Value
         ? referenceColor * transparency
         : new Color(referenceColor.r, referenceColor.g, referenceColor.b, transparency);
-    var mat = _rendererFactory.CreateTransparencyMaterial(name, color);
+    var mat = _rendererFactory.CreateTransparencyMaterial(name, color, _rendererFactory.WaterRendererQueue + 2);
     if (_meshSettings.GlowingEdges.Value) {
       _rendererFactory.SetMaterialToGlowing(mat);
     }

@@ -207,7 +207,8 @@ class WireframeTerrainMeshService(
   }
 
   GameObject CreateWireOverlay() {
-    _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", meshSettings.WireframeEdgeColor.Color);
+    _material = rendererFactory.CreateTransparencyMaterial(
+        "WireMaterial", meshSettings.WireframeEdgeColor.Color, rendererFactory.WaterRendererQueue + 2);
     var size = mapSize.TerrainSize;
     var overlayObj = new GameObject("XRayWireframeTerrainMesh");
     for (var startX = 0; startX < size.x; startX += XMeshSize) {
