@@ -514,6 +514,12 @@ while live tags remain unchanged. Use the repository Steam tag updater helper th
 then verify the live tags through Steam published-file details. SteamCMD remains the normal content upload path, but tag
 synchronization is separate.
 
+For a publicly visible Steam item, when the authenticated owner query is unavailable, verified public details may be
+used as read-only evidence that the live tags already match the exact target tags and no mutation is required. Do not
+use this fallback to authorize tag changes, verify a Private or inaccessible item, or infer visibility. If the public
+tags differ from the target, stop until owner-authenticated tag mutation is available. Keep `publish-steam.ps1` and
+`update-platform-tags.ps1` consistent with this boundary.
+
 When publishing a Steam release, compute target tags from the final package's version folders before upload. If live
 Steam tags differ, synchronize them before starting the SteamCMD upload and verify them after synchronization.
 
