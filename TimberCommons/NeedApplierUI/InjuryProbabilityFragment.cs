@@ -7,6 +7,7 @@ using System.Linq;
 using IgorZ.TimberCommons.NeedApplier;
 using IgorZ.TimberCommons.Settings;
 using IgorZ.TimberDev.UI;
+using Timberborn.AssetSystem;
 using Timberborn.BaseComponentSystem;
 using Timberborn.CoreUI;
 using Timberborn.EntityPanelSystem;
@@ -25,10 +26,13 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   const string InjuryProbabilityLocKey = "IgorZ.TimberCommons.InjuryProbability";
   const string InjuryProbabilityDailyLocKey = "IgorZ.TimberCommons.InjuryProbabilityDaily";
   const string InjuriesLocKey = "IgorZ.TimberCommons.Injuries";
+  const string GameMiscStylePath = "UI/Views/Game/GameMiscStyle";
   static readonly Color InjuryHistoryColor = new Color32(255, 99, 71, 255);
+  static readonly Color InactiveInjuryHistoryColor = new Color32(102, 86, 82, 255);
 
   readonly UiFactory _uiFactory;
   readonly VisualElementLoader _visualElementLoader;
+  readonly IAssetLoader _assetLoader;
   readonly ITooltipRegistrar _tooltipRegistrar;
   readonly EffectProbabilityService _effectProbabilityService;
 
@@ -43,13 +47,18 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   WorkshopInjuryStatistics _injuryStatistics;
   bool _indicatorAttached;
   string _displayedInjuryHistory;
+  bool _displayedShowAvatarHint;
+  bool _displayedShowDailyProbability;
+  bool _displayedShowInFragment;
   bool _displayedShowInjuryStatistics;
 
   InjuryProbabilityFragment(
-      UiFactory uiFactory, VisualElementLoader visualElementLoader, ITooltipRegistrar tooltipRegistrar,
+      UiFactory uiFactory, VisualElementLoader visualElementLoader, IAssetLoader assetLoader,
+      ITooltipRegistrar tooltipRegistrar,
       EffectProbabilityService effectProbabilityService) {
     _uiFactory = uiFactory;
     _visualElementLoader = visualElementLoader;
+    _assetLoader = assetLoader;
     _tooltipRegistrar = tooltipRegistrar;
     _effectProbabilityService = effectProbabilityService;
   }
@@ -62,28 +71,13 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
             alignSelf = Align.FlexEnd,
         },
     };
-    _tooltipRegistrar.Register(_injuryProbabilityAvatarHint, () => _injuryProbabilityText);
+    _tooltipRegistrar.Register(_injuryProbabilityAvatarHint, CreateAvatarTooltip);
     _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: false);
 
     _injuryProbabilityLabel = _uiFactory.CreateLabel();
     _root = _uiFactory.CreateCenteredPanelFragment();
     _root.Add(_injuryProbabilityLabel);
-    _injuryHistoryRoot = new VisualElement {
-        style = {
-            flexDirection = FlexDirection.Row,
-        },
-    };
-    for (var i = 0; i <= DailyInjuryCounter.HistoryDays; i++) {
-      var loadRate = _visualElementLoader.LoadVisualElement("Game/AttractionLoadRate");
-      var currentDayMarker = loadRate.Q<VisualElement>("CurrentHourMarker");
-      currentDayMarker.style.unityBackgroundImageTintColor = InjuryHistoryColor;
-      currentDayMarker.ToggleDisplayStyle(visible: i == 0);
-      _injuryHistoryRoot.Add(loadRate);
-      var injuryHistoryBar = loadRate.Q<VisualElement>("Rate");
-      injuryHistoryBar.style.backgroundImage = StyleKeyword.None;
-      injuryHistoryBar.style.backgroundColor = InjuryHistoryColor;
-      _injuryHistoryBars.Add(injuryHistoryBar);
-    }
+    _injuryHistoryRoot = CreateInjuryHistory(_injuryHistoryBars, useTooltipColors: false);
     _tooltipRegistrar.Register(_injuryHistoryRoot, () => CreateInjuryStatisticsText());
     _root.Add(_injuryHistoryRoot);
     _root.ToggleDisplayStyle(visible: false);
@@ -115,7 +109,10 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
   /// <inheritdoc/>
   public void UpdateFragment() {
     if (_injuryStatistics != null
-        && (InjuryProbabilitySettings.ShowInjuryStatistics != _displayedShowInjuryStatistics
+        && (InjuryProbabilitySettings.ShowAvatarHint != _displayedShowAvatarHint
+            || InjuryProbabilitySettings.ShowDailyProbability != _displayedShowDailyProbability
+            || InjuryProbabilitySettings.ShowInFragment != _displayedShowInFragment
+            || InjuryProbabilitySettings.ShowInjuryStatistics != _displayedShowInjuryStatistics
             || InjuryProbabilitySettings.ShowInjuryStatistics
             && CreateInjuryHistorySnapshot() != _displayedInjuryHistory)) {
       UpdateInjuryProbability();
@@ -157,19 +154,63 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
       pctLocKey = InjuryProbabilityDailyLocKey;
     }
     var coloredText = $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{probabilityPct:0.###%}</color>";
+    _displayedShowAvatarHint = InjuryProbabilitySettings.ShowAvatarHint;
+    _displayedShowDailyProbability = InjuryProbabilitySettings.ShowDailyProbability;
+    _displayedShowInFragment = InjuryProbabilitySettings.ShowInFragment;
     _displayedShowInjuryStatistics = InjuryProbabilitySettings.ShowInjuryStatistics;
     var injuryProbabilityText = _uiFactory.T(pctLocKey, coloredText);
     _injuryProbabilityText = injuryProbabilityText;
     if (_displayedShowInjuryStatistics) {
       _displayedInjuryHistory = CreateInjuryHistorySnapshot();
-      _injuryProbabilityText = $"{_injuryProbabilityText}\n{CreateInjuryStatisticsText()}";
-      UpdateInjuryHistory();
+      UpdateInjuryHistory(_injuryHistoryBars);
     }
     _injuryProbabilityLabel.text = injuryProbabilityText;
-    _injuryHistoryRoot.ToggleDisplayStyle(visible: _displayedShowInjuryStatistics);
+    _injuryHistoryRoot.ToggleDisplayStyle(visible: _displayedShowInFragment && _displayedShowInjuryStatistics);
 
-    _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: InjuryProbabilitySettings.ShowAvatarHint);
-    _root.ToggleDisplayStyle(visible: InjuryProbabilitySettings.ShowInFragment);
+    _injuryProbabilityAvatarHint.ToggleDisplayStyle(visible: _displayedShowAvatarHint);
+    _root.ToggleDisplayStyle(visible: _displayedShowInFragment);
+  }
+
+  TooltipContent CreateAvatarTooltip() {
+    if (!_displayedShowInjuryStatistics) {
+      return TooltipContent.Create(() => _injuryProbabilityText);
+    }
+    return TooltipContent.Create(CreateAvatarTooltipContent);
+  }
+
+  VisualElement CreateAvatarTooltipContent() {
+    var root = new VisualElement();
+    root.styleSheets.Add(_assetLoader.Load<StyleSheet>(GameMiscStylePath));
+    root.Add(new Label(_injuryProbabilityText));
+    root.Add(new Label(CreateInjuryStatisticsText()));
+    var bars = new List<VisualElement>();
+    root.Add(CreateInjuryHistory(bars, useTooltipColors: true));
+    UpdateInjuryHistory(bars);
+    return root;
+  }
+
+  VisualElement CreateInjuryHistory(List<VisualElement> injuryHistoryBars, bool useTooltipColors) {
+    var root = new VisualElement {
+        style = {
+            flexDirection = FlexDirection.Row,
+        },
+    };
+    for (var i = 0; i <= DailyInjuryCounter.HistoryDays; i++) {
+      var loadRate = _visualElementLoader.LoadVisualElement("Game/AttractionLoadRate");
+      var currentDayMarker = loadRate.Q<VisualElement>("CurrentHourMarker");
+      currentDayMarker.style.unityBackgroundImageTintColor = InjuryHistoryColor;
+      currentDayMarker.ToggleDisplayStyle(visible: i == 0);
+      root.Add(loadRate);
+      var injuryHistoryBar = loadRate.Q<VisualElement>("Rate");
+      if (useTooltipColors) {
+        injuryHistoryBar.parent.style.backgroundImage = StyleKeyword.None;
+        injuryHistoryBar.parent.style.backgroundColor = InactiveInjuryHistoryColor;
+      }
+      injuryHistoryBar.style.backgroundImage = StyleKeyword.None;
+      injuryHistoryBar.style.backgroundColor = InjuryHistoryColor;
+      injuryHistoryBars.Add(injuryHistoryBar);
+    }
+    return root;
   }
 
   string CreateInjuryStatisticsText() {
@@ -181,16 +222,16 @@ sealed class InjuryProbabilityFragment : IEntityPanelFragment {
     return $"{_injuryStatistics.InjuriesToday},{string.Join(",", _injuryStatistics.InjuryHistory)}";
   }
 
-  void UpdateInjuryHistory() {
+  void UpdateInjuryHistory(List<VisualElement> injuryHistoryBars) {
     var history = _injuryStatistics.InjuryHistory;
     var maxInjuries = Mathf.Max(_injuryStatistics.InjuriesToday, history.DefaultIfEmpty().Max());
-    for (var i = 0; i < _injuryHistoryBars.Count; i++) {
+    for (var i = 0; i < injuryHistoryBars.Count; i++) {
       var historyIndex = history.Count - i;
       var injuries = i == 0
           ? _injuryStatistics.InjuriesToday
           : historyIndex >= 0 ? history[historyIndex] : 0;
       var height = maxInjuries == 0 ? 0 : 100f * injuries / maxInjuries;
-      _injuryHistoryBars[i].style.height = new StyleLength(Length.Percent(height));
+      injuryHistoryBars[i].style.height = new StyleLength(Length.Percent(height));
     }
   }
 
