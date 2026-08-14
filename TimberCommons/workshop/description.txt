@@ -16,7 +16,7 @@ Check out the image slideshow above to get a picture of what the mod provides. I
 [list]
 [*] [b]Clearer time values[/b]. Shows supply time, growth time, and recipe duration as days/hours where it is easier to read. For example, '2d 4h' is clearer than '52 hours'.
 [*] [b]More precise small durations[/b]. Some values in Timberborn are rounded in the stock UI. TimberCommons can show short recipe durations more accurately, such as the Grilled Potatoes recipe taking '0.52h'.
-[*] [b]Injury probability[/b]. Buildings that can injure workers can show the injury chance in the right panel or as a small avatar indicator with a tooltip. This is configurable in the settings.
+[*] [b]Injury probability and history[/b]. Buildings that can injure workers can show the injury chance in the right panel or as a small avatar indicator with a tooltip, plus up to 28 days of workplace injury history in the building panel. This is configurable in the settings.
 [*] [b]Active mod filter[/b]. Adds a 'Show active' filter to the mod selection dialog, so it is easier to review which installed mods are actually enabled.
 [*] [b]Better save loading information[/b]. Shows the saved game version in the load-game preview and helps enable installed disabled mods from the mod incompatibility dialog.
 [*] [b]Water output control[/b]. Lets you set the output water level for Mechanical Pumps, Deep Mechanical Pumps, Compact Mechanical Pumps, and Discharges. This helps tune reservoirs and avoid accidental flooding.

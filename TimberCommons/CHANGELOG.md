@@ -1,4 +1,4 @@
-# v1.23.0 (TBD)
+# v1.23.0 (August 13th, 2026)
 * [Feature] Show 28 days of workplace injury history in the building panel and tooltip.
 
 # v1.22.0 (August 9th, 2026)
