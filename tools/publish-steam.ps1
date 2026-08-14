@@ -445,7 +445,12 @@ function Get-LiveSteamTags([string] $PublishedFileId) {
         $ErrorActionPreference = $previousErrorActionPreference
     }
     if ($queryExitCode -ne 0) {
-        throw "Steam tag query failed.`n$($output -join [Environment]::NewLine)"
+        $publicDetails = Get-SteamDetails $PublishedFileId
+        if ($null -ne $publicDetails.tags) {
+            Write-Host "Owner Steamworks tag query unavailable; using verified public Steam details for a visible item."
+            return Get-UniqueTags @($publicDetails.tags | ForEach-Object { [string]$_.tag })
+        }
+        throw "Steam tag query failed and public Steam details did not expose tags.`n$($output -join [Environment]::NewLine)"
     }
     $line = @($output | ForEach-Object { [string]$_ } | Where-Object { $_ -like "LIVE_TAGS_JSON=*" }) | Select-Object -Last 1
     if ([string]::IsNullOrWhiteSpace($line)) {
