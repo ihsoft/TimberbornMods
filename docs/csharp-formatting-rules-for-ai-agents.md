@@ -146,6 +146,15 @@ Use explicit types only when they improve readability or the type is not obvious
 
 * * *
 
+## Guard clauses
+
+Prefer an inverse guard clause when it removes substantial nesting from the main path of a method.
+
+When a condition protects only one short action, keep the direct conditional. Do not expand a compact branch into a
+multi-line guard mechanically.
+
+* * *
+
 ## Line length
 
 Maximum line length is 120 characters.

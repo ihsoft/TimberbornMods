@@ -29,3 +29,17 @@ requires an explicit lane.
 Never export current Unity resources into the preserved `version-1.0` lane as part of ordinary Update 1.1 release
 preparation. After export and legacy restoration, validate both lanes independently and verify that platform tags match
 the final package folders.
+
+## Object Transparency
+
+Apply building transparency only to the model roots owned by `BuildingModel`: `FinishedModel`, `UnfinishedModel`, and
+`FinishedUncoveredModel`. Do not traverse the entire entity hierarchy, because it can capture unrelated dynamic
+visualizers and per-entity materials.
+
+Handle stockpile goods through the owning `GoodVisualization` component. Preserve and restore the active state of its
+visualization object; do not locate it by child-object name or call `Clear()` as a visibility toggle. Exclude its
+renderer from shared material traversal and caches.
+
+When enabling X-Ray with saved object transparency, keep the object-material synchronization deferred until the next
+input-processing frame. Applying it in the same frame as terrain, wire, and resource updates caused a user-confirmed
+hitch on a large map. Change this scheduling only with new profiling and real-game evidence.

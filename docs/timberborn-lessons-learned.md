@@ -155,6 +155,16 @@ Verify assumptions against actual code and actual game data.
 
 ---
 
+## Iterated Prototype Cleanup
+
+Before committing an iterated prototype, search production code, package data, IDs, assets, localization, focused
+tests, and test stubs for rejected variants, obsolete architecture, and stale names.
+
+Distinguish intentionally retained pre-existing behavior from abandoned prototype code. A passing focused test can
+still preserve a rejected prototype when its stubs or expectations were not included in the cleanup audit.
+
+---
+
 ## PowerShell WhatIf
 
 Do not assume a repository script supports `-WhatIf` unless it declares `CmdletBinding(SupportsShouldProcess)`.

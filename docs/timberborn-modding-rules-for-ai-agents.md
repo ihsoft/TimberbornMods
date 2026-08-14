@@ -93,6 +93,15 @@ Avoid:
 Debug.LogWarning($"Failed to read save version from {selectedSave.DisplayName}: {e}");
 ```
 
+## Component identity
+
+When two `BaseComponent` instances of different types only need to be checked for ownership by the same game entity,
+compare their `GameObject` references directly. Do not call `GetComponent<T>()` merely to convert one side to the other
+component type for equality.
+
+Use component lookup only when the target component data or behavior is actually needed, or when there is evidence that
+the relevant components may belong to different GameObjects within one logical entity.
+
 ## Harmony patching practices
 
 Prefer small, targeted patches.
@@ -112,6 +121,10 @@ access before falling back to string method names or `AccessTools`.
 
 If publicized direct access is not available for the target method, use the existing reflection or `AccessTools`
 approach instead of forcing `nameof`.
+
+When a Harmony target method is overloaded, specify the exact parameter types in the patch declaration. Include the
+appropriate `ArgumentType.Out` or `ArgumentType.Ref` metadata for by-reference parameters. Do not rely on a method name
+alone when overload resolution can be ambiguous.
 
 Organize Harmony patches by target game class, not by feature.
 
