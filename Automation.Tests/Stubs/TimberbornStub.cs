@@ -1270,18 +1270,24 @@ namespace Timberborn.ResourceCountingSystem {
 
     public readonly StockCounter _stockCounter = new();
     public readonly CapacityCounter _capacityCounter = new();
+    public int GetResourceCountCalls { get; private set; }
 
     public void SetAvailableCarriedStock(string goodId, int value) {
       _availableCarriedStock[goodId] = value;
     }
 
     public ResourceCount GetResourceCount(string goodId) {
+      GetResourceCountCalls++;
       return new ResourceCount {
           AvailableStock = _stockCounter.GetInputOutputStock(goodId)
               + _stockCounter.GetOutputStock(goodId)
               + _availableCarriedStock.GetValueOrDefault(goodId),
           InputOutputCapacity = _capacityCounter.GetInputOutputCapacity(goodId),
       };
+    }
+
+    public void ResetGetResourceCountCalls() {
+      GetResourceCountCalls = 0;
     }
   }
 
@@ -1309,6 +1315,7 @@ namespace Timberborn.ResourceCountingSystem {
   public sealed class CapacityCounter {
     public readonly Dictionary<string, int> _inputOutputCapacity = [];
     public readonly Dictionary<string, int> _outputCapacity = [];
+    public int GetInputOutputCapacityCalls { get; private set; }
 
     public void SetInputOutputCapacity(string goodId, int value) {
       _inputOutputCapacity[goodId] = value;
@@ -1319,7 +1326,12 @@ namespace Timberborn.ResourceCountingSystem {
     }
 
     public int GetInputOutputCapacity(string goodId) {
+      GetInputOutputCapacityCalls++;
       return _inputOutputCapacity.GetValueOrDefault(goodId);
+    }
+
+    public void ResetGetInputOutputCapacityCalls() {
+      GetInputOutputCapacityCalls = 0;
     }
   }
 }

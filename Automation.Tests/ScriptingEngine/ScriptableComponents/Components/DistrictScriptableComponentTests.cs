@@ -185,6 +185,32 @@ static class DistrictScriptableComponentTests {
     Assert.Equal("District.ResourceFill.Log", fillListener.LastSignalName);
   }
 
+  public static void TickUsesPrecomputedResourceValues() {
+    var component = CreateComponent();
+    var districtCenter = CreateDistrictCenter();
+    var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
+    resourceCounter._stockCounter.SetInputOutputStock("Log", 4);
+    resourceCounter._capacityCounter.SetInputOutputCapacity("Log", 12);
+    var behavior = CreateBehavior(districtCenter, withDynamicComponents: true);
+    var stockListener = new TestSignalListener(behavior);
+    var capacityListener = new TestSignalListener(behavior);
+    var fillListener = new TestSignalListener(behavior);
+
+    component.RegisterSignalChangeCallback(Signal("District.ResourceStock.Log", behavior), stockListener);
+    component.RegisterSignalChangeCallback(Signal("District.ResourceCapacity.Log", behavior), capacityListener);
+    component.RegisterSignalChangeCallback(Signal("District.ResourceFill.Log", behavior), fillListener);
+    resourceCounter.ResetGetResourceCountCalls();
+    resourceCounter._capacityCounter.ResetGetInputOutputCapacityCalls();
+
+    component.Tick();
+
+    Assert.Equal(2, resourceCounter.GetResourceCountCalls);
+    Assert.Equal(3, resourceCounter._capacityCounter.GetInputOutputCapacityCalls);
+    Assert.Equal(0, stockListener.Calls);
+    Assert.Equal(0, capacityListener.Calls);
+    Assert.Equal(0, fillListener.Calls);
+  }
+
   public static void TickResetsTrackedResourcesWhenDistrictDisconnects() {
     var component = CreateComponent();
     var districtCenter = CreateDistrictCenter();

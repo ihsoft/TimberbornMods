@@ -73,12 +73,16 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components {
 
 namespace IgorZ.TimberDev.Utils {
   static class StringProtoSerializer {
+    static readonly System.Collections.Generic.Dictionary<string, object> SerializedObjects = new();
+
     public static string Serialize<T>(T obj) {
-      return "";
+      var key = System.Guid.NewGuid().ToString();
+      SerializedObjects.Add(key, obj);
+      return key;
     }
 
     public static T Deserialize<T>(string text) {
-      return default;
+      return (T)SerializedObjects[text];
     }
   }
 }

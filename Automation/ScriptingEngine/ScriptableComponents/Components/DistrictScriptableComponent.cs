@@ -50,17 +50,20 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           foreach (var goodId in tracker.GoodCapacity.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter._capacityCounter.GetInputOutputCapacity(goodId);
             tracker.GoodCapacity[goodId] = value;
-            tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
+            tracker.TriggerSignalUpdate(
+                ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.FromInt(value));
           }
           foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
             var value = resourceCounter.GetResourceCount(goodId).AvailableStock;
             tracker.GoodStock[goodId] = value;
-            tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
+            tracker.TriggerSignalUpdate(
+                ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.FromInt(value));
           }
           foreach (var goodId in tracker.GoodFill.Keys.ToArray()) { // Need a copy!
             var value = GetResourceFillRawValue(resourceCounter.GetResourceCount(goodId));
             tracker.GoodFill[goodId] = value;
-            tracker.TriggerSignalUpdate(ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId));
+            tracker.TriggerSignalUpdate(
+                ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.Of(value));
           }
         }
       }
@@ -72,21 +75,24 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             continue;
           }
           tracker.GoodCapacity[goodId] = 0;
-          tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
+          tracker.TriggerSignalUpdate(
+              ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.FromInt(0));
         }
         foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
           if (tracker.GoodStock[goodId] == 0) {
             continue;
           }
           tracker.GoodStock[goodId] = 0;
-          tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
+          tracker.TriggerSignalUpdate(
+              ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.FromInt(0));
         }
         foreach (var goodId in tracker.GoodFill.Keys.ToArray()) { // Need a copy!
           if (tracker.GoodFill[goodId] == 0) {
             continue;
           }
           tracker.GoodFill[goodId] = 0;
-          tracker.TriggerSignalUpdate(ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId));
+          tracker.TriggerSignalUpdate(
+              ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId), ScriptValue.Of(0));
         }
       }
     }

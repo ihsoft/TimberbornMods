@@ -60,6 +60,55 @@ static class AbstractStatusTrackerTests {
     Assert.Equal("Signals.Value", firstListener.LastSignalName);
   }
 
+  public static void UsesProvidedValueWithoutReevaluatingSource() {
+    var tracker = new TestStatusTracker();
+    var sourceCalls = 0;
+    var signal = CreateSignal(() => {
+      sourceCalls++;
+      return ScriptValue.FromInt(1);
+    });
+    var listener = new TestSignalListener();
+
+    tracker.AddSignal(signal, listener);
+    Assert.Equal(1, sourceCalls);
+
+    tracker.TriggerSignalUpdate("Signals.Value", ScriptValue.FromInt(1));
+    Assert.Equal(1, sourceCalls);
+    Assert.Equal(0, listener.Calls);
+
+    tracker.TriggerSignalUpdate("Signals.Value", ScriptValue.FromInt(2));
+    Assert.Equal(1, sourceCalls);
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal("Signals.Value", listener.LastSignalName);
+  }
+
+  public static void ComparesProvidedValueWithRestoredLastValue() {
+    var componentKey = new ComponentKey(typeof(TestStatusTracker).FullName);
+    var savedTracker = new TestStatusTracker();
+    var savedListener = new TestSignalListener();
+    savedTracker.AddSignal(CreateSignal(() => ScriptValue.FromInt(1)), savedListener);
+    var saver = new TestEntitySaver();
+    savedTracker.Save(saver);
+
+    var loader = new TestEntityLoader();
+    loader.SetComponent(componentKey, new IObjectLoader(saver.Components[componentKey.Name].Values));
+    var restoredTracker = new TestStatusTracker();
+    restoredTracker.Load(loader);
+    var sourceCalls = 0;
+    var restoredSignal = CreateSignal(() => {
+      sourceCalls++;
+      return ScriptValue.FromInt(2);
+    });
+    var restoredListener = new TestSignalListener();
+    restoredTracker.AddSignal(restoredSignal, restoredListener);
+
+    restoredTracker.TriggerSignalUpdate("Signals.Value", ScriptValue.FromInt(2));
+
+    Assert.Equal(0, sourceCalls);
+    Assert.Equal(1, restoredListener.Calls);
+    Assert.Equal("Signals.Value", restoredListener.LastSignalName);
+  }
+
   public static void NotifiesSameListenerOnceForMultipleSignalRegistrations() {
     TestScripting.CreateService();
     var tracker = new TestStatusTracker();

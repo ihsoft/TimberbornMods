@@ -146,6 +146,19 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
     if (!_signals.TryGetValue(signalName, out var signalSink) || !signalSink.UpdateLastValue()) {
       return;
     }
+    NotifySignalListeners(signalName, signalSink);
+  }
+
+  /// <summary>Notifies all signal listeners if the supplied value has changed.</summary>
+  /// <remarks>Use this overload when the caller has already computed the current value.</remarks>
+  public void TriggerSignalUpdate(string signalName, ScriptValue currentValue) {
+    if (!_signals.TryGetValue(signalName, out var signalSink) || !signalSink.UpdateLastValue(currentValue)) {
+      return;
+    }
+    NotifySignalListeners(signalName, signalSink);
+  }
+
+  static void NotifySignalListeners(string signalName, SignalSink signalSink) {
     foreach (var listener in signalSink.Listeners) {
       ScriptingService.Instance.NotifySignalListener(signalName, listener);
     }
@@ -165,7 +178,13 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
       if (_registrants.Count == 0) {
         return false;
       }
-      var newValue = _registrants[0].signalOperator.ValueFn();
+      return UpdateLastValue(_registrants[0].signalOperator.ValueFn());
+    }
+
+    public bool UpdateLastValue(ScriptValue newValue) {
+      if (_registrants.Count == 0) {
+        return false;
+      }
       var isChanged = LastValue != newValue;
       LastValue = newValue;
       return isChanged;
