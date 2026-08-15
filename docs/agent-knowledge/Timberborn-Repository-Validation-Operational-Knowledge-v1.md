@@ -42,7 +42,6 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | TimberCommons | `TimberCommons/TimberCommons.csproj` | `dotnet run --project TimberCommons.Tests/TimberCommons.Tests.csproj` | `ModsUnityProject/Assets/Mods/TimberCommons` | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
 | TimberDev source | No standalone production project in the current checkout | `dotnet run --project TimberDev.Tests/TimberDev.Tests.csproj` | No standalone mod package | `docs/timberborn-repository-notes.md` |
 | XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
-| TimberUI | Reference only; do not build by default | None | `ModsUnityProject/Assets/Mods/TimberUI` | `docs/timberborn-repository-notes.md` |
 
 `CustomResources`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
 in this matrix. Inspect their specific project purpose before applying a mod build, export, test, or release workflow.

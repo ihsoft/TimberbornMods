@@ -20,7 +20,6 @@ Examples include:
 - Automation
 - AutomationForModdableWeather
 - TimberCommons
-- TimberUI
 - XRay
 - SmartPower
 
@@ -90,11 +89,6 @@ only on TimberDev and the game APIs. Do not use other mods as a TimberDev valida
 
 If a TimberDev change affects logic that another mod actually uses, also run that mod's tests as downstream regression
 coverage.
-
-### TimberUI
-
-TimberUI is a dead mod kept only for reference. It does not build and should be excluded from release, publishing, and
-platform description synchronization workflows unless the user explicitly asks to revive or inspect it.
 
 ## Local Tools and Generated Game References
 

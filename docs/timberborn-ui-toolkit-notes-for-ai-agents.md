@@ -27,6 +27,21 @@ ModsUnityProject/Assets/Mods/<ModName>/AssetBundles/Resources/UI/Views/
 TimberDev/UI/UiFactory.cs
 ```
 
+## UXML Loading Contract
+
+Choose a UXML loader by its behavior, and verify the current implementation against decompiled `Timberborn.CoreUI`
+before relying on game-version-sensitive details. `VisualElementLoader.LoadVisualElement` currently clones the asset,
+returns only the first root element, and runs `VisualElementInitializer`. Use it for a single-root fragment that should
+inherit styles from its parent; do not use it when multiple roots or root-owned stylesheets must be preserved.
+
+For a complete mod view, load the `VisualTreeAsset`, instantiate the complete asset, and explicitly run
+`VisualElementInitializer`, following `TimberDev/UI/UiFactory.LoadVisualTreeAsset`. This preserves the instantiated
+asset's root structure and stylesheets.
+
+Use the current provenance-verified official `UI.zip` extraction as the primary stock source for UXML and USS. Treat
+reconstruction from publicized `VisualTreeAsset` or `StyleSheet` serialized internals as a version-bound diagnostic
+fallback, not maintained extraction or conversion infrastructure.
+
 ## UXML Ownership
 
 Declare stable static UI elements under their final parent in UXML. Do not create a static declarative layout in UXML
