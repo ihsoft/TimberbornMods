@@ -104,6 +104,37 @@ function Get-ModIoAccessToken() {
 }
 
 function Get-SteamDescription([string] $PublishedFileId) {
+    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    Assert-PathExists $projectPath "Steam metadata query project"
+    & dotnet build $projectPath -c Release | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "Steam metadata query build failed with exit code $LASTEXITCODE."
+    }
+
+    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $ownerOutput = @(& dotnet $dllPath --query $PublishedFileId 2>&1)
+        $ownerExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($ownerExitCode -eq 0) {
+        $itemLine = @($ownerOutput | ForEach-Object { [string]$_ } | Where-Object {
+            $_ -like "LIVE_ITEM_JSON=*"
+        }) | Select-Object -Last 1
+        if ([string]::IsNullOrWhiteSpace($itemLine)) {
+            throw "Authenticated Steam query returned no machine-readable item metadata."
+        }
+        $item = $itemLine.Substring("LIVE_ITEM_JSON=".Length) | ConvertFrom-Json
+        if ([string]$item.PublishedFileId -ne $PublishedFileId) {
+            throw "Authenticated Steam query returned the wrong item identity: $($item.PublishedFileId)."
+        }
+        return [string]$item.Description
+    }
+
     $body = "itemcount=1&publishedfileids%5B0%5D=$PublishedFileId"
     $response = Invoke-WebRequest `
         -Uri "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/" `
@@ -113,8 +144,10 @@ function Get-SteamDescription([string] $PublishedFileId) {
         -UseBasicParsing
     $item = ($response.Content | ConvertFrom-Json).response.publishedfiledetails[0]
     if ($item.result -ne 1) {
-        throw "Steam API failed for $PublishedFileId with result $($item.result)."
+        throw "Authenticated Steam query failed and public Steam API returned result $($item.result) for " +
+            "$PublishedFileId.`n$($ownerOutput -join [Environment]::NewLine)"
     }
+    Write-Host "Authenticated Steam query unavailable; using public description for visible item $PublishedFileId."
     return [string]$item.description
 }
 

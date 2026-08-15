@@ -80,6 +80,10 @@ sealed class SteamTagUpdater {
         return 4;
       }
       try {
+        if (!SteamUGC.SetReturnLongDescription(query, true)) {
+          Console.Error.WriteLine("Could not request the Workshop item description.");
+          return 4;
+        }
         var completed = false;
         var ioFailureResult = false;
         SteamUGCQueryCompleted_t response = default;
@@ -106,6 +110,11 @@ sealed class SteamTagUpdater {
         }
         Console.WriteLine($"LIVE_TAGS_JSON={JsonSerializer.Serialize(tags)}");
         Console.WriteLine($"LIVE_ITEM_JSON={JsonSerializer.Serialize(new {
+            PublishedFileId = details.m_nPublishedFileId.m_PublishedFileId,
+            ConsumerAppId = details.m_nConsumerAppID.m_AppId,
+            OwnerSteamId = details.m_ulSteamIDOwner,
+            Title = details.m_rgchTitle,
+            Description = details.m_rgchDescription,
             Visibility = details.m_eVisibility.ToString(),
             FileSize = details.m_nFileSize,
             Updated = details.m_rtimeUpdated,
