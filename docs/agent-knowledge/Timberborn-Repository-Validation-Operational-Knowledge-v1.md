@@ -44,7 +44,7 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
 | TimberUI | Reference only; do not build by default | None | `ModsUnityProject/Assets/Mods/TimberUI` | `docs/timberborn-repository-notes.md` |
 
-`CustomResources`, `TestParser`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
+`CustomResources`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
 in this matrix. Inspect their specific project purpose before applying a mod build, export, test, or release workflow.
 
 ## Bulk Package Selection

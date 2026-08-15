@@ -150,16 +150,16 @@ users select a building, but read the current game-owned aggregate object at eva
 aggregate owner as the source of truth unless the game API provides stable lifecycle events that keep the cache
 correct.
 
-## Standalone Parser Harness
+## Parser Regression Coverage
 
-`TestParser` is a supported downstream parser harness, not an active mod package and not a substitute for
-`Automation.Tests`. When an Automation change affects parser behavior, the expression model, `ExpressionDescriber`,
-`ValueDef` contracts, or source files linked by `TestParser`, keep its linked compile includes and local stubs
-synchronized, then run:
+`Automation.Tests/ScriptingEngine/Parser/ParserRegressionTests.cs` is the canonical home for the legacy parser sample
+matrix. When an Automation change affects parser behavior, the expression model, `ExpressionDescriber`, or `ValueDef`
+contracts, keep both `ParserTests` and `ParserRegressionTests` current, then run:
 
 ```powershell
-dotnet run --project TestParser/TestParser.csproj
+dotnet run --project Automation.Tests/Automation.Tests.csproj
 ```
 
-The harness must return a nonzero exit code when any expected-pass sample, expected-fail sample, round trip, execution,
-description, or decompile check fails. Do not accept a successful process exit that merely prints failed samples.
+Keep expected-pass and expected-fail samples, round trips, execution, description, and decompile checks in this focused
+test project. Do not recreate a separate parser harness that links Automation production sources and maintains parallel
+stubs.
