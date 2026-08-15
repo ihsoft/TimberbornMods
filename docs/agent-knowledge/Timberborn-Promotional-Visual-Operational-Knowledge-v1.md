@@ -15,8 +15,22 @@ Determine whether the task is a new composition, an approved redesign, or a boun
 For a bounded update, identify the invariants that must survive: typography, annotations, overlay geometry, grading,
 subject relationships, and delivery dimensions. Do not treat stylistic plausibility as permission to change them.
 
+Before generating or editing a gameplay-derived visual, record any scene geometry that communicates the mechanic.
+Exact object counts, relative heights, support relationships, and construction state may be semantic invariants rather
+than composition preferences. Do not normalize them for visual balance.
+
 Avoid adding or intensifying vignette, blur, color grading, shadows, or other subjective effects unless the requested
 design needs them. Preserve map and gameplay readability when an approved composition is meant to remain recognizable.
+
+## Use Gameplay Plates Deliberately
+
+When resemblance to known Timberborn models, materials, scale, perspective, and lighting matters, prefer trying a
+verified gameplay image as the background or base plate and ask the generator to add only the promotional layer. This
+is an evidence-supported workflow heuristic, not a guarantee that generated output will preserve the plate.
+
+Compare the result with the source. If unchanged pixels are a hard requirement, keep the approved plate immutable,
+generate only the local insert, and composite it deterministically through an explicit mask. Verify that pixels outside
+the authorized mask are identical to the checkpoint.
 
 ## Separate Editable Inputs From Outputs
 
@@ -39,6 +53,12 @@ or an accidentally retained screenshot as repository ownership.
 
 The repository does not have to retain every large raw screenshot. It does need an explicit decision: track the source,
 store an established layered format elsewhere with discoverable ownership, or accept and report the regeneration limit.
+
+The repository default for tracked mod-owned publication visuals is the lowercase
+`<ModName>/workshop/Slideshow/` folder. This is an artifact and publication boundary, not runtime `Mod/` package data,
+a C# namespace, or a Bindito package. Use `thumbnail.jpg` for the cover delivery asset. When retaining a separate
+reviewable master, use `thumbnail-master.png` by default. Closer local instructions and an established owning export
+pipeline take precedence.
 
 ## Frame The Semantic Safe Region
 
