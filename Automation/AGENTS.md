@@ -149,3 +149,17 @@ When exposing a network, district, graph, or other aggregate as a building signa
 users select a building, but read the current game-owned aggregate object at evaluation or tick time. Do not cache the
 aggregate owner as the source of truth unless the game API provides stable lifecycle events that keep the cache
 correct.
+
+## Standalone Parser Harness
+
+`TestParser` is a supported downstream parser harness, not an active mod package and not a substitute for
+`Automation.Tests`. When an Automation change affects parser behavior, the expression model, `ExpressionDescriber`,
+`ValueDef` contracts, or source files linked by `TestParser`, keep its linked compile includes and local stubs
+synchronized, then run:
+
+```powershell
+dotnet run --project TestParser/TestParser.csproj
+```
+
+The harness must return a nonzero exit code when any expected-pass sample, expected-fail sample, round trip, execution,
+description, or decompile check fails. Do not accept a successful process exit that merely prints failed samples.
