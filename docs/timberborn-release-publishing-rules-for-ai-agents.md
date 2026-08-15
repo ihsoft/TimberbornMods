@@ -81,10 +81,23 @@ Prefer dry-run-first identity-bootstrap tooling that fails when creation mode is
 or identity fields are incomplete. It must create and verify identities only and must not continue silently into package
 upload.
 
+If Steam `CreateItem` returns or exposes a new `PublishedFileId` but a later profile, preview, verification, or receipt
+step fails, treat the identity creation as partial success. Do not call `CreateItem` again. Recover only through an
+explicit existing-ID mode that cannot create another item. Before mutation, verify the owner, consumer app, Private
+visibility, and that any already-populated title matches the expected title; after completing the profile update,
+live-verify the exact title and state. Write the local creation receipt only after that recovery succeeds. If no
+trustworthy ID is available or any identity check differs, stop for owner investigation instead of guessing or creating
+another item.
+
+When a Mod.IO creation plan declares dependencies, require `community_options` to include the Mod.IO
+`ALLOW_DEPENDENCY` capability bit (`1024`) before creating the page. A dependency preview is planning evidence only.
+After creation, add the declared dependencies through the supported API and verify them by readback before final
+preflight may pass.
+
 Before a Steam item becomes public, verify it through an authenticated owner Steamworks UGC query. A missing or failed
 result from the public published-file details endpoint is not evidence that an owner-visible Private item is missing or
-invalid. The owner query must verify the intended item identity, title, visibility, tags, content state, and dependencies.
-After publication, also verify that the item is visible through the public endpoint.
+invalid. The owner query must verify the intended item identity, title, exact description, visibility, tags, content
+state, and dependencies. After publication, also verify that the item is visible through the public endpoint.
 
 ## Final preflight snapshot
 
