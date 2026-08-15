@@ -31,6 +31,20 @@ package that would be published. It must not pass `-Publish` to platform scripts
 preflight invariants before public changes, including the release identity and source/package state captured by the
 report. It may request required host or network elevation up front when practical.
 
+Use the unified scripts' compact child output for routine releases. Every distinct child invocation must remain visible
+as a named operation so repeated export, build, package, verification, or publish work is not hidden. Use
+`-DetailedOutput` only when the user requests it or when diagnosing a failure or meaningful plan difference.
+
+Preserve complete stdout and stderr for every child operation under the ignored
+`.tools/release-logs/<ModName>-<Version>/` tree and record the relevant log paths in the preflight report. Do not load
+complete success logs into agent context by default.
+
+The compact summary must still surface release identity, version and commit, compatibility lane, package and source
+hashes or fingerprints, visibility intent, platform IDs, tag equality or mutations, public mutation results, actionable
+warnings, and log paths. On child failure, show the complete child output and saved log path while preserving a nonzero
+exit. If public steps already completed, report them explicitly together with partial-success state and any unknown
+external outcome; do not collapse the result into a generic failure.
+
 Issue closing and Wiki handoff remain explicit user-confirmed follow-up steps, not automatic side effects of the
 publish script.
 
@@ -38,8 +52,8 @@ The Discord release handoff is a local preparation step after successful publica
 but it must not copy the proposed message to the clipboard, send through, or automate the user's Discord account. It
 does not depend on GitHub Release creation.
 
-This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
-unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
+Treat unexpected unified-script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc
+manual steps.
 
 ## First release of a new mod
 
