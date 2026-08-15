@@ -53,6 +53,19 @@ every meaningful occurrence, such as a counter scoped to the current recipe or m
 notifications because they weaken the normal value-change semantics of signal updates. Use same-value notification only
 if a stateful representation would be misleading or impossible.
 
+When the Rules UI groups parameterized signals by meaning, use explicit `SignalDef` metadata such as
+`DisplayNameLocKey` and its supported display-name argument. Do not infer semantic groups by splitting or comparing the
+localized `DisplayName`; word, separator, and common-prefix heuristics are language-dependent and can invent misleading
+subgroups.
+
+Preserve the signal order supplied by each `ScriptableComponent` when creating groups. Do not globally sort the merged
+signal list without an explicit product requirement. Place a group where its first member occurred and preserve the
+members' relative order.
+
+Keep display-name metadata aligned with the localization and UI contract that is actually implemented. The current
+parameterized signal contract supports one display-name argument; do not introduce argument arrays or imply multiple
+placeholder support until the complete localization and UI path supports it.
+
 For global time-like signals, prefer game events, `ITimeTriggerFactory`, or similar scheduled triggers over
 `AutomationService.RegisterTickable` polling. If exact per-tick precision is not required, use a coarse bucket and a
 lazy one-shot trigger when there are listeners.
