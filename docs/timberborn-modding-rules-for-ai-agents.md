@@ -315,6 +315,17 @@ using old fallback values or copied logic.
 
 Each package should have its own configurator.
 
+The C# folder-to-namespace rule and Bindito package ownership are separate, cumulative contracts. A source file's path
+determines its namespace under the repository C# rules regardless of dependency injection. In a Timberborn mod, each
+functional C# source folder is additionally a Bindito package and must have a local `Configurator.cs` that owns that
+package's bindings, multibindings, or Harmony registration. Satisfying one contract does not replace the other.
+
+When splitting code into folders such as `Core`, `Patches`, or `UI`, update both the namespaces and Bindito package
+ownership. Do not leave their registration in an omnibus root configurator.
+
+Keep package dependencies directed from integration packages toward foundational packages. For example, `Patches` may
+depend on `Core`, but `Core` should not depend on patch types merely to initialize or register them.
+
 A configurator implements `IConfigurator` and is marked with one or more `Context` attributes.
 
 Known Timberborn contexts:
