@@ -34,9 +34,9 @@ report. It may request required host or network elevation up front when practica
 Issue closing and Wiki handoff remain explicit user-confirmed follow-up steps, not automatic side effects of the
 publish script.
 
-The Discord release handoff is a local preparation step after successful publication. It may copy a proposed message
-and open the target channel, but it must never send through or automate the user's Discord account. It does not depend
-on GitHub Release creation.
+The Discord release handoff is a local preparation step after successful publication. It may open the target channel,
+but it must not copy the proposed message to the clipboard, send through, or automate the user's Discord account. It
+does not depend on GitHub Release creation.
 
 This unified tooling is still new. Until it has been proven by at least one successful real release publish flow, treat
 unexpected script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc manual steps.
@@ -827,9 +827,13 @@ Format the release title as the neutral Markdown heading `# <display mod name> v
 Render each top-level changelog item as a Markdown `-` bullet for Discord, even when the source changelog uses `*`.
 Changing the bullet marker is formatting only; preserve the changelog item text exactly.
 
-With `-Prepare`, the helper may copy the message to the local clipboard and open the tracked direct mod channel for the
-user. The user reviews and sends the message manually. Never automate a normal Discord user account, send the message,
-or treat opening the channel as evidence that an announcement was posted.
+With `-Prepare`, the helper may open the tracked direct mod channel for the user, but must not copy the message to the
+local clipboard. The user reviews, copies, and sends the message manually. Never automate a normal Discord user account,
+send the message, or treat opening the channel as evidence that an announcement was posted.
+
+Put the complete reviewed Discord message in a fenced `text` block at the very end of the Publisher's final release
+response, after the release summary, verification, issue, and Wiki notes. Do not replace this visible handoff with a
+clipboard-only delivery; the final block keeps the outstanding manual action durable and prominent.
 
 Do not silently shorten, rewrite, or choose alternate player-facing text to fit Discord's 2000-character limit. If the
 message is over the limit, or the direct channel URL is missing or conflicts between tracked descriptions, report the
