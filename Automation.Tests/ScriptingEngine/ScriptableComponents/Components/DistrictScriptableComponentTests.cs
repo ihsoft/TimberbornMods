@@ -41,8 +41,10 @@ static class DistrictScriptableComponentTests {
 
     Assert.Equal("District.ResourceStock.Plank", signalNames[3]);
     Assert.Equal("District.ResourceCapacity.Plank", signalNames[4]);
-    Assert.Equal("District.ResourceStock.Log", signalNames[5]);
-    Assert.Equal("District.ResourceCapacity.Log", signalNames[6]);
+    Assert.Equal("District.ResourceFill.Plank", signalNames[5]);
+    Assert.Equal("District.ResourceStock.Log", signalNames[6]);
+    Assert.Equal("District.ResourceCapacity.Log", signalNames[7]);
+    Assert.Equal("District.ResourceFill.Log", signalNames[8]);
   }
 
   public static void EncodesUnsafeResourceSignalGoodIds() {
@@ -62,8 +64,10 @@ static class DistrictScriptableComponentTests {
 
     Assert.Equal("District.ResourceStock.LogX5FRewrite", signalNames[3]);
     Assert.Equal("District.ResourceCapacity.LogX5FRewrite", signalNames[4]);
+    Assert.Equal("District.ResourceFill.LogX5FRewrite", signalNames[5]);
     Assert.Equal(11, component.GetSignalSource("District.ResourceStock.LogX5FRewrite", behavior)().AsInt);
     Assert.Equal(12, component.GetSignalSource("District.ResourceCapacity.LogX5FRewrite", behavior)().AsInt);
+    Assert.Equal(92, component.GetSignalSource("District.ResourceFill.LogX5FRewrite", behavior)().AsRawNumber);
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceStock:Rewrite Logs",
         component.GetSignalDefinition("District.ResourceStock.LogX5FRewrite", behavior).DisplayName);
     Assert.Equal(1, stockListener.Calls);
@@ -98,6 +102,31 @@ static class DistrictScriptableComponentTests {
     Assert.Equal(12, component.GetSignalSource("District.ResourceCapacity.Log", behavior)().AsInt);
   }
 
+  public static void ClampsResourceFillToNormalizedRange() {
+    var component = CreateComponent();
+    var districtCenter = CreateDistrictCenter();
+    var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
+    var behavior = CreateBehavior(districtCenter);
+    var source = component.GetSignalSource("District.ResourceFill.Log", behavior);
+
+    resourceCounter._stockCounter.SetInputOutputStock("Log", 4);
+    resourceCounter._capacityCounter.SetInputOutputCapacity("Log", 10);
+    Assert.Equal(40, source().AsRawNumber);
+
+    resourceCounter._stockCounter.SetOutputStock("Log", 5);
+    resourceCounter.SetAvailableCarriedStock("Log", 2);
+    Assert.Equal(100, source().AsRawNumber);
+
+    resourceCounter._stockCounter.SetInputOutputStock("Log", 0);
+    resourceCounter._stockCounter.SetOutputStock("Log", 0);
+    resourceCounter.SetAvailableCarriedStock("Log", 0);
+    resourceCounter._capacityCounter.SetInputOutputCapacity("Log", 0);
+    Assert.Equal(0, source().AsRawNumber);
+
+    resourceCounter._stockCounter.SetOutputStock("Log", 1);
+    Assert.Equal(100, source().AsRawNumber);
+  }
+
   public static void BuildsSignalDefinitions() {
     var component = CreateComponent();
     var behavior = CreateBehavior(CreateDistrictCenter());
@@ -105,6 +134,7 @@ static class DistrictScriptableComponentTests {
     var beaversDef = component.GetSignalDefinition("District.Beavers", behavior);
     var stockDef = component.GetSignalDefinition("District.ResourceStock.Log", behavior);
     var capacityDef = component.GetSignalDefinition("District.ResourceCapacity.Log", behavior);
+    var fillDef = component.GetSignalDefinition("District.ResourceFill.Log", behavior);
 
     Assert.Equal("District.Beavers", beaversDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.Beavers", beaversDef.DisplayName);
@@ -117,6 +147,12 @@ static class DistrictScriptableComponentTests {
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity:Logs", capacityDef.DisplayName);
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity", capacityDef.DisplayNameLocKey);
     Assert.Equal("Logs", capacityDef.DisplayNameArgument);
+    Assert.Equal("District.ResourceFill.Log", fillDef.ScriptName);
+    Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceFill:Logs", fillDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceFill", fillDef.DisplayNameLocKey);
+    Assert.Equal("Logs", fillDef.DisplayNameArgument);
+    Assert.Equal(ValueDef.NumericFormatEnum.Percent, fillDef.Result.DisplayNumericFormat);
+    Assert.Equal((0f, 100f), fillDef.Result.DisplayNumericFormatRange);
   }
 
   public static void TickUpdatesTrackedResourcesAndNotifiesListeners() {
@@ -128,9 +164,11 @@ static class DistrictScriptableComponentTests {
     var behavior = CreateBehavior(districtCenter, withDynamicComponents: true);
     var stockListener = new TestSignalListener(behavior);
     var capacityListener = new TestSignalListener(behavior);
+    var fillListener = new TestSignalListener(behavior);
 
     component.RegisterSignalChangeCallback(Signal("District.ResourceStock.Log", behavior), stockListener);
     component.RegisterSignalChangeCallback(Signal("District.ResourceCapacity.Log", behavior), capacityListener);
+    component.RegisterSignalChangeCallback(Signal("District.ResourceFill.Log", behavior), fillListener);
     resourceCounter._stockCounter.SetInputOutputStock("Log", 6);
     resourceCounter._stockCounter.SetOutputStock("Log", 1);
     resourceCounter._capacityCounter.SetInputOutputCapacity("Log", 18);
@@ -138,10 +176,13 @@ static class DistrictScriptableComponentTests {
 
     Assert.Equal(7, component.GetSignalSource("District.ResourceStock.Log", behavior)().AsInt);
     Assert.Equal(18, component.GetSignalSource("District.ResourceCapacity.Log", behavior)().AsInt);
+    Assert.Equal(39, component.GetSignalSource("District.ResourceFill.Log", behavior)().AsRawNumber);
     Assert.Equal(1, stockListener.Calls);
     Assert.Equal("District.ResourceStock.Log", stockListener.LastSignalName);
     Assert.Equal(1, capacityListener.Calls);
     Assert.Equal("District.ResourceCapacity.Log", capacityListener.LastSignalName);
+    Assert.Equal(1, fillListener.Calls);
+    Assert.Equal("District.ResourceFill.Log", fillListener.LastSignalName);
   }
 
   public static void TickResetsTrackedResourcesWhenDistrictDisconnects() {
@@ -154,16 +195,20 @@ static class DistrictScriptableComponentTests {
     var districtBuilding = behavior.GetComponent<DistrictBuilding>();
     var stockListener = new TestSignalListener(behavior);
     var capacityListener = new TestSignalListener(behavior);
+    var fillListener = new TestSignalListener(behavior);
 
     component.RegisterSignalChangeCallback(Signal("District.ResourceStock.Log", behavior), stockListener);
     component.RegisterSignalChangeCallback(Signal("District.ResourceCapacity.Log", behavior), capacityListener);
+    component.RegisterSignalChangeCallback(Signal("District.ResourceFill.Log", behavior), fillListener);
     districtBuilding.SetDistrict(null);
     component.Tick();
 
     Assert.Equal(0, component.GetSignalSource("District.ResourceStock.Log", behavior)().AsInt);
     Assert.Equal(0, component.GetSignalSource("District.ResourceCapacity.Log", behavior)().AsInt);
+    Assert.Equal(0, component.GetSignalSource("District.ResourceFill.Log", behavior)().AsRawNumber);
     Assert.Equal(1, stockListener.Calls);
     Assert.Equal(1, capacityListener.Calls);
+    Assert.Equal(1, fillListener.Calls);
   }
 
   public static void StopsTrackingStockAfterLastListenerIsRemoved() {
@@ -185,6 +230,21 @@ static class DistrictScriptableComponentTests {
 
     component.UnregisterSignalChangeCallback(secondSignal, secondListener);
     Assert.False(tracker.GoodStock.ContainsKey("Log"));
+  }
+
+  public static void StopsTrackingFillAfterLastListenerIsRemoved() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateDistrictCenter(), withDynamicComponents: true);
+    var signal = Signal("District.ResourceFill.Log", behavior);
+    var listener = new TestSignalListener(behavior);
+
+    component.RegisterSignalChangeCallback(signal, listener);
+
+    var tracker = behavior.GetOrThrow<DistrictScriptableComponent.DistrictChangeTracker>();
+    Assert.True(tracker.GoodFill.ContainsKey("Log"));
+
+    component.UnregisterSignalChangeCallback(signal, listener);
+    Assert.False(tracker.GoodFill.ContainsKey("Log"));
   }
 
   public static void TickResetsCarriedStockWhenDistrictDisconnects() {

@@ -162,6 +162,7 @@ IgorZ.Automation.Scriptable.District.Signal.Beavers,"beavers in district","Name 
 IgorZ.Automation.Scriptable.District.Signal.Bots,"bots in district","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"beds in district","Name of the condition for the current number of beds checking"
 IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity,"district capacity: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
+IgorZ.Automation.Scriptable.District.Signal.ResourceFill,"district fill: {0}","Name of the condition that returns available district stock divided by fillable storage capacity, capped at 100%"
 IgorZ.Automation.Scriptable.District.Signal.ResourceStock,"district stock: {0}","Name of the condition that returns the current district stock output of the specified good"
 IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"detonate dynamite","Name of the action that immediately detonates the dynamite"
 IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"detonate dynamite and add another <GreenHighlight>{0} times</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"

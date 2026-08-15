@@ -16,6 +16,7 @@ using Timberborn.GameDistricts;
 using Timberborn.Goods;
 using Timberborn.ResourceCountingSystem;
 using Timberborn.TickSystem;
+using UnityEngine;
 using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
@@ -26,6 +27,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   const string BeaversPopulationSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.Beavers";
   const string NumberOfBedsSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds";
   const string ResourceCapacitySignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity";
+  const string ResourceFillSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.ResourceFill";
   const string ResourceStockSignalLocKey = "IgorZ.Automation.Scriptable.District.Signal.ResourceStock";
 
   const string BotPopulationSignalName = "District.Bots";
@@ -33,6 +35,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   const string NumberOfBedsSignalName = "District.NumberOfBeds";
   const string ResourceStockSignalNamePrefix = "District.ResourceStock.";
   const string ResourceCapacitySignalNamePrefix = "District.ResourceCapacity.";
+  const string ResourceFillSignalNamePrefix = "District.ResourceFill.";
 
   #region ITickableSingleton implemenation
 
@@ -54,6 +57,11 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             tracker.GoodStock[goodId] = value;
             tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
           }
+          foreach (var goodId in tracker.GoodFill.Keys.ToArray()) { // Need a copy!
+            var value = GetResourceFillRawValue(resourceCounter.GetResourceCount(goodId));
+            tracker.GoodFill[goodId] = value;
+            tracker.TriggerSignalUpdate(ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId));
+          }
         }
       }
     }
@@ -72,6 +80,13 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           }
           tracker.GoodStock[goodId] = 0;
           tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
+        }
+        foreach (var goodId in tracker.GoodFill.Keys.ToArray()) { // Need a copy!
+          if (tracker.GoodFill[goodId] == 0) {
+            continue;
+          }
+          tracker.GoodFill[goodId] = 0;
+          tracker.TriggerSignalUpdate(ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId));
         }
       }
     }
@@ -108,6 +123,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
       foreach (var goodId in sortedGoodIds) {
         res.Add(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
         res.Add(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
+        res.Add(ResourceFillSignalNamePrefix + SignalNameSegment.Encode(goodId));
       }
     }
 
@@ -124,6 +140,10 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     if (name.StartsWith(ResourceCapacitySignalNamePrefix)) {
       var goodId = ParseResourceSignalName(name).Id;
       return () => ResourceCapacitySignal(districtBuilding, goodId);
+    }
+    if (name.StartsWith(ResourceFillSignalNamePrefix)) {
+      var goodId = ParseResourceSignalName(name).Id;
+      return () => ResourceFillSignal(districtBuilding, goodId);
     }
     return name switch {
         BeaverPopulationSignalName => () => BeaverPopulationSignal(districtBuilding),
@@ -142,6 +162,9 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     if (name.StartsWith(ResourceCapacitySignalNamePrefix)) {
       return _signalDefsCache.GetOrAdd(name, MakeResourceCapacityTrackerSignalDef);
     }
+    if (name.StartsWith(ResourceFillSignalNamePrefix)) {
+      return _signalDefsCache.GetOrAdd(name, MakeResourceFillTrackerSignalDef);
+    }
     return name switch {
         BeaverPopulationSignalName => BeaverPopulationSignalDef,
         BotPopulationSignalName => BotPopulationSignalDef,
@@ -155,6 +178,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
     if (name.StartsWith(ResourceStockSignalNamePrefix) || name.StartsWith(ResourceCapacitySignalNamePrefix)
+        || name.StartsWith(ResourceFillSignalNamePrefix)
         || name is BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName) {
       host.Behavior.GetOrCreate<DistrictChangeTracker>().AddSignal(signalOperator, host);
     } else {
@@ -166,6 +190,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
     var name = signalOperator.SignalName;
     if (name.StartsWith(ResourceStockSignalNamePrefix) || name.StartsWith(ResourceCapacitySignalNamePrefix)
+        || name.StartsWith(ResourceFillSignalNamePrefix)
         || name is BeaverPopulationSignalName or BotPopulationSignalName or NumberOfBedsSignalName) {
       host.Behavior.GetOrThrow<DistrictChangeTracker>().RemoveSignal(signalOperator, host);
     } else {
@@ -247,6 +272,24 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     };
   }
 
+  SignalDef MakeResourceFillTrackerSignalDef(string signalName) {
+    var spec = ParseResourceSignalName(signalName);
+    var displayNameArgument = spec.PluralDisplayName.Value;
+    return new SignalDef {
+        ScriptName = signalName,
+        DisplayName = Loc.T(ResourceFillSignalLocKey, displayNameArgument),
+        DisplayNameLocKey = ResourceFillSignalLocKey,
+        DisplayNameArgument = displayNameArgument,
+        Scope = SignalDef.ScopeEnum.Global,
+        Result = new ValueDef {
+            ValueType = ScriptValue.TypeEnum.Number,
+            DisplayNumericFormat = ValueDef.NumericFormatEnum.Percent,
+            DisplayNumericFormatRange = (0, 100),
+            RuntimeValueValidator = ValueDef.RangeCheckValidator(min: 0f, max: 1f),
+        },
+    };
+  }
+
   ScriptValue ResourceStockSignal(DistrictBuilding districtBuilding, string goodId) {
     var districtCenter = districtBuilding.District;
     if (!districtCenter) { // Disconnected buildings don't have District.
@@ -263,6 +306,26 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     }
     var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
     return ScriptValue.FromInt(resourceCounter.GetResourceCount(goodId).InputOutputCapacity);
+  }
+
+  ScriptValue ResourceFillSignal(DistrictBuilding districtBuilding, string goodId) {
+    var districtCenter = districtBuilding.District;
+    if (!districtCenter) { // Disconnected buildings don't have District.
+      return ScriptValue.FromInt(0);
+    }
+    var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
+    return ScriptValue.Of(GetResourceFillRawValue(resourceCounter.GetResourceCount(goodId)));
+  }
+
+  static int GetResourceFillRawValue(ResourceCount resourceCount) {
+    if (resourceCount.AvailableStock == 0) {
+      return 0;
+    }
+    if (resourceCount.InputOutputCapacity == 0
+        || resourceCount.AvailableStock >= resourceCount.InputOutputCapacity) {
+      return 100;
+    }
+    return Mathf.RoundToInt((float)resourceCount.AvailableStock / resourceCount.InputOutputCapacity * 100f);
   }
 
   static ScriptValue BeaverPopulationSignal(DistrictBuilding districtBuilding) {
@@ -354,6 +417,15 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
           GoodStock.Add(goodId, value);
           HostedDebugLog.Fine(AutomationBehavior, "Start tracking district signal: {0}, value={1}", signalName, value);
         }
+      } else if (signalName.StartsWith(ResourceFillSignalNamePrefix)) {
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceFillSignalNamePrefix.Length..]);
+        if (!GoodFill.ContainsKey(goodId)) {
+          var value = resourceCounter != null
+              ? GetResourceFillRawValue(resourceCounter.GetResourceCount(goodId))
+              : 0;
+          GoodFill.Add(goodId, value);
+          HostedDebugLog.Fine(AutomationBehavior, "Start tracking district signal: {0}, value={1}", signalName, value);
+        }
       }
       return isFirstListener;
     }
@@ -376,6 +448,12 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         if (!GoodStock.Remove(goodId)) { // It's an abnormal situation.
           throw new InvalidOperationException($"Cannot remove resource stock for: {signalName}");
         }
+      } else if (signalName.StartsWith(ResourceFillSignalNamePrefix)) {
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceFillSignalNamePrefix.Length..]);
+        HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
+        if (!GoodFill.Remove(goodId)) { // It's an abnormal situation.
+          throw new InvalidOperationException($"Cannot remove resource fill for: {signalName}");
+        }
       }
       return false;
     }
@@ -387,6 +465,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
     DistrictCenter _currentDistrictCenter;
 
     public readonly Dictionary<string, int> GoodCapacity = [];
+    public readonly Dictionary<string, int> GoodFill = [];
     public readonly Dictionary<string, int> GoodStock = [];
 
     void UpdateDistrictCenter() {
