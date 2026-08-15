@@ -74,6 +74,17 @@ For Automation scriptable components that poll only while signals have subscribe
 through `AutomationService.RegisterTickable` on the first listener and unregister it on the last listener. Use
 `ITickableSingleton` only when the component must tick independently of script listeners.
 
+For parameterized signal families backed by per-key polling caches, keep first-listener registration and last-listener
+removal symmetric for every key. Remove a key from the polling cache after its last listener is removed.
+
+Use one canonical value formula for a signal's direct read, initial tracker state, and tick update. Do not maintain a
+partial approximation in the polling cache; it can suppress a real change or a required reset when district or owner
+state changes.
+
+In a demonstrated hot polling path, let calculation helpers return the raw representation consumed by cache comparison
+and convert it to `ScriptValue` only at the scripting API boundary. Do not generalize this into a requirement for cold
+paths where the extra representation would not remove measured wrapping and unwrapping.
+
 Before adding a new Automation scriptable component with callbacks, ticking, trackers, or reference management, inspect
 at least one nearby component with the same lifecycle shape and follow that lifecycle pattern unless there is a reason
 not to.
@@ -118,6 +129,13 @@ not on script-name prefixes or deny-lists.
 
 Global game, colony, district, weather, time, science, or service-state signals should use `SignalDef.ScopeEnum.Global`
 unless a specific building actually owns and produces the value.
+
+`District.ResourceCapacity` intentionally uses `ResourceCount.InputOutputCapacity`, not `TotalCapacity`. It represents
+fillable storage that can accept and later provide the good; output-only buffers are excluded.
+
+`District.ResourceFill` intentionally uses `clamp(AvailableStock / InputOutputCapacity, 0, 1)`, not
+`ResourceCount.FillRate`. Preserve the edge cases `0 / 0 = 0` and positive stock with zero fillable capacity equal to
+`1`.
 
 When adding global signals, verify that the building signal export dialog does not list them.
 
