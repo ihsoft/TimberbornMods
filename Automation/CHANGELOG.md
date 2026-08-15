@@ -1,9 +1,9 @@
-# v4.9.0 (TBD)
+# v4.9.0 (August 15th, 2026)
 * [Feature] Add district fill signals based on available stock and fillable storage capacity.
-* [Fix] District stock signals could remain stale after disconnecting from a district and continue polling after their last listener was removed.
 * [Feature] Allow combining conditions with AND and OR in the rule constructor.
 * [Feature] Add an option to show optional parentheses around nested logical groups in rule descriptions.
 * [Feature] Group parameterized signals in rule constructor dropdowns.
+* [Fix] District stock signals could remain stale after disconnecting from a district and continue polling after their last listener was removed.
 
 # v4.8.1 (July 18th, 2026)
 * [Update] Support Timberborn `1.1.1.1`.
