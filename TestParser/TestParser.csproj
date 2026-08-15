@@ -6,9 +6,8 @@
         <ProjectGuid>{CD9EA9B6-88C7-417F-B9AC-B43FF6522221}</ProjectGuid>
         <OutputType>Exe</OutputType>
         <RootNamespace>TestParser</RootNamespace>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <LangVersion>12</LangVersion>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -181,6 +180,9 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalDef.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\SignalDef.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\SignalNameSegment.cs">
+        <Link>Import\ScriptingEngine\ScriptableComponents\SignalNameSegment.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\ValueDef.cs">
         <Link>Import\ScriptingEngine\ScriptableComponents\ValueDef.cs</Link>

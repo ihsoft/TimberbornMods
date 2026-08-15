@@ -10,6 +10,8 @@ class LocStub : ILoc {
       { "IgorZ.Automation.Scripting.Expressions.OrOperator", "OR" },
       { "IgorZ.Automation.Scriptable.Signals.Signal.Get", "Signal({0})" },
       { "IgorZ.Automation.Scriptable.Signals.Action.Set", "SetSignal({0})" },
+      { "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument", "Signal name" },
+      { "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument", "Signal value" },
       { "IgorZ.Automation.Scriptable.Debug.Action.Log", "write to logs: '{0}'" },
   };
 

@@ -13,13 +13,11 @@ using TestParser.Stubs.Patches;
 
 namespace TestParser;
 
-public class Application {
-  public static void Main(string[] args) {
-    var parser = new Application();
-    parser.Run();
+class Application {
+  public static int Main() {
+    var application = new Application();
+    return application.Run() ? 0 : 1;
   }
-
-  readonly Dictionary<string, string> _localizations = new();
 
   readonly List<string> _goodScriptSamples = [
       // String constants
@@ -29,11 +27,11 @@ public class Application {
       "'test' != 'test2'",
 
       // Number constants
-      "-1. == -1",
-      "12. == 12",
+      "-1.0 == -1",
+      "12.0 == 12",
       "123.0 == 123",
       "-123.0 == -123",
-      "123.-10 == 113",  // 123.0 - 10
+      "123.0 - 10 == 113",
 
       // Custom signals.
       "Signals.Set('yellow', 12)",
@@ -84,10 +82,10 @@ public class Application {
       "21 % 5 * 3 == 3",
       "(21 % 5) * 3 == 3",
       "21 % (5 * 3) == 6",
-      "1.001 == 1.00",  // FIXME: probably fail on such constants?
-      "1.006 == 1.01",
-      "1 + 0.006 == 1.01",
-      "1.003 + 0.003 == 1",
+      "1.00 == 1",
+      "1.01 == 1.01",
+      "1 + 0.01 == 1.01",
+      "1.00 + 0.00 == 1",
       "round(1.01) == 1",
       "round(1.61) == 2",
       "min(1,2,3) == 1",
@@ -100,8 +98,8 @@ public class Application {
       "max(10+4, 10+3, 10+2) == 14",
       "min(10+4, 10+3, 10+2) == 12",
       "round(1) == 1",
-      "round(1.333) == 1",
-      "round(1.555) == 2",
+      "round(1.33) == 1",
+      "round(1.55) == 2",
       "round(1/3) == 0",
       "round(4/3) == 1",
       "round(2/3) == 1",
@@ -148,11 +146,22 @@ public class Application {
       "min(1)",
       "max(2)",
       "round()",
+
+      // Numeric values outside the supported precision.
+      "-1.",
+      "12.",
+      "123.-10",
+      "1.001 == 1.00",
+      "1.006 == 1.01",
+      "1 + 0.006 == 1.01",
+      "1.003 + 0.003 == 1",
+      "round(1.333) == 1",
+      "round(1.555) == 2",
   ];
 
   IContainer _container;
 
-  void Run() {
+  bool Run() {
     const bool showErrorsOnly = true;
     RegisterComponents();
     PatchStubs.Apply();
@@ -160,11 +169,12 @@ public class Application {
     // TestOneStatement("1 + 2 + 3 + 4", out var reports);
     // Console.WriteLine(string.Join("\n", reports));
 
-    RunGoodScriptSamples(_goodScriptSamples, showErrorsOnly);
-    RunBadScriptSamples(_badScriptSamples, showErrorsOnly);
+    var goodSamplesPassed = RunGoodScriptSamples(_goodScriptSamples, showErrorsOnly);
+    var badSamplesPassed = RunBadScriptSamples(_badScriptSamples, showErrorsOnly);
+    return goodSamplesPassed && badSamplesPassed;
   }
 
-  void RunGoodScriptSamples(IList<string> samples, bool showErrorsOnly = false) {
+  bool RunGoodScriptSamples(IList<string> samples, bool showErrorsOnly = false) {
     Console.WriteLine("Samples that must pass:");
     var success = 0;
     foreach (var testFormula in samples) {
@@ -177,9 +187,10 @@ public class Application {
       }
     }
     Console.WriteLine($"{success} of {samples.Count} test samples passed\n");
+    return success == samples.Count;
   }
 
-  void RunBadScriptSamples(IList<string> samples, bool showErrorsOnly = false) {
+  bool RunBadScriptSamples(IList<string> samples, bool showErrorsOnly = false) {
     var pyParser = _container.GetInstance<PythonSyntaxParser>();
     var behavior = new AutomationBehavior();
     Console.WriteLine("Samples that must fail:");
@@ -197,6 +208,7 @@ public class Application {
       }
     }
     Console.WriteLine($"{success} of {samples.Count} test samples passed\n");
+    return success == samples.Count;
   }
 
   bool TestOneStatement(string input, out List<string> reports) {
@@ -219,7 +231,7 @@ public class Application {
       reports.Add($"  * ERROR: Failed to parse decompiled Python: {result.LastError}");
       return false;
     }
-    TryMakeDescription(result.ParsedExpression, reports);
+    res &= TryMakeDescription(result.ParsedExpression, reports);
     res &= TryBooleanOperator(result.ParsedExpression, reports);
     var decompiled2 = lispParser.Decompile(result.ParsedExpression);
     if (decompiled1 != decompiled2) {
@@ -234,23 +246,26 @@ public class Application {
       reports.Add($"  * ERROR: Failed to parse decompiled Python: {result.LastError}");
       return false;
     }
-    TryMakeDescription(result.ParsedExpression, reports);
+    res &= TryMakeDescription(result.ParsedExpression, reports);
     res &= TryBooleanOperator(result.ParsedExpression, reports);
     decompiled2 = pyParser.Decompile(result.ParsedExpression);
     if (decompiled1 != decompiled2) {
       reports.Add($"  * ERROR: {decompiled1} is not {decompiled2}");
+      res = false;
     }
 
     return res;
   }
 
-  void TryMakeDescription(IExpression expr, List<string> reports) {
+  bool TryMakeDescription(IExpression expr, List<string> reports) {
     var describer = _container.GetInstance<ExpressionDescriber>();
     try {
       var description = describer.DescribeExpression(expr);
       reports.Add($"  * Description: {description}");
+      return true;
     } catch (Exception e) {
       reports.Add($"  * Failed making description: {e.Message}");
+      return false;
     }
   }
 

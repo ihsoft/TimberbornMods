@@ -26,6 +26,7 @@ sealed class FoobarScriptingComponent : ScriptableComponentBase {
             Arguments = [
                 new ValueDef {
                     ValueType = ScriptValue.TypeEnum.Number,
+                    DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
                 },
             ],
         },
