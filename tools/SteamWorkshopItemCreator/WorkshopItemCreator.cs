@@ -44,7 +44,11 @@ sealed class WorkshopItemCreator {
 
   sealed record CreatedItem(ulong PublishedFileId, bool NeedsLegalAgreement);
 
-  sealed record ItemDetails(ulong PublishedFileId, uint ConsumerAppId, string Title, string Visibility);
+  sealed record PreparedPlan(
+      CreationPlan Plan, string DescriptionPath, string Description, string PreviewPath, string ResultPath);
+
+  sealed record ItemDetails(
+      ulong PublishedFileId, uint ConsumerAppId, ulong OwnerSteamId, string Title, string Visibility);
 
   sealed class CreationResult {
     /// <summary>Creates the durable receipt written only after live verification succeeds.</summary>
@@ -86,10 +90,108 @@ sealed class WorkshopItemCreator {
 
   /// <summary>Validates a creation plan and optionally creates and verifies its private Workshop identity.</summary>
   public int Run(bool create, string planPathArgument) {
+    var prepared = PreparePlan(planPathArgument);
+    WritePlan(
+        prepared.Plan, prepared.DescriptionPath, prepared.PreviewPath, prepared.ResultPath);
+    if (!InitializeSteam(prepared.Plan.AppId)) {
+      return 3;
+    }
+
+    try {
+      var steamId = SteamUser.GetSteamID();
+      Console.WriteLine($"  Steam user: {steamId.m_SteamID}");
+      Console.WriteLine($"  Logged on: {SteamUser.BLoggedOn()}");
+
+      var existingItems = QueryUserItems(steamId.GetAccountID(), prepared.Plan.AppId);
+      var duplicate = existingItems.FirstOrDefault(item =>
+          string.Equals(item.Title, prepared.Plan.Title, StringComparison.OrdinalIgnoreCase));
+      if (duplicate is not null) {
+        Console.Error.WriteLine(
+            $"An item with this exact title already exists: {duplicate.PublishedFileId} ({duplicate.Visibility}).");
+        return 4;
+      }
+
+      Console.WriteLine("  Existing exact-title item: none");
+      if (!create) {
+        Console.WriteLine("Dry run only. No Workshop item was created.");
+        return 0;
+      }
+
+      var created = CreateItem(prepared.Plan.AppId);
+      Console.WriteLine($"Created Workshop identity: {created.PublishedFileId}");
+      Console.WriteLine($"Needs legal agreement: {created.NeedsLegalAgreement}");
+      return CompleteCreatedItem(created, prepared, steamId.m_SteamID);
+    } finally {
+      SteamAPI.Shutdown();
+    }
+  }
+
+  /// <summary>Completes and verifies a known partial identity without creating another Workshop item.</summary>
+  public int Recover(ulong publishedFileId, bool needsLegalAgreement, string planPathArgument) {
+    var prepared = PreparePlan(planPathArgument);
+    WritePlan(
+        prepared.Plan, prepared.DescriptionPath, prepared.PreviewPath, prepared.ResultPath);
+    Console.WriteLine($"Recovery-only PublishedFileId: {publishedFileId}");
+    Console.WriteLine("CreateItem: disabled in recovery mode");
+    if (!InitializeSteam(prepared.Plan.AppId)) {
+      return 3;
+    }
+
+    try {
+      var steamId = SteamUser.GetSteamID().m_SteamID;
+      var current = QueryItem(publishedFileId);
+      if (current.ConsumerAppId != prepared.Plan.AppId || current.OwnerSteamId != steamId
+          || current.Visibility != "Private"
+          || current.Title.Length > 0
+              && !string.Equals(current.Title, prepared.Plan.Title, StringComparison.Ordinal)) {
+        throw new InvalidOperationException(
+            $"Recovery target mismatch. App={current.ConsumerAppId}, Owner={current.OwnerSteamId}, "
+            + $"Title={current.Title}, Visibility={current.Visibility}.");
+      }
+
+      return CompleteCreatedItem(
+          new CreatedItem(publishedFileId, needsLegalAgreement), prepared, steamId);
+    } finally {
+      SteamAPI.Shutdown();
+    }
+  }
+
+  int CompleteCreatedItem(
+      CreatedItem created, PreparedPlan prepared, ulong steamId) {
+    try {
+      UpdateItemProfile(
+          created.PublishedFileId, prepared.Plan, prepared.Description, prepared.PreviewPath);
+      var verified = QueryItem(created.PublishedFileId);
+      if (verified.ConsumerAppId != prepared.Plan.AppId || verified.OwnerSteamId != steamId
+          || !string.Equals(verified.Title, prepared.Plan.Title, StringComparison.Ordinal)
+          || verified.Visibility != prepared.Plan.Visibility) {
+        throw new InvalidOperationException(
+            $"Live verification mismatch. App={verified.ConsumerAppId}, Owner={verified.OwnerSteamId}, "
+            + $"Title={verified.Title}, Visibility={verified.Visibility}.");
+      }
+
+      Directory.CreateDirectory(Path.GetDirectoryName(prepared.ResultPath)!);
+      var result = new CreationResult(
+          created.PublishedFileId, prepared.Plan.AppId, steamId, verified.Title, verified.Visibility,
+          created.NeedsLegalAgreement, DateTimeOffset.UtcNow);
+      File.WriteAllText(prepared.ResultPath, JsonSerializer.Serialize(result, JsonOptions()));
+      Console.WriteLine($"Verified Workshop identity: {created.PublishedFileId}");
+      Console.WriteLine($"CREATED_PUBLISHED_FILE_ID={created.PublishedFileId}");
+      return 0;
+    } catch (Exception exception) {
+      // Steam identities cannot be rolled back here, so preserve the ID even when later profile setup fails.
+      Console.Error.WriteLine(
+          $"Workshop identity {created.PublishedFileId} was created, but profile update or verification failed.");
+      Console.Error.WriteLine(exception);
+      Console.Error.WriteLine($"PARTIAL_PUBLISHED_FILE_ID={created.PublishedFileId}");
+      return 5;
+    }
+  }
+
+  static PreparedPlan PreparePlan(string planPathArgument) {
     var planPath = Path.GetFullPath(planPathArgument);
     if (!File.Exists(planPath)) {
-      Console.Error.WriteLine($"Plan not found: {planPath}");
-      return 2;
+      throw new FileNotFoundException("Creation plan not found.", planPath);
     }
 
     var plan = JsonSerializer.Deserialize<CreationPlan>(File.ReadAllText(planPath), JsonOptions())
@@ -109,71 +211,8 @@ sealed class WorkshopItemCreator {
       throw new InvalidOperationException($"Result already exists; refusing duplicate creation: {resultPath}");
     }
 
-    var description = File.ReadAllText(descriptionPath);
-    WritePlan(plan, descriptionPath, previewPath, resultPath);
-    if (!InitializeSteam(plan.AppId)) {
-      return 3;
-    }
-
-    try {
-      var steamId = SteamUser.GetSteamID();
-      Console.WriteLine($"  Steam user: {steamId.m_SteamID}");
-      Console.WriteLine($"  Logged on: {SteamUser.BLoggedOn()}");
-
-      var existingItems = QueryUserItems(steamId.GetAccountID(), plan.AppId);
-      var duplicate = existingItems.FirstOrDefault(item =>
-          string.Equals(item.Title, plan.Title, StringComparison.OrdinalIgnoreCase));
-      if (duplicate is not null) {
-        Console.Error.WriteLine(
-            $"An item with this exact title already exists: {duplicate.PublishedFileId} ({duplicate.Visibility}).");
-        return 4;
-      }
-
-      Console.WriteLine("  Existing exact-title item: none");
-      if (!create) {
-        Console.WriteLine("Dry run only. No Workshop item was created.");
-        return 0;
-      }
-
-      var created = CreateItem(plan.AppId);
-      Console.WriteLine($"Created Workshop identity: {created.PublishedFileId}");
-      Console.WriteLine($"Needs legal agreement: {created.NeedsLegalAgreement}");
-      return CompleteCreatedItem(created, plan, description, previewPath, resultPath, steamId.m_SteamID);
-    } finally {
-      SteamAPI.Shutdown();
-    }
-  }
-
-  int CompleteCreatedItem(
-      CreatedItem created, CreationPlan plan, string description, string previewPath,
-      string resultPath, ulong steamId) {
-    try {
-      UpdateItemProfile(created.PublishedFileId, plan, description, previewPath);
-      var verified = QueryItem(created.PublishedFileId);
-      if (verified.ConsumerAppId != plan.AppId
-          || !string.Equals(verified.Title, plan.Title, StringComparison.Ordinal)
-          || verified.Visibility != plan.Visibility) {
-        throw new InvalidOperationException(
-            $"Live verification mismatch. App={verified.ConsumerAppId}, Title={verified.Title}, "
-            + $"Visibility={verified.Visibility}.");
-      }
-
-      Directory.CreateDirectory(Path.GetDirectoryName(resultPath)!);
-      var result = new CreationResult(
-          created.PublishedFileId, plan.AppId, steamId, verified.Title, verified.Visibility,
-          created.NeedsLegalAgreement, DateTimeOffset.UtcNow);
-      File.WriteAllText(resultPath, JsonSerializer.Serialize(result, JsonOptions()));
-      Console.WriteLine($"Verified Workshop identity: {created.PublishedFileId}");
-      Console.WriteLine($"CREATED_PUBLISHED_FILE_ID={created.PublishedFileId}");
-      return 0;
-    } catch (Exception exception) {
-      // Steam identities cannot be rolled back here, so preserve the ID even when later profile setup fails.
-      Console.Error.WriteLine(
-          $"Workshop identity {created.PublishedFileId} was created, but profile update or verification failed.");
-      Console.Error.WriteLine(exception);
-      Console.Error.WriteLine($"PARTIAL_PUBLISHED_FILE_ID={created.PublishedFileId}");
-      return 5;
-    }
+    return new PreparedPlan(
+        plan, descriptionPath, File.ReadAllText(descriptionPath), previewPath, resultPath);
   }
 
   static void WritePlan(CreationPlan plan, string descriptionPath, string previewPath, string resultPath) {
@@ -299,7 +338,7 @@ sealed class WorkshopItemCreator {
       }
       items.Add(new ItemDetails(
           details.m_nPublishedFileId.m_PublishedFileId, details.m_nConsumerAppID.m_AppId,
-          details.m_rgchTitle, ToVisibility(details.m_eVisibility)));
+          details.m_ulSteamIDOwner, details.m_rgchTitle, ToVisibility(details.m_eVisibility)));
     }
     return items;
   }

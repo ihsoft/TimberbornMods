@@ -42,6 +42,11 @@ foreach ($field in $requiredFields) {
 if ([int]$plan.Visible -ne 0) {
     throw "Identity creation supports Hidden visibility only."
 }
+$dependencyPreview = [string]$plan.DependencyPreview
+if (-not [string]::IsNullOrWhiteSpace($dependencyPreview) -and
+        (([int]$plan.CommunityOptions -band 1024) -eq 0)) {
+    throw "A creation plan with DependencyPreview must enable Mod.IO ALLOW_DEPENDENCY (1024)."
+}
 
 $descriptionPath = Resolve-RequiredPath ([string]$plan.DescriptionPath) "Description source"
 $logoPath = Resolve-RequiredPath ([string]$plan.LogoPath) "Logo source"
