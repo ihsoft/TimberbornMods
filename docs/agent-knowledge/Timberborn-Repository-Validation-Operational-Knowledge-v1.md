@@ -18,6 +18,10 @@ Update this matrix when a production project, test project, package-data locatio
 removed, or renamed. Adding a new mod is not complete until its row records the known project, focused test status,
 package-data ownership, and local instructions.
 
+Add a new mod's row only after its first real, non-prototype implementation has been submitted to the repository.
+Untracked or uncommitted local paths, a completed design discussion, or a declaration that prototyping is finished are
+not sufficient evidence that the mod is an active repository package.
+
 Focused test projects are executable console runners. Run them with `dotnet run --project`, not `dotnet test`.
 `No focused tests` means no package-specific test project exists in the current repository; it does not mean that
 testing is unnecessary or that an unrelated package's tests should be substituted.
