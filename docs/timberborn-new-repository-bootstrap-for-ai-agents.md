@@ -151,8 +151,9 @@ Generated references are optional until a task needs them:
 - `_ExtractedGameAssets/` is generated from `_GAME!/Timberborn_Data/StreamingAssets/Modding/*.zip` and used for
   blueprints, localizations, shaders, and UI assets.
 
-Treat generated references as read-only caches. If they are missing, stale, or incomplete, generate or refresh them
-instead of designing around missing files.
+Treat generated references as read-only caches. Before use, verify their `generation-provenance.json` according to the
+repository notes. If the cache or valid matching provenance is missing, stale, incomplete, or does not cover the needed
+inputs, generate or refresh it instead of designing around missing files.
 
 ### Release Package Local State
 
@@ -393,6 +394,11 @@ Recommended scripts:
 - read archives from `_GAME!/Timberborn_Data/StreamingAssets/Modding/`,
 - extract `Blueprints.zip`, `Localizations.zip`, `Shaders.zip`, and `UI.zip`,
 - output generated references to `_ExtractedGameAssets/`.
+
+After a successful real run, both scripts must write `generation-provenance.json` at the output root using the schema
+defined in the repository notes. Invalidate existing provenance before mutating generated output, and publish the new
+manifest only after every requested input succeeds. A failed or partial run must leave no current provenance claim.
+`-WhatIf` must neither create nor invalidate provenance.
 
 Treat both output folders as read-only generated references.
 

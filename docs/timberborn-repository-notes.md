@@ -109,10 +109,38 @@ Use decompiled game sources as a read-only architecture reference.
 
 Use extracted game assets as read-only data and UI references.
 
-Before treating generated references as authoritative, verify that they match the target Timberborn game version or
-branch for the task. Check available version markers, generated folder provenance, game assemblies, package
-`MinimumGameVersion`, and the user's requested Stable or Experimental target. If the generated reference version does
-not match, say so and avoid relying on it without additional verification against the correct game files.
+Before using generated references as evidence, identify the target installed Timberborn build for the task and verify
+the cache's `generation-provenance.json`. Both `_DecompiledGame/` and `_ExtractedGameAssets/` use this file at their
+output root.
+
+Schema v1 records:
+
+- `SchemaVersion`, `ResourceKind`, and `GeneratedAtUtc`;
+- `Game.CurrentVersion` from `StreamingAssets/VersionNumbers.json` and `Game.VersionText` from
+  `StreamingAssets/Version.txt`;
+- the repository-relative generator script name and its SHA-256, plus the external tool name/version when applicable;
+- effective generation options;
+- the portable source-relative path, byte length, and SHA-256 of every assembly or archive in the generated input set.
+
+The normal verification path compares both recorded `Game` values with the target installation and confirms that the
+resources needed by the task are listed in `Inputs`. When the game identity matches exactly and the required resources
+are covered, treat those generated resources as verified without recomputing every source-input hash.
+
+The recorded lengths and SHA-256 values preserve what the generator actually consumed and support targeted provenance
+checks. Recompute them only for the specific inputs whose identity is uncertain, when the installation may have been
+manually modified or partially updated, or when diagnosing cache integrity. Do not scan every input hash during routine
+generated-reference use.
+
+The manifest proves only the exact input set it lists. Outputs left from another run but absent from `Inputs` remain
+unverified. Do not infer equivalence from directory or file timestamps. Generator identity is audit evidence, and a
+changed generator requires regeneration when the task depends on the changed generation semantics.
+
+If provenance is absent, incomplete, invalid, has a different game identity, does not cover a resource needed by the
+task, or fails a targeted input check, treat the cache as unverified and regenerate it before drawing conclusions. A
+failed or partial generation must not leave provenance claiming that the cache is current.
+
+Provenance must remain portable. Do not store absolute installation paths, local aliases, usernames, hostnames, or
+other machine-specific identity in it.
 
 Treat `_ExtractedGameAssets` as a generated cache that can be stale or partially extracted. When an expected current
 game UI or data asset is missing there, check the source archive under
@@ -125,9 +153,9 @@ Do not edit generated files under `_DecompiledGame/`.
 
 Do not edit generated files under `_ExtractedGameAssets/`.
 
-Regenerate `_DecompiledGame/` from the game assemblies when needed.
+Regenerate `_DecompiledGame/` from the game assemblies when provenance verification requires it.
 
-Regenerate `_ExtractedGameAssets/` from the game modding archives when needed.
+Regenerate `_ExtractedGameAssets/` from the game modding archives when provenance verification requires it.
 
 The game modding archives are located under:
 

@@ -445,6 +445,10 @@ export, and focused test commands.
 - `_DecompiledGame/` contains generated decompiled game sources and must stay ignored.
 - `_ExtractedGameAssets/` contains generated extracted game modding assets and must stay ignored.
 - Do not edit game DLLs, generated decompiled game sources, or generated extracted game assets.
+- Before using either generated-reference cache as evidence, verify that its `generation-provenance.json` game identity
+  matches the target installed Timberborn build and covers the inputs needed by the task. If provenance is absent,
+  incomplete, does not cover those inputs, or has a different game identity, regenerate the required cache before
+  drawing conclusions. Directory timestamps alone are not version proof.
 - Use decompiled game sources as a read-only reference for understanding Timberborn architecture.
 - Use extracted game assets as a read-only reference for game blueprints, localizations, UI assets, and shaders.
 
