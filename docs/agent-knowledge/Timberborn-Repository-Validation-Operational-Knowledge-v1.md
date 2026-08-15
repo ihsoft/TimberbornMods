@@ -15,12 +15,15 @@ This document does not replace:
 ## Package Build And Validation Matrix
 
 Update this matrix when a production project, test project, package-data location, or local `AGENTS.md` is added,
-removed, or renamed. Adding a new mod is not complete until its row records the known project, focused test status,
-package-data ownership, and local instructions.
+removed, or renamed. Once a new mod has a committed candidate, its repository integration is incomplete until a row
+records the known project, focused test status, package-data ownership, and local instructions.
 
-Add a new mod's row only after its first real, non-prototype implementation has been submitted to the repository.
-Untracked or uncommitted local paths, a completed design discussion, or a declaration that prototyping is finished are
-not sufficient evidence that the mod is an active repository package.
+Add a new mod's row only after its first real, non-prototype candidate is committed and establishes stable production,
+test, and package ownership. Untracked or uncommitted local paths, a completed design discussion, or a declaration that
+prototyping is finished are not sufficient evidence that the mod is an active repository package.
+
+Registration is an ownership and validation checkpoint. It does not mean that implementation is complete, the mod is
+ready for release, or publication is authorized.
 
 Focused test projects are executable console runners. Run them with `dotnet run --project`, not `dotnet test`.
 `No focused tests` means no package-specific test project exists in the current repository; it does not mean that
@@ -32,6 +35,7 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | AutomationForModdableWeather | `AutomationForModdableWeather/AutomationForModdableWeather.csproj` | No focused tests | Project-local manifest and content | None |
 | CustomTools | `CustomTools/CustomTools.csproj` | `dotnet run --project CustomTools.Tests/CustomTools.Tests.csproj` | `ModsUnityProject/Assets/Mods/CustomTools` | None |
 | DualDistrictStorage | `DualDistrictStorage/DualDistrictStorage.csproj` | No focused tests | `DualDistrictStorage/Mod` | `DualDistrictStorage/AGENTS.md` |
+| FillTheGap | `FillTheGap/FillTheGap.csproj` | `dotnet run --project FillTheGap.Tests/FillTheGap.Tests.csproj -c Release` | `FillTheGap/Mod` | None |
 | MapBrowser | `MapBrowser/MapBrowser.csproj` | No focused tests | `ModsUnityProject/Assets/Mods/MapBrowser` | `MapBrowser/AGENTS.md` |
 | SmartHaulers | `SmartHaulers/SmartHaulers.csproj` | No focused tests | Split between `SmartHaulers/Mod` and `ModsUnityProject/Assets/Mods/SmartHaulers` | `SmartHaulers/AGENTS.md` |
 | SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | None |
