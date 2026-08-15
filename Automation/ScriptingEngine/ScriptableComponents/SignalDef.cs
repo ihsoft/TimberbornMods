@@ -17,6 +17,13 @@ sealed record SignalDef {
   /// <summary>Human-readable and localized name of the signal.</summary>
   public string DisplayName { get; init; }
 
+  /// <summary>Localization key used to make a parameterized <see cref="DisplayName"/>.</summary>
+  /// <remarks>Set this together with <see cref="DisplayNameArgument"/> only for parameterized signal names.</remarks>
+  public string DisplayNameLocKey { get; init; }
+
+  /// <summary>Value substituted into <see cref="DisplayNameLocKey"/> to make <see cref="DisplayName"/>.</summary>
+  public string DisplayNameArgument { get; init; }
+
   /// <summary>Scope that owns the signal value.</summary>
   public ScopeEnum Scope { get; init; } = ScopeEnum.Building;
 

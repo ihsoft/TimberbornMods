@@ -94,6 +94,8 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
         .Select(t => _scriptingService.GetSignalDefinition(t, behavior))
         .Select(t => new ConditionConstructor.ConditionDefinition {
             Name = (t.ScriptName, t.DisplayName),
+            DisplayNameLocKey = t.DisplayNameLocKey,
+            DisplayNameArgument = t.DisplayNameArgument,
             Argument = new ArgumentDefinition(_uiFactory, t.Result),
         });
     ruleConstructor.SetConditionDefinitions(conditions);

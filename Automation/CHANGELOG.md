@@ -1,6 +1,7 @@
 # v4.9.0 (TBD)
 * [Feature] Allow combining conditions with AND and OR in the rule constructor.
 * [Feature] Add an option to show optional parentheses around nested logical groups in rule descriptions.
+* [Feature] Group parameterized signals in rule constructor dropdowns.
 
 # v4.8.1 (July 18th, 2026)
 * [Update] Support Timberborn `1.1.1.1`.

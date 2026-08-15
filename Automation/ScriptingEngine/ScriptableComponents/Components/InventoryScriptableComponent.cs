@@ -183,9 +183,13 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
   #region Signals
 
   SignalDef MakeSignalDef(string name, bool isInput, string goodId, int capacity) {
+    var displayNameLocKey = isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey;
+    var displayNameArgument = _goodService.GetGood(goodId).PluralDisplayName.Value;
     return new SignalDef {
         ScriptName = name,
-        DisplayName = LocGoodSignal(isInput ? InputGoodSignalLocKey : OutputGoodSignalLocKey, goodId),
+        DisplayName = Loc.T(displayNameLocKey, displayNameArgument),
+        DisplayNameLocKey = displayNameLocKey,
+        DisplayNameArgument = displayNameArgument,
         Scope = SignalDef.ScopeEnum.Building,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
@@ -380,10 +384,6 @@ sealed class InventoryScriptableComponent : ScriptableComponentBase {
       return signalNameSegment;
     }
     return SignalNameSegment.TryDecode(signalNameSegment, out var decodedGoodId) ? decodedGoodId : signalNameSegment;
-  }
-
-  string LocGoodSignal(string name, string goodId) {
-    return Loc.T(name, _goodService.GetGood(goodId).PluralDisplayName.Value);
   }
 
   static string GetHaulingMode(StockpilePriority stockpilePriority) {

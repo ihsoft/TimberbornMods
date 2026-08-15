@@ -50,6 +50,8 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
     return GetSignalDef with {
         ScriptName = name,
         DisplayName = Loc.T(GetSignalLocKey, signalName),
+        DisplayNameLocKey = GetSignalLocKey,
+        DisplayNameArgument = signalName,
     };
   }
 

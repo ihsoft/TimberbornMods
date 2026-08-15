@@ -443,6 +443,10 @@ static class Program {
       ("ObjectsCache caches objects by composite keys", ObjectsCacheTests.CachesObjectsByCompositeKeys),
 
       // ScriptingEngineUI
+      ("ParameterizedItemsGrouper requires the minimum group size",
+          ParameterizedItemsGrouperTests.RequiresMinimumGroupSize),
+      ("ParameterizedItemsGrouper preserves group and item order",
+          ParameterizedItemsGrouperTests.PreservesGroupAndItemOrder),
       ("InvertRuleButtonProvider inverts FillValve.SetHeight argument without changing action",
           InvertRuleButtonProviderTests.InvertsFillValveSetHeightArgumentWithoutChangingAction),
       ("InvertRuleButtonProvider inverts FillValve open and close actions",

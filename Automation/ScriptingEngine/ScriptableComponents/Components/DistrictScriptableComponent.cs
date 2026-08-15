@@ -216,9 +216,12 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   SignalDef MakeResourceStockTrackerSignalDef(string signalName) {
     var spec = ParseResourceSignalName(signalName);
+    var displayNameArgument = spec.PluralDisplayName.Value;
     return new SignalDef {
         ScriptName = signalName,
-        DisplayName = Loc.T(ResourceStockSignalLocKey, spec.PluralDisplayName.Value),
+        DisplayName = Loc.T(ResourceStockSignalLocKey, displayNameArgument),
+        DisplayNameLocKey = ResourceStockSignalLocKey,
+        DisplayNameArgument = displayNameArgument,
         Scope = SignalDef.ScopeEnum.Global,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,
@@ -230,9 +233,12 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
 
   SignalDef MakeResourceCapacityTrackerSignalDef(string signalName) {
     var spec = ParseResourceSignalName(signalName);
+    var displayNameArgument = spec.PluralDisplayName.Value;
     return new SignalDef {
         ScriptName = signalName,
-        DisplayName = Loc.T(ResourceCapacitySignalLocKey, spec.PluralDisplayName.Value),
+        DisplayName = Loc.T(ResourceCapacitySignalLocKey, displayNameArgument),
+        DisplayNameLocKey = ResourceCapacitySignalLocKey,
+        DisplayNameArgument = displayNameArgument,
         Scope = SignalDef.ScopeEnum.Global,
         Result = new ValueDef {
             ValueType = ScriptValue.TypeEnum.Number,

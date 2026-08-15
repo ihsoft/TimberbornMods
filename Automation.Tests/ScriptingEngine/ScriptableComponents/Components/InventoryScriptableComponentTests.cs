@@ -166,9 +166,13 @@ static class InventoryScriptableComponentTests {
 
     Assert.Equal("Inventory.InputGood.Log", inputDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.InputGood", inputDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.InputGood", inputDef.DisplayNameLocKey);
+    Assert.Equal("Logs", inputDef.DisplayNameArgument);
     Assert.Equal((0, 30), inputDef.Result.DisplayNumericFormatRange);
     Assert.Equal("Inventory.OutputGood.Plank", outputDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood", outputDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood", outputDef.DisplayNameLocKey);
+    Assert.Equal("Planks", outputDef.DisplayNameArgument);
     Assert.Equal((0, 20), outputDef.Result.DisplayNumericFormatRange);
   }
 

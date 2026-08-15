@@ -111,8 +111,12 @@ static class DistrictScriptableComponentTests {
     Assert.Equal((0, float.NaN), beaversDef.Result.DisplayNumericFormatRange);
     Assert.Equal("District.ResourceStock.Log", stockDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceStock:Logs", stockDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceStock", stockDef.DisplayNameLocKey);
+    Assert.Equal("Logs", stockDef.DisplayNameArgument);
     Assert.Equal("District.ResourceCapacity.Log", capacityDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity:Logs", capacityDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity", capacityDef.DisplayNameLocKey);
+    Assert.Equal("Logs", capacityDef.DisplayNameArgument);
   }
 
   public static void TickUpdatesTrackedResourcesAndNotifiesListeners() {
