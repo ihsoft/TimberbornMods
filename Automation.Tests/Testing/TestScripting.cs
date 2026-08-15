@@ -76,6 +76,27 @@ sealed class TestScriptable : IScriptable {
     );
   }
 
+  public void RegisterVariadicAction(string name, ScriptValue.TypeEnum firstArgumentType) {
+    _actions[name] = (
+        new ActionDef {
+            ScriptName = name,
+            DisplayName = name,
+            Arguments = [
+                new ValueDef {
+                    ValueType = firstArgumentType,
+                    DisplayNumericFormat = firstArgumentType == ScriptValue.TypeEnum.Number
+                        ? ValueDef.NumericFormatEnum.Float
+                        : ValueDef.NumericFormatEnum.Unspecified,
+                },
+            ],
+            VarArg = new ValueDef {
+                ValueType = ScriptValue.TypeEnum.Unset,
+            },
+        },
+        _ => {}
+    );
+  }
+
   public void RegisterStringAction(string name, params string[] options) {
     _actions[name] = (
         new ActionDef {
