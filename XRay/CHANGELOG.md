@@ -1,4 +1,4 @@
-# v1.3.0 (TBD)
+# v1.3.0 (August 14th, 2026):
 * [Feature] Add configurable transparency for buildings and plants, with click-or-hold activation and underground object selection through surface structures.
 
 # v1.2.0 (July 18th, 2026):
