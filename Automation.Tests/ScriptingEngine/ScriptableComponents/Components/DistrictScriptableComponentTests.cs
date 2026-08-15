@@ -166,6 +166,51 @@ static class DistrictScriptableComponentTests {
     Assert.Equal(1, capacityListener.Calls);
   }
 
+  public static void StopsTrackingStockAfterLastListenerIsRemoved() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateDistrictCenter(), withDynamicComponents: true);
+    var firstSignal = Signal("District.ResourceStock.Log", behavior);
+    var secondSignal = Signal("District.ResourceStock.Log", behavior);
+    var firstListener = new TestSignalListener(behavior);
+    var secondListener = new TestSignalListener(behavior);
+
+    component.RegisterSignalChangeCallback(firstSignal, firstListener);
+    component.RegisterSignalChangeCallback(secondSignal, secondListener);
+
+    var tracker = behavior.GetOrThrow<DistrictScriptableComponent.DistrictChangeTracker>();
+    Assert.True(tracker.GoodStock.ContainsKey("Log"));
+
+    component.UnregisterSignalChangeCallback(firstSignal, firstListener);
+    Assert.True(tracker.GoodStock.ContainsKey("Log"));
+
+    component.UnregisterSignalChangeCallback(secondSignal, secondListener);
+    Assert.False(tracker.GoodStock.ContainsKey("Log"));
+  }
+
+  public static void TickResetsCarriedStockWhenDistrictDisconnects() {
+    var component = CreateComponent();
+    var districtCenter = CreateDistrictCenter();
+    var resourceCounter = districtCenter.GetComponent<DistrictResourceCounter>();
+    resourceCounter.SetAvailableCarriedStock("Log", 5);
+    var behavior = CreateBehavior(districtCenter, withDynamicComponents: true);
+    var districtBuilding = behavior.GetComponent<DistrictBuilding>();
+    var signal = Signal("District.ResourceStock.Log", behavior);
+    var listener = new TestSignalListener(behavior);
+    var source = component.GetSignalSource("District.ResourceStock.Log", behavior);
+
+    component.RegisterSignalChangeCallback(signal, listener);
+    component.Tick();
+    Assert.Equal(0, listener.Calls);
+    Assert.Equal(5, source().AsInt);
+
+    districtBuilding.SetDistrict(null);
+    component.Tick();
+
+    Assert.Equal(0, source().AsInt);
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal("District.ResourceStock.Log", listener.LastSignalName);
+  }
+
   public static void PopulationEventsNotifyMatchingListeners() {
     var component = CreateComponent();
     var districtCenter = CreateDistrictCenter();

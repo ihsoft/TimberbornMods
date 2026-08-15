@@ -50,8 +50,7 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
             tracker.TriggerSignalUpdate(ResourceCapacitySignalNamePrefix + SignalNameSegment.Encode(goodId));
           }
           foreach (var goodId in tracker.GoodStock.Keys.ToArray()) { // Need a copy!
-            var value = resourceCounter._stockCounter.GetInputOutputStock(goodId)
-                + resourceCounter._stockCounter.GetOutputStock(goodId);
+            var value = resourceCounter.GetResourceCount(goodId).AvailableStock;
             tracker.GoodStock[goodId] = value;
             tracker.TriggerSignalUpdate(ResourceStockSignalNamePrefix + SignalNameSegment.Encode(goodId));
           }
@@ -365,13 +364,18 @@ sealed class DistrictScriptableComponent : ScriptableComponentBase, ITickableSin
         return true;  // Still need to track it.
       }
       var signalName = signalOperator.SignalName;
-      if (!signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
-        return false;
-      }
-      var goodId = DecodeResourceSignalNameSegment(signalName[ResourceCapacitySignalNamePrefix.Length..]);
-      HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
-      if (!GoodCapacity.Remove(goodId)) { // It's an abnormal situation.
-        throw new InvalidOperationException($"Cannot remove resource capacity for: {signalName}");
+      if (signalName.StartsWith(ResourceCapacitySignalNamePrefix)) {
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceCapacitySignalNamePrefix.Length..]);
+        HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
+        if (!GoodCapacity.Remove(goodId)) { // It's an abnormal situation.
+          throw new InvalidOperationException($"Cannot remove resource capacity for: {signalName}");
+        }
+      } else if (signalName.StartsWith(ResourceStockSignalNamePrefix)) {
+        var goodId = DecodeResourceSignalNameSegment(signalName[ResourceStockSignalNamePrefix.Length..]);
+        HostedDebugLog.Fine(AutomationBehavior, "Stop tracking district signal: {0}", signalName);
+        if (!GoodStock.Remove(goodId)) { // It's an abnormal situation.
+          throw new InvalidOperationException($"Cannot remove resource stock for: {signalName}");
+        }
       }
       return false;
     }

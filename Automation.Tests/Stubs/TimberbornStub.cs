@@ -1266,12 +1266,20 @@ namespace Timberborn.ResourceCountingSystem {
   }
 
   public sealed class DistrictResourceCounter : BaseComponent {
+    private readonly Dictionary<string, int> _availableCarriedStock = [];
+
     public readonly StockCounter _stockCounter = new();
     public readonly CapacityCounter _capacityCounter = new();
 
+    public void SetAvailableCarriedStock(string goodId, int value) {
+      _availableCarriedStock[goodId] = value;
+    }
+
     public ResourceCount GetResourceCount(string goodId) {
       return new ResourceCount {
-          AvailableStock = _stockCounter.GetInputOutputStock(goodId) + _stockCounter.GetOutputStock(goodId),
+          AvailableStock = _stockCounter.GetInputOutputStock(goodId)
+              + _stockCounter.GetOutputStock(goodId)
+              + _availableCarriedStock.GetValueOrDefault(goodId),
           InputOutputCapacity = _capacityCounter.GetInputOutputCapacity(goodId),
       };
     }
