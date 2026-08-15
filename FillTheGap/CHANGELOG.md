@@ -1,4 +1,4 @@
-# v0.1.0 (TBD)
+# v1.0.0 (2026-08-15)
 
 * [Feature] Add a Terrain Block that works normally or replaces one level of a standard Platform.
 * [Feature] Support roads and loose goods inside Platforms, stack replacement blocks from the bottom up, and recover excess Platform materials.

@@ -1,6 +1,6 @@
 {
   "Name": "Fill The Gap",
-  "Version": "0.1.0",
+  "Version": "1.0.0",
   "Id": "Timberborn.IgorZ.FillTheGap",
   "MinimumGameVersion": "1.1.0.0",
   "Description": "Adds a Terrain Block that can be built normally or inside standard Platforms.",

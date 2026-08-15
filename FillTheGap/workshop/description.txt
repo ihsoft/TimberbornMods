@@ -1,0 +1,22 @@
+[h1]Support the mods[/h1]
+All my Timberborn mods are free. I make them for fun, because I enjoy improving the game and experimenting with new ideas.
+
+Donations are completely optional. If you enjoy the mods and want to say thanks, you can buy me a coffee or donate via PayPal. It is never required, but it is always appreciated and helps keep me motivated.
+
+[url=https://buymeacoffee.com/igor.zavoychinskiy]Buy Me a Coffee[/url]
+[url=https://www.paypal.com/donate/?hosted_button_id=8RPFC884ZEV9L]Donate via PayPal[/url]
+
+[hr][/hr]
+
+[h1]Fill Platforms without rebuilding around them[/h1]
+Fill The Gap adds a Terrain Block that can be built normally or replace one level of a standard Platform.
+
+Use it to turn occupied Platform space into solid terrain without first clearing roads or loose goods. Replacement blocks build from the bottom up, preserve completed Platforms as temporary support, and recover excess Platform materials.
+
+[h1]How to use[/h1]
+Select Fill the Gap from the Landscaping building group. Place it on empty terrain like a normal Terrain Block, or place it inside a standard Platform to replace that level.
+
+[hr][/hr]
+
+[h1]Source[/h1]
+GitHub repository: https://github.com/ihsoft/TimberbornMods
