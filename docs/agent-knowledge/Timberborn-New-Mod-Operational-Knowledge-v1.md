@@ -77,6 +77,11 @@ Choose only the asset lanes the feature needs:
 Split ownership explicitly when a mod uses more than one lane. Do not create a Unity project, test project, custom
 generator, compatibility lane, or Harmony patch merely because another mod has one.
 
+When a mod genuinely needs a tracked utility to reproduce, validate, or maintain one of its owned artifacts, place the
+utility under the mod-local lowercase `tools/` folder. This folder is a tooling boundary, not a C# namespace or Bindito
+package, and does not require a `Configurator.cs`. Keep only utilities with a concrete owner, explicit input/output
+contract, and continuing maintenance value; do not retain arbitrary one-off scripts.
+
 If the architecture or ownership choice remains material and unclear, load the Modding How-To plus the relevant
 Repository Notes and Lessons Learned, record the evidence checked, and ask only when the remaining choice affects
 scope, public API, persisted data, compatibility, player-visible behavior, external state, or reversibility.
