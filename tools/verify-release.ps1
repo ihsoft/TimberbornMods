@@ -27,12 +27,16 @@ param(
     [switch] $SkipSteam,
     [switch] $SkipModIo,
     [switch] $PublishSteamVisibility,
-    [switch] $PublishModIoPage
+    [switch] $PublishModIoPage,
+    [switch] $DetailedOutput
 )
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
+$releaseLogDirectory = ""
+$releaseStepIndex = 0
 
 function Resolve-RepoPath([string] $Path) {
     if ([System.IO.Path]::IsPathRooted($Path)) {
@@ -219,23 +223,9 @@ function Invoke-ReleaseStep([string] $Name, [string] $ScriptName, [string[]] $Ar
     Write-Host "== $Name =="
 
     $scriptPath = Join-Path $PSScriptRoot $ScriptName
-    Assert-PathExists $scriptPath $Name
-
-    $output = & powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
-    $output | ForEach-Object {
-        Write-Host $_
-    }
-    if ($exitCode -ne 0) {
-        throw "$Name failed with exit code $exitCode."
-    }
-
-    return [ordered]@{
-        Name = $Name
-        Script = $scriptPath
-        Arguments = [string[]]$Arguments
-        CompletedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
-    }
+    $script:releaseStepIndex++
+    return Invoke-LoggedReleaseStep -Name $Name -ScriptPath $scriptPath -Arguments $Arguments `
+        -LogDirectory $releaseLogDirectory -StepIndex $releaseStepIndex -DetailedOutput:$DetailedOutput
 }
 
 function Add-OptionalArgument([System.Collections.Generic.List[string]] $Arguments, [string] $Name, [string] $Value) {
@@ -260,6 +250,7 @@ $modVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVersion")
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "ReleaseVersion is empty in $releaseConfigPath."
 }
+$releaseLogDirectory = New-ReleaseLogDirectory -RepoRoot $repoRoot -ModName $ModName -Version $modVersion -Phase "verify"
 
 $changesPath = Resolve-RepoPath ([string](Get-ObjectPropertyValue $releaseConfig "ChangesPath"))
 $packageMode = [string](Get-ObjectPropertyValue $releaseConfig.Package "Mode")
@@ -380,6 +371,32 @@ if (-not [string]::IsNullOrWhiteSpace($packageSourceValue)) {
 $gitSnapshot = Get-ReleaseGitSnapshot $ReleaseCommit `
     @($identityPaths | Sort-Object -Unique) `
     @($criticalPaths | Sort-Object -Unique)
+
+$steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
+$resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
+    Resolve-RepoPath ".tools/modio/$ModName.local.json"
+}
+else {
+    Resolve-RepoPath $ModIoConfigPath
+}
+$modIoId = ""
+if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
+    $modIoConfig = Get-Content -Raw -LiteralPath $resolvedModIoConfigPath | ConvertFrom-Json
+    $modIoId = [string](Get-ObjectPropertyValue $modIoConfig "ModId")
+}
+
+Write-Host "Release preflight: $ModName v$modVersion"
+Write-Host "  Release commit: $($gitSnapshot.ReleaseCommit)"
+Write-Host "  Game compatibility lane: $GameVersion"
+if (-not $SkipSteam) {
+    $steamVisibilityIntent = if ($PublishSteamVisibility) { "publish requested" } else { "unchanged" }
+    Write-Host "  Steam: PublishedFileId=$steamPublishedFileId; visibility=$steamVisibilityIntent"
+}
+if (-not $SkipModIo) {
+    $modIoVisibilityIntent = if ($PublishModIoPage) { "publish requested" } else { "unchanged" }
+    Write-Host "  Mod.IO: ModId=$modIoId; page visibility=$modIoVisibilityIntent"
+}
+Write-Host "  Full child logs: $releaseLogDirectory"
 
 $steps = New-Object System.Collections.Generic.List[object]
 
@@ -619,6 +636,7 @@ $report = [ordered]@{
         PublishModIoPage = [bool]$PublishModIoPage
     }
     Steps = [object[]]$steps.ToArray()
+    ReleaseLogDirectory = $releaseLogDirectory
     ReadyForPublish = $true
 }
 

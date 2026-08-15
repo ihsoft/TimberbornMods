@@ -20,12 +20,17 @@ param(
     [switch] $SkipGitHubRelease,
     [switch] $SkipDiscordHandoff,
     [switch] $ReplaceExistingGitHubAsset,
-    [switch] $CorrectiveReplacement
+    [switch] $CorrectiveReplacement,
+    [switch] $DetailedOutput
 )
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
+$releaseLogDirectory = ""
+$releaseStepIndex = 0
+$completedPublicSteps = New-Object System.Collections.Generic.List[string]
 
 function Resolve-RepoPath([string] $Path) {
     if ([System.IO.Path]::IsPathRooted($Path)) {
@@ -98,15 +103,21 @@ function Invoke-ReleaseStep([string] $Name, [string] $ScriptName, [string[]] $Ar
     Write-Host "== $Name =="
 
     $scriptPath = Join-Path $PSScriptRoot $ScriptName
-    Assert-PathExists $scriptPath $Name
-
-    $output = & powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
-    $output | ForEach-Object {
-        Write-Host $_
+    $script:releaseStepIndex++
+    try {
+        Invoke-LoggedReleaseStep -Name $Name -ScriptPath $scriptPath -Arguments $Arguments `
+            -LogDirectory $releaseLogDirectory -StepIndex $releaseStepIndex -DetailedOutput:$DetailedOutput | Out-Null
     }
-    if ($exitCode -ne 0) {
-        throw "$Name failed with exit code $exitCode."
+    catch {
+        if ($completedPublicSteps.Count -gt 0) {
+            Write-Warning "Partial success before failure: $($completedPublicSteps -join ', ')."
+        }
+        Write-Warning "The failing step may have changed external state. Verify it before retrying."
+        throw
+    }
+
+    if ($Name -ne "Discord release handoff") {
+        $completedPublicSteps.Add($Name)
     }
 }
 
@@ -163,6 +174,7 @@ if ([string]::IsNullOrWhiteSpace($modName) -or [string]::IsNullOrWhiteSpace($mod
     [string]::IsNullOrWhiteSpace($releaseCommit)) {
     throw "Preflight report is missing mod name, version, or release commit."
 }
+$releaseLogDirectory = New-ReleaseLogDirectory -RepoRoot $repoRoot -ModName $modName -Version $modVersion -Phase "publish"
 
 if ([string]::IsNullOrWhiteSpace($Configuration)) {
     $Configuration = [string]$report.Configuration
@@ -217,6 +229,38 @@ elseif ($null -ne $report.Package) {
         throw "Release package changed since preflight. Preflight: $($report.Package.Sha256); current: $currentPackageHash"
     }
 }
+
+$steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
+$resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
+    Resolve-RepoPath ".tools/modio/$modName.local.json"
+}
+else {
+    Resolve-RepoPath $ModIoConfigPath
+}
+$modIoId = ""
+if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
+    $summaryModIoConfig = Get-Content -Raw -LiteralPath $resolvedModIoConfigPath | ConvertFrom-Json
+    $modIoId = [string](Get-ObjectPropertyValue $summaryModIoConfig "ModId")
+}
+
+Write-Host "Release publish: $modName v$modVersion"
+Write-Host "  Release commit: $releaseCommit"
+Write-Host "  Game compatibility lane: $GameVersion"
+Write-Host "  Package: $($report.Package.Path)"
+Write-Host "  Package SHA256: $($report.Package.Sha256)"
+if ($null -ne $report.Source) {
+    Write-Host "  Source fingerprint: $($report.Source.Sha256)"
+}
+if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
+    $steamVisibilityIntent = if ([bool]$report.PreflightOptions.PublishSteamVisibility) { "publish requested" } else { "unchanged" }
+    Write-Host "  Steam: PublishedFileId=$steamPublishedFileId; visibility=$steamVisibilityIntent"
+}
+if (-not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo) {
+    $modIoVisibilityIntent = if ([bool]$report.PreflightOptions.PublishModIoPage) { "publish requested" } else { "unchanged" }
+    Write-Host "  Mod.IO: ModId=$modIoId; page visibility=$modIoVisibilityIntent"
+}
+Write-Host "  Git tag: $tagName"
+Write-Host "  Full child logs: $releaseLogDirectory"
 
 & git -C $repoRoot rev-parse -q --verify "refs/tags/$tagName" *> $null
 if ($LASTEXITCODE -eq 0 -and -not $SkipGitTag) {
@@ -284,14 +328,21 @@ if (-not $SkipGitTag) {
     Write-Host "== Git release tag =="
     & git -C $repoRoot tag $tagName $releaseCommit
     if ($LASTEXITCODE -ne 0) {
+        if ($completedPublicSteps.Count -gt 0) {
+            Write-Warning "Partial success before failure: $($completedPublicSteps -join ', ')."
+        }
         throw "Failed to create Git tag $tagName."
     }
 
     & git -C $repoRoot push origin $tagName
     if ($LASTEXITCODE -ne 0) {
+        if ($completedPublicSteps.Count -gt 0) {
+            Write-Warning "Partial success before failure: $($completedPublicSteps -join ', '), local Git tag creation."
+        }
         throw "Failed to push Git tag $tagName."
     }
 
+    $completedPublicSteps.Add("Git release tag")
     Write-Host "Git tag created and pushed: $tagName -> $releaseCommit"
 }
 
