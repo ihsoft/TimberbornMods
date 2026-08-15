@@ -22,7 +22,7 @@
   "Steam": {
     "PublishedFileId": "3783720917",
     "Visibility": "Public",
-    "UpdateVisibility": true,
+    "UpdateVisibility": false,
     "AllowSingleGameVersion": true,
     "CompatibilityReason": "The initial release targets Update 1.1; no Update 1.0 release artifact exists."
   }
