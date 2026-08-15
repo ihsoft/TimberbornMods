@@ -102,11 +102,10 @@ Write-Host $message
 
 if (-not $Prepare) {
     Write-Host ""
-    Write-Host "Dry run only. Pass -Prepare to copy the message and open the Discord channel."
+    Write-Host "Dry run only. Pass -Prepare to open the Discord channel."
     exit 0
 }
 
-Set-Clipboard -Value $message
 $channelMatch = [regex]::Match($channelUrl, "/channels/(?<server>\d+)/(?<channel>\d+)")
 $discordAppUrl = "discord://-/channels/$($channelMatch.Groups['server'].Value)/$($channelMatch.Groups['channel'].Value)"
 try {
@@ -118,4 +117,4 @@ catch {
 }
 
 Write-Host ""
-Write-Host "Message copied to the clipboard and Discord channel opened. Review it and send it manually."
+Write-Host "Discord channel opened. Copy the message from the Publisher's final response, review it, and send it manually."
