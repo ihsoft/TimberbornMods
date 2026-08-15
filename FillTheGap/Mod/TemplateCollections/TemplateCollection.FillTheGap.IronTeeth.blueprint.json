@@ -1,0 +1,8 @@
+{
+  "TemplateCollectionSpec": {
+    "CollectionId": "Buildings.IronTeeth",
+    "Blueprints": [
+      "Buildings/Landscaping/FillTheGap/FillTheGap.IronTeeth.blueprint"
+    ]
+  }
+}

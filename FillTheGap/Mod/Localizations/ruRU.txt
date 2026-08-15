@@ -1,0 +1,5 @@
+ID,Text,Comment
+Building.FillTheGap.Description,"Создаёт обычный ландшафтный блок или заменяет им один уровень стандартной платформы.","Building description."
+Building.FillTheGap.DisplayName,"Заполнение платформы","Building name."
+Building.FillTheGap.InvalidPlacement,"Здесь нельзя разместить ландшафтный блок.","Placement warning."
+Building.FillTheGap.PlatformInsideTerrainBlock,"Нельзя разместить платформу внутри незавершённого ландшафтного блока.","Placement warning."

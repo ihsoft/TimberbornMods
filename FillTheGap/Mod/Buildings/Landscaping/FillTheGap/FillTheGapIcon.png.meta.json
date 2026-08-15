@@ -1,0 +1,14 @@
+{
+  "isSprite": true,
+  "isNormalMap": false,
+  "linear": false,
+  "generateMipmap": false,
+  "mipmapCount": -1,
+  "ignoreMipmapLimits": true,
+  "filterMode": "Bilinear",
+  "wrapMode": "Clamp",
+  "textureFormat": "RGBA32",
+  "anisoLevel": 1,
+  "width": 112,
+  "height": 112
+}

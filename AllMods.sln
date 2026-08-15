@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWorkshopMapMetadataInd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWorkshopIndexer", "tools\SteamWorkshopIndexer\SteamWorkshopIndexer.csproj", "{8F917F41-453C-4F11-A81D-1A30105A8E3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillTheGap", "FillTheGap\FillTheGap.csproj", "{40DB7CAF-9997-46A6-ACB0-CE08A55D43A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillTheGap.Tests", "FillTheGap.Tests\FillTheGap.Tests.csproj", "{45A0C08B-A5BB-4277-83AD-42216CE6405B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,5 +124,13 @@ Global
 		{8F917F41-453C-4F11-A81D-1A30105A8E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F917F41-453C-4F11-A81D-1A30105A8E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F917F41-453C-4F11-A81D-1A30105A8E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40DB7CAF-9997-46A6-ACB0-CE08A55D43A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40DB7CAF-9997-46A6-ACB0-CE08A55D43A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40DB7CAF-9997-46A6-ACB0-CE08A55D43A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40DB7CAF-9997-46A6-ACB0-CE08A55D43A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45A0C08B-A5BB-4277-83AD-42216CE6405B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A0C08B-A5BB-4277-83AD-42216CE6405B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A0C08B-A5BB-4277-83AD-42216CE6405B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A0C08B-A5BB-4277-83AD-42216CE6405B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

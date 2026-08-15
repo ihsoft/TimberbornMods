@@ -1,0 +1,5 @@
+ID,Text,Comment
+Building.FillTheGap.Description,"Builds a normal Terrain Block or replaces one level of a standard Platform.","Building description."
+Building.FillTheGap.DisplayName,"Fill the Gap","Building name."
+Building.FillTheGap.InvalidPlacement,"A Terrain Block cannot be placed here.","Placement warning."
+Building.FillTheGap.PlatformInsideTerrainBlock,"Cannot place a Platform inside an unfinished Terrain Block.","Placement warning."
