@@ -10,6 +10,10 @@ static class BatteriesSettings {
   public static float BatteryRatioHysteresis { get; set; } = 1f;
 }
 
+static class ManufactorySettings {
+  public static bool ConsumeOneHorsepowerInPowerSavingMode { get; set; }
+}
+
 static class UnmannedConsumerSettings {
   public static bool ShowFloatingIcon { get; set; }
 }

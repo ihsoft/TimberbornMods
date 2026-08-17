@@ -1,4 +1,5 @@
 using IgorZ.SmartPower.PowerConsumers;
+using IgorZ.SmartPower.Settings;
 using Timberborn.EnterableSystem;
 using Timberborn.MechanicalSystem;
 using Timberborn.StatusSystem;
@@ -18,6 +19,21 @@ static class SmartManufactoryTests {
     Assert.Equal(2, manufactory.UpdateAndGetPowerInput());
     Assert.True(manufactory.StandbyMode);
     Assert.True(manufactory.MissingIngredients);
+  }
+
+  public static void UpdatesExistingManufactoryWhenPowerSavingSettingChanges() {
+    var manufactory = CreateManufactory(
+        nominalPower: 20,
+        hasCurrentRecipe: true,
+        hasAllIngredients: false,
+        hasFuel: true,
+        hasCapacity: true);
+
+    Assert.Equal(2, manufactory.UpdateAndGetPowerInput());
+
+    ManufactorySettings.ConsumeOneHorsepowerInPowerSavingMode = true;
+
+    Assert.Equal(1, manufactory.UpdateAndGetPowerInput());
   }
 
   public static void NominalPowerWhenReady() {
@@ -53,6 +69,7 @@ static class SmartManufactoryTests {
       bool hasAllIngredients,
       bool hasFuel,
       bool hasCapacity) {
+    ManufactorySettings.ConsumeOneHorsepowerInPowerSavingMode = false;
     var manufactory = new SmartManufactory();
     manufactory.InjectDependencies(new FakeLoc());
     manufactory.SetComponent(new MechanicalNode { Active = true });

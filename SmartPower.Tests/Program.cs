@@ -36,6 +36,8 @@ static class Program {
       ("SmartPoweredAttraction uses nominal power when occupied", SmartPoweredAttractionTests.UsesNominalPowerWhenOccupied),
       ("SmartPoweredAttraction returns zero when inactive", SmartPoweredAttractionTests.ReturnsZeroWhenInactive),
       ("SmartManufactory enters standby when ingredients are missing", SmartManufactoryTests.StandbyOnMissingIngredients),
+      ("SmartManufactory updates existing buildings when the power saving setting changes",
+          SmartManufactoryTests.UpdatesExistingManufactoryWhenPowerSavingSettingChanges),
       ("SmartManufactory uses nominal power when recipe can run", SmartManufactoryTests.NominalPowerWhenReady),
       ("SmartManufactory returns zero without current recipe", SmartManufactoryTests.ZeroWithoutRecipe),
   ];

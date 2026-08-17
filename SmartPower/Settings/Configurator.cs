@@ -18,6 +18,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<WorkplaceConsumerSettings>().AsSingleton();
     containerDefinition.Bind<UnmannedConsumerSettings>().AsSingleton();
     containerDefinition.Bind<AttractionConsumerSettings>().AsSingleton();
+    containerDefinition.Bind<ManufactorySettings>().AsSingleton();
     containerDefinition.Bind<SmartPowerDebugSettings>().AsSingleton();
   }
 }

@@ -1,3 +1,6 @@
+# v1.18.0 (TBD)
+* [Feature] Add an option to consume only 1 hp in manufactory power saving mode.
+
 # v1.17.1 (July 17th, 2026)
 * [Update] Support game version `1.1.1.1`.
 

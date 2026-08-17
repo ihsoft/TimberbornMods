@@ -12,3 +12,6 @@ IgorZ.SmartPower.MechanicalBuilding.NoFuelStatus,"<YellowHighlight>⏻</YellowHi
 IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,"<YellowHighlight>⏻</YellowHighlight> Ingrédients manquants",
 IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,"<YellowHighlight>⏻</YellowHighlight> Trop de marchandises",
 IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,"Mode économie d'énergie",
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepower,"Ne consommer que 1 ch en mode économie d'énergie","When enabled, manufactories in power saving mode consume 1 hp instead of 10% of nominal power."
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"Par défaut, le mode économie d'énergie consomme 10 % de la puissance nominale du bâtiment. Activez cette option pour réduire la consommation à 1 ch.","Tooltip for the 1 hp power saving mode setting."
+IgorZ.SmartPower.Settings.ManufactorySection,"Bâtiments de production","Settings section for manufactory power saving behavior."
