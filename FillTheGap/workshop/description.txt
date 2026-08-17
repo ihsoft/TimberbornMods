@@ -20,3 +20,4 @@ Select Fill the Gap from the Landscaping building group. Place it on empty terra
 
 [h1]Source[/h1]
 GitHub repository: https://github.com/ihsoft/TimberbornMods
+Discord channel: [url=https://discord.com/channels/558398674389172225/1538299837316079676]Fill The Gap[/url]
