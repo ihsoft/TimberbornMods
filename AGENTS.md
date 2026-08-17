@@ -120,6 +120,11 @@ closing workflow.
 The publisher follows `docs/timberborn-release-publishing-rules-for-ai-agents.md`. The publisher should not implement
 unrelated code fixes, edit agent rules, or edit the GitHub Wiki unless the user explicitly expands the task.
 
+Publisher execution should normally use one fresh task per release or tightly related release batch and keep that task
+through complete signoff and any partial-success recovery. A persistent Publisher task may serve as a coordination
+inbox for rule and role notifications, but should not accumulate release execution history. Task titles and thread IDs
+are not durable role contracts; use the role assignment and current repository context.
+
 ### Wiki editor
 
 The Wiki editor owns the separate GitHub Wiki checkout. The expected local layout is a sibling repository named
@@ -272,6 +277,12 @@ At the start of every new standalone user request, estimate the token budget for
 Show one concise approximate budget only when the expected work is substantial enough that the estimate could affect
 scope, sequencing, delegation, or the user's expectations. Make clear that it is an estimate, not an exact usage
 measurement.
+
+When an estimate may later be compared with telemetry, state or preserve its accounting basis. A substantial task
+estimate should account for the fresh context and tool output likely to be consumed as well as generated reasoning and
+answers; do not silently treat output-side tokens as the whole task cost. When reporting measured usage, distinguish
+non-cached input plus output, output-side tokens, cached input, and automatic context compactions when those values are
+available. Do not call an estimate accurate by comparing it with a different metric.
 
 Do not invent a fixed numeric threshold until repeated task evidence supports one. For now, treat multi-phase work,
 broad repository research, substantial implementation or review, several artifacts, external coordination, or a

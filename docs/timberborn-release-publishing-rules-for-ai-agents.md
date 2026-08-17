@@ -15,6 +15,24 @@ Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
 Dry runs may build packages, validate files, generate metadata, and prepare staging directories. They must not upload
 anything.
 
+## Publisher task boundary
+
+Run each release, or one tightly related release batch, in a fresh Publisher task when practical. Keep preparation,
+final preflight, Steam and Mod.IO publication, live verification, Git tag, GitHub Release, issue audit or closure
+decision, Wiki handoff, Discord handoff, and final signoff in that same task. If a platform operation partially succeeds
+or its outcome is uncertain, keep diagnosis and recovery in the same task so the mutation boundary is not lost. Do not
+split one release into separate platform tasks.
+
+Reconstruct release context from the current checkout and durable release artifacts: applicable root and local rules,
+the target changelog and release configuration, current Git history and tags, package state, preflight reports, and
+saved release logs. Do not read old Publisher conversations by default. Consult a previous task only when a specific
+fact cannot be recovered safely from authoritative repository, report, log, or platform evidence.
+
+Keep cross-release tooling work and broad platform investigations in separate Publisher-tooling tasks. A persistent
+Publisher task may be used as a lightweight coordination inbox for Mentor and role notifications, but should not be the
+default place to execute releases. Do not depend on a fixed task title or thread ID; the role assignment and target
+release establish the task's identity.
+
 ## Unified preflight and publish scripts
 
 Prefer the unified release entry points when they support the target release:
