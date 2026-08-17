@@ -36,7 +36,7 @@ IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip,"Suspended con
 IgorZ.SmartPower.Settings.WalkerPoweredGeneratorSection,"Beaver-powered generators",
 IgorZ.SmartPower.Settings.GoodConsumingGeneratorSection,"Good-consuming generators",
 IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepower,"Consume only 1 hp in power saving mode","When enabled, manufactories in power saving mode consume 1 hp instead of 10% of nominal power."
-IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"By default, power saving mode consumes 10% of the building's nominal power. Enable this option to reduce it to 1 hp.","Tooltip for the 1 hp power saving mode setting."
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"By default, power saving mode consumes 10% of the building's nominal power.","Tooltip for the 1 hp power saving mode setting."
 IgorZ.SmartPower.Settings.ManufactorySection,"Manufactories","Settings section for manufactory power saving behavior."
 IgorZ.SmartPower.Settings.WorkplaceConsumerSection,"Workshops with a workplace",
 IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Unmanned buildings",

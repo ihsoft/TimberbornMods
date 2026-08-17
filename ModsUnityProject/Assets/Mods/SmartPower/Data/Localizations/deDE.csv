@@ -13,7 +13,7 @@ IgorZ.SmartPower.MechanicalBuilding.NoInputStatus,<YellowHighlight>⏻</YellowHi
 IgorZ.SmartPower.MechanicalBuilding.BlockedOutputStatus,<YellowHighlight>⏻</YellowHighlight> Fehlende Lagerplätze,
 IgorZ.SmartPower.MechanicalBuilding.PowerSavingModeStatus,Energiesparmodus,
 IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepower,"Im Energiesparmodus nur 1 PS verbrauchen","When enabled, manufactories in power saving mode consume 1 hp instead of 10% of nominal power."
-IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"Standardmäßig verbraucht der Energiesparmodus 10 % der Nennleistung des Gebäudes. Aktiviere diese Option, um den Verbrauch auf 1 PS zu reduzieren.","Tooltip for the 1 hp power saving mode setting."
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"Standardmäßig verbraucht der Energiesparmodus 10 % der Nennleistung des Gebäudes.","Tooltip for the 1 hp power saving mode setting."
 IgorZ.SmartPower.Settings.ManufactorySection,"Produktionsgebäude","Settings section for manufactory power saving behavior."
 IgorZ.TimberCommons.Settings.DebugSection,Fehlersuche und Fehlerbehebung,
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,Ausführliches Loggen,

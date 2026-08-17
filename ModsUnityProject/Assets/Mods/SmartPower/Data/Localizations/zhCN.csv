@@ -34,7 +34,7 @@ IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip,如果暂停�
 IgorZ.SmartPower.Settings.WalkerPoweredGeneratorSection,海狸动力发电机,
 IgorZ.SmartPower.Settings.GoodConsumingGeneratorSection,消耗资源的发电机,
 IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepower,"节能模式下仅消耗 1 马力","When enabled, manufactories in power saving mode consume 1 hp instead of 10% of nominal power."
-IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"默认情况下，节能模式会消耗建筑额定功率的 10%。启用此选项可将功耗降至 1 马力。","Tooltip for the 1 hp power saving mode setting."
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"默认情况下，节能模式会消耗建筑额定功率的 10%。","Tooltip for the 1 hp power saving mode setting."
 IgorZ.SmartPower.Settings.ManufactorySection,"生产建筑","Settings section for manufactory power saving behavior."
 IgorZ.SmartPower.Settings.WorkplaceConsumerSection,工坊类建筑,
 IgorZ.SmartPower.Settings.UnmannedConsumerSection,无人值守类建筑,

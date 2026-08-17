@@ -36,7 +36,7 @@ IgorZ.SmartPower.Settings.Batteries.BatteryRatioHysteresisTooltip,"Выключ�
 IgorZ.SmartPower.Settings.WalkerPoweredGeneratorSection,"Генераторы на бобровой тяге",
 IgorZ.SmartPower.Settings.GoodConsumingGeneratorSection,"Генераторы, потребляющие ресурсы",
 IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepower,"Потреблять только 1 л.с. в режиме энергосбережения","When enabled, manufactories in power saving mode consume 1 hp instead of 10% of nominal power."
-IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"По умолчанию в режиме энергосбережения здание потребляет 10% номинальной мощности. Включите эту опцию, чтобы снизить потребление до 1 л.с.","Tooltip for the 1 hp power saving mode setting."
+IgorZ.SmartPower.Settings.Manufactory.ConsumeOneHorsepowerTooltip,"По умолчанию в режиме энергосбережения здание потребляет 10% номинальной мощности.","Tooltip for the 1 hp power saving mode setting."
 IgorZ.SmartPower.Settings.ManufactorySection,"Производственные здания","Settings section for manufactory power saving behavior."
 IgorZ.SmartPower.Settings.WorkplaceConsumerSection,"Мастерские с рабочими местами",
 IgorZ.SmartPower.Settings.UnmannedConsumerSection,"Здания без персонала",
