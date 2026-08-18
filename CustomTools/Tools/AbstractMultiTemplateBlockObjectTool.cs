@@ -116,6 +116,7 @@ public abstract class AbstractMultiTemplateBlockObjectTool<T>
   /// <inheritdoc/>
   public virtual bool ProcessInput() {
     CurrentMode = SelectMode();
+    PreviewPlacementFlipping.Configure(_previewPlacement, Template.GetSpec<BlockObjectSpec>());
     return _areaPicker.PickBlockObjectArea(
         Template, _previewPlacement.Orientation, _previewPlacement.FlipMode, PreviewCallback, ActionCallback);
   }

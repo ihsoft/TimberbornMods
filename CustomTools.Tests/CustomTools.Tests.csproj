@@ -34,5 +34,8 @@
       <Compile Include="..\CustomTools\KeyBindings\KeyBindingInputProcessor.cs">
         <Link>CustomTools\KeyBindings\KeyBindingInputProcessor.cs</Link>
       </Compile>
+      <Compile Include="..\CustomTools\Tools\PreviewPlacementFlipping.cs">
+        <Link>CustomTools\Tools\PreviewPlacementFlipping.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

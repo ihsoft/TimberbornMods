@@ -32,6 +32,10 @@ static class Program {
           KeyBindingInputProcessorTests.IgnoresBindingsWithoutCustomToolSpec),
       ("KeyBindingInputProcessor throws when block object blueprint is unknown",
           KeyBindingInputProcessorTests.ThrowsWhenBlockObjectBlueprintIsUnknown),
+      ("PreviewPlacementFlipping disables flipping for non-flippable templates",
+          PreviewPlacementFlippingTests.DisablesFlippingForNonFlippableTemplate),
+      ("PreviewPlacementFlipping enables flipping for flippable templates",
+          PreviewPlacementFlippingTests.EnablesFlippingForFlippableTemplate),
   ];
 
   static int Main() {

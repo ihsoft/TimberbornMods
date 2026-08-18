@@ -1,4 +1,7 @@
-﻿# v1.4.1 (July 3rd, 2026)
+﻿# v1.4.2 (TBD)
+* [Fix] Path+ could place paths mirrored after using the flip mode on a building.
+
+# v1.4.1 (July 3rd, 2026)
 * [Fix] Import CustomTools sprites through Unity asset bundles so tool icons stay sharp in game version `v1.1`.
 
 # v1.4.0 (6/13/2026)
