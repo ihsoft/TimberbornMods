@@ -85,6 +85,12 @@ SmartHaulers, inspect every changed path and run each owning build or export pip
 Verify the expected DLL, XML, manifest, data, bundle, or timestamp after refreshing the package. A compile-only build is
 not sufficient before asking the user to validate gameplay, runtime, or UI behavior in the real game.
 
+Before treating a real-game result as evidence for that refreshed package, verify the current runtime log's
+`Started from` origin for the target mod. A matching local DLL or package hash proves what was built, not which copy the
+game loaded. When local and Steam Workshop copies share the same mod ID, confirm that the Local copy is enabled and the
+Workshop copy is disabled, or otherwise establish from the current log which package actually ran. Do not diagnose or
+revise production behavior from a run that loaded a different copy.
+
 ## Focused Tests
 
 Follow the root real-game gate before creating, modifying, or running regression tests for gameplay, runtime, or UI
