@@ -1,4 +1,4 @@
-﻿# v1.4.2 (TBD)
+﻿# v1.4.2 (August 17th, 2026)
 * [Fix] Path+ could place paths mirrored after using the flip mode on a building.
 
 # v1.4.1 (July 3rd, 2026)
