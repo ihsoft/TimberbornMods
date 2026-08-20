@@ -19,6 +19,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
   const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
   const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
+  const string CustomSignalPrefix = "Signals.";
 
   #region IEditorProvider implementation
 
@@ -62,9 +63,8 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (!TryGetConditionEntries(ruleRow.ParsedCondition, out var conditions)) {
       return false;
     }
-    if (conditions.Any(x => x.Comparison.Left is not SignalOperator signal
-            || x.Comparison.Right is not ConstantValueExpr
-            || !_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName))
+    var signalNames = _scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).ToHashSet();
+    if (conditions.Any(x => !IsSupportedComparison(x.Comparison, signalNames))
         || !_scriptingService.GetActionNamesForBuilding(ruleRow.ActiveBuilding).Contains(action.FullActionName)) {
       return false;
     }
@@ -198,6 +198,18 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
       }
     }
     return result;
+  }
+
+  static bool IsSupportedComparison(ComparisonOperator comparison, HashSet<string> signalNames) {
+    if (comparison.Left is not SignalOperator leftSignal || !signalNames.Contains(leftSignal.SignalName)) {
+      return false;
+    }
+    return comparison.Right switch {
+        ConstantValueExpr => true,
+        SignalOperator rightSignal => rightSignal.SignalName.StartsWith(CustomSignalPrefix, StringComparison.Ordinal)
+            && signalNames.Contains(rightSignal.SignalName),
+        _ => false,
+    };
   }
 
   #endregion

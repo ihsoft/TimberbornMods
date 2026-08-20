@@ -29,6 +29,7 @@ static class ParserRegressionTests {
       // Custom signals.
       "Signals.Set('yellow', 12)",
       "Signals.Set('yellow', Signals.Var1 + 123)",
+      "Signals.Var1 == Signals.Var2",
 
       // Actions.
       "Foobar.EmptyAction()",
@@ -227,6 +228,7 @@ static class ParserRegressionTests {
   static AutomationBehavior CreateBehavior() {
     var signals = new TestScriptable("Signals");
     signals.RegisterSignal("Signals.Var1", ScriptValue.TypeEnum.Number);
+    signals.RegisterSignal("Signals.Var2", ScriptValue.TypeEnum.Number);
     signals.RegisterAction("Signals.Set", ScriptValue.TypeEnum.String, ScriptValue.TypeEnum.Number);
 
     var foobar = new TestScriptable("Foobar");

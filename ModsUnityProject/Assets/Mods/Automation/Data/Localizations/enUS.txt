@@ -246,6 +246,7 @@ IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals,"decimals","Name of the d
 IgorZ.Automation.Scripting.Editor.ConstantTypeString,"string","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.ConstantTypePercent,"percent","Name of the percent constant type"
 IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber,"whole number","Name of the whole number constant type"
+IgorZ.Automation.Scripting.Editor.SignalValueType,"signal","Right condition operand type that selects a custom signal"
 IgorZ.Automation.Scripting.Editor.CopyRuleBtn,"Duplicate",
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Rule removed","A message to show over the deleted rule"
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Delete rule",

@@ -1,3 +1,6 @@
+# v4.10.0 (TBD)
+* [Feature] Allow comparing numeric conditions with custom signals in the rule constructor.
+
 # v4.9.0 (August 15th, 2026)
 * [Feature] Add district fill signals based on available stock and fillable storage capacity.
 * [Feature] Allow combining conditions with AND and OR in the rule constructor.

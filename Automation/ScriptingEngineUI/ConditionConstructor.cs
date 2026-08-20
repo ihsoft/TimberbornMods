@@ -16,6 +16,7 @@ namespace IgorZ.Automation.ScriptingEngineUI;
 class ConditionConstructor : BaseConstructor {
 
   const string ConditionLabelLocKey = "IgorZ.Automation.Scripting.Editor.ConditionLabel";
+  const string CustomSignalPrefix = "Signals.";
   const int MinimumGroupSize = 3;
 
   #region API
@@ -36,6 +37,14 @@ class ConditionConstructor : BaseConstructor {
 
   public void SetDefinitions(IEnumerable<ConditionDefinition> lvalueDef) {
     _lvalueDefinitions = lvalueDef.ToArray();
+    _customSignalOptions = _lvalueDefinitions
+        .Where(x => x.Name.Value.StartsWith(CustomSignalPrefix, StringComparison.Ordinal))
+        .Select(x => new DropdownItem {
+            Value = x.Name.Value,
+            Text = x.DisplayNameArgument,
+            Icon = x.Name.Icon,
+        })
+        .ToArray();
     _signalGroups = MakeSignalGroups(_lvalueDefinitions);
     SignalSelector.Items = MakePrimaryItems(_lvalueDefinitions, _signalGroups);
   }
@@ -52,10 +61,16 @@ class ConditionConstructor : BaseConstructor {
   public void SetComparison(ComparisonOperator comparisonOperator) {
     SelectSignal((comparisonOperator.Left as SignalOperator)!.SignalName);
     OperatorSelector.SelectedValue = LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
-    if (comparisonOperator.Right is not ConstantValueExpr constantValue) {
-      throw new InvalidOperationException("Constant value is expected");
+    switch (comparisonOperator.Right) {
+      case ConstantValueExpr constantValue:
+        ValueSelector.SetScriptValue(constantValue.ValueFn());
+        break;
+      case SignalOperator signal:
+        ValueSelector.SetSignalValue(signal.SignalName);
+        break;
+      default:
+        throw new InvalidOperationException("Constant value or custom signal is expected");
     }
-    ValueSelector.SetScriptValue(constantValue.ValueFn());
   }
 
   #endregion
@@ -78,6 +93,7 @@ class ConditionConstructor : BaseConstructor {
 
   ConditionDefinition _selectedDefinition;
   ConditionDefinition[] _lvalueDefinitions;
+  DropdownItem[] _customSignalOptions;
   SignalGroup[] _signalGroups;
 
   public ConditionConstructor(UiFactory uiFactory) : base(uiFactory) {
@@ -135,7 +151,10 @@ class ConditionConstructor : BaseConstructor {
         ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
     OperatorSelector.ToggleDisplayStyle(true);
-    ValueSelector.SetDefinition(_selectedDefinition.Argument);
+    var customSignalOptions = _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.Number
+        ? _customSignalOptions
+        : null;
+    ValueSelector.SetDefinition(_selectedDefinition.Argument, customSignalOptions);
     ValueSelector.Root.ToggleDisplayStyle(true);
   }
 
