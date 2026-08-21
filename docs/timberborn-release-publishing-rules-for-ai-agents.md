@@ -8,6 +8,20 @@ For clean-checkout local environment requirements such as `_MODS!`, `_GAME!`, de
 tokens, GitHub CLI auth, generated references, and local release artifacts, follow
 `docs/timberborn-new-repository-bootstrap-for-ai-agents.md`.
 
+## Conditional Release Knowledge
+
+This file is the routine release runbook. Load additional release knowledge only when its condition applies:
+
+| Condition | Read |
+|---|---|
+| The mod lacks a verified Steam `PublishedFileId` or Mod.IO `ModId` | `docs/agent-knowledge/Timberborn-Release-Identity-Bootstrap-Operational-Knowledge-v1.md` |
+| Same-version corrective replacement, unchanged legacy-lane restoration, or post-release artifact comparison | `docs/agent-knowledge/Timberborn-Release-Recovery-Operational-Knowledge-v1.md` |
+| Changing or diagnosing platform tags, visibility, descriptions, change notes, Private item verification, or Steam authentication | `docs/agent-knowledge/Timberborn-Release-Platform-Metadata-Operational-Knowledge-v1.md` |
+| Platform uploads are verified, or the task performs post-release tag, GitHub Release, issue, Wiki, Discord, or final signoff work | `docs/agent-knowledge/Timberborn-Release-Signoff-Operational-Knowledge-v1.md` |
+
+Do not load every conditional document preemptively. The core rules below preserve the mandatory routine gates and
+identify when a conditional branch must be loaded.
+
 ## Explicit publish requests only
 
 Never publish to Steam or Mod.IO unless the user explicitly asks to publish.
@@ -32,6 +46,17 @@ Keep cross-release tooling work and broad platform investigations in separate Pu
 Publisher task may be used as a lightweight coordination inbox for Mentor and role notifications, but should not be the
 default place to execute releases. Do not depend on a fixed task title or thread ID; the role assignment and target
 release establish the task's identity.
+
+## Routine Black-Box Execution
+
+For a routine release, treat the committed unified release scripts as the execution interface. Read their compact
+plans, reports, hashes, warnings, and mutation results; do not inspect script source, enumerate broad `tools/` content,
+or load complete successful logs merely to re-derive checks the scripts already performed.
+
+Open a child script, detailed log, or conditional release document only when a command fails, a plan differs from the
+expected release, a required invariant is absent from the compact report, or the task explicitly changes tooling or
+platform metadata. Keep the investigation scoped to that discrepancy. Successful black-box execution does not weaken
+any explicit authorization, immutable-snapshot, live-verification, or partial-success gate in this runbook.
 
 ## Unified preflight and publish scripts
 
@@ -72,50 +97,6 @@ does not depend on GitHub Release creation.
 
 Treat unexpected unified-script behavior as a stop-and-investigate condition instead of silently falling back to ad hoc
 manual steps.
-
-## First release of a new mod
-
-For a mod without a verified Steam `PublishedFileId` or Mod.IO `ModId`, use a one-time platform identity bootstrap and
-then return to the ordinary release workflow. Do not maintain a separate first-release publishing pipeline.
-
-1. **Prepare locally without platform mutation.** Confirm the exact mod identity, first version, compatibility lanes,
-   title, package source and DLL, changelog, descriptions, thumbnail, category and compatibility metadata, and required
-   dependencies. Create the ordinary release inputs, build and validate the final package, date the changelog, and
-   commit the release preparation. A report may identify missing platform IDs, but it is preliminary and must not be
-   marked `ReadyForPublish`.
-2. **Bootstrap platform identities with separate explicit authorization.** The authorization must name the mod, each
-   platform to create, and the initial visibility or publication state. Through a bounded creation mode or a documented
-   manual step, show the exact account, game, title or slug, state, tags, dependencies, description source, and thumbnail
-   before creating only the requested Workshop item or Mod.IO page. Live-verify the returned identity, ownership, game
-   scope, mod identity, and state before adopting it. Never guess, reuse, or copy another mod's platform ID. Identity
-   creation does not authorize package upload, a later visibility change, a Git tag, or a GitHub Release.
-3. **Re-enter the normal immutable pipeline.** Record verified IDs in tracked release configuration or ignored local
-   platform configuration according to repository convention; never store credentials. Commit any tracked identity or
-   metadata adoption, configure and verify structured dependencies and compatibility/category tags, then rerun the full
-   final preflight. From that point use the normal upload order, live verification, partial-success stop gate, tagging,
-   GitHub Release, and post-release workflow.
-
-Prefer dry-run-first identity-bootstrap tooling that fails when creation mode is not explicit, an item already exists,
-or identity fields are incomplete. It must create and verify identities only and must not continue silently into package
-upload.
-
-If Steam `CreateItem` returns or exposes a new `PublishedFileId` but a later profile, preview, verification, or receipt
-step fails, treat the identity creation as partial success. Do not call `CreateItem` again. Recover only through an
-explicit existing-ID mode that cannot create another item. Before mutation, verify the owner, consumer app, Private
-visibility, and that any already-populated title matches the expected title; after completing the profile update,
-live-verify the exact title and state. Write the local creation receipt only after that recovery succeeds. If no
-trustworthy ID is available or any identity check differs, stop for owner investigation instead of guessing or creating
-another item.
-
-When a Mod.IO creation plan declares dependencies, require `community_options` to include the Mod.IO
-`ALLOW_DEPENDENCY` capability bit (`1024`) before creating the page. A dependency preview is planning evidence only.
-After creation, add the declared dependencies through the supported API and verify them by readback before final
-preflight may pass.
-
-Before a Steam item becomes public, verify it through an authenticated owner Steamworks UGC query. A missing or failed
-result from the public published-file details endpoint is not evidence that an owner-visible Private item is missing or
-invalid. The owner query must verify the intended item identity, title, exact description, visibility, tags, content
-state, and dependencies. After publication, also verify that the item is visible through the public endpoint.
 
 ## Final preflight snapshot
 
@@ -158,32 +139,11 @@ stop before the next public change. Apply the change during release preparation 
 repeat all affected validation, and create a new final preflight report with the new fingerprints and hashes. Do not
 continue under the old report even when the rebuilt package is expected to be equivalent.
 
-## Same-version corrective package replacement
+## Exceptional Corrective Releases
 
-A same-version corrective replacement is an exceptional workflow for replacing already published package contents
-without changing the mod version. Do not infer this mode from a packaging defect or an existing platform release. The
-user must explicitly authorize replacement for the named mod, version, and platforms.
-
-Prepare the correction as a committed package-layout or release-input change, then run a fresh final preflight for the
-corrected artifact. Keep the existing release identity unchanged. The report must identify the correction commit,
-corrected package hash and source fingerprint, requested replacement platforms, existing live artifact identities and
-hashes when obtainable, and the chosen disposition of the existing pushed tag.
-
-Use explicit corrective-replacement modes in unified and child platform tooling. Normal create-or-publish behavior must
-continue to fail when the platform release or same-named asset already exists. If tooling cannot intentionally replace
-an existing package or GitHub Release asset, stop and implement or validate that bounded mode; do not bypass the
-workflow with ad hoc platform commands or an implicit clobber option.
-
-Authorization to replace platform packages or assets does not authorize changing Git history. Do not create another
-version tag or duplicate GitHub Release. Moving an existing pushed tag to the correction commit requires separate
-explicit user authorization for that tag rewrite. If the user chooses to leave the tag at its original commit, record
-that provenance difference explicitly before replacement and in the final report; do not imply that the tag contains
-the corrected package-layout commit.
-
-Before each replacement, re-check the unchanged mod and version identity plus the corrected artifact hash. Afterward,
-verify that every requested platform exposes the corrected artifact or content and that its digest or closest available
-content fingerprint matches the preflight snapshot. If replacement succeeds on only some platforms, stop, report the
-partial public state, and require explicit direction before retrying or changing tag provenance.
+Do not use the routine workflow to replace already published contents under the same mod version. This requires
+explicit user authorization for the named mod, version, and platforms plus the Release Recovery Operational Knowledge.
+Do not infer corrective-replacement mode from a packaging defect or an existing platform release.
 
 ## Network checks
 
@@ -384,40 +344,10 @@ export a new `version-X.X` folder only when the release needs a distinct compati
 experimental or an incompatible game API/data change. If the source folder does not contain a game-version folder, the
 release does not contain it.
 
-## Restoring an unchanged legacy compatibility lane
+## Building LocalModFolder Releases
 
-For a newly prepared `LocalModFolder` release, a required legacy compatibility lane may be restored before packaging
-from a verified previously published artifact only when the release plan intentionally preserves that lane unchanged.
-If it is unclear whether the new release behavior should also be rebuilt for the legacy game version, stop and ask
-instead of carrying an older lane forward implicitly.
-
-The release configuration must contain a lane-specific `ManifestVersions` value for the preserved lane. If it does
-not, stop instead of inferring the expected legacy version from the artifact being considered.
-
-Prepare, export, and build the new current lane through the normal workflow first. Never obtain the current lane from a
-previous artifact. Restore a legacy lane only when it is missing or known stale; do not overwrite a present verified
-lane merely because an older artifact is available.
-
-Resolve legacy provenance in this order:
-
-1. The verified previously published Steam Workshop item whose `PublishedFileId` matches the target mod's current
-   release configuration.
-2. An exact known local archive of that previously published release.
-
-Do not use a backup folder, similarly named archive, neighboring Workshop item, or inferred previous output. Before
-copying anything, verify:
-
-- the platform or archive identity and the previously published mod version;
-- the mod manifest identity;
-- the exact legacy `version-X.X` lane name;
-- the lane manifest version against its configured `ManifestVersions` value;
-- the required DLL/XML files or an explicit configured legacy exception;
-- any Unity bundles or other lane-owned content required by that published artifact.
-
-Copy only the verified legacy lane into the exact configured `Package.SourcePath`. Record the Workshop item or archive,
-published version, lane, and validation evidence in the preflight report or release handoff. After restoration, treat
-the completed configured `LocalModFolder` as the only packaging input and run normal final-package validation across
-all lanes.
+If a release intentionally restores an unchanged legacy compatibility lane, load and follow Release Recovery
+Operational Knowledge before copying that lane. Never obtain the current lane from a previous artifact.
 
 For LocalModFolder releases with Unity-exported assets, use this order:
 
@@ -474,19 +404,6 @@ After the user confirms that Unity assets were exported, verify the `manifest.js
 `Package.SourcePath` or final package source. Do not rely only on the Unity project file, because the Unity project and
 the exported package source can be out of sync.
 
-## Post-release artifact comparison
-
-When comparing an installed Steam Workshop copy with a local release source, first resolve the expected Steam
-`PublishedFileId` from release config or repository tooling and verify that the installed Workshop folder manifest
-belongs to the target mod. Do not infer the Workshop folder ID manually from memory, neighboring folders, or previous
-investigations.
-
-Distinguish the live release artifact from current `_MODS!` state. After unreleased Unity export or development changes,
-`_MODS!/<ModName>` can be ahead of the last published release. For post-release artifact equality, compare against the
-ZIP or staging folder produced by the actual release run, or verify before any later export/development changes. If only
-current `_MODS!` is available after later changes, report it as current local development state, not as the published
-artifact.
-
 ## Package validation
 
 Before any upload, validate the final package, not just source files.
@@ -504,450 +421,34 @@ after the user confirms that case. Keep XML required by default; do not add a gl
 
 If `ManifestVersions` is configured, each manifest version must match its configured version for that folder.
 
-## Steam game-version coverage
+## Routine Platform Verification Gates
 
-Steam cannot target Timberborn Main and Experimental branches separately.
+The compact preflight and publish plans must show platform IDs, compatibility tags, description equality, visibility
+intent, and Mod.IO file/version intent. Stop if any of those fields is absent or differs from the requested release.
 
-For Steam, if a package contains only one `version-X.X` folder, stop unless `Steam.AllowSingleGameVersion` is explicitly
-configured with a `Steam.CompatibilityReason`.
+Derive compatibility claims and update tags from the final package's actual `version-*` lanes plus explicit documented
+release-config exceptions. Do not infer support for an absent lane. Verify exact target/live tags through the supported
+platform tooling before and after any required synchronization.
 
-Do not infer compatibility across major Timberborn versions.
+Normal release publishing must not change Steam visibility. A local visibility value is not authorization. Stop if a
+routine plan includes a visibility mutation; any intentional change requires explicit user authorization and Platform
+Metadata Operational Knowledge.
 
-## Steam visibility
+Verify the target mod's tracked Steam and Mod.IO descriptions against live platform text before upload. A mismatch for
+the target platform is a stop condition, not permission to update either side. Load Platform Metadata Operational
+Knowledge only when metadata must change, verification fails, a Private item needs owner-only handling, or Steam
+authentication requires diagnosis.
 
-Do not change Steam Workshop visibility during normal release publishing, description updates, metadata updates, or
-package uploads.
+For Mod.IO, use the target mod's config and a known valid owner token, generate compatibility metadata from the final
+package, and verify that the uploaded file becomes the live file with the intended version. A different known owner
+token file for the same account and game scope may be passed explicitly; never copy, rename, or guess token files.
 
-Publication tooling must omit the Steam `visibility` field by default, even if local `workshop_data.json` contains a
-`Visibility` value. A stored local visibility value is not permission to change the live Steam visibility.
+## Signoff Transition
 
-Change visibility only when the user explicitly asks to change visibility for that specific mod and release operation.
-In that case, use a command-level opt-in such as `-UpdateVisibility`, together with the requested visibility, and make
-the dry-run output say that visibility will be updated.
-
-If local data or release config already has `UpdateVisibility=true`, do not treat that as enough permission to change
-the live Steam visibility. Stop unless the current user request explicitly asks for a visibility change and the
-publication command includes the visibility-update opt-in.
-
-If a normal publish dry-run shows that visibility will be updated, stop before upload and ask the user for explicit
-confirmation. Treat accidental `Private`, `FriendsOnly`, or `Unlisted` visibility changes as release blockers.
-
-## Platform tags
-
-Treat the final `_MODS!/<ModName>/version-*` folders as the source of truth for platform compatibility tags.
-
-Convert `version-X.Y` and `version-X.Y.Z` folders to platform update tags such as `Update X.Y`. Preserve non-version
-tags from `workshop_data.json`, but replace version/update tags so they match the actual final package folders.
-
-If a mod-local `AGENTS.md` documents a temporary package-layout exception where a single package folder intentionally
-covers multiple Timberborn update tags, follow that local rule and stop if the generic tag plan would remove a required
-compatibility tag. Keep such exceptions narrow and revisit them when the mod's compatibility model changes.
-
-When a documented exception requires compatibility/update tags beyond the final package folders, express those tags in
-the mod's `release.json` under `PlatformTags.AdditionalCompatibilityTags`. Values must be update tags such as
-`Update 1.1`. The publish and tag-sync tools merge these explicit compatibility tags with folder-derived update tags
-and still preserve non-version local tags from `workshop_data.json`.
-
-Use `PlatformTags.AdditionalCompatibilityTags` only for compatibility/update tags that are intentionally not represented
-by package folders. Do not use it for arbitrary category tags.
-
-For Mod.IO, update tags through the Mod.IO tags API and verify the live tags after the update. Map local Steam-style tag
-names to Mod.IO names where needed, such as `Quality of life` to `QoL` and `New content` to `New in-game content`.
-
-For Steam, do not rely on SteamCMD `workshop_build_item` to update existing Workshop tags. SteamCMD may report success
-while live tags remain unchanged. Use the repository Steam tag updater helper through `tools/update-platform-tags.ps1`,
-then verify the live tags through Steam published-file details. SteamCMD remains the normal content upload path, but tag
-synchronization is separate.
-
-For a publicly visible Steam item, when the authenticated owner query is unavailable, verified public details may be
-used as read-only evidence that the live tags already match the exact target tags and no mutation is required. Do not
-use this fallback to authorize tag changes, verify a Private or inaccessible item, or infer visibility. If the public
-tags differ from the target, stop until owner-authenticated tag mutation is available. Keep `publish-steam.ps1` and
-`update-platform-tags.ps1` consistent with this boundary.
-
-When publishing a Steam release, compute target tags from the final package's version folders before upload. If live
-Steam tags differ, synchronize them before starting the SteamCMD upload and verify them after synchronization.
-
-Do not change Steam visibility as part of tag synchronization.
-
-## Mod.IO compatibility suffix
-
-For Mod.IO, generate the game compatibility suffix from the actual `version-X.X` folders in the final package.
-
-Example:
-
-```text
----
-MinimumGameVersion: 1.0.12.7
-MaximumGameVersion: 1.1.99.99
----
-```
-
-Do not claim support for a game version unless the final package contains the corresponding `version-X.X` folder.
-
-For Mod.IO uploads, prefer the target mod's own token file when it exists. In this repository, local Mod.IO token files
-are equivalent owner tokens for the same account and game scope. If the per-mod token is missing but another known valid
-owner token file exists, pass it explicitly with `-AccessTokenPath` while keeping the target mod's own Mod.IO config.
-Do not ask solely because the token filename belongs to another mod. Do not copy, rename, or guess token files.
-
-If the publish script stops only because the target mod's token file is missing, either create the target mod's local
-token file when the user provides one, or rerun with an explicit `-AccessTokenPath` to another known owner token. After
-upload, verify that the target mod's parent modfile ID and version point to the uploaded file.
-
-After uploading a Mod.IO file, verify that the uploaded file becomes the live file. If Mod.IO reports the file as
-uploaded but not live after scanning, explicitly activate the uploaded modfile through the Mod.IO API instead of
-assuming upload success is enough.
-
-For a first Mod.IO publication, keep the page Hidden through file upload, virus scanning, and active-file selection.
-Only after the intended file is active and verified may the explicitly authorized publication step make the page
-Public; then live-verify the page state. A Hidden identity page, even with an active file, is not a completed published
-release.
-
-## Platform descriptions
-
-For publishable mods, the mod's `release.json` is the tracked source for release-discoverable platform identity such as
-`Steam.PublishedFileId`. Keep platform-description tooling driven by release configs and local platform configs instead
-of hardcoded mod registries or copied Steam ID tables.
-
-Local files under a mod's `Workshop` directory are the expected source for published platform descriptions. Use the
-standard description paths:
-
-```text
-<ModName>/workshop/description.txt
-<ModName>/workshop/description-ModIO.html
-```
-
-Do not add per-mod description path exceptions when a mod can instead be moved to the common file names.
-
-Do not apply these rules to mods explicitly known as dead, unpublished, or kept only for reference.
-
-Before publishing any mod, compare the local `Workshop` description files with the current descriptions published on
-Steam Workshop and Mod.IO when platform access is available. This synchronization verification is mandatory for every
-release.
-
-Use `tools/verify-platform-descriptions.ps1` for this check when possible.
-
-When verifying descriptions for a specific release, gate the release on the requested mod and platform targets. If a
-shared verification command reports mismatches for unrelated mods, report them as background but do not block the
-current mod release because of those unrelated mismatches.
-
-If `tools/verify-platform-descriptions.ps1 -ModName <ModName>` returns nonzero while the requested mod's target
-platform descriptions match, treat that as a tooling friction rather than a current-release blocker. Preserve the
-distinction explicitly in the report: selected mod synchronized, unrelated mismatches reported separately. Do not ignore
-nonzero exits when the requested mod or requested platform still has a mismatch.
-
-If a local description and the published platform description differ, stop. Do not publish until the user decides which
-side is correct:
-
-- update the platform from the local `Workshop` file,
-- update the local `Workshop` file from the platform,
-- or manually reconcile the difference.
-
-Do not silently overwrite either side when a mismatch is found.
-
-Updating platform descriptions is not part of the normal release flow. Change local description files or published
-platform descriptions only when the user explicitly asks for a description update.
-
-Before publishing, review the target changelog section for serious player-facing capability changes. Ignore ordinary
-fixes for this purpose. If the release adds new capabilities, removes capabilities, substantially changes what players
-can do with the mod, or changes the mod's public positioning, propose updating the mod description on all published
-platforms before release. Do not edit or publish description changes automatically; show the user what should be
-updated and ask whether to prepare the new text.
-
-When the user asks to update a description because release behavior changed, update it as the current product
-description for a new player. Describe what the mod does now. Do not describe removed or historical behavior in the
-main platform description. Put historical change information only in changelog or release notes when needed.
-
-For a new description or a user-approved full description refresh, keep the player-value core focused on why a player
-should install the mod, which gameplay problem it solves, its meaningful features, and how to use it. Do not fill that
-core with implementation provenance, technical build details, routine expected faction support, game-version prose, or
-dependency prose. State a faction limitation when it materially constrains use. Keep game compatibility and dependency
-declarations in the required structured platform metadata and package manifest; their absence from promotional prose
-does not weaken those publication checks.
-
-When the repository-established Support or donation block is present, keep it at the top for visibility, followed by a
-separator, the player-value core, another separator, and the source or community footer. Support and footer content is
-allowed on the page but remains editorially separate from feature claims. This layout rule does not by itself authorize
-restyling an existing description; preserve the existing structure unless the user requests and reviews the refresh.
-
-Include a Discord link only when it leads to a dedicated channel for that mod, unless the user explicitly requests a
-generic community invite. If no dedicated channel exists, omit the generic invite and add the direct channel link later
-when it becomes available.
-
-For release-announcement handoff, the tracked Steam and Mod.IO descriptions are the source for the mod's direct
-`discord.com/channels/<server>/<channel>` URL. Keep the direct URL consistent across both descriptions. Do not guess a
-channel, choose between conflicting URLs, or substitute a generic invite. Report missing or conflicting metadata and
-propose a reviewed description update when appropriate.
-
-Preserve each platform's existing markup and file style. Steam Workshop descriptions use Steam formatting:
-
-```text
-https://steamcommunity.com/comment/Recommendation/formattinghelp
-```
-
-Example:
-
-```text
-[h1]Header[/h1]
-[h2]Section[/h2]
-[list]
-[*]Item
-[/list]
-```
-
-Mod.IO descriptions use regular HTML formatting, such as:
-
-```html
-<h1>Header</h1>
-<h2>Section</h2>
-<ul>
-  <li>Item</li>
-</ul>
-```
-
-When applying the same editorial change to both Steam and Mod.IO descriptions, keep the text semantically equivalent
-but format it natively for each platform.
-
-Use a small mechanical mapping where practical:
-
-- Steam `[h1]` and `[h2]` map to Mod.IO `<h1>` and `<h2>`.
-- Steam `[list]` with `[*]` items maps to Mod.IO `<ul>` with `<li>` items.
-- Steam `[b]` maps to Mod.IO `<strong>`.
-- Steam `[i]` maps to Mod.IO `<em>`.
-- Steam `[url=...]text[/url]` maps to Mod.IO `<a href="...">text</a>`.
-
-Preserve each platform's existing structure and make the smallest reviewed edit. Do not run an automatic
-full-description conversion or restyle unless the user explicitly asks for it and reviews the result.
-
-Make the smallest description edit that matches the current mod behavior. Do not regenerate or restyle the full
-description unless the user explicitly asks for it.
-
-Steam descriptions must be compared as exact text after normalizing CRLF/LF line endings only. Do not ignore trailing
-spaces, blank lines, line breaks, punctuation, or other formatting characters in Steam descriptions. Steam formatting is
-plain text markup, so whitespace may change rendering.
-
-Mod.IO descriptions use HTML and the platform may normalize HTML attributes, links, entities, and whitespace. For
-Mod.IO synchronization, compare the visible rendered text after HTML decoding and tag stripping instead of requiring
-byte-for-byte HTML equality.
-
-An existing Mod.IO token for one mod can be used to read descriptions for the other mods owned by the same account and
-game scope. If the available tokens cannot read a mod description, stop and ask the user to create or provide a new
-token.
-
-When the user explicitly asks to update a Mod.IO description, prefer `tools/update-modio-description.ps1`. The script
-does a dry run by default, updates only when `-Publish` is passed, supports explicit `-AccessTokenPath`, and verifies
-the live Mod.IO visible HTML text after upload.
-
-When the user explicitly asks to update a Steam description, prefer `tools/update-steam-description.ps1`. The script
-does a dry run by default, updates only when `-Publish` is passed, and verifies the live Steam description after upload.
-
-For a Private Steam item, a public `GetPublishedFileDetails` result indicating that the item is inaccessible is not
-evidence that the item is absent. Prefer an authenticated owner Steamworks query for identity and description
-verification.
-
-If the owner query is temporarily unavailable and the user explicitly authorized the description update, the updater
-may apply its reviewed generated VDF through an authenticated SteamCMD session. Keep Steam visibility omitted and
-unchanged.
-
-Treat SteamCMD `Committing update...Success` as acknowledgement that Steam accepted the update, not as verification of
-the resulting description. Explicitly report the verification limitation and repeat owner-authenticated or public live
-verification when an appropriate endpoint becomes available.
-
-Keep this fallback inside the repository description updater. Do not normalize hand-written VDFs or ad hoc direct
-SteamCMD commands as the ordinary workflow.
-
-Do not hand-write Steam description VDFs unless the script is unavailable and the user explicitly approves the risk.
-SteamCMD description VDFs are fragile: unescaped double quotes inside multiline `description` values can truncate the
-published description. If a Steam description contains double quotes, replace them or improve and test the escaping
-before publishing.
-
-Keep Steam descriptions under the practical SteamCMD limit of about 8000 bytes. Do not silently shorten a Steam
-description to fit this limit. If a description is too long, propose a shortened version for user review and publish it
-only after the user approves the new text.
-
-If SteamCMD parses the VDF but returns `Invalid Parameter` while updating a description, check description length first.
-If shortening is needed, prepare a reviewed shorter description before retrying. Treat this limit as empirical and
-replace it with an exact platform limit if tooling later proves one.
-
-Avoid raw double quotes in local Steam description files unless the updater is proven to escape them safely. Prefer
-single quotes or wording that avoids quotes instead of ad-hoc VDF escaping.
-
-## Steam change notes
-
-Steam change notes use Steam formatting.
-
-Use:
-
-```text
-[h3]vX.Y.Z[/h3]
-[*] Change item.
-```
-
-Convert changelog bullet lines from:
-
-```text
-* [Update] Something changed.
-```
-
-to:
-
-```text
-[*] [Update] Something changed.
-```
-
-## Steam login retry
-
-Steam Guard mobile confirmation may take longer than an agent command timeout.
-
-Use a login-only/retry mode that opens SteamCMD for interactive login and does not build, stage, or publish anything.
-
-Do not store Steam passwords in repository files or local config files.
-
-Treat the Steam client Steamworks session and the SteamCMD cached login as separate sessions. If an authenticated owner
-query reports `BLoggedOn=false` while SteamCMD still works, restart or reauthenticate the Steam client and repeat the
-owner query; do not diagnose a missing item or platform failure from that state alone. Avoid unrelated SteamCMD work
-between the final authenticated owner verification and the intended upload.
-
-## Git release tags
-
-After a mod release has been successfully uploaded and verified on all requested platforms, create a Git tag for the
-published release commit.
-
-Use the repository's existing mod-release tag pattern:
-
-```text
-<ModName>_<Version>
-```
-
-Examples:
-
-- `Automation_4.7.0`
-- `TimberCommons_1.19.0`
-
-Do not add a `v` prefix for new mod-release tags unless the user explicitly asks.
-
-The tag must point to the exact release-preparation commit recorded by final preflight for that mod. Never derive the
-tag target from current `HEAD` at publish time. If `HEAD` contains later unrelated commits, create the tag against the
-recorded commit after the preflight checks above succeed; do not make the earlier mod inherit the later commit. Verify
-the recorded object ID still resolves to the expected commit and that the tag does not already exist before creating
-it. The repository's existing mod-release tags are lightweight tags, so use a lightweight tag unless the user
-explicitly asks for an annotated tag.
-
-Changing an existing pushed tag to repair an incorrect target rewrites public release history. Do not delete, move, or
-force-push that tag without explicit user authorization for the specific correction.
-
-Create the tag only after platform uploads and live verification succeed. If publishing fails or is only partially
-completed, do not create a release tag unless the user explicitly asks.
-
-When Git remote access is available, push the tag after creating it. Report the tag name and whether it was pushed in
-the final release summary.
-
-## GitHub releases
-
-After the release tag is created and pushed, create a GitHub Release for the same tag.
-
-Use `tools/publish-github-release.ps1` for this step. The script dry-runs by default and publishes only with
-`-Publish`.
-
-The GitHub Release title should be `<display mod name> v<Version>`. The description should use the released version's
-changelog section as-is, without Steam or Mod.IO formatting conversion. Attach the exact release ZIP that was published
-to Steam Workshop and Mod.IO.
-
-Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
-publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.
-
-## Discord release handoff
-
-After successful publication, use `tools/prepare-discord-release-message.ps1` to prepare the mod's release announcement
-from the display name and exact released-version changelog section. The unified publish tool invokes this handoff unless
-Discord preparation was explicitly skipped, including when GitHub Release creation was skipped.
-
-The announcement contains only the release title and exact changelog section. Do not append a download link, GitHub
-Release link, or other acquisition instructions; subscribers in the dedicated mod channel already know where to obtain
-the current version.
-
-Format the release title as the neutral Markdown heading `# <display mod name> v<Version>`, followed by a blank line.
-Render each top-level changelog item as a Markdown `-` bullet for Discord, even when the source changelog uses `*`.
-Changing the bullet marker is formatting only; preserve the changelog item text exactly.
-
-With `-Prepare`, the helper may open the tracked direct mod channel for the user, but must not copy the message to the
-local clipboard. The user reviews, copies, and sends the message manually. Never automate a normal Discord user account,
-send the message, or treat opening the channel as evidence that an announcement was posted.
-
-Put the complete reviewed Discord message in a fenced `text` block at the very end of the Publisher's final release
-response, after the release summary, verification, issue, and Wiki notes. Do not replace this visible handoff with a
-clipboard-only delivery; the final block keeps the outstanding manual action durable and prominent.
-
-Do not silently shorten, rewrite, or choose alternate player-facing text to fit Discord's 2000-character limit. If the
-message is over the limit, or the direct channel URL is missing or conflicts between tracked descriptions, report the
-problem and leave the announcement unsent. A Discord handoff failure after verified publication is a post-release
-warning; it must not misreport the already completed release as failed.
-
-## Wiki handoff after release
-
-After a successful mod release, consider whether the release changes any Wiki-facing surface:
-
-- public API,
-- mod component specs,
-- configuration or data formats,
-- user-facing behavior documented in the Wiki,
-- compatibility notes,
-- examples or scripting/reference material.
-
-If the release plausibly affects the Wiki, send a delegated note to the `Wiki editor` thread. Include the mod name,
-released version, release commit, relevant changelog bullets, and the Wiki areas that may need review.
-
-Do not edit the Wiki directly as part of the publisher role unless the user explicitly expands the task.
-
-Do not send a Wiki handoff for releases with no plausible Wiki impact. If uncertain, send a concise "may need review"
-note instead of silently skipping.
-
-## Publisher signoff handoff
-
-At the end of a non-trivial publishing, release-preparation, platform-description, platform-tag, or post-release
-investigation task, perform the root `AGENTS.md` role learning handoff check before signing off.
-
-Do not wait for the user to ask for a mentor handoff. If the publisher task exposed a durable release, platform,
-artifact, credential, staging, verification, or tooling lesson that is not already clearly covered by the rules, send a
-concise delegated note to the mentor with the observation, evidence, suggested scope, and risk.
-
-Do not send a mentor handoff only to say that an incident is understood or that an existing rule already covers it. In
-that case, mention in the publisher's final report that no new mentor-rule update seems needed.
-
-## Closing GitHub issues after release
-
-When publishing a mod release, identify the issue-backed changes included in that release.
-
-Before closing any GitHub issues, show the user the exact list of issues proposed for closure and ask for explicit
-confirmation.
-
-Never close GitHub issues automatically as a side effect of committing, pushing, packaging, or publishing.
-
-If release scope is unclear, ask instead of closing issues.
-
-When the user confirms closing GitHub issues after a release, use GitHub CLI when available:
-
-```powershell
-gh issue comment <issue-number> --repo ihsoft/TimberbornMods --body "Released in <ModName> vX.Y.Z."
-gh issue close <issue-number> --repo ihsoft/TimberbornMods
-gh issue view <issue-number> --repo ihsoft/TimberbornMods --json number,title,state,url,comments
-```
-
-Run authenticated `gh` commands outside the sandbox. In this environment, sandboxed `gh` may see an invalid or default
-token because it runs without access to the user's keyring, while the user's normal `gh auth` works outside the
-sandbox.
-
-For each closed issue, add a release comment such as:
-
-```text
-Released in Automation v4.5.0.
-```
-
-After closing, verify the issue state with `gh issue view`.
-
-If automatic issue closing is unavailable because GitHub CLI, tokens, browser access, or another authenticated path is
-not available, do not treat the issues as closed. Give the user direct links to the confirmed issues and state clearly
-that they still need manual closing.
+After every requested platform upload and live verification succeeds, load Release Signoff Operational Knowledge and
+complete its Git tag, GitHub Release, issue, Wiki, Discord, role-learning, and final-report gates in the same Publisher
+task. Do not enter signoff while a platform result is failed, partial, or uncertain unless the user explicitly directs
+an exceptional action.
 
 ## Stop on uncertainty
 
