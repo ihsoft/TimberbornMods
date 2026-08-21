@@ -15,10 +15,10 @@ The faction-visible 3x3 tool blueprints are `DualDistrictPile.Folktails` and `Du
 `AsymmetricDualDistrictStoragePlacerSpec` and names its faction's hidden `DualDistrictPile.Narrow.*` and
 `DualDistrictPile.Wide.*` templates. Only the tool blueprints belong in the faction tool collections.
 
-The hidden narrow and wide templates are the linked physical entities with logical 3x1 and 3x2 footprints. Keep their
-complete `BuildingSpec` companion data, including a `PlaceableBlockObjectSpec` with an empty `ToolGroupId` and
-`DevModeTool=true`, so current global building consumers can inspect them without exposing them as player tools or
-ordinary achievement structures.
+The hidden narrow and wide templates are persistent linked physical entities with logical 3x1 and 3x2 footprints.
+Each must carry `AsymmetricDualDistrictStoragePartSpec` and complete construction data, but must not carry
+`PlaceableBlockObjectSpec`. `BuildingAvailabilityValidator` must report marked halves unavailable so global building
+consumers skip placeable-only assumptions. Only `AsymmetricDualDistrictStoragePlacer` creates these entities.
 
 `AsymmetricDualDistrictStoragePlacer` creates the narrow entity at the selected placement. It derives the wide entity
 from the orientation-relative `(2, 2, 0)` offset, flips its orientation, preserves the requested finished/unfinished
@@ -36,10 +36,10 @@ hidden narrow and wide physical templates, they do not automatically map back to
 visible tool. When replacing or wrapping the tool's `EntitySetup.Builder`, preserve `DuplicationInit` and apply it to
 every created physical entity that must receive copied settings.
 
-DevMode enables hidden physical tools, so the stock exact-`TemplateName` finder can otherwise claim a hidden Narrow or
-Wide template before the custom composite finder runs. Exclude only hidden DualDistrictStorage physical templates from
-stock copy-tool ownership: templates with `DualDistrictStorageSpec`, `DevModeTool=true`, and an empty `ToolGroupId`.
-Ordinary player mode is not enough validation for duplication behavior.
+Do not make hidden halves placeable merely to satisfy global building consumers. Assigning a `ToolGroupId` exposes the
+internal templates as DevMode tools, while an empty `ToolGroupId` produces missing-parent warnings. Do not restore the
+removed `BlockObjectToolFinderPatch` or filter tool buttons to hide the resulting symptoms; preserve the non-placeable
+template boundary instead. Ordinary player mode is not enough validation for duplication behavior.
 
 ## Preview Ownership
 
@@ -98,8 +98,9 @@ After changing pile blueprints, placement, preview, generated assets, colliders,
 
 1. Regenerate and validate the complete five-model set when its inputs or transformation changed; regenerate the shared
    icon set when a pile icon input or composition changed.
-2. Verify the visible faction tool identities, hidden template references, complete hidden companion specs, and absence
-   of hidden tools from ordinary player selection.
+2. Verify the visible faction tool identities and hidden template references. Confirm every hidden half has
+   `AsymmetricDualDistrictStoragePartSpec`, has no `PlaceableBlockObjectSpec`, reports unavailable for placement, and is
+   absent from ordinary and DevMode tool selection.
 3. Build through the ordinary package path and verify the DLL, blueprints, Timbermesh models, icons, and metadata match
    their tracked sources.
 4. In the real game, rotate the preview and confirm the full silhouette and both entrance markers, then place and build
