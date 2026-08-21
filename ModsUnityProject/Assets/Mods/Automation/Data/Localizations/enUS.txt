@@ -112,6 +112,7 @@ IgorZ.Automation.Scripting.Error.ValueOutOfRange,"ERROR: Value out of range","Lo
 IgorZ.Automation.Scripting.Error.DivisionByZero,"ERROR: Division by zero","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.BadValue,"ERROR: Bad value","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ERROR: Internal error","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.AutomatorSignalUnavailable,"ERROR: Automation signal source is unavailable","Shown when a rule references a stock automation transmitter that no longer exists"
 IgorZ.Automation.Scripting.Error.StackOverflow,"ERROR: Stack overflow","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.AndMoreRow,"...and {0} more rules...","Indicates that there are more rules that are not shown in the panel"
@@ -149,6 +150,7 @@ IgorZ.Automation.Tool.CopyRules.Text,"Copy {0} rules",
 IgorZ.Automation.Tool.CopyRules.Title,"Copy automation rules",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scriptable.Automator.Signal.State,"automation signal","Name of the condition for the automator state checking"
+IgorZ.Automation.Scriptable.Automator.Signal.RemoteState,"automation signal: {0}","Name of a condition that reads the stock automation state from another building"
 IgorZ.Automation.Scriptable.BreedingPod.Signal.Progress,"breeding progress","Name of the condition for the breeding pod progress checking"
 IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"ready for collection","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"construction progress","Name of the condition for the construction progress checking"

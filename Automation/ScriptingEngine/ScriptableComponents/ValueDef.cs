@@ -34,6 +34,10 @@ sealed record ValueDef {
     /// <summary>An integer value. No fractional part allowed.</summary>
     Integer,
 
+    /// <summary>A numeric value presented as a two-state On/Off choice.</summary>
+    /// <remarks>At runtime zero means false and every non-zero value means true.</remarks>
+    Boolean,
+
     /// <summary>A float value with 2 digits after the comma.</summary>
     /// <remarks>If the number has more digits after the comme, the UI will block it.</remarks>
     Float,

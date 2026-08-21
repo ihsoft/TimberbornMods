@@ -35,6 +35,8 @@ sealed class ArgumentConstructor : BaseConstructor {
     var value = valueDef.ValueType switch {
         ScriptValue.TypeEnum.String => scriptValue.AsString,
         ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Boolean =>
+                ScriptValue.FromBool(scriptValue.AsRawNumber != 0).AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
@@ -181,8 +183,10 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
     var valueDef = _argumentDefinition.ValueDef;
 
-    // Integer & Percent.
-    if (numericFormat is ValueDef.NumericFormatEnum.Integer or ValueDef.NumericFormatEnum.Percent) {
+    // Integer, Percent & Boolean.
+    if (numericFormat is ValueDef.NumericFormatEnum.Integer
+        or ValueDef.NumericFormatEnum.Percent
+        or ValueDef.NumericFormatEnum.Boolean) {
       if (!int.TryParse(strValue, out var intValue)) {
         error = $"Value must be an integer: {strValue}";
         return ScriptValue.InvalidValue;
@@ -198,9 +202,11 @@ sealed class ArgumentConstructor : BaseConstructor {
           return ScriptValue.InvalidValue;
         }
       }
-      var result = numericFormat == ValueDef.NumericFormatEnum.Integer
-          ? ScriptValue.FromInt(intValue)
-          : ScriptValue.Of(intValue);
+      var result = numericFormat switch {
+          ValueDef.NumericFormatEnum.Integer => ScriptValue.FromInt(intValue),
+          ValueDef.NumericFormatEnum.Percent or ValueDef.NumericFormatEnum.Boolean => ScriptValue.Of(intValue),
+          _ => throw new InvalidOperationException($"Unsupported numeric format: {numericFormat}"),
+      };
       return ExecuteValidator(result, out error) ? result : ScriptValue.InvalidValue;
     }
 
@@ -260,7 +266,9 @@ sealed class ArgumentConstructor : BaseConstructor {
   string FormatToArgPrecision(float value) {
     return _argumentDefinition.ValueDef.DisplayNumericFormat switch {
         ValueDef.NumericFormatEnum.Float => value.ToString("0.00"),
-        ValueDef.NumericFormatEnum.Integer or ValueDef.NumericFormatEnum.Percent =>
+        ValueDef.NumericFormatEnum.Integer
+            or ValueDef.NumericFormatEnum.Percent
+            or ValueDef.NumericFormatEnum.Boolean =>
             value.ToString(CultureInfo.InvariantCulture),
         ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException("Numeric format must be set"),
     };

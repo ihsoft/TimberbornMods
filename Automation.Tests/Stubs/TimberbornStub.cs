@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Timberborn.BaseComponentSystem {
@@ -86,6 +88,8 @@ namespace Timberborn.AutomationBuildings {
 }
 
 namespace Timberborn.Automation {
+  using Timberborn.EntitySystem;
+
   public enum AutomatorState {
     Off,
     On,
@@ -95,6 +99,25 @@ namespace Timberborn.Automation {
     public bool IsTransmitter { get; init; }
     public AutomatorState State { get; set; }
     public string AutomatorName { get; set; }
+  }
+
+  public sealed class AutomatorRegistry {
+    readonly List<Automator> _transmitters = [];
+
+    public ReadOnlyCollection<string> SortedTransmitterIds =>
+        _transmitters.Select(x => x.GetComponent<EntityComponent>().EntityId.ToString()).ToList().AsReadOnly();
+
+    public Automator FindTransmitterById(Guid entityId) {
+      return _transmitters.FirstOrDefault(x => x.GetComponent<EntityComponent>().EntityId == entityId);
+    }
+
+    public void Register(Automator automator) {
+      _transmitters.Add(automator);
+    }
+
+    public void Unregister(Automator automator) {
+      _transmitters.Remove(automator);
+    }
   }
 }
 
@@ -307,7 +330,7 @@ namespace Timberborn.DwellingSystem {
 
 namespace Timberborn.EntitySystem {
   public sealed class EntityComponent : Timberborn.BaseComponentSystem.BaseComponent {
-    public object EntityId { get; set; } = "entity";
+    public Guid EntityId { get; set; } = Guid.NewGuid();
   }
 
   public sealed class Citizen : Timberborn.BaseComponentSystem.BaseComponent {
@@ -322,17 +345,17 @@ namespace Timberborn.EntitySystem {
   }
 
   public sealed class EntityInitializedEvent {
-    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+    public EntityComponent Entity { get; }
 
-    public EntityInitializedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+    public EntityInitializedEvent(EntityComponent entity) {
       Entity = entity;
     }
   }
 
   public sealed class EntityDeletedEvent {
-    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+    public EntityComponent Entity { get; }
 
-    public EntityDeletedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+    public EntityDeletedEvent(EntityComponent entity) {
       Entity = entity;
     }
   }
@@ -621,6 +644,10 @@ namespace Timberborn.SingletonSystem {
   }
 
   public interface IPostLoadableSingleton {
+  }
+
+  public interface IUnloadableSingleton {
+    void Unload();
   }
 
   public sealed class EventBus {

@@ -2,6 +2,8 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
+
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 /// <summary>Definition of a signal that can be used in the scripting engine.</summary>
@@ -15,7 +17,14 @@ sealed record SignalDef {
   public string ScriptName { get; init; }
 
   /// <summary>Human-readable and localized name of the signal.</summary>
-  public string DisplayName { get; init; }
+  /// <remarks>If <see cref="DisplayNameFn"/> is set, the name is resolved dynamically on every access.</remarks>
+  public string DisplayName {
+    get => DisplayNameFn?.Invoke() ?? _displayName;
+    init => _displayName = value;
+  }
+
+  /// <summary>Optional function that resolves a dynamic human-readable and localized signal name.</summary>
+  public Func<string> DisplayNameFn { get; init; }
 
   /// <summary>Localization key used to make a parameterized <see cref="DisplayName"/>.</summary>
   /// <remarks>Set this together with <see cref="DisplayNameArgument"/> only for parameterized signal names.</remarks>
@@ -29,4 +38,6 @@ sealed record SignalDef {
 
   /// <summary>Definition of the result value.</summary>
   public ValueDef Result { get; init; }
+
+  string _displayName;
 }

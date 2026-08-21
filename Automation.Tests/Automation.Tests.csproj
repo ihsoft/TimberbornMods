@@ -131,6 +131,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorSignalReferenceManager.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorSignalReferenceManager.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs</Link>
       </Compile>
@@ -169,6 +172,9 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngineUI\ExpressionDescriber.cs">
         <Link>Automation\ScriptingEngineUI\ExpressionDescriber.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\BooleanComparison.cs">
+        <Link>Automation\ScriptingEngineUI\BooleanComparison.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>

@@ -124,7 +124,8 @@ sealed class RuleRow {
   }
   bool _isEnabled = true;
 
-  public bool HasErrors => (ParsedAction == null || ParsedCondition == null) && !IsDeleted && !IsInEditMode;
+  public bool HasErrors => !IsDeleted && !IsInEditMode
+      && (ParsedAction == null || ParsedCondition == null || GetCompilationError() != null);
 
   public event EventHandler OnStateChanged;
 
@@ -253,6 +254,22 @@ sealed class RuleRow {
 
   public void ClearError() {
     _notifications.ToggleDisplayStyle(false);
+  }
+
+  /// <summary>Compiles the current expressions against the current game state and returns the first error.</summary>
+  public ScriptError GetCompilationError() {
+    if (LegacyAction != null) {
+      return null;
+    }
+    if (IsNew && ConditionExpression == null && ActionExpression == null) {
+      return null;
+    }
+    _parserFactory.ParseCondition(ConditionExpression, ActiveBuilding, out var conditionResult);
+    if (conditionResult.LastScriptError != null) {
+      return conditionResult.LastScriptError;
+    }
+    _parserFactory.ParseAction(ActionExpression, ActiveBuilding, out var actionResult);
+    return actionResult.LastScriptError;
   }
 
   #endregion
@@ -421,7 +438,6 @@ sealed class RuleRow {
       }
       return CommonFormats.HighlightYellow(description);
     } catch (ScriptError.RuntimeError e) {
-      DebugEx.Error("Failed to get description: {0}\n{1}", expression, e);
       return CommonFormats.HighlightRed(_uiFactory.T(e.LocKey));
     }
   }

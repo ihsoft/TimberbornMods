@@ -53,6 +53,12 @@ class ConditionConstructor : BaseConstructor {
 
   public string GetLispScript() {
     var arg = _selectedDefinition.Name.Value;
+    if (BooleanComparison.IsBoolean(_selectedDefinition.Argument.ValueDef)) {
+      var state = ValueSelector.GetScriptValue() != "0";
+      var booleanOperator = LispSyntaxParser.ComparisonOperators[
+          state ? ComparisonOperator.OpType.NotEqual : ComparisonOperator.OpType.Equal];
+      return $"({booleanOperator} (sig {arg}) 0)";
+    }
     var op = OperatorSelector.SelectedValue;
     var val = ValueSelector.GetScriptValue();
     return $"({op} (sig {arg}) {val})";
@@ -60,6 +66,13 @@ class ConditionConstructor : BaseConstructor {
 
   public void SetComparison(ComparisonOperator comparisonOperator) {
     SelectSignal((comparisonOperator.Left as SignalOperator)!.SignalName);
+    if (BooleanComparison.IsBoolean(_selectedDefinition.Argument.ValueDef)) {
+      if (!BooleanComparison.TryGetState(comparisonOperator, out var state)) {
+        throw new InvalidOperationException("Unsupported Boolean comparison: " + comparisonOperator);
+      }
+      ValueSelector.SetScriptValue(ScriptValue.FromBool(state));
+      return;
+    }
     OperatorSelector.SelectedValue = LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
     switch (comparisonOperator.Right) {
       case ConstantValueExpr constantValue:
@@ -145,13 +158,14 @@ class ConditionConstructor : BaseConstructor {
       OperatorSelector.ToggleDisplayStyle(false);
       ValueSelector.Root.ToggleDisplayStyle(false);
     }
+    var isBoolean = BooleanComparison.IsBoolean(_selectedDefinition.Argument.ValueDef);
     OperatorSelector.Items = _selectedDefinition.Argument.ValueType switch {
         ScriptValue.TypeEnum.String => StringOperators,
         ScriptValue.TypeEnum.Number => NumberOperators,
         ScriptValue.TypeEnum.Unset => throw new InvalidOperationException("Value type must be set"),
     };
-    OperatorSelector.ToggleDisplayStyle(true);
-    var customSignalOptions = _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.Number
+    OperatorSelector.ToggleDisplayStyle(!isBoolean);
+    var customSignalOptions = _selectedDefinition.Argument.ValueType == ScriptValue.TypeEnum.Number && !isBoolean
         ? _customSignalOptions
         : null;
     ValueSelector.SetDefinition(_selectedDefinition.Argument, customSignalOptions);

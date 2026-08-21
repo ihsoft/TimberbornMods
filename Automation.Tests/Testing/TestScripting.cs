@@ -41,15 +41,19 @@ sealed class TestScriptable : IScriptable {
 
   public void RegisterSignal(
       string name, ScriptValue.TypeEnum valueType, Func<ScriptValue> source = null,
-      SignalDef.ScopeEnum scope = SignalDef.ScopeEnum.Building) {
+      SignalDef.ScopeEnum scope = SignalDef.ScopeEnum.Building,
+      ValueDef.NumericFormatEnum numericFormat = ValueDef.NumericFormatEnum.Float,
+      IgorZ.TimberDev.UI.DropdownItem[] options = null, Func<string> displayNameFn = null) {
     _signals[name] = (
         new SignalDef {
             ScriptName = name,
             DisplayName = name,
+            DisplayNameFn = displayNameFn,
             Scope = scope,
             Result = new ValueDef {
                 ValueType = valueType,
-                DisplayNumericFormat = ValueDef.NumericFormatEnum.Float,
+                DisplayNumericFormat = numericFormat,
+                Options = options,
             },
         },
         source ?? (() => valueType == ScriptValue.TypeEnum.String

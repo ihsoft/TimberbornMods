@@ -31,6 +31,11 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
   /// <inheritdoc/>
   public void OnRuleRowBtnAction(RuleRow ruleRow) {
+    var compilationError = ruleRow.GetCompilationError();
+    if (compilationError != null) {
+      ruleRow.ReportError(compilationError);
+      return;
+    }
     var root = _uiFactory.LoadVisualElement("IgorZ.Automation/ConstructorEditView");
     var ruleConstructor = new RuleConstructor(_uiFactory, root.Q2<VisualElement>("RuleConstructor"));
 
@@ -45,8 +50,13 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
         ruleRow.ReportError(error);
         return;
       }
-      ruleRow.ConditionExpression = ToDefaultSyntax(ruleConstructor.GetConditionLispScript(), ruleRow);
-      ruleRow.ActionExpression = ToDefaultSyntax(ruleConstructor.ActionConstructor.GetLispScript(), ruleRow);
+      if (!TryToDefaultSyntax(ruleConstructor.GetConditionLispScript(), ruleRow, out var conditionExpression)
+          || !TryToDefaultSyntax(
+              ruleConstructor.ActionConstructor.GetLispScript(), ruleRow, out var actionExpression)) {
+        return;
+      }
+      ruleRow.ConditionExpression = conditionExpression;
+      ruleRow.ActionExpression = actionExpression;
       ruleRow.SwitchToViewMode();
     };
     root.Q<Button>("DiscardScriptBtn").clicked += ruleRow.DiscardChangesAndSwitchToViewMode;
@@ -109,16 +119,17 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     ruleConstructor.ActionConstructor.SetDefinitions(actions);
   }
 
-  string ToDefaultSyntax(string lispSyntax, RuleRow ruleRow) {
-    if (ScriptEditorSettings.DefaultScriptSyntax == ScriptEditorSettings.ScriptSyntax.Lisp) {
-      return lispSyntax;
-    }
+  bool TryToDefaultSyntax(string lispSyntax, RuleRow ruleRow, out string resultSyntax) {
     var result = _parserFactory.LispSyntaxParser.Parse(lispSyntax, ruleRow.ActiveBuilding);
     if (result.LastScriptError != null) {
-      //FXIME: maybe deal with it better?
-      throw result.LastScriptError;  // Not expected!
+      ruleRow.ReportError(result.LastScriptError);
+      resultSyntax = null;
+      return false;
     }
-    return _parserFactory.DefaultParser.Decompile(result.ParsedExpression);
+    resultSyntax = ScriptEditorSettings.DefaultScriptSyntax == ScriptEditorSettings.ScriptSyntax.Lisp
+        ? lispSyntax
+        : _parserFactory.DefaultParser.Decompile(result.ParsedExpression);
+    return true;
   }
 
   static void PopulateAction(RuleRow ruleRow, RuleConstructor ruleConstructor) {
@@ -203,6 +214,9 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
   static bool IsSupportedComparison(ComparisonOperator comparison, HashSet<string> signalNames) {
     if (comparison.Left is not SignalOperator leftSignal || !signalNames.Contains(leftSignal.SignalName)) {
       return false;
+    }
+    if (BooleanComparison.IsBoolean(leftSignal.SignalDef.Result)) {
+      return BooleanComparison.TryGetState(comparison, out _);
     }
     return comparison.Right switch {
         ConstantValueExpr => true,

@@ -37,6 +37,8 @@ sealed class ExpressionDescriber(ILoc Loc) {
   public static string FormatValue(ScriptValue scriptValue, ValueDef valueDef) {
     var stringValue = scriptValue.ValueType switch {
         ScriptValue.TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Boolean =>
+                ScriptValue.FromBool(scriptValue.AsRawNumber != 0).AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsFloat.ToString("0%"),
             // If the runtime value happen to be not an integer, it's still formatted as float in UI.
@@ -83,6 +85,9 @@ sealed class ExpressionDescriber(ILoc Loc) {
     if (op.Left is SignalOperator leftSignal && op.Right is SignalOperator rightSignal
         && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == ComparisonOperator.OpType.Equal) {
       return DescribeExpressionInternal(leftSignal);
+    }
+    if (BooleanComparison.TryGetState(op, out var state)) {
+      return $"{DescribeLeft(op.Left, op)} = {FormatValue(ScriptValue.FromBool(state), op.ResultValueDef)}";
     }
     var sb = new StringBuilder();
     sb.Append(DescribeLeft(op.Left, op));

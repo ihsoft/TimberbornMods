@@ -14,6 +14,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<SignalDispatcher>().AsSingleton();
     containerDefinition.Bind<ReferenceManager>().AsTransient();
+    containerDefinition.Bind<AutomatorSignalReferenceManager>().AsSingleton();
 
     // The building-specific components. The declaring order defines the order of teh items in UI.
     containerDefinition.Bind<BreedingPodScriptableComponent>().AsSingleton();
