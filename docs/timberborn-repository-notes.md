@@ -204,6 +204,11 @@ When completing a user-visible feature or bug fix for a mod package, update that
 committing. Do not add noisy changelog entries for internal refactors, test-only changes, or documentation-only changes
 unless they have user-visible release-note value or the user asks for it.
 
+Describe the net player-visible delta from the package's last dated release, not the development history inside the
+current `(TBD)` section. A defect introduced and corrected while implementing the same unreleased feature is not a
+separate `[Fix]`; fold the final behavior into the feature entry. Use a separate fix entry only when it repairs behavior
+players could encounter in a released version or represents an independently meaningful player-facing change.
+
 Keep entries short. For features, describe the new capability. For fixes, describe the broken behavior before the fix.
 
 Group implementation controls, compatibility switches, and small options under the primary user-facing feature unless

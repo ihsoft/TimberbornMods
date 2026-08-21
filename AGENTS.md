@@ -392,6 +392,18 @@ not start from them.
 - Do not change production code unless the user explicitly asks.
 - If tests expose a production issue, stop and ask.
 
+### C# submission task
+
+- Before handing off or committing C# changes, the coder must audit the final changed C# diff against
+  `docs/csharp-formatting-rules-for-ai-agents.md` without waiting for user feedback. Build, tests, line-length checks,
+  and `git diff --check` do not replace this construct-level review.
+- Confirm intentional API and access ownership, constructor and private-member placement, established section
+  organization, imports, and removal of unused prototype scaffolding. Re-check every wrapped construct in its final
+  form and collapse obsolete wrapping that now fits cleanly within 120 characters.
+- When promoting a validated prototype to a final implementation, repeat this audit after the architecture settles.
+  Remove or justify temporary and unintentionally public surfaces, then re-check the changelog against the net
+  player-visible release delta defined in `docs/timberborn-repository-notes.md`.
+
 ### Mode-shifted task
 
 - If a task starts as investigation, diagnostics, review, or reproduction work and then turns into an implemented fix or
