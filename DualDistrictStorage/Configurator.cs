@@ -26,8 +26,8 @@ sealed class Configurator : IConfigurator {
     HarmonyPatcher.ApplyPatch(
         PatchId,
         typeof(ResourceCountingServicePatch),
+        typeof(BuildingAvailabilityValidatorPatch),
         typeof(BuildingPlacerPatch),
-        typeof(BlockObjectToolFinderPatch),
         typeof(StockpileGoodPileVisualizerPatch),
         typeof(StockpilePlaneVisualizerPatch));
   }

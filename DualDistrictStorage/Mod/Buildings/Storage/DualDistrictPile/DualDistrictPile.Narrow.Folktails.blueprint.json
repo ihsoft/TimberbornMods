@@ -112,6 +112,7 @@
     "VisualizationShareDenominator": 3,
     "OwnsSharedPlaneVisualization": true
   },
+  "AsymmetricDualDistrictStoragePartSpec": {},
   "LinkedBuildingSpec": {},
   "DistrictObstacleSpec": {
     "CoordinateOffset": {
@@ -164,18 +165,6 @@
         "GoodVisualizationVariant": "3x3"
       }
     ]
-  },
-  "PlaceableBlockObjectSpec": {
-    "ToolGroupId": "",
-    "ToolOrder": 0,
-    "ToolShape": "Square",
-    "Layout": "Single",
-    "CustomPivot": {
-      "HasCustomPivot": false,
-      "Coordinates": { "X": 0.0, "Y": 0.0, "Z": 0.0 }
-    },
-    "CanBeAttachedToTerrainSide": false,
-    "DevModeTool": true
   },
   "ConstructionSiteProgressVisualizerSpec": {
     "ProgressThresholds": [

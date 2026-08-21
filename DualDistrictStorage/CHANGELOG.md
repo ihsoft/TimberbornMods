@@ -1,3 +1,7 @@
+# v1.0.3 (TBD)
+
+* [Fix] Hidden Dual-District Pile templates entered tool-group systems, causing load warnings and unsafe standalone DevMode tools.
+
 # v1.0.2 (2026-08-02)
 
 * [Change] Move dual-district buildings to the end of the Storage toolbar.
