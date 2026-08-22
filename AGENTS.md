@@ -392,17 +392,26 @@ not start from them.
 - Do not change production code unless the user explicitly asks.
 - If tests expose a production issue, stop and ask.
 
-### C# submission task
+### C# finalization and submission task
 
-- Before handing off or committing C# changes, the coder must audit the final changed C# diff against
-  `docs/csharp-formatting-rules-for-ai-agents.md` without waiting for user feedback. Build, tests, line-length checks,
-  and `git diff --check` do not replace this construct-level review.
-- Confirm intentional API and access ownership, constructor and private-member placement, established section
-  organization, imports, and removal of unused prototype scaffolding. Re-check every wrapped construct in its final
-  form and collapse obsolete wrapping that now fits cleanly within 120 characters.
-- When promoting a validated prototype to a final implementation, repeat this audit after the architecture settles.
-  Remove or justify temporary and unintentionally public surfaces, then re-check the changelog against the net
-  player-visible release delta defined in `docs/timberborn-repository-notes.md`.
+- In this checklist, finalization is the explicit transition from a validated prototype or iterative working solution
+  to repository-ready production code. A user request to finalize the code, solution, or implementation triggers this
+  entire checklist even when the user has not yet asked for review or commit. Finalization does not mean only completing
+  missing behavior, preserving the prototype as-is, or adding tests.
+- For every non-trivial or iterative C# task, add `Finalize C# implementation and audit final diff` as its own visible
+  pending item in the task plan when C# editing begins. It may remain pending while a prototype undergoes real-game
+  validation, but must become the active gate when the user accepts the prototype and asks to finalize it.
+- During finalization, audit every changed production and test C# file. Confirm intentional API and access ownership,
+  constructor, private-member, helper-type, and section placement, imports, naming, comments, removal of prototype
+  scaffolding, and compact final formatting. Re-check every wrapped construct and collapse obsolete wrapping that now
+  fits cleanly within 120 characters.
+- After the last production or test C# edit, re-read the final changed C# diff against
+  `docs/csharp-formatting-rules-for-ai-agents.md`. Build, export, tests, line-length checks, and `git diff --check` do not
+  replace this construct-level review. Re-check the changelog against the net player-visible release delta defined in
+  `docs/timberborn-repository-notes.md`.
+- Keep this plan item separate from build, export, tests, and generic finalization. Reopen it after any later C# change.
+  Before reporting finalization complete or requesting review or commit, explicitly report whether the audit is
+  complete; code without that completed gate is not finalized.
 
 ### Mode-shifted task
 
