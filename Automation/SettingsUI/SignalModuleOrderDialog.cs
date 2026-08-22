@@ -16,7 +16,7 @@ sealed class SignalModuleOrderDialog(
     ScriptingService scriptingService, ITooltipRegistrar tooltipRegistrar) : AbstractDialog {
 
   const string DialogAsset = "IgorZ.Automation/SignalModuleOrderDialog";
-  const string RowAsset = "IgorZ.Automation/SignalModuleOrderRow";
+  const string RowTmplAsset = "IgorZ.Automation/SignalModuleOrderRowTmpl";
 
   const string MoveUpLocKey = "IgorZ.Automation.SignalModuleOrder.MoveUp";
   const string MoveDownLocKey = "IgorZ.Automation.SignalModuleOrder.MoveDown";
@@ -52,17 +52,15 @@ sealed class SignalModuleOrderDialog(
   public override void Show() {
     base.Show();
 
+    _moduleList = Root.Q2<ListView>("ModuleList");
+    // ListView cannot serialize itemsSource, so UI Builder uses a separate authoring-time preview.
+    Root.Q2<ScrollView>("ModuleListPreview").RemoveFromHierarchy();
     _registeredModuleOrder = scriptingService.GetScriptableNames().ToArray();
     _initialModuleOrder = SignalModuleOrder.Apply(_registeredModuleOrder, moduleName => moduleName).ToArray();
     SetModuleOrder(_initialModuleOrder);
 
-    _moduleList = Root.Q2<ListView>("ModuleList");
     _moduleList.makeItem = MakeModuleRow;
     _moduleList.bindItem = BindModuleRow;
-    _moduleList.fixedItemHeight = 32;
-    _moduleList.selectionType = SelectionType.None;
-    _moduleList.reorderable = true;
-    _moduleList.reorderMode = ListViewReorderMode.Animated;
     _moduleList.itemsSource = _moduleNames;
     _moduleList.itemIndexChanged += OnItemIndexChanged;
     Root.Q2<Button>("ResetButton").clicked += ResetOrder;
@@ -98,7 +96,7 @@ sealed class SignalModuleOrderDialog(
   }
 
   VisualElement MakeModuleRow() {
-    var root = UiFactory.LoadVisualElement(RowAsset);
+    var root = UiFactory.LoadVisualElement(RowTmplAsset, unwrapContainer: true);
     var rowState = new ModuleRowState(root);
     root.userData = rowState;
     tooltipRegistrar.RegisterLocalizable(rowState.MoveUpButton, MoveUpLocKey);

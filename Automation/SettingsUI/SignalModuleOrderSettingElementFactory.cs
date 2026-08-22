@@ -16,7 +16,7 @@ sealed class SignalModuleOrderSettingElementFactory(
     UiFactory uiFactory, IContainer dependencyContainer, IModSettingsContextProvider contextProvider,
     ITooltipRegistrar tooltipRegistrar) : IModSettingElementFactory {
 
-  const string SettingElementAsset = "IgorZ.Automation/SignalModuleOrderSettingElement";
+  const string SettingElementTmplAsset = "IgorZ.Automation/SignalModuleOrderSettingElementTmpl";
   const string UnavailableLocKey = "IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderUnavailable";
 
   #region API
@@ -31,7 +31,7 @@ sealed class SignalModuleOrderSettingElementFactory(
       return false;
     }
 
-    var root = uiFactory.LoadVisualElement(SettingElementAsset);
+    var root = uiFactory.LoadVisualElement(SettingElementTmplAsset, unwrapContainer: true);
     var descriptor = signalModuleOrderSetting.Descriptor;
     root.Q2<Label>("SettingLabel").text = descriptor.NameLocKey != null
         ? uiFactory.T(descriptor.NameLocKey)

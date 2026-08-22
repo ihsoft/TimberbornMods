@@ -2,6 +2,34 @@
     --background-image: resource('UI/Images/Core/border_nontransparent');
 }
 
+.signal-module-order-template-preview {
+    flex-grow: 1;
+    min-width: 600px;
+    min-height: 64px;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgb(7, 39, 37);
+}
+
+.signal-module-order-list__preview-item {
+    height: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
+}
+
+.signal-module-order-list__preview-instance {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: 100%;
+}
+
+.signal-module-order-list__preview-instance .signal-module-order-template-preview {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
 /* Keep the technical wrapper padding-free: ListView positions it by fixedItemHeight. */
 .signal-module-order-list .unity-list-view__reorderable-item {
     flex-direction: row;

@@ -11,11 +11,16 @@ public static class VisualElementDisplayExtensions {
 }
 
 public sealed class VisualElementLoader {
+  public Func<string, VisualElement> LoadVisualElementOverride { get; set; }
+
   public VisualTreeAsset LoadVisualTreeAsset(string name) {
     return new VisualTreeAsset();
   }
 
   public VisualElement LoadVisualElement(string name) {
+    if (LoadVisualElementOverride != null) {
+      return LoadVisualElementOverride(name);
+    }
     var root = new VisualElement();
     var container = new VisualElement();
     root.Add(container);

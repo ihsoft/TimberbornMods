@@ -94,12 +94,7 @@ public class UiFactory {
 
   /// <summary>Wraps the element to make it centered in the UI fragment.</summary>
   public VisualElement CenterElement(VisualElement element) {
-    var center = new VisualElement {
-        style = {
-            justifyContent = Justify.Center,
-            flexDirection = FlexDirection.Row,
-        },
-    };
+    var center = new VisualElement { style = { justifyContent = Justify.Center, flexDirection = FlexDirection.Row } };
     center.Add(element);
     return center;
   }
@@ -154,11 +149,8 @@ public class UiFactory {
   /// <see cref="EntityPanelTextClass"/>.
   /// </param>
   public Button CreateButton(string locKey, Action<Button> onClickFn,
-                             (int top, int left, int bottom, int right)? padding = null,
-                             string[] classes = null) {
-    var button = new NineSliceButton {
-        text = T(locKey),
-    };
+      (int top, int left, int bottom, int right)? padding = null, string[] classes = null) {
+    var button = new NineSliceButton { text = T(locKey) };
     button.AddToClassList("button-game");
     if (classes != null) {
       foreach (var cls in classes) {
@@ -187,7 +179,7 @@ public class UiFactory {
   /// Classes to add to the control. If not set, then the component will be set up for the entity panel.
   /// </param>
   public Toggle CreateToggle(string locKey, Action<ChangeEvent<bool>> onValueChangedFn,
-                             int spacing = 5, string[] classes = null) {
+      int spacing = 5, string[] classes = null) {
     var toggle = new Toggle();
     toggle.AddToClassList("game-toggle");
     if (locKey != null) {
@@ -221,7 +213,7 @@ public class UiFactory {
   /// <param name="spacing">If a non-negative value, then the bottom margin will be set.</param>
   /// <param name="classes">Optional classes to add to the control.</param>
   public Slider CreateSlider(Action<ChangeEvent<float>> onValueChangedFn, float lowValue, float highValue,
-                             float stepSize = 0, int spacing = 5, string[] classes = null) {
+      float stepSize = 0, int spacing = 5, string[] classes = null) {
     var slider = new Slider(lowValue, highValue);
     slider.AddToClassList("slider");
     if (spacing >= 0) {
@@ -247,7 +239,8 @@ public class UiFactory {
   /// <summary>Creates a min/max slider in the game's UI theme.</summary>
   /// <remarks>
   /// This method requires TimberDev stylesheet. It should either be attached to the element that will become a parent
-  /// of the slider, or the stylesheet can be added specifically to the slider via <see cref="AddTimberDevStylesheet"/>.
+  /// of the slider, or the stylesheet can be added specifically to the slider via
+  /// <see cref="AddTimberDevStylesheet"/>.
   /// </remarks>
   /// <param name="lowValue">The minimum value limit.</param>
   /// <param name="highValue">The maximum value limit.</param>
@@ -265,7 +258,8 @@ public class UiFactory {
   /// <summary>Creates a scroll view in a theme suitable for the right side panel.</summary>
   /// <remarks>
   /// This method requires TimberDev stylesheet. It should either be attached to the element that will become a parent
-  /// of the slider, or the stylesheet can be added specifically to the slider via <see cref="AddTimberDevStylesheet"/>.
+  /// of the slider, or the stylesheet can be added specifically to the slider via
+  /// <see cref="AddTimberDevStylesheet"/>.
   /// </remarks>
   public ScrollView CreateScrollView() {
     var scrollView = new ScrollView();
@@ -313,7 +307,7 @@ public class UiFactory {
 
   /// <summary>Adds a handler to the slider that will round the value to the step size.</summary>
   public void AddFixedStepChangeHandler(MinMaxSlider slider, float stepSize, float minDelta,
-                                        Action<Vector2> onValueChangedFn) {
+      Action<Vector2> onValueChangedFn) {
     slider.RegisterValueChangedCallback(
         e => {
           var newValue = e.newValue;
@@ -369,7 +363,7 @@ public class UiFactory {
 
   /// <summary>Loads a visual element from the "UI/Views" folder.</summary>
   /// <remarks>
-  /// If the name is a template, then the first visual element gets extracted adn returned, and all the others (if any)
+  /// If the name is a template, then the first visual element gets extracted and returned, and all the others (if any)
   /// will be ignored. The game controls will be properly initialized. The stylesheets aren't preserved! The element,
   /// once added to the hierarchy, will inherit the styles from its parent.
   /// </remarks>
@@ -379,8 +373,27 @@ public class UiFactory {
   }
 
   /// <inheritdoc cref="LoadVisualElement{T}"/>
-  public VisualElement LoadVisualElement(string name) {
-    return _visualElementLoader.LoadVisualElement(name);
+  /// <param name="name">Name of the visual element resource.</param>
+  /// <param name="unwrapContainer">
+  /// If <c>true</c>, requires the loaded element to have exactly one direct child, detaches it, and returns it. Use
+  /// this for a transparent runtime fragment wrapped in an authoring-time backdrop.
+  /// </param>
+  /// <exception cref="InvalidOperationException">
+  /// Thrown when <paramref name="unwrapContainer"/> is <c>true</c> and the loaded element does not have exactly one
+  /// direct child.
+  /// </exception>
+  public VisualElement LoadVisualElement(string name, bool unwrapContainer = false) {
+    var element = _visualElementLoader.LoadVisualElement(name);
+    if (!unwrapContainer) {
+      return element;
+    }
+    if (element.childCount != 1) {
+      throw new InvalidOperationException(
+          $"Cannot unwrap UI element '{name}': expected exactly one direct child, found {element.childCount}.");
+    }
+    var child = element.ElementAt(0);
+    child.RemoveFromHierarchy();
+    return child;
   }
 
   #region Implementation
@@ -392,7 +405,7 @@ public class UiFactory {
   readonly DropdownListDrawer _dropdownListDrawer;
 
   UiFactory(VisualElementLoader visualElementLoader, ILoc loc, IAssetLoader assetLoader,
-            VisualElementInitializer visualElementInitializer, DropdownListDrawer dropdownListDrawer) {
+      VisualElementInitializer visualElementInitializer, DropdownListDrawer dropdownListDrawer) {
     _visualElementLoader = visualElementLoader;
     _loc = loc;
     _assetLoader = assetLoader;

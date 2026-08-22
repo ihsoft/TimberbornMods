@@ -70,10 +70,7 @@ static class UiFactoryTests {
     var factory = CreateFactory();
     var selected = "";
     var dropdown = factory.CreateSimpleDropdown(value => selected = value);
-    dropdown.Items = [
-        ("first", "First"),
-        ("second", "Second"),
-    ];
+    dropdown.Items = [("first", "First"), ("second", "Second")];
 
     dropdown.SelectedValue = "second";
 
@@ -83,10 +80,24 @@ static class UiFactoryTests {
         UiFactory.FindElementUpstream<Button>(dropdown.ChildAt(0), "Selection"));
   }
 
+  public static void LoadsAndUnwrapsVisualElements() {
+    var factory = CreateFactory();
+
+    var wrapped = factory.LoadVisualElement("Wrapped");
+    var unwrapped = factory.LoadVisualElement("Wrapped", unwrapContainer: true);
+
+    Assert.Equal(1, wrapped.childCount);
+    Assert.Equal(2, unwrapped.childCount);
+    Assert.Equal(null, unwrapped.parent);
+
+    var emptyLoader = new VisualElementLoader { LoadVisualElementOverride = _ => new VisualElement() };
+    var emptyFactory = CreateFactory(visualElementLoader: emptyLoader);
+    Assert.Throws<InvalidOperationException>(() => emptyFactory.LoadVisualElement("Empty", unwrapContainer: true));
+  }
+
   static UiFactory CreateFactory(
-      FakeLoc loc = null,
-      TestAssetLoader assetLoader = null,
-      VisualElementInitializer initializer = null) {
+      FakeLoc loc = null, TestAssetLoader assetLoader = null,
+      VisualElementInitializer initializer = null, VisualElementLoader visualElementLoader = null) {
     var constructor = typeof(UiFactory).GetConstructor(
         BindingFlags.Instance | BindingFlags.NonPublic,
         null,
@@ -99,7 +110,7 @@ static class UiFactoryTests {
         ],
         null);
     return (UiFactory)constructor.Invoke([
-        new VisualElementLoader(),
+        visualElementLoader ?? new VisualElementLoader(),
         loc ?? new FakeLoc(),
         assetLoader ?? new TestAssetLoader(),
         initializer ?? new VisualElementInitializer(),

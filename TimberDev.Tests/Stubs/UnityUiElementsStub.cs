@@ -43,6 +43,15 @@ public class VisualElement {
     return _children[index];
   }
 
+  public VisualElement ElementAt(int index) {
+    return _children[index];
+  }
+
+  public void RemoveFromHierarchy() {
+    parent?._children.Remove(this);
+    parent = null;
+  }
+
   public T Q<T>(string queryName = null) where T : VisualElement {
     if (this is T self && queryName == null) {
       return self;
@@ -302,10 +311,7 @@ public sealed class ChangeEvent<T> {
   public T newValue;
 
   public static ChangeEvent<T> GetPooled(T previousValue, T newValue) {
-    return new ChangeEvent<T> {
-        previousValue = previousValue,
-        newValue = newValue,
-    };
+    return new ChangeEvent<T> { previousValue = previousValue, newValue = newValue };
   }
 }
 

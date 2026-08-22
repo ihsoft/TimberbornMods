@@ -25,6 +25,7 @@ static class Program {
       ("UiFactory creates initialized controls", UiFactoryTests.CreatesInitializedControls),
       ("UiFactory slider helpers round values", UiFactoryTests.SliderHelpersRoundValues),
       ("UiFactory creates dropdown and finds upstream", UiFactoryTests.CreatesSimpleDropdownAndFindsUpstreamElement),
+      ("UiFactory loads and unwraps visual elements", UiFactoryTests.LoadsAndUnwrapsVisualElements),
       ("AbstractDialog confirms valid input", AbstractDialogTests.ShowWiresButtonsAndConfirmAppliesValidInput),
       ("AbstractDialog keeps open on error", AbstractDialogTests.ConfirmShowsErrorAndKeepsDialogOpen),
       ("AbstractDialog handles cancel", AbstractDialogTests.CancelClosesOrConfirmsUnsavedChanges),
