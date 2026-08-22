@@ -186,6 +186,26 @@ If code fits within 120 characters, keep it on one line.
 
 * * *
 
+## Final per-file audit
+
+The repository C# finalization gate requires a positive inventory, not a general diff reread or a search only for known
+errors. Enumerate every changed production and test C# file, then complete both of these checks for each file:
+
+  * Account for every `using` directive by a referenced symbol, alias, or required extension-method namespace. Remove
+    every directive that has no current use; successful compilation does not prove an import is needed.
+  * Account for every surviving wrapped declaration, call, expression, and initializer. Reconstruct or measure its
+    final single-line form and keep the wrap only when it exceeds 120 characters or is genuinely clearer for a specific
+    reason. A scan for lines over 120 characters cannot find obsolete wrapping.
+
+At finalization handoff, provide compact completion evidence: the number of changed C# files audited, the number of
+`using` directives accounted for, and the number of surviving wrapped constructs rechecked. List only intentional
+exceptions that remain under 120 characters or otherwise need explanation; do not dump the complete per-file inventory
+unless the user asks for it. A bare statement that the audit was completed is not sufficient evidence.
+
+Build, tests, analyzers, and whitespace checks may support this audit but do not replace either positive inventory.
+
+* * *
+
 ## Broad style refactors
 
 Before a project-wide or otherwise broad C# style refactor, enumerate the exact target `.cs` files and audit each file
@@ -488,6 +508,21 @@ Use trailing commas in multi-line initializers.
 
 * * *
 
+## Collection expressions
+
+When the project's effective language version supports C# 12 collection expressions and the target collection type is
+unambiguous, prefer the compact target-typed form:
+
+    value.Split([Separator], StringSplitOptions.RemoveEmptyEntries);
+    string[] names = [];
+
+Do not use redundant forms such as `new[] { Separator }` merely to spell a type already clear from the assignment,
+argument, return, or member context. Keep explicit array or collection construction when the concrete runtime type is
+part of the contract, target typing would change or make overload resolution ambiguous, or the target project does not
+support collection expressions. Verify the effective `LangVersion` before modernizing existing code.
+
+* * *
+
 ## Lambdas
 
 Lambda bodies are normal executable code.
@@ -500,6 +535,18 @@ Use 2-space indentation.
     };
 
 Do not use 4-space indentation for lambda bodies.
+
+* * *
+
+## Dictionary fallback lookups
+
+When a dictionary lookup needs only the stored value or one fallback value, prefer the direct API:
+
+    var order = orderByName.GetValueOrDefault(moduleName, int.MaxValue);
+
+Do not expand this intent into `TryGetValue`, an `out` variable, and a ternary expression. Use `TryGetValue` when the
+caller must distinguish key absence from a stored default or `null` value, branch on presence, reuse the retrieved value
+in additional logic, or target a dictionary type that does not provide the direct API.
 
 * * *
 

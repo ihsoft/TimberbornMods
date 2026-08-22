@@ -410,8 +410,9 @@ not start from them.
   replace this construct-level review. Re-check the changelog against the net player-visible release delta defined in
   `docs/timberborn-repository-notes.md`.
 - Keep this plan item separate from build, export, tests, and generic finalization. Reopen it after any later C# change.
-  Before reporting finalization complete or requesting review or commit, explicitly report whether the audit is
-  complete; code without that completed gate is not finalized.
+  Before reporting finalization complete or requesting review or commit, provide the compact positive-inventory evidence
+  required by `docs/csharp-formatting-rules-for-ai-agents.md`; a bare completion claim does not close the gate. Code
+  without that completed gate is not finalized.
 
 ### Mode-shifted task
 
