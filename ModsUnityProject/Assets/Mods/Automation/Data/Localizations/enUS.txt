@@ -322,10 +322,20 @@ IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntax,"Default expressions 
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxLisp,"Lisp-style",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxPython,"Python-style",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxTooltip,"Syntax can be overridden in the expression body by adding prefix '#PY' for Python or '#LP' for Lisp.",
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrder,"Signal module order","Name of the setting that opens the signal module order dialog."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderTooltip,"Controls the order of signal modules in the rule constructor.","Tooltip for the signal module order setting."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderUnavailable,"Available after loading a settlement.","Tooltip shown when signal module order cannot be configured from the main menu."
 IgorZ.Automation.Settings.ScriptEngine.Header,"Script engine settings",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Check argument value in runtime",
 IgorZ.Automation.Settings.ScriptEngine.PinnedCustomSignals,"Show pinned custom signals panel",
 IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize,"Signal execution stack size",
+=,=,Signal module order dialog
+IgorZ.Automation.SignalModuleOrder.Configure,"Configure...","Button that opens the signal module order dialog."
+IgorZ.Automation.SignalModuleOrder.DialogHeader,"Signal module order","Header of the dialog that configures signal module order."
+IgorZ.Automation.SignalModuleOrder.Instructions,"Drag modules to reorder them, or use the arrow buttons.","Short instructions shown above the module list."
+IgorZ.Automation.SignalModuleOrder.MoveDown,"Move module down","Tooltip for the button that moves a module down."
+IgorZ.Automation.SignalModuleOrder.MoveUp,"Move module up","Tooltip for the button that moves a module up."
+IgorZ.Automation.SignalModuleOrder.Reset,"Registration order","Button that restores component registration order."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Verbose logging",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"Logs will have more useful details, but it may impact game performance.",

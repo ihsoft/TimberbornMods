@@ -22,7 +22,7 @@ sealed class ScriptingService {
 
   /// <summary>The scripting service instance shortcut.</summary>
   /// <remarks>
-  /// Don't waste loading time and memory by injecting it. Use directly! However, avoid doing so from the singletons
+  /// Don't waste loading time and memory by injecting it. Use directly! However, avoid doing so from the singleton
   /// constructors and dependency injectors as the instantiation order is undetermined.
   /// </remarks>
   public static ScriptingService Instance { get; private set; }
@@ -38,8 +38,8 @@ sealed class ScriptingService {
                            host, DebugEx.ObjectToString(SignalListener.Behavior), Name, GetScriptingRuleIndex() + 1);
     }
 
-    /// <summary>Find the index of teh rule that golds the signal listener.</summary>
-    /// <returns>The 0-based index or -1 if the listener is not a scripted condtion.</returns>
+    /// <summary>Find the index of the rule that holds the signal listener.</summary>
+    /// <returns>The 0-based index or -1 if the listener is not a scripted condition.</returns>
     /// <exception cref="InvalidOperationException"></exception>
     public int GetScriptingRuleIndex() {
       if (SignalListener is not IAutomationCondition condition) {
@@ -61,7 +61,7 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetSignalNamesForBuilding"/>
   public string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
-    return _registeredScriptables.Values
+    return SignalModuleOrder.Apply(_registeredScriptables.Values, scriptable => scriptable.Name)
         .SelectMany(s => s.GetSignalNamesForBuilding(behavior))
         .ToArray();
   }
@@ -78,9 +78,7 @@ sealed class ScriptingService {
 
   /// <inheritdoc cref="IScriptable.GetActionNamesForBuilding"/>
   public string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
-    return _registeredScriptables.Values
-        .SelectMany(s => s.GetActionNamesForBuilding(behavior))
-        .ToArray();
+    return _registeredScriptables.Values.SelectMany(s => s.GetActionNamesForBuilding(behavior)).ToArray();
   }
 
   /// <inheritdoc cref="IScriptable.GetActionExecutor"/>
@@ -147,7 +145,7 @@ sealed class ScriptingService {
   /// Triggers update on the signal, handling the expected errors. No scripting errors will be passed out.
   /// </summary>
   /// <remarks>
-  /// It doesn't fail if a scripting error happen. It will report the problem, but the caller will never know if there
+  /// It doesn't fail if a scripting error happens. It will report the problem, but the caller will never know if there
   /// was a problem. This implies that all signal handlers must handle the error "in place".
   /// </remarks>
   /// <param name="signalName"></param>
@@ -167,12 +165,12 @@ sealed class ScriptingService {
   /// <summary>Places an execution trace object to the execution stack.</summary>
   /// <remarks>
   /// <p>
-  /// The object can be anything. Its string representation will be used in the error reports. Some well known objects
-  /// has a better support than the others. See <see cref="CaptureCallStack"/> method.
+  /// The object can be anything. Its string representation will be used in the error reports. Some well-known objects
+  /// have a better support than the others. See <see cref="CaptureCallStack"/> method.
   /// </p>
   /// <p>
-  /// The <paramref name="traceObject"/> is added to the stack <i>before</i> preforming any checks. That being said, the
-  /// caller is responsible to remove it from the stack if any error raises.
+  /// The <paramref name="traceObject"/> is added to the stack <i>before</i> performing any checks. That being said, the
+  /// caller is responsible for removing it from the stack if an error is raised.
   /// </p>
   /// </remarks>
   /// <param name="traceObject">The object to put at the top of the stack.</param>

@@ -32,6 +32,9 @@
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Core\SignalModuleOrder.cs">
+        <Link>Automation\ScriptingEngine\Core\SignalModuleOrder.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptingService.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptingService.cs</Link>
       </Compile>

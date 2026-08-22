@@ -1,0 +1,69 @@
+.signal-module-order-dialog .sliced-border {
+    --background-image: resource('UI/Images/Core/border_nontransparent');
+}
+
+/* Keep the technical wrapper padding-free: ListView positions it by fixedItemHeight. */
+.signal-module-order-list .unity-list-view__reorderable-item {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.signal-module-order-list .unity-list-view__reorderable-handle {
+    flex-shrink: 0;
+    width: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: url("project://database/Assets/Resources/UI/Images/Core/dragging-icon.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.signal-module-order-list .unity-list-view__reorderable-handle-bar {
+    display: none;
+}
+
+.signal-module-order-list .unity-list-view__reorderable-item__container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    align-self: stretch;
+    flex-direction: row;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.signal-module-order-row {
+    align-self: stretch;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.signal-module-order-row__content {
+    flex-grow: 1;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.signal-module-order-row__label {
+    align-self: stretch;
+    flex-grow: 1;
+    -unity-text-align: middle-left;
+}
+
+.signal-module-order-row__buttons {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+}
+
+.signal-module-order-row__button {
+    align-self: center;
+    flex-shrink: 0;
+}

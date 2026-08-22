@@ -51,6 +51,9 @@
       <Reference Include="ModSettings.Core">
         <HintPath>..\_WORKSHOP!\3283831040\version-0.7\Scripts\ModSettings.Core.dll</HintPath>
       </Reference>
+      <Reference Include="ModSettings.CoreUI">
+        <HintPath>..\_WORKSHOP!\3283831040\version-0.7\Scripts\ModSettings.CoreUI.dll</HintPath>
+      </Reference>
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>

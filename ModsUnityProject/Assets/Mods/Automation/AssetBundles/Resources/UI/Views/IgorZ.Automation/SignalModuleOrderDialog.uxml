@@ -1,0 +1,19 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Options/OptionsStyle.uss?fileID=7433441132597879392&amp;guid=f87f4f59669712f47bfbacc67f7e4fc1&amp;type=3#OptionsStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalModuleOrderStyle.uss?fileID=7433441132597879392&amp;guid=4c90993be2cc4683bcc931642abae26d&amp;type=3#SignalModuleOrderStyle"/>
+    <engine:VisualElement class="content-row-centered signal-module-order-dialog">
+        <engine:Instance template="NamedBoxTemplate" style="width: 650px; height: 650px;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.SignalModuleOrder.DialogHeader"/>
+            <Timberborn.CoreUI.LocalizableLabel text="Drag modules to reorder them, or use the arrow buttons." text-loc-key="IgorZ.Automation.SignalModuleOrder.Instructions" class="text--default" style="white-space: normal; margin-bottom: 10px;"/>
+            <engine:ListView name="ModuleList" class="panel-list-view text--default scroll--green-decorated signal-module-order-list" style="height: 440px; flex-shrink: 0;"/>
+            <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableButton text="Registration order" name="ResetButton" text-loc-key="IgorZ.Automation.SignalModuleOrder.Reset" class="menu-button menu-button--medium"/>
+                <Timberborn.CoreUI.LocalizableButton text="Cancel" name="CancelButton" text-loc-key="Core.Cancel" class="menu-button menu-button--medium"/>
+                <Timberborn.CoreUI.LocalizableButton text="Save" name="ConfirmButton" text-loc-key="Core.Save" class="menu-button menu-button--medium"/>
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

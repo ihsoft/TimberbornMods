@@ -1,4 +1,5 @@
 # v4.10.0 (TBD)
+* [Feature] Add a setting to customize the order of signal modules in the rule constructor.
 * [Feature] Allow comparing numeric conditions with custom signals in the rule constructor.
 * [Feature] Allow using stock game automation signals directly as Boolean conditions in the rule constructor.
 * [Feature] Allow assigning unrestricted custom names to signals pinned on the left-side panel.

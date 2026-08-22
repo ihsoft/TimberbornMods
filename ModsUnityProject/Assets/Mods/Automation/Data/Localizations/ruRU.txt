@@ -324,10 +324,20 @@ IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxLisp,"языка Ли�
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxPython,"языка Питон",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxTooltip,"Синтаксис может быть переопределен внутри тела выражения путем
 добавления префикса '#PY' для Питона и '#LP' для Лиспа.",
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrder,"Порядок модулей сигналов","Name of the setting that opens the signal module order dialog."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderTooltip,"Определяет порядок модулей сигналов в конструкторе правил.","Tooltip for the signal module order setting."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderUnavailable,"Доступно после загрузки поселения.","Tooltip shown when signal module order cannot be configured from the main menu."
 IgorZ.Automation.Settings.ScriptEngine.Header,"Настройки движка скриптов",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Проверять значения аргументов во время исполнения",
 IgorZ.Automation.Settings.ScriptEngine.PinnedCustomSignals,"Показывать панель прикрепленных сигналов",
 IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize,"Размер стека исполнения сигналов",
+=,=,Signal module order dialog
+IgorZ.Automation.SignalModuleOrder.Configure,"Настроить...","Button that opens the signal module order dialog."
+IgorZ.Automation.SignalModuleOrder.DialogHeader,"Порядок модулей сигналов","Header of the dialog that configures signal module order."
+IgorZ.Automation.SignalModuleOrder.Instructions,"Перетаскивайте модули или используйте кнопки со стрелками.","Short instructions shown above the module list."
+IgorZ.Automation.SignalModuleOrder.MoveDown,"Переместить модуль вниз","Tooltip for the button that moves a module down."
+IgorZ.Automation.SignalModuleOrder.MoveUp,"Переместить модуль вверх","Tooltip for the button that moves a module up."
+IgorZ.Automation.SignalModuleOrder.Reset,"Порядок регистрации","Button that restores component registration order."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

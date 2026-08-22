@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Options/OptionsStyle.uss?fileID=7433441132597879392&amp;guid=f87f4f59669712f47bfbacc67f7e4fc1&amp;type=3#OptionsStyle"/>
+    <engine:VisualElement name="SettingElement" class="settings-wrapper settings-element">
+        <engine:Label text="Signal module order" name="SettingLabel" class="settings-text" style="flex-grow: 1; margin-right: 10px;"/>
+        <Timberborn.CoreUI.LocalizableButton text="Configure..." name="ConfigureButton" text-loc-key="IgorZ.Automation.SignalModuleOrder.Configure" class="menu-button menu-button--medium"/>
+    </engine:VisualElement>
+</engine:UXML>
