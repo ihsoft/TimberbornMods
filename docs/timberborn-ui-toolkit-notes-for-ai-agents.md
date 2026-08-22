@@ -15,7 +15,9 @@ Before adding or changing UI:
 1. Find the closest existing game or mod UI with the same role.
 2. Inspect its UXML, USS, and code.
 3. Reuse the same `Timberborn.CoreUI` element type and USS classes where practical.
-4. Verify that the required stylesheets are available in the UXML or loaded view.
+4. Inventory USS classes used by the final view and every UXML template or row it loads. Verify that the stylesheet
+   defining each class is attached to the owning view or otherwise loaded by the final visual tree; do not assume a
+   template reference also brings the stylesheet that defines its classes.
 
 Useful local references:
 
