@@ -170,6 +170,9 @@
       <Compile Include="..\Automation\ScriptingEngineUI\ParameterizedItemsGrouper.cs">
         <Link>Automation\ScriptingEngineUI\ParameterizedItemsGrouper.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\PinnedSignalNames.cs">
+        <Link>Automation\ScriptingEngineUI\PinnedSignalNames.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngineUI\ExpressionDescriber.cs">
         <Link>Automation\ScriptingEngineUI\ExpressionDescriber.cs</Link>
       </Compile>

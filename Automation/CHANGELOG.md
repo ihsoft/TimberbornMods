@@ -1,6 +1,7 @@
 # v4.10.0 (TBD)
 * [Feature] Allow comparing numeric conditions with custom signals in the rule constructor.
 * [Feature] Allow using stock game automation signals directly as Boolean conditions in the rule constructor.
+* [Feature] Allow assigning unrestricted custom names to signals pinned on the left-side panel.
 
 # v4.9.0 (August 15th, 2026)
 * [Feature] Add district fill signals based on available stock and fillable storage capacity.

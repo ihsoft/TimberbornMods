@@ -38,6 +38,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
 
   static readonly SingletonKey PinnedCustomSignalsKey = new("IgorZ.Automation.PinnedCustomSignalsPanel");
   static readonly ListKey<string> PinnedSignalsKey = new("PinnedSignals");
+  static readonly ListKey<string> PinnedSignalNamesKey = new("PinnedSignalNames");
 
   readonly UiFactory _uiFactory;
   readonly UILayout _uiLayout;
@@ -47,6 +48,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   readonly SignalDispatcher _signalDispatcher;
 
   readonly List<string> _pinnedSignals = [];
+  readonly PinnedSignalNames _pinnedSignalNames = new();
   readonly Dictionary<string, VisualElement> _signalRows = [];
   readonly Dictionary<string, Label> _signalLabels = [];
   VisualElement _root;
@@ -71,7 +73,17 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
       return;
     }
     _pinnedSignals.Clear();
-    _pinnedSignals.AddRange(objectLoader.Get(PinnedSignalsKey).Distinct());
+    _pinnedSignalNames.Clear();
+    var savedSignals = objectLoader.Get(PinnedSignalsKey);
+    IList<string> savedNames = objectLoader.Has(PinnedSignalNamesKey) ? objectLoader.Get(PinnedSignalNamesKey) : [];
+    for (var i = 0; i < savedSignals.Count; i++) {
+      var signalName = savedSignals[i];
+      if (_pinnedSignals.Contains(signalName)) {
+        continue;
+      }
+      _pinnedSignals.Add(signalName);
+      _pinnedSignalNames.Set(signalName, i < savedNames.Count ? savedNames[i] : "");
+    }
   }
 
   /// <inheritdoc/>
@@ -95,7 +107,9 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
 
   /// <inheritdoc/>
   public void Save(ISingletonSaver singletonSaver) {
-    singletonSaver.GetSingleton(PinnedCustomSignalsKey).Set(PinnedSignalsKey, _pinnedSignals);
+    var objectSaver = singletonSaver.GetSingleton(PinnedCustomSignalsKey);
+    objectSaver.Set(PinnedSignalsKey, _pinnedSignals);
+    objectSaver.Set(PinnedSignalNamesKey, _pinnedSignals.Select(GetSavedPinnedSignalName).ToList());
   }
 
   [OnEvent]
@@ -190,7 +204,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
     row.Q2<Image>("StateIcon").ToggleDisplayStyle(visible: false);
     var signalLabel = row.Q2<Label>("Name");
     signalLabel.text = _uiFactory.T(
-        SignalValueLocKey, FormatSignalName(signalName), GetFormattedSignalValue(signalName));
+        SignalValueLocKey, GetPinnedSignalName(signalName), GetFormattedSignalValue(signalName));
     _signalLabels[signalName] = signalLabel;
     signalLabel.RegisterCallback<ClickEvent>(_ => ShowSetSignalValueDialog(signalName));
     _tooltipRegistrar.RegisterLocalizable(signalLabel, SetSignalValueLocKey);
@@ -218,6 +232,7 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
 
   void RemovePinnedSignal(string signalName) {
     _pinnedSignals.Remove(signalName);
+    _pinnedSignalNames.Remove(signalName);
     _signalLabels.Remove(signalName);
     if (!_signalRows.Remove(signalName, out var row)) {
       return;
@@ -228,13 +243,15 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
   void UpdateSignalValues() {
     foreach (var (signalName, signalLabel) in _signalLabels) {
       signalLabel.text = _uiFactory.T(
-          SignalValueLocKey, FormatSignalName(signalName), GetFormattedSignalValue(signalName));
+          SignalValueLocKey, GetPinnedSignalName(signalName), GetFormattedSignalValue(signalName));
     }
   }
 
   void ShowSetSignalValueDialog(string signalName) {
     StaticBindings.DependencyContainer.GetInstance<SetCustomSignalValueDialog>()
-        .WithSignal(signalName, FormatSignalName(signalName), _signalDispatcher.GetSignalValue(signalName))
+        .WithSignal(
+            signalName, FormatSignalName(signalName), GetSavedPinnedSignalName(signalName),
+            _signalDispatcher.GetSignalValue(signalName), pinnedName => SetPinnedSignalName(signalName, pinnedName))
         .Show();
   }
 
@@ -259,6 +276,22 @@ sealed class PinnedCustomSignalsPanel : ILoadableSingleton, IPostLoadableSinglet
 
   string GetFormattedSignalValue(string signalName) {
     return ScriptValue.Of(_signalDispatcher.GetSignalValue(signalName)).AsFloat.ToString("0.##");
+  }
+
+  string GetPinnedSignalName(string signalName) {
+    return _pinnedSignalNames.GetDisplayName(signalName, FormatSignalName(signalName));
+  }
+
+  string GetSavedPinnedSignalName(string signalName) {
+    return _pinnedSignalNames.GetSavedName(signalName);
+  }
+
+  void SetPinnedSignalName(string signalName, string pinnedName) {
+    _pinnedSignalNames.Set(signalName, pinnedName);
+    if (_signalLabels.TryGetValue(signalName, out var signalLabel)) {
+      signalLabel.text = _uiFactory.T(
+          SignalValueLocKey, GetPinnedSignalName(signalName), GetFormattedSignalValue(signalName));
+    }
   }
 
   static string FormatSignalName(string signalName) {
