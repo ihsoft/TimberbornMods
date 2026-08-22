@@ -37,22 +37,25 @@ input are different contexts, not competing definitions of one source of truth.
 
 ## Select The Pipeline
 
-Use the changed files and the package matrix:
+Use the changed files and the package matrix, but choose the final package assembly sequence from every owner that
+contributes to the package destination:
 
 | Change | Required package refresh |
 |---|---|
 | C# only | build the mod project into the resolved real `ModPath` |
-| Unity-owned package data only | export the selected compatibility lane through repository Unity tooling |
+| Unity data, no external C# owner | export the selected lane through repository Unity tooling |
+| Unity data, external C# owner | export the lane, then build the registered C# project even if C# source is unchanged |
 | C# and Unity-owned data | export Unity data first, then build C# into that exported package |
 | imported DLLs or assets are missing or stale | follow Unity Import Operational Knowledge and the official interactive importer workflow from bootstrap |
 
 A successful C# build does not prove that Unity-owned data, localization, assets, or bundles were exported. A Unity
-export does not prove that DLL/XML output is current or present. When a final local package needs both Unity export and
-C# script output, always run Unity export first and then build the registered C# project into the exported package.
-Unity export may clean the destination, so a later export can erase a previously validated `Scripts` folder. Do not
-assume the export wrapper's `-BuildCode` switch builds an external project unless the package-specific pipeline proves
-that it does. After export and final C# build, verify `Scripts` and the changed Unity-owned files or bundles in the
-same package destination.
+export does not prove that DLL/XML output is current or present. Determine this sequence from final package ownership,
+not only from the source files changed in the latest iteration. For a package with both Unity and external C# owners,
+every Unity export invalidates prior script verification: always export first and then build the registered C# project
+into the exported package, even for a Unity-only source edit with an unchanged DLL. Unity export may clean the
+destination and erase a previously validated `Scripts` folder. Do not assume the export wrapper's `-BuildCode` switch
+builds an external project unless the package-specific pipeline proves that it does. After export and final C# build,
+verify `Scripts` and the changed Unity-owned files or bundles together in the same package destination.
 
 For split ownership, such as a project-local `Mod` directory plus Unity resources, inspect every changed path and run
 each owning pipeline. The package matrix records known split layouts.

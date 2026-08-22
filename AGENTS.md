@@ -455,8 +455,9 @@ not start from them.
 
 - Use Timberborn Unity Operational Knowledge and the package matrix to select the owner, compatibility lane, and export
   path.
-- If both Unity export and C# script output are needed for the final local package, run Unity export first and build the
-  C# project into the exported package afterward.
+- For a package composed from both Unity export and an external C# project, every Unity export invalidates prior script
+  verification. Always export first, then build the registered C# project into the exported package, even when the
+  current source edit is Unity-only and the DLL did not change. Verify the final package contains both layers.
 - When Unity-owned package data changed, run repository export tooling before real-game validation. Never hand-copy it
   into `_MODS!`; if export was not run, report that the local package was not refreshed.
 
