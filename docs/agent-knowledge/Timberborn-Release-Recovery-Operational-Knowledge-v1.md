@@ -40,6 +40,10 @@ from a verified previously published artifact only when the release plan intenti
 If it is unclear whether the new release behavior should also be rebuilt for the legacy game version, stop and ask
 instead of carrying an older lane forward implicitly.
 
+This workflow never creates or updates a backport. When the user requests changed behavior for the older game line,
+follow Timberborn Backport Operational Knowledge and build that lane from its verified source and target toolchain;
+do not copy an older published artifact and then modify it in place.
+
 The release configuration must contain a lane-specific `ManifestVersions` value for the preserved lane. If it does
 not, stop instead of inferring the expected legacy version from the artifact being considered.
 

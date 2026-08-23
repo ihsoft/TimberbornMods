@@ -16,6 +16,7 @@ This file is the routine release runbook. Load additional release knowledge only
 |---|---|
 | The mod lacks a verified Steam `PublishedFileId` or Mod.IO `ModId` | `docs/agent-knowledge/Timberborn-Release-Identity-Bootstrap-Operational-Knowledge-v1.md` |
 | Same-version corrective replacement, unchanged legacy-lane restoration, or post-release artifact comparison | `docs/agent-knowledge/Timberborn-Release-Recovery-Operational-Knowledge-v1.md` |
+| Preparing or publishing a newly rebuilt backport for an older compatibility line | `docs/agent-knowledge/Timberborn-Backport-Operational-Knowledge-v1.md` |
 | Changing or diagnosing platform tags, visibility, descriptions, change notes, Private item verification, or Steam authentication | `docs/agent-knowledge/Timberborn-Release-Platform-Metadata-Operational-Knowledge-v1.md` |
 | Platform uploads are verified, or the task performs post-release tag, GitHub Release, issue, Wiki, Discord, or final signoff work | `docs/agent-knowledge/Timberborn-Release-Signoff-Operational-Knowledge-v1.md` |
 

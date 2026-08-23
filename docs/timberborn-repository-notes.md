@@ -243,14 +243,21 @@ Choose the next version from the last published version of that package:
 - feature work starts the next minor version,
 - fix-only work starts the next patch version.
 
-If an existing `(TBD)` section was started as a patch version and a feature is added before publication, rename the
-pending section to the next minor version because feature scope dominates patch scope.
+An explicitly requested backport to an older Timberborn game line is the exception defined by
+`docs/agent-knowledge/Timberborn-Backport-Operational-Knowledge-v1.md`: both features and fixes advance only the patch
+component of the latest published minor version on that older line. Do not apply this exception to ordinary current-line
+development.
+
+For ordinary current-line development, if an existing `(TBD)` section was started as a patch version and a feature is
+added before publication, rename the pending section to the next minor version because feature scope dominates patch
+scope. Do not apply that promotion inside the explicit patch-only backport workflow.
 
 Before committing any player-visible change, perform a semantic changelog review rather than checking only that an
 entry exists. Compare every new entry category with the top `(TBD)` heading and the package's last dated version, state
 the expected pending package version in the final review, and correct the heading before commit when the categories do
 not match it. A pending section containing any `[Feature]` entry must use the next minor version; a fix-only pending
-section uses the next patch version.
+section uses the next patch version. The explicit older-line backport workflow remains patch-only regardless of entry
+category.
 
 Each package may have its own changelog and version stream. Update the target package changelog, not a repository-wide
 changelog, unless the task explicitly affects repository-wide release notes.

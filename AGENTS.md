@@ -46,6 +46,7 @@ blindly.
 | Locating, extracting, generating, modifying, or packaging Timberborn `.timbermesh` models | `docs/agent-knowledge/Timberborn-Timbermesh-Operational-Knowledge-v1.md` |
 | Modifying instantiated runtime `UnityEngine.Mesh` geometry, UVs, or per-entity visualization meshes | `docs/agent-knowledge/Timberborn-Runtime-Unity-Mesh-Operational-Knowledge-v1.md` |
 | Designing, creating, porting, reviving, or integrating a Timberborn mod project | `docs/agent-knowledge/Timberborn-New-Mod-Operational-Knowledge-v1.md` |
+| Backporting mod features or fixes to an older Timberborn game line | `docs/agent-knowledge/Timberborn-Backport-Operational-Knowledge-v1.md` and `docs/agent-knowledge/Timberborn-Repository-Validation-Operational-Knowledge-v1.md` |
 | Designing a new feature inside an existing mod | `docs/timberborn-modding-howto-for-ai-agents.md`, `docs/timberborn-repository-notes.md`, and `docs/timberborn-lessons-learned.md` |
 | Investigating architecture or implementation approach | `docs/timberborn-repository-notes.md` and `docs/timberborn-lessons-learned.md` |
 | Diagnosing build, export, mod loading, runtime, UI, save/load, or platform behavior | `docs/agent-knowledge/Timberborn-Diagnostics-Operational-Knowledge-v1.md` |
@@ -259,6 +260,9 @@ reminder is needed to prevent repeated misses.
 - Preserve existing content unless explicitly asked to remove it.
 - Make the smallest change that satisfies the task.
 - Avoid opportunistic refactoring unless explicitly requested.
+- Never backport current-line work automatically. When a completed change plausibly applies to a documented older
+  supported game line, mention the option once at signoff; implement it only after the user explicitly requests the
+  target mod, older game line, and scope.
 - Do not invent missing user intent. If a request has multiple plausible meanings, clarify before acting, especially
   before public, external, destructive, historical, release, tag, Wiki, or platform-facing changes.
 - Treat player-facing and user-facing text as high-impact content. Do not silently shorten, rewrite, or add visible
