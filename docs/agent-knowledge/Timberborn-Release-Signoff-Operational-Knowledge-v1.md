@@ -9,8 +9,8 @@ platform publication is failed, partial, or uncertain unless the user explicitly
 
 ## Git Release Tags
 
-After a mod release has been successfully uploaded and verified on all requested platforms, create a Git tag for the
-published release commit.
+After a mod release has been successfully uploaded and verified on all requested platforms, create the Git tags
+recorded by final preflight for the changed source commits.
 
 Use the repository's existing mod-release tag pattern:
 
@@ -25,12 +25,18 @@ Examples:
 
 Do not add a `v` prefix for new mod-release tags unless the user explicitly asks.
 
-The tag must point to the exact release-preparation commit recorded by final preflight for that mod. Never derive the
-tag target from current `HEAD` at publish time. If `HEAD` contains later unrelated commits, create the tag against the
-recorded commit after the preflight checks above succeed; do not make the earlier mod inherit the later commit. Verify
-the recorded object ID still resolves to the expected commit and that the tag does not already exist before creating
-it. The repository's existing mod-release tags are lightweight tags, so use a lightweight tag unless the user
-explicitly asks for an annotated tag.
+For an explicitly registered older compatibility line, use the qualified pattern
+`<ModName>_<Version>_<ReleaseLine>`. When multiple lines changed in one package, create every recorded source tag and
+push them atomically. The current-line unqualified tag is primary for the GitHub Release. When only an older line
+changed, its qualified tag is primary. Follow the core release rules and Backport Operational Knowledge for the full
+multi-source contract.
+
+Each tag must point to its exact release-preparation commit recorded by final preflight. Never derive a tag target from
+current `HEAD` at publish time or choose one commit to represent two changed worktrees. If `HEAD` contains later
+unrelated commits, create the tag against the recorded commit after the preflight checks above succeed; do not make the
+earlier mod inherit the later commit. Verify each recorded object ID still resolves to the expected commit and that no
+tag already exists before creating it. The repository's existing mod-release tags are lightweight tags, so use
+lightweight tags unless the user explicitly asks for annotated tags.
 
 Changing an existing pushed tag to repair an incorrect target rewrites public release history. Do not delete, move, or
 force-push that tag without explicit user authorization for the specific correction.
@@ -48,9 +54,10 @@ After the release tag is created and pushed, create a GitHub Release for the sam
 Use `tools/publish-github-release.ps1` for this step. The script dry-runs by default and publishes only with
 `-Publish`.
 
-The GitHub Release title should be `<display mod name> v<Version>`. The description should use the released version's
-changelog section as-is, without Steam or Mod.IO formatting conversion. Attach the exact release ZIP that was published
-to Steam Workshop and Mod.IO.
+The GitHub Release title should be `<display mod name> v<primary Version>`. For a single-source release, the description
+uses that version's changelog section as-is, without Steam or Mod.IO formatting conversion. For a multi-source release,
+include one clearly labelled section per changed compatibility line and preserve each source changelog text. Attach the
+exact release ZIP that was published to Steam Workshop and Mod.IO.
 
 Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
 publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.

@@ -66,6 +66,11 @@ Prefer the unified release entry points when they support the target release:
 - `tools/verify-release.ps1` for local release preparation and verification.
 - `tools/publish-release.ps1` for public publishing from a preflight report.
 
+The scripts are owned by the tooling checkout, while tracked release inputs may live in another registered worktree.
+Pass that worktree explicitly as `-ReleaseRoot`; source files, Git identity, builds, Unity project, and package paths then
+resolve there, while local credentials and helper binaries remain owned by the tooling checkout. Never copy modern
+release scripts into an older branch or let the scripts infer a worktree from the current process directory.
+
 `tools/verify-release.ps1` is the preflight step. It may create or refresh local generated release artifacts such as
 Unity exports, `_MODS!` output, staging folders, ZIPs, VDFs, temporary GitHub release notes, and
 `.tools/release-preflight/<ModName>-<Version>.json` reports when those artifacts are needed to validate the exact
@@ -122,6 +127,12 @@ preparation, select that commit, and rerun final preflight.
 The unified preflight report must record the selected commit and the checked release-critical path set or equivalent
 evidence that those inputs match it. `tools/publish-release.ps1` must re-check that invariant before its first public
 change and fail on drift; a warning or interactive "continue anyway" prompt is not sufficient for this condition.
+
+Schema-4 reports also record the release root, branch, version policy, line identifier, final package lane
+fingerprints, and one or more release-source records. Each changed compatibility line owns its source worktree, commit,
+changelog version, tag, critical-path evidence, and expected `version-X.X` lane fingerprint. Exactly one source is
+primary. Publishing must re-check every source and every changed lane before the first public mutation; do not collapse
+a multi-worktree release into one `ReleaseCommit`.
 
 When publishing includes an explicitly authorized platform-state transition, the final preflight report must capture
 the action and exact target state for each platform, including Steam visibility and Mod.IO page publication. Publishing
@@ -251,6 +262,19 @@ Search package changelogs such as `CHANGELOG.md` and `CHANGES.md` for top-level 
 sections are the publish candidates. If no `(TBD)` sections exist, report that there are no unpublished mod versions to
 publish.
 
+Search both the current checkout and every registered compatibility worktree that owns a release line. Treat each
+candidate as `(worktree, branch, mod, compatibility line, version)`, not only `(mod, version)`. Do not scan arbitrary
+historical worktrees. If a registered release worktree is missing or inaccessible, report that the candidate audit is
+incomplete and ask whether to restore or locate it.
+
+Use `tools/find-unpublished-releases.ps1` for this inventory. Its tracked `tools/release-lines.json` registry identifies
+the compatibility branches and mods that participate in release discovery; worktree paths remain local and are
+resolved from Git. Update the registry only after a real committed compatibility-line owner is established.
+
+Group candidates by mod before preparation. If the same mod has `(TBD)` candidates in current and registered older
+lines, prepare one coordinated multi-source package and release transaction under the rules below; do not upload each
+branch independently or let the first upload temporarily remove the other changed lane.
+
 Here `(TBD)` identifies a release candidate for preparation; it does not mean that the candidate is ready for final
 preflight or upload.
 
@@ -271,6 +295,11 @@ Do not treat close versions as aliases. Ask the user to confirm the exact versio
 
 Before release preparation, verify that the target package changelog has a matching version section and user-visible
 release notes. Changelog workflow rules live in `docs/timberborn-repository-notes.md`.
+
+Apply the version policy of the selected source worktree. Current-line releases keep the ordinary category-based
+versioning rule. An explicitly requested older-line backport uses the next patch after that line's latest dated release,
+even when it contains `[Feature]` entries and the current line has advanced to a higher minor version. Final preflight
+must require `ReleaseVersion` to match the top changelog version in that worktree and record the chosen policy.
 
 If the requested version matches the top package changelog section and that section is marked `(TBD)`, treat stale
 release metadata as normal release-preparation work. Update `release.json`, `directory.build.props`, Unity manifest
@@ -296,6 +325,9 @@ previous-version ZIP.
 
 At the start of release preparation, clarify which Timberborn game version folder the release targets, such as
 `version-1.1`, unless the user already stated it.
+
+Also identify the source worktree and branch that own that lane. A matching `version-X.X` folder name in another
+worktree is not equivalent source evidence.
 
 If the user does not name a specific game version folder, treat the intended default as the current Timberborn game
 version, meaning the latest known game version for the current checkout and release tooling. Resolve that current
@@ -344,6 +376,30 @@ Treat `version-*` folders as compatibility lanes, not as mandatory folders for e
 export a new `version-X.X` folder only when the release needs a distinct compatibility lane, such as stable versus
 experimental or an incompatible game API/data change. If the source folder does not contain a game-version folder, the
 release does not contain it.
+
+## Multiple changed compatibility lines
+
+A public platform upload may contain changed lanes from more than one source branch. Treat that as one coordinated
+release, not independent Steam or Mod.IO uploads. Build and preflight every changed line in its owning worktree first.
+Use `tools/import-release-lane.ps1` to materialize a secondary lane from its immutable single-source preflight package,
+then run the final primary preflight with each secondary report passed as an additional release source. The final ZIP
+must match every changed lane fingerprint.
+
+One Git tag identifies one source commit. Current-line tags keep `<ModName>_<Version>`. Older-line tags add their stable
+line identifier: `<ModName>_<Version>_<ReleaseLine>`, such as `XRay_1.1.2_update-1.0`. Never reuse the unqualified tag
+for an older-line commit or choose one of two source commits arbitrarily.
+
+When current and older lines both changed, the current-line source is primary. Its unqualified tag owns the GitHub
+Release, public title, and platform file version; every changed older line receives its qualified source tag. Release
+notes, Discord text, Wiki handoff, and signoff must identify the versions delivered for every changed line.
+
+When only an older line changed, its qualified tag is primary for the GitHub Release and no new current-line tag is
+created. The public package must still preserve every required unchanged lane through verified release-recovery
+provenance. A changed older lane comes from its own preflight, never from historical recovery.
+
+Do not start platform publishing from separate single-source reports. Only the final combined report may authorize the
+single public package mutation. If the tooling cannot represent all changed source commits, tags, and lane
+fingerprints, stop instead of publishing one branch and planning to repair the package with another upload.
 
 ## Building LocalModFolder Releases
 

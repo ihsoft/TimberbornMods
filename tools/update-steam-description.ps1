@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $SteamConfigPath = "",
     [string] $SteamCmdPath = "",
     [string] $SteamUserName = "",
@@ -11,13 +12,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -67,7 +71,10 @@ function Get-SteamDescriptionTargetFromReleaseConfig([string] $Name) {
 
 function Read-SteamConfig([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Resolve-RepoPath ".tools/steam/steam.local.json"
+        $Path = Resolve-ToolPath ".tools/steam/steam.local.json"
+    }
+    elseif (-not [System.IO.Path]::IsPathRooted($Path)) {
+        $Path = Resolve-ToolPath $Path
     }
     if (-not (Test-Path -LiteralPath $Path)) {
         return $null
@@ -77,7 +84,7 @@ function Read-SteamConfig([string] $Path) {
 
 function Resolve-SteamCmdPath([string] $ConfiguredPath) {
     if (-not [string]::IsNullOrWhiteSpace($ConfiguredPath)) {
-        $resolvedPath = Resolve-RepoPath $ConfiguredPath
+        $resolvedPath = Resolve-ToolPath $ConfiguredPath
         if (Test-Path -LiteralPath $resolvedPath) {
             return $resolvedPath
         }
@@ -89,7 +96,7 @@ function Resolve-SteamCmdPath([string] $ConfiguredPath) {
         return $command.Source
     }
 
-    $localSteamCmd = Resolve-RepoPath ".tools/steamcmd/steamcmd.exe"
+    $localSteamCmd = Resolve-ToolPath ".tools/steamcmd/steamcmd.exe"
     if (Test-Path -LiteralPath $localSteamCmd) {
         return $localSteamCmd
     }
@@ -173,7 +180,7 @@ $localPath = Resolve-RepoPath $target.LocalPath
 Assert-PathExists $localPath "Local Steam description"
 
 $description = Get-Content -Raw -LiteralPath $localPath
-$vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName-description.vdf"
+$vdfPath = Join-Path (Resolve-ToolPath $VdfRoot) "$ModName-description.vdf"
 Write-DescriptionVdf $vdfPath $target.PublishedFileId $target.Title $description
 
 Write-Host "Steam description update plan for $ModName"

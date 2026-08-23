@@ -2,9 +2,12 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $GameVersion = "version-1.1",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $Repository = "ihsoft/TimberbornMods",
+    [string] $TagName = "",
+    [string] $ReleaseNotesPath = "",
     [string] $ExpectedPackageSha256 = "",
     [switch] $ReplaceExistingAsset,
     [switch] $Publish
@@ -12,7 +15,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 
@@ -23,10 +28,11 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 }
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Get-LatestChangeNotes([string] $Path, [string] $Version) {
@@ -150,7 +156,7 @@ function Get-PackagePath([object] $ReleaseConfig, [string] $Version) {
 }
 
 function Test-GitRefExists([string] $Ref) {
-    & git rev-parse --verify --quiet $Ref *> $null
+    & git -C $repoRoot rev-parse --verify --quiet $Ref *> $null
     return $LASTEXITCODE -eq 0
 }
 
@@ -195,13 +201,23 @@ Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $releaseConfig.Package
 $versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
 
-$tagName = "$($ModName)_$modVersion"
+$tagName = $TagName
+if ([string]::IsNullOrWhiteSpace($tagName)) {
+    $tagName = "$($ModName)_$modVersion"
+}
 if (-not (Test-GitRefExists "refs/tags/$tagName")) {
     throw "Release tag does not exist locally: $tagName"
 }
 
-$tagCommit = (& git rev-list -n 1 $tagName).Trim()
-$changeNotes = Get-LatestChangeNotes $changesPath $modVersion
+$tagCommit = (& git -C $repoRoot rev-list -n 1 $tagName).Trim()
+$changeNotes = if ([string]::IsNullOrWhiteSpace($ReleaseNotesPath)) {
+    Get-LatestChangeNotes $changesPath $modVersion
+}
+else {
+    $resolvedNotesPath = Resolve-ToolPath $ReleaseNotesPath
+    Assert-PathExists $resolvedNotesPath "Release notes"
+    (Get-Content -Raw -LiteralPath $resolvedNotesPath).Trim()
+}
 $releaseTitle = "$([string]$manifest.Name) v$modVersion"
 if ([string]::IsNullOrWhiteSpace($manifest.Name)) {
     $releaseTitle = "$ModName v$modVersion"
@@ -261,7 +277,7 @@ if ($ReplaceExistingAsset) {
     }
 }
 else {
-    $notesRoot = Resolve-RepoPath ".tools/github-release-notes"
+    $notesRoot = Resolve-ToolPath ".tools/github-release-notes"
     New-Item -ItemType Directory -Path $notesRoot -Force | Out-Null
     $notesPath = Join-Path $notesRoot "$tagName.md"
     $utf8NoBom = [System.Text.UTF8Encoding]::new($false)

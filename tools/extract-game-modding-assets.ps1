@@ -1,5 +1,6 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
+  [string] $RepositoryRoot = "",
   [string] $GameRoot = "_GAME!",
   [string] $OutputRoot = "_ExtractedGameAssets",
   [string[]] $Archives = @("Blueprints.zip", "Localizations.zip", "Shaders.zip", "UI.zip"),
@@ -9,6 +10,9 @@ param(
 $ErrorActionPreference = "Stop"
 
 $provenanceFileName = "generation-provenance.json"
+$toolRepoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
 
 function Get-GameIdentity([string] $gameRootPath) {
   $streamingAssetsPath = Join-Path $gameRootPath "Timberborn_Data\StreamingAssets"
@@ -38,7 +42,15 @@ function Get-GameIdentity([string] $gameRootPath) {
 }
 
 function Get-Sha256([string] $path) {
-  return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+  $stream = [System.IO.File]::OpenRead($path)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha.ComputeHash($stream)
+    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha.Dispose()
+    $stream.Dispose()
+  }
 }
 
 function Get-RepositoryRelativePath([string] $repoRootPath, [string] $path) {
@@ -65,10 +77,9 @@ function Write-GenerationProvenance([string] $path, [object] $provenance) {
   }
 }
 
-$repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
-$gameRootPath = Join-Path $repoRoot $GameRoot
+$gameRootPath = Resolve-RepositoryPath $repoRoot $GameRoot
 $moddingAssetsPath = Join-Path $gameRootPath "Timberborn_Data\StreamingAssets\Modding"
-$outputRootPath = Join-Path $repoRoot $OutputRoot
+$outputRootPath = Resolve-RepositoryPath $repoRoot $OutputRoot
 $provenancePath = Join-Path $outputRootPath $provenanceFileName
 $repoRootFullPath = [System.IO.Path]::GetFullPath($repoRoot)
 $outputRootFullPath = [System.IO.Path]::GetFullPath($outputRootPath)
@@ -97,7 +108,7 @@ if ($archiveFiles.Count -eq 0) {
 }
 
 $gameIdentity = Get-GameIdentity $gameRootPath
-$scriptRelativePath = Get-RepositoryRelativePath $repoRoot $PSCommandPath
+$scriptRelativePath = Get-RepositoryRelativePath $toolRepoRoot $PSCommandPath
 $inputRecords = @($archiveFiles | ForEach-Object {
   [ordered]@{
     Path = "Timberborn_Data/StreamingAssets/Modding/$($_.Name)"

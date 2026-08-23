@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [string] $GameRoot = "_GAME!",
@@ -23,7 +24,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 $buildScriptPath = Join-Path $PSScriptRoot "build-mod-package.ps1"
@@ -36,10 +39,11 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 }
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Get-LatestChangeNotes([string] $Path, [string] $Version) {
@@ -187,7 +191,8 @@ function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
 
 function Invoke-UnityExport([string] $Name, [string] $VersionFolder) {
     Assert-PathExists $unityExportScriptPath "Unity export script"
-    & $unityExportScriptPath -ModName $Name -GameVersion $VersionFolder
+    & $unityExportScriptPath -ModName $Name -GameVersion $VersionFolder -RepositoryRoot $repoRoot `
+        -CoordinationRoot $toolRepoRoot
 }
 
 function Assert-RepositoryReleaseVersions(
@@ -357,7 +362,10 @@ MaximumGameVersion: $maximumGameVersion
 
 function Read-ModIoConfig([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/modio/$ModName.local.json"
+        $Path = Resolve-ToolPath ".tools/modio/$ModName.local.json"
+    }
+    elseif (-not [System.IO.Path]::IsPathRooted($Path)) {
+        $Path = Resolve-ToolPath $Path
     }
     if (-not (Test-Path -LiteralPath $Path)) {
         return $null
@@ -367,7 +375,10 @@ function Read-ModIoConfig([string] $Path) {
 
 function Read-ModIoAccessToken([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/modio/$ModName.token.txt"
+        $Path = Resolve-ToolPath ".tools/modio/$ModName.token.txt"
+    }
+    elseif (-not [System.IO.Path]::IsPathRooted($Path)) {
+        $Path = Resolve-ToolPath $Path
     }
     if (Test-Path -LiteralPath $Path) {
         return (Get-Content -Raw -LiteralPath $Path).Trim()
@@ -536,6 +547,7 @@ if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
 elseif ($packageMode -eq "Build") {
     $buildArguments = @{
         ModName = $ModName
+        ReleaseRoot = $repoRoot
         Configuration = $Configuration
         GameVersion = $GameVersion
         OutputRoot = $OutputRoot
@@ -586,7 +598,7 @@ elseif ($packageMode -eq "LocalModFolder") {
         Build-LocalModScripts $ModName $Configuration $sourcePath $GameVersion $scriptFileBase $modVersion
     }
 
-    $packageStage = Resolve-RepoPath ".tools/release-staging/$ModName-local"
+    $packageStage = Resolve-ToolPath ".tools/release-staging/$ModName-local"
     if (Test-Path -LiteralPath $packageStage) {
         Remove-Item -LiteralPath $packageStage -Recurse -Force
     }

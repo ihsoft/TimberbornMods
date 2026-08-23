@@ -36,6 +36,19 @@ Keep the existing native safety checks. Unity project lockfiles/process checks a
 non-participating processes and low-level collisions; repository coordination prevents the higher-level race between
 otherwise valid checks and commands.
 
+## Target Worktrees
+
+Repository tools may be executed from the current tooling checkout against an explicitly selected compatibility
+worktree. Keep these ownership boundaries separate:
+
+- tracked source, Git identity, project/build inputs, Unity project, package source, and generated-reference output
+  resolve from the explicit target repository root;
+- helper binaries, credentials, local platform configuration, coordination locks, and reusable tool output resolve
+  from the tooling checkout unless a parameter explicitly says otherwise.
+
+Validate that every configured target is an exact Git worktree root. Do not infer it from the process working directory,
+copy modern scripts into an older branch, or let an older-game generation overwrite another worktree's cache.
+
 ## Authenticated Standalone Steamworks.NET Tools
 
 For a standalone Steamworks.NET CLI that uses the logged-in Steam client, treat the CLI as a repository tool, not as

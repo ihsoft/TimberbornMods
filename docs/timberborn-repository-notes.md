@@ -120,6 +120,12 @@ The normal verification path compares both recorded `Game` values with the targe
 resources needed by the task are listed in `Inputs`. When the game identity matches exactly and the required resources
 are covered, treat those generated resources as verified without recomputing every source-input hash.
 
+Generated-reference caches are owned by the repository worktree and compatibility line that consumes them. A
+registered older-line worktree uses its own ignored `_DecompiledGame/` and `_ExtractedGameAssets/` roots with provenance
+for that line's game installation. Missing older-line caches never fall back to current-line caches. Run the current
+provenance-capable generator from the tooling checkout with an explicit target `-RepositoryRoot`; do not copy a newer
+cache, run an old generator that cannot write current provenance, or redirect an older game into another line's output.
+
 The recorded lengths and SHA-256 values preserve what the generator actually consumed and support targeted provenance
 checks. Recompute them only for the specific inputs whose identity is uncertain, when the installation may have been
 manually modified or partially updated, or when diagnosing cache integrity. Do not scan every input hash during routine
@@ -353,3 +359,7 @@ Inspect the repository before assuming branch structure.
 Historically, release branches may exist for specific Timberborn versions.
 
 Do not assume that main is always the only active branch.
+
+`update-1.0` is the registered common older-game branch, but compatibility ownership remains per mod. Different mods
+may have transitioned to the current game line at different commits. Register and audit each mod independently; do not
+infer one repository-wide transition baseline from XRay or from the branch name.

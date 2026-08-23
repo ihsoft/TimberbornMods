@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [string] $OutputRoot = "_MODS!",
@@ -14,13 +15,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $projectPath = Join-Path $modRoot "$ModName.csproj"
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
 $propsPath = Join-Path $modRoot "directory.build.props"
 $modContentRoot = Join-Path $modRoot "Mod"
-$outputRootPath = Join-Path $repoRoot $OutputRoot
+$outputRootPath = Resolve-RepositoryPath $repoRoot $OutputRoot
 $localModRootPath = $LocalModRoot
 if ([string]::IsNullOrWhiteSpace($localModRootPath)) {
     $localModRootPath = Join-Path "_MODS!" $ModName
@@ -28,7 +31,7 @@ if ([string]::IsNullOrWhiteSpace($localModRootPath)) {
 if (-not [System.IO.Path]::IsPathRooted($localModRootPath)) {
     $localModRootPath = Join-Path $repoRoot $localModRootPath
 }
-$stagingRootPath = Join-Path $repoRoot $StagingRoot
+$stagingRootPath = Resolve-RepositoryPath $toolRepoRoot $StagingRoot
 $packageStage = Join-Path $stagingRootPath $ModName
 $packageRoot = Join-Path $packageStage $ModName
 $versionStage = Join-Path $packageRoot $GameVersion

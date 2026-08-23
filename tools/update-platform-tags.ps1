@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [ValidateSet("All", "Steam", "ModIO")]
     [string] $Platform = "All",
 
@@ -19,13 +20,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -189,9 +193,9 @@ function Get-SteamDetails([string] $PublishedFileId) {
 
 function Resolve-SteamPublisherKeyPath([string] $Path) {
     if (-not [string]::IsNullOrWhiteSpace($Path)) {
-        return Resolve-RepoPath $Path
+        return Resolve-ToolPath $Path
     }
-    return Resolve-RepoPath ".tools/steam/publisher.key.txt"
+    return Resolve-ToolPath ".tools/steam/publisher.key.txt"
 }
 
 function Read-SteamPublisherKey() {
@@ -208,14 +212,14 @@ function Invoke-SteamTagsUpdate(
     [string] $PublishedFileId,
     [string] $AppId,
     [string[]] $TargetTags) {
-    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
     Assert-PathExists $projectPath "Steam tag updater project"
     & dotnet build $projectPath -c Release
     if ($LASTEXITCODE -ne 0) {
         throw "Steam tag updater build failed with exit code $LASTEXITCODE."
     }
 
-    $exePath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.exe"
+    $exePath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.exe"
     Assert-PathExists $exePath "Steam tag updater executable"
     $arguments = @($PublishedFileId) + $TargetTags
     Push-Location (Split-Path -Parent $exePath)
@@ -262,7 +266,10 @@ $($tagLines -join "`r`n")
 
 function Read-SteamConfig([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/steam/steam.local.json"
+        $Path = Resolve-ToolPath ".tools/steam/steam.local.json"
+    }
+    elseif (-not [System.IO.Path]::IsPathRooted($Path)) {
+        $Path = Resolve-ToolPath $Path
     }
     if (-not (Test-Path -LiteralPath $Path)) {
         return $null
@@ -272,7 +279,7 @@ function Read-SteamConfig([string] $Path) {
 
 function Resolve-SteamCmdPath([string] $ConfiguredPath) {
     if (-not [string]::IsNullOrWhiteSpace($ConfiguredPath)) {
-        $resolvedPath = Resolve-RepoPath $ConfiguredPath
+        $resolvedPath = Resolve-ToolPath $ConfiguredPath
         if (Test-Path -LiteralPath $resolvedPath) {
             return $resolvedPath
         }
@@ -289,7 +296,7 @@ function Resolve-SteamCmdPath([string] $ConfiguredPath) {
         "C:\SteamCMD\steamcmd.exe",
         "C:\Program Files (x86)\Steam\steamcmd.exe",
         "C:\Program Files\Steam\steamcmd.exe",
-        (Join-Path $repoRoot ".tools/steamcmd/steamcmd.exe")
+        (Resolve-ToolPath ".tools/steamcmd/steamcmd.exe")
     )
     foreach ($path in $commonPaths) {
         if (Test-Path -LiteralPath $path) {
@@ -335,16 +342,16 @@ function Invoke-SteamTagsUpdateWithSteamCmd([string] $VdfPath) {
 
 function Resolve-ModIoConfigPath([string] $Path) {
     if (-not [string]::IsNullOrWhiteSpace($Path)) {
-        return Resolve-RepoPath $Path
+        return Resolve-ToolPath $Path
     }
-    return Resolve-RepoPath ".tools/modio/$ModName.local.json"
+    return Resolve-ToolPath ".tools/modio/$ModName.local.json"
 }
 
 function Resolve-ModIoAccessTokenPath([string] $Path) {
     if (-not [string]::IsNullOrWhiteSpace($Path)) {
-        return Resolve-RepoPath $Path
+        return Resolve-ToolPath $Path
     }
-    return Resolve-RepoPath ".tools/modio/$ModName.token.txt"
+    return Resolve-ToolPath ".tools/modio/$ModName.token.txt"
 }
 
 function Get-ModIoHeaders([string] $AccessToken) {
@@ -474,13 +481,13 @@ if ($MaterializeLocalOnly) {
 }
 
 function Get-AuthenticatedSteamTags([string] $PublishedFileId) {
-    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
     Assert-PathExists $projectPath "Steam tag updater project"
     & dotnet build $projectPath -c Release | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Steam tag updater build failed with exit code $LASTEXITCODE."
     }
-    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $dllPath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {
@@ -527,7 +534,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
 
     $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam" $releaseConfig
     Assert-SteamTagsValid $targetTags
-    $vdfPath = Join-Path (Resolve-RepoPath $SteamVdfRoot) "$ModName-tags.vdf"
+    $vdfPath = Join-Path (Resolve-ToolPath $SteamVdfRoot) "$ModName-tags.vdf"
     Write-SteamTagsVdf $vdfPath $appId $publishedFileId ([string]$workshopData.Name) $targetTags
 
     $currentTagResult = Get-AuthenticatedSteamTags $publishedFileId

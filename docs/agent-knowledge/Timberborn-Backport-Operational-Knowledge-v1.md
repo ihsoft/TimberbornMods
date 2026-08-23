@@ -36,6 +36,19 @@ Before editing:
    branch, worktree, project, lane, or conditional-build strategy when one exists. If none exists, propose the smallest
    maintainable boundary and ask before introducing a new long-lived support architecture.
 
+For a registered compatibility worktree, treat its branch and worktree root as the source boundary. Use current tracked
+tooling with an explicit target root when historical branch scripts lack required checks; do not copy current scripts
+into the older branch or let a tool silently resolve source paths from its own checkout.
+
+Register a proven release owner in `tools/release-lines.json` by stable branch, release-line identifier, game lane,
+version policy, and mod name. Do not store a machine-local worktree path there; discovery resolves the branch through
+Git and stops when its worktree is absent.
+
+Generated references remain local to that worktree. Its `_DecompiledGame/` and `_ExtractedGameAssets/` caches must carry
+matching provenance for the older game. A missing cache is a regeneration requirement, not permission to read the
+current line's cache. Generate through an explicit target root so the old game cannot replace or mix with current-line
+output.
+
 Do not silently repoint shared game references, overwrite the current generated package, or make the current line
 depend on older game assemblies merely to obtain a successful legacy build.
 
@@ -83,6 +96,10 @@ line without losing or misidentifying a current-line `(TBD)` section. If simulta
 top-section assumption, stop and establish a deliberate per-mod representation or tooling change instead of reordering
 history or overwriting another line's pending release.
 
+When the older line lives in its own worktree, its changelog is authoritative for that line. Candidate discovery and
+version validation must inspect that worktree directly. The next backport version is the next patch after that
+changelog's latest dated release, even when the current line has a higher minor version.
+
 Ordinary implementation does not authorize release metadata changes. Leave lane-specific `release.json`, manifest,
 package version, and platform metadata updates to explicit release preparation unless the user included them in the
 task.
@@ -111,3 +128,17 @@ A rebuilt backport lane is changed content. Never source it from the unchanged-l
 Release Recovery Operational Knowledge. Build it from the verified older-line source and target toolchain. Preserve or
 restore any other unchanged compatibility lane only through its own verified provenance workflow, and validate the
 completed multi-lane package before publication.
+
+Use a line-qualified Git tag for a backport source commit: `<ModName>_<Version>_<ReleaseLine>`, for example
+`XRay_1.1.2_update-1.0`. The ordinary unqualified tag remains reserved for the current line. One Git tag cannot identify
+two commits.
+
+If current and older lines both change for one public package, create one source record and one tag per changed line.
+The current-line source is primary: its ordinary tag owns the GitHub Release and public release title; the qualified
+older-line tag points to the older worktree commit. Build and verify each changed lane independently, import the older
+lane only from its immutable preflight package, and require the final combined preflight to match each lane fingerprint
+and both source commits before any upload. Include both changelog sections in release notes and handoffs.
+
+If only the older line changes, its qualified tag is the primary GitHub Release tag. Preserve any unchanged current lane
+only through verified published-artifact provenance; do not create a new current-line tag or imply that current-line
+code changed.

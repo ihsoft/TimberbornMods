@@ -2,11 +2,16 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
+    [ValidateSet("CurrentLine", "BackportPatchOnly")]
+    [string] $VersionPolicy = "CurrentLine",
     [string] $GameRoot = "_GAME!",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $ReportRoot = ".tools/release-preflight",
+    [string] $ReleaseLine = "",
+    [string[]] $AdditionalReleaseSourceReportPath = @(),
     [string] $LocalModRoot = "",
     [string] $SteamConfigPath = "",
     [string] $SteamCmdPath = "",
@@ -33,16 +38,26 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-lines.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
+$releaseBranch = (& git -C $repoRoot branch --show-current).Trim()
+if ([string]::IsNullOrWhiteSpace($releaseBranch)) {
+    $releaseBranch = "(detached)"
+}
 $releaseLogDirectory = ""
 $releaseStepIndex = 0
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -162,59 +177,65 @@ function Get-ReleaseHeading([string] $ChangesPath, [string] $Version) {
     return [string]$line
 }
 
-function Get-ReleaseSection([string] $ChangesPath, [string] $Version) {
-    $content = Get-Content -Raw -LiteralPath $ChangesPath
-    $escapedVersion = [regex]::Escape($Version)
-    $pattern = "(?ms)^#\s+v$escapedVersion[^\r\n]*\r?\n(?<body>.*?)(?=^#\s+v|\z)"
-    $match = [regex]::Match($content, $pattern)
-    if (-not $match.Success) {
-        throw "Changelog section for version $Version was not found in $ChangesPath."
-    }
+function Get-TopReleaseVersion([string] $ChangesPath) {
+    $line = Get-Content -LiteralPath $ChangesPath | Where-Object {
+        $_ -match "^#\s+v?(?<version>\d+\.\d+(?:\.\d+)?)(?:\s|\(|:|$)"
+    } | Select-Object -First 1
 
-    return $match.Groups["body"].Value
+    if ([string]::IsNullOrWhiteSpace($line) -or $line -notmatch "^#\s+v?(?<version>\d+\.\d+(?:\.\d+)?)") {
+        throw "No top-level release heading was found in $ChangesPath."
+    }
+    return $Matches["version"]
 }
 
-function Assert-ReleaseVersionMatchesChangelog([string] $ChangesPath, [string] $Version) {
-    $section = Get-ReleaseSection $ChangesPath $Version
-    $hasFeature = $section -match "(?m)^\*\s+\[Feature(?:\s+#\d+)?\]"
-    if (-not $hasFeature) {
-        return
+function Get-LaneFingerprint([object[]] $Fingerprints, [string] $Lane, [string] $Description) {
+    $matches = @($Fingerprints | Where-Object { [string]$_.GameVersion -eq $Lane })
+    if ($matches.Count -ne 1) {
+        throw "$Description must contain exactly one $Lane lane, found $($matches.Count)."
+    }
+    return $matches[0]
+}
+
+function Assert-ReleaseSourceCurrent([object] $Source) {
+    $sourceRoot = Resolve-RepositoryRoot ([string]$Source.ReleaseRoot) $toolRepoRoot
+    $sourceBranch = (& git -C $sourceRoot branch --show-current).Trim()
+    if ([string]::IsNullOrWhiteSpace($sourceBranch)) {
+        $sourceBranch = "(detached)"
+    }
+    if ($sourceBranch -ne [string]$Source.Branch) {
+        throw "Release source branch changed. Preflight: $($Source.Branch); current: $sourceBranch."
     }
 
-    $content = Get-Content -Raw -LiteralPath $ChangesPath
-    $headings = [regex]::Matches($content, "(?m)^#\s+v(?<version>\d+\.\d+\.\d+|\d+\.\d+)(?:\s+\((?<date>[^)]+)\))?")
-    $currentIndex = -1
-    for ($index = 0; $index -lt $headings.Count; $index++) {
-        if ($headings[$index].Groups["version"].Value -eq $Version) {
-            $currentIndex = $index
-            break
-        }
+    $sourceCommit = [string]$Source.Commit
+    $sourceHead = (& git -C $sourceRoot rev-parse HEAD).Trim()
+    & git -C $sourceRoot merge-base --is-ancestor $sourceCommit $sourceHead
+    if ($LASTEXITCODE -ne 0) {
+        throw "Release source commit $sourceCommit is not an ancestor of $sourceHead in $sourceRoot."
     }
 
-    if ($currentIndex -lt 0) {
-        throw "Cannot locate changelog heading for version $Version while validating feature versioning."
+    $criticalPaths = @($Source.ReleaseCriticalPaths | ForEach-Object { [string]$_ })
+    if ($criticalPaths.Count -eq 0) {
+        throw "Release source $sourceRoot contains no release-critical paths."
+    }
+    $laterChanges = @(& git -C $sourceRoot diff --name-only "$sourceCommit..$sourceHead" -- @criticalPaths)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Cannot verify later release-critical changes in $sourceRoot."
+    }
+    if ($laterChanges.Count -gt 0) {
+        throw "Release source has later critical changes: $($laterChanges -join ', ')."
+    }
+    $workingChanges = @(& git -C $sourceRoot diff --name-only $sourceCommit -- @criticalPaths)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Cannot verify working-tree release-critical changes in $sourceRoot."
+    }
+    if ($workingChanges.Count -gt 0) {
+        throw "Release source differs from commit ${sourceCommit}: $($workingChanges -join ', ')."
     }
 
-    $previous = $null
-    for ($index = $currentIndex + 1; $index -lt $headings.Count; $index++) {
-        $date = $headings[$index].Groups["date"].Value
-        if (-not [string]::IsNullOrWhiteSpace($date) -and $date -ne "TBD") {
-            $previous = $headings[$index].Groups["version"].Value
-            break
-        }
-    }
-
-    if ($null -eq $previous) {
-        if ($Version -eq "1.0.0") {
-            return
-        }
-        throw "Cannot validate feature version $Version because no previous dated release was found in $ChangesPath."
-    }
-
-    $previousParts = $previous.Split('.') | ForEach-Object { [int]$_ }
-    $expected = "$($previousParts[0]).$($previousParts[1] + 1).0"
-    if ($Version -ne $expected) {
-        throw "Feature release version $Version is invalid for $ChangesPath. A [Feature] entry requires the next minor version $expected after $previous."
+    $evidencePaths = @($Source.ReleaseCriticalPathEvidence | ForEach-Object { [string]$_.Path })
+    if ($evidencePaths.Count -ne $criticalPaths.Count -or
+        @($criticalPaths | Where-Object { $_ -notin $evidencePaths }).Count -gt 0) {
+        throw "Release source is missing release-critical path evidence."
     }
 }
 
@@ -259,10 +280,41 @@ if ([string]::IsNullOrWhiteSpace($packageMode)) {
 }
 
 $changelogHeading = Get-ReleaseHeading $changesPath $modVersion
+$topChangelogVersion = Get-TopReleaseVersion $changesPath
+if (-not $CorrectiveReplacement -and $topChangelogVersion -ne $modVersion) {
+    throw "ReleaseVersion $modVersion does not match top changelog version $topChangelogVersion in $changesPath."
+}
 if ($changelogHeading -match "\(TBD\)") {
     throw "Changelog heading for $ModName v$modVersion is still marked (TBD). Set and commit the concrete release date before final preflight."
 }
-Assert-ReleaseVersionMatchesChangelog $changesPath $modVersion
+Assert-ReleaseVersionMatchesChangelog $changesPath $modVersion $VersionPolicy
+if ($VersionPolicy -eq "BackportPatchOnly") {
+    if ([string]::IsNullOrWhiteSpace($ReleaseLine)) {
+        throw "BackportPatchOnly requires a release-line identifier such as update-1.0."
+    }
+    if ($ReleaseLine -notmatch "^[A-Za-z0-9][A-Za-z0-9.-]*$") {
+        throw "Release line contains unsupported tag characters: $ReleaseLine"
+    }
+    $registeredLine = Get-RegisteredReleaseLine $PSScriptRoot $ReleaseLine $ModName
+    if ([string]$registeredLine.Branch -ne $releaseBranch) {
+        throw "Release line $ReleaseLine is registered to branch $($registeredLine.Branch), not $releaseBranch."
+    }
+    if ([string]$registeredLine.GameVersion -ne $GameVersion) {
+        throw "Release line $ReleaseLine requires game lane $($registeredLine.GameVersion), not $GameVersion."
+    }
+    if ([string]$registeredLine.VersionPolicy -ne $VersionPolicy) {
+        throw "Release line $ReleaseLine requires version policy $($registeredLine.VersionPolicy)."
+    }
+}
+elseif (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
+    throw "ReleaseLine is reserved for a qualified backport release."
+}
+if ($CorrectiveReplacement -and $AdditionalReleaseSourceReportPath.Count -gt 0) {
+    throw "Multi-source corrective replacement is not supported by the routine release workflow."
+}
+if ($AdditionalReleaseSourceReportPath.Count -gt 0 -and $VersionPolicy -ne "CurrentLine") {
+    throw "A multi-source release must use the current compatibility line as its primary source."
+}
 
 function Invoke-Git([string[]] $Arguments) {
     $output = @(& git -C $repoRoot @Arguments 2>&1)
@@ -374,10 +426,10 @@ $gitSnapshot = Get-ReleaseGitSnapshot $ReleaseCommit `
 
 $steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
 $resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
-    Resolve-RepoPath ".tools/modio/$ModName.local.json"
+    Resolve-ToolPath ".tools/modio/$ModName.local.json"
 }
 else {
-    Resolve-RepoPath $ModIoConfigPath
+    Resolve-ToolPath $ModIoConfigPath
 }
 $modIoId = ""
 if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
@@ -386,8 +438,10 @@ if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
 }
 
 Write-Host "Release preflight: $ModName v$modVersion"
+Write-Host "  Release root: $repoRoot ($releaseBranch)"
 Write-Host "  Release commit: $($gitSnapshot.ReleaseCommit)"
 Write-Host "  Game compatibility lane: $GameVersion"
+Write-Host "  Version policy: $VersionPolicy"
 if (-not $SkipSteam) {
     $steamVisibilityIntent = if ($PublishSteamVisibility) { "publish requested" } else { "unchanged" }
     Write-Host "  Steam: PublishedFileId=$steamPublishedFileId; visibility=$steamVisibilityIntent"
@@ -404,6 +458,8 @@ if (-not $SkipPlatformDescriptions) {
     $descriptionArgs = New-Object System.Collections.Generic.List[string]
     $descriptionArgs.Add("-ModName")
     $descriptionArgs.Add($ModName)
+    $descriptionArgs.Add("-ReleaseRoot")
+    $descriptionArgs.Add($repoRoot)
     Add-SwitchArgument $descriptionArgs "-SkipSteam" $SkipSteam
     Add-SwitchArgument $descriptionArgs "-SkipModIo" $SkipModIo
     $steps.Add((Invoke-ReleaseStep "Platform description verification" "verify-platform-descriptions.ps1" $descriptionArgs.ToArray()))
@@ -412,6 +468,8 @@ if (-not $SkipPlatformDescriptions) {
 $commonPublishArgs = New-Object System.Collections.Generic.List[string]
 $commonPublishArgs.Add("-ModName")
 $commonPublishArgs.Add($ModName)
+$commonPublishArgs.Add("-ReleaseRoot")
+$commonPublishArgs.Add($repoRoot)
 $commonPublishArgs.Add("-Configuration")
 $commonPublishArgs.Add($Configuration)
 $commonPublishArgs.Add("-GameVersion")
@@ -449,6 +507,8 @@ if (-not $SkipPlatformTags) {
     $tagArgs = New-Object System.Collections.Generic.List[string]
     $tagArgs.Add("-ModName")
     $tagArgs.Add($ModName)
+    $tagArgs.Add("-ReleaseRoot")
+    $tagArgs.Add($repoRoot)
     if ($SkipSteam) {
         $tagArgs.Add("-Platform")
         $tagArgs.Add("ModIO")
@@ -468,6 +528,8 @@ if (-not $SkipPlatformTags) {
     $materializeTagArgs = New-Object System.Collections.Generic.List[string]
     $materializeTagArgs.Add("-ModName")
     $materializeTagArgs.Add($ModName)
+    $materializeTagArgs.Add("-ReleaseRoot")
+    $materializeTagArgs.Add($repoRoot)
     Add-OptionalArgument $materializeTagArgs "-LocalModRoot" $LocalModRoot
     $materializeTagArgs.Add("-MaterializeLocalOnly")
     $steps.Add((Invoke-ReleaseStep "Local release tag materialization" "update-platform-tags.ps1" $materializeTagArgs.ToArray()))
@@ -507,13 +569,100 @@ Write-Host ""
 Write-Host "Collecting release artifact snapshots..."
 $packagePath = Get-PackagePath $releaseConfig
 $packageSnapshot = Get-FileSnapshot $packagePath "Release package"
+$packageLaneFingerprints = @(Get-PackageLaneFingerprints $packagePath)
+$primaryLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $GameVersion "Primary release package"
 $sourceSnapshot = Get-SourceSnapshot $releaseConfig
 $gitStatus = @(& git -C $repoRoot status --porcelain=v1 --untracked-files=normal)
-$tagName = "$($ModName)_$modVersion"
+$tagName = if ($VersionPolicy -eq "BackportPatchOnly") {
+    "$($ModName)_${modVersion}_$ReleaseLine"
+}
+else {
+    "$($ModName)_$modVersion"
+}
 $tagExists = $false
 & git -C $repoRoot rev-parse -q --verify "refs/tags/$tagName" *> $null
 if ($LASTEXITCODE -eq 0) {
     $tagExists = $true
+}
+
+$releaseSources = New-Object System.Collections.Generic.List[object]
+$releaseSources.Add([ordered]@{
+    ReleaseRoot = $repoRoot
+    Branch = $releaseBranch
+    Commit = $gitSnapshot.ReleaseCommit
+    GameVersion = $GameVersion
+    ModVersion = $modVersion
+    ReleaseLine = $ReleaseLine
+    VersionPolicy = $VersionPolicy
+    TagName = $tagName
+    TagExistsBeforePublish = $tagExists
+    PackageLaneSha256 = [string]$primaryLaneFingerprint.Sha256
+    ChangesPath = (Resolve-Path -LiteralPath $changesPath).Path
+    ChangelogHeading = $changelogHeading
+    ReleaseCriticalPaths = [string[]]$gitSnapshot.CriticalPaths
+    ReleaseCriticalPathEvidence = [object[]]$gitSnapshot.CriticalPathEvidence
+    IsPrimary = $true
+})
+
+foreach ($additionalReportValue in $AdditionalReleaseSourceReportPath) {
+    $additionalReportPath = Resolve-ToolPath $additionalReportValue
+    Assert-PathExists $additionalReportPath "Additional release-source preflight report"
+    $additionalReport = Get-Content -Raw -LiteralPath $additionalReportPath | ConvertFrom-Json
+    if ([int]$additionalReport.SchemaVersion -ne 4 -or $additionalReport.ReadyForPublish -ne $true) {
+        throw "Additional release source must be a publish-ready schema-4 preflight report: $additionalReportPath"
+    }
+    if ([string]$additionalReport.ModName -ne $ModName) {
+        throw "Additional release source is for $($additionalReport.ModName), expected $ModName."
+    }
+
+    $additionalSources = @($additionalReport.ReleaseSources)
+    if ($additionalSources.Count -ne 1) {
+        throw "Additional release-source report must describe exactly one source, found $($additionalSources.Count)."
+    }
+    $additionalSource = $additionalSources[0]
+    $additionalLane = [string]$additionalSource.GameVersion
+    if (@($releaseSources | Where-Object { $_.GameVersion -eq $additionalLane }).Count -gt 0) {
+        throw "Release source lane is duplicated: $additionalLane"
+    }
+    if (@($releaseSources | Where-Object { $_.TagName -eq [string]$additionalSource.TagName }).Count -gt 0) {
+        throw "Release source tag is duplicated: $($additionalSource.TagName)"
+    }
+
+    Assert-ReleaseSourceCurrent $additionalSource
+    $additionalPackagePath = [string]$additionalReport.Package.Path
+    Assert-PathExists $additionalPackagePath "Additional release-source package"
+    $additionalPackageHash = (Get-FileHash -LiteralPath $additionalPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($additionalPackageHash -ne [string]$additionalReport.Package.Sha256) {
+        throw "Additional release-source package changed after preflight: $additionalPackagePath"
+    }
+    $additionalFingerprints = @(Get-PackageLaneFingerprints $additionalPackagePath)
+    $additionalLaneFingerprint = Get-LaneFingerprint `
+        $additionalFingerprints $additionalLane "Additional release-source package"
+    if ([string]$additionalLaneFingerprint.Sha256 -ne [string]$additionalSource.PackageLaneSha256) {
+        throw "Additional release-source lane no longer matches its preflight evidence: $additionalLane"
+    }
+    $finalLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $additionalLane "Final combined package"
+    if ([string]$finalLaneFingerprint.Sha256 -ne [string]$additionalLaneFingerprint.Sha256) {
+        throw "Final package lane $additionalLane does not match the additional release-source package."
+    }
+
+    $releaseSources.Add([ordered]@{
+        ReleaseRoot = [string]$additionalSource.ReleaseRoot
+        Branch = [string]$additionalSource.Branch
+        Commit = [string]$additionalSource.Commit
+        GameVersion = $additionalLane
+        ModVersion = [string]$additionalSource.ModVersion
+        ReleaseLine = [string]$additionalSource.ReleaseLine
+        VersionPolicy = [string]$additionalSource.VersionPolicy
+        TagName = [string]$additionalSource.TagName
+        TagExistsBeforePublish = [bool]$additionalSource.TagExistsBeforePublish
+        PackageLaneSha256 = [string]$additionalSource.PackageLaneSha256
+        ChangesPath = [string]$additionalSource.ChangesPath
+        ChangelogHeading = [string]$additionalSource.ChangelogHeading
+        ReleaseCriticalPaths = [string[]]$additionalSource.ReleaseCriticalPaths
+        ReleaseCriticalPathEvidence = [object[]]$additionalSource.ReleaseCriticalPathEvidence
+        IsPrimary = $false
+    })
 }
 
 $correctiveSnapshot = $null
@@ -551,8 +700,8 @@ if ($CorrectiveReplacement) {
     }
 
     if ("ModIO" -in $platforms) {
-        $resolvedModIoConfigPath = Resolve-RepoPath $ModIoConfigPath
-        $resolvedTokenPath = Resolve-RepoPath $ModIoAccessTokenPath
+        $resolvedModIoConfigPath = Resolve-ToolPath $ModIoConfigPath
+        $resolvedTokenPath = Resolve-ToolPath $ModIoAccessTokenPath
         Assert-PathExists $resolvedModIoConfigPath "Mod.IO config"
         Assert-PathExists $resolvedTokenPath "Mod.IO access token"
         $modIoConfig = Get-Content -Raw -LiteralPath $resolvedModIoConfigPath | ConvertFrom-Json
@@ -599,9 +748,13 @@ if ($CorrectiveReplacement) {
 }
 
 $report = [ordered]@{
-    SchemaVersion = 3
+    SchemaVersion = 4
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     RepoRoot = $repoRoot
+    ReleaseRoot = $repoRoot
+    ReleaseBranch = $releaseBranch
+    ReleaseLine = $ReleaseLine
+    VersionPolicy = $VersionPolicy
     GitHead = $gitSnapshot.HeadAtPreflight
     ReleaseCommit = $gitSnapshot.ReleaseCommit
     ReleaseIdentityPaths = $gitSnapshot.IdentityPaths
@@ -614,6 +767,7 @@ $report = [ordered]@{
     ModName = $ModName
     Version = $modVersion
     TagName = $tagName
+    ReleaseSources = [object[]]$releaseSources.ToArray()
     TagExistsBeforePublish = $tagExists
     GameVersion = $GameVersion
     Configuration = $Configuration
@@ -622,6 +776,7 @@ $report = [ordered]@{
     ChangelogHeading = $changelogHeading
     PackageMode = $packageMode
     Package = $packageSnapshot
+    PackageLaneFingerprints = [object[]]$packageLaneFingerprints
     Source = $sourceSnapshot
     PreflightOptions = [ordered]@{
         IncludeLegacyVersions = [bool]$IncludeLegacyVersions

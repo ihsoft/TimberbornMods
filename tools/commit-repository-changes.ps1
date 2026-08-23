@@ -7,6 +7,8 @@ param(
     [ValidateNotNullOrEmpty()]
     [string] $Message,
 
+    [string] $RepositoryRoot = "",
+    [string] $CoordinationRoot = "",
     [string] $Owner = "",
     [string] $ExpectedHead = ""
 )
@@ -14,7 +16,11 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+$repositoryPathsModule = Join-Path $PSScriptRoot "repository-paths.psm1"
+Import-Module $repositoryPathsModule -Force
+$repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
+$coordinationRoot = Resolve-RepositoryRoot $CoordinationRoot $toolRepoRoot
 $coordinationModule = Join-Path $PSScriptRoot "repository-coordination.psm1"
 Import-Module $coordinationModule -Force
 
@@ -74,7 +80,8 @@ $inputPaths = @(
 $relativePaths = @($inputPaths | ForEach-Object { Convert-ToRepositoryPath $_ } | Sort-Object -Unique)
 $operation = "Commit repository changes: $Message"
 
-Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "git-transaction" -Operation $operation -Owner $Owner -Action {
+Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "git-transaction" -Operation $operation `
+    -Owner $Owner -Action {
     Push-Location $repoRoot
     $stagedByScript = @()
     $stagingAttempted = $false

@@ -1,4 +1,6 @@
+[CmdletBinding(SupportsShouldProcess = $true)]
 param(
+  [string] $RepositoryRoot = "",
   [string] $GameRoot = "Dependencies\GameRoot",
   [string] $OutputRoot = "_DecompiledGame",
   [string] $ToolPath = ".tools\ilspy",
@@ -12,6 +14,9 @@ param(
 $ErrorActionPreference = "Stop"
 
 $provenanceFileName = "generation-provenance.json"
+$toolRepoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
 
 function Get-GameIdentity([string] $gameRootPath) {
   $streamingAssetsPath = Join-Path $gameRootPath "Timberborn_Data\StreamingAssets"
@@ -41,7 +46,15 @@ function Get-GameIdentity([string] $gameRootPath) {
 }
 
 function Get-Sha256([string] $path) {
-  return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+  $stream = [System.IO.File]::OpenRead($path)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $hashBytes = $sha.ComputeHash($stream)
+    return [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
+  } finally {
+    $sha.Dispose()
+    $stream.Dispose()
+  }
 }
 
 function Get-RepositoryRelativePath([string] $repoRootPath, [string] $path) {
@@ -68,11 +81,10 @@ function Write-GenerationProvenance([string] $path, [object] $provenance) {
   }
 }
 
-$repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
-$gameRootPath = Join-Path $repoRoot $GameRoot
+$gameRootPath = Resolve-RepositoryPath $repoRoot $GameRoot
 $managedPath = Join-Path $gameRootPath "Timberborn_Data\Managed"
-$outputRootPath = Join-Path $repoRoot $OutputRoot
-$toolRootPath = Join-Path $repoRoot $ToolPath
+$outputRootPath = Resolve-RepositoryPath $repoRoot $OutputRoot
+$toolRootPath = Resolve-RepositoryPath $toolRepoRoot $ToolPath
 $ilspyPath = Join-Path $toolRootPath "ilspycmd.exe"
 $provenancePath = Join-Path $outputRootPath $provenanceFileName
 $errorLogPath = Join-Path $outputRootPath "decompile-errors.csv"
@@ -86,6 +98,10 @@ if (!(Test-Path -LiteralPath $ilspyPath)) {
     throw "ilspycmd not found: $ilspyPath. Re-run with -InstallTool to install it."
   }
 
+  if (!$PSCmdlet.ShouldProcess($toolRootPath, "Install ilspycmd")) {
+    Write-Host "Done. Verified ilspycmd installation plan for $toolRootPath"
+    return
+  }
   New-Item -ItemType Directory -Force -Path $toolRootPath | Out-Null
   dotnet tool install ilspycmd --tool-path $toolRootPath
 }
@@ -110,7 +126,7 @@ if (!$ilspyVersionLine -or !([string]$ilspyVersionLine -match '^ilspycmd:\s*(.+)
   throw "Unexpected ilspycmd version output: $($ilspyVersionOutput -join [System.Environment]::NewLine)"
 }
 $ilspyVersion = $Matches[1].Trim()
-$scriptRelativePath = Get-RepositoryRelativePath $repoRoot $PSCommandPath
+$scriptRelativePath = Get-RepositoryRelativePath $toolRepoRoot $PSCommandPath
 $inputRecords = @($assemblies | ForEach-Object {
   [ordered]@{
     Path = "Timberborn_Data/Managed/$($_.Name)"
@@ -118,6 +134,12 @@ $inputRecords = @($assemblies | ForEach-Object {
     Sha256 = Get-Sha256 $_.FullName
   }
 })
+
+if (!$PSCmdlet.ShouldProcess(
+    $outputRootPath, "Decompile $($assemblies.Count) game assemblies and write provenance")) {
+  Write-Host "Done. Verified decompilation plan for $($assemblies.Count) assemblies into $outputRootPath"
+  return
+}
 
 if (Test-Path -LiteralPath $provenancePath) {
   Remove-Item -LiteralPath $provenancePath -Force

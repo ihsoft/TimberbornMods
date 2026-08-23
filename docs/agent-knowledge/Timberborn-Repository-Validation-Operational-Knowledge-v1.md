@@ -43,6 +43,10 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | TimberDev source | No standalone production project in the current checkout | `dotnet run --project TimberDev.Tests/TimberDev.Tests.csproj` | No standalone mod package | `docs/timberborn-repository-notes.md` |
 | XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
 
+XRay's committed Update 1.0 backport uses the same relative project, test, and Unity-owner paths in the registered
+`update-1.0` worktree. Select that worktree's Timberborn 1.0 assemblies, Unity project, and `version-1.0` package output;
+do not use the current worktree's Update 1.1 build or export as evidence for that line.
+
 `CustomResources`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
 in this matrix. Inspect their specific project purpose before applying a mod build, export, test, or release workflow.
 

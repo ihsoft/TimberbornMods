@@ -155,6 +155,12 @@ Treat generated references as read-only caches. Before use, verify their `genera
 repository notes. If the cache or valid matching provenance is missing, stale, incomplete, or does not cover the needed
 inputs, generate or refresh it instead of designing around missing files.
 
+Each registered compatibility worktree owns separate ignored generated-reference caches. Bootstrap its game alias and
+generate its caches under that worktree; do not link them to the main worktree's caches. Historical branch copies of
+the generator may predate provenance support. In that case, invoke the current tracked generator with explicit
+`-RepositoryRoot` and game input paths so output and provenance land in the selected worktree while helper tools remain
+owned by the tooling checkout.
+
 ### Release Package Local State
 
 Release package sources and ZIPs are local artifacts, not tracked repository files.

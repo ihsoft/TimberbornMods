@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [string] $GameRoot = "_GAME!",
@@ -25,7 +26,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 $buildScriptPath = Join-Path $PSScriptRoot "build-mod-package.ps1"
@@ -38,10 +41,11 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 }
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Get-LatestChangeNotes([string] $Path, [string] $Version) {
@@ -174,7 +178,8 @@ function New-ZipFromDirectory([string] $SourceRoot, [string] $ZipPath) {
 
 function Invoke-UnityExport([string] $Name, [string] $VersionFolder) {
     Assert-PathExists $unityExportScriptPath "Unity export script"
-    & $unityExportScriptPath -ModName $Name -GameVersion $VersionFolder
+    & $unityExportScriptPath -ModName $Name -GameVersion $VersionFolder -RepositoryRoot $repoRoot `
+        -CoordinationRoot $toolRepoRoot
 }
 
 function Assert-RepositoryReleaseVersions(
@@ -428,13 +433,13 @@ function Get-SteamDetails([string] $PublishedFileId) {
 }
 
 function Get-LiveSteamTags([string] $PublishedFileId) {
-    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
     Assert-PathExists $projectPath "Steam tag updater project"
     & dotnet build $projectPath -c Release | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Steam tag updater build failed with exit code $LASTEXITCODE."
     }
-    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $dllPath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {
@@ -460,14 +465,14 @@ function Get-LiveSteamTags([string] $PublishedFileId) {
 }
 
 function Invoke-SteamTagsUpdate([string] $PublishedFileId, [string[]] $TargetTags) {
-    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
     Assert-PathExists $projectPath "Steam tag updater project"
     & dotnet build $projectPath -c Release
     if ($LASTEXITCODE -ne 0) {
         throw "Steam tag updater build failed with exit code $LASTEXITCODE."
     }
 
-    $exePath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.exe"
+    $exePath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.exe"
     Assert-PathExists $exePath "Steam tag updater executable"
     $arguments = @($PublishedFileId) + $TargetTags
     Push-Location (Split-Path -Parent $exePath)
@@ -521,7 +526,10 @@ $($tagLines -join "`r`n")
 
 function Read-SteamConfig([string] $Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
-        $Path = Join-Path $repoRoot ".tools/steam/steam.local.json"
+        $Path = Resolve-ToolPath ".tools/steam/steam.local.json"
+    }
+    elseif (-not [System.IO.Path]::IsPathRooted($Path)) {
+        $Path = Resolve-ToolPath $Path
     }
     if (-not (Test-Path -LiteralPath $Path)) {
         return $null
@@ -531,7 +539,7 @@ function Read-SteamConfig([string] $Path) {
 
 function Resolve-SteamCmdPath([string] $ConfiguredPath) {
     if (-not [string]::IsNullOrWhiteSpace($ConfiguredPath)) {
-        $resolvedPath = Resolve-RepoPath $ConfiguredPath
+        $resolvedPath = Resolve-ToolPath $ConfiguredPath
         if (Test-Path -LiteralPath $resolvedPath) {
             return $resolvedPath
         }
@@ -548,7 +556,7 @@ function Resolve-SteamCmdPath([string] $ConfiguredPath) {
         "C:\SteamCMD\steamcmd.exe",
         "C:\Program Files (x86)\Steam\steamcmd.exe",
         "C:\Program Files\Steam\steamcmd.exe",
-        (Join-Path $repoRoot ".tools/steamcmd/steamcmd.exe")
+        (Resolve-ToolPath ".tools/steamcmd/steamcmd.exe")
     )
     foreach ($path in $commonPaths) {
         if (Test-Path -LiteralPath $path) {
@@ -661,6 +669,7 @@ if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
 elseif ($packageMode -eq "Build") {
     $buildArguments = @{
         ModName = $ModName
+        ReleaseRoot = $repoRoot
         Configuration = $Configuration
         GameVersion = $GameVersion
         OutputRoot = $OutputRoot
@@ -709,7 +718,7 @@ elseif ($packageMode -eq "LocalModFolder") {
         Build-LocalModScripts $ModName $Configuration $sourcePath $GameVersion $scriptFileBase $modVersion
     }
 
-    $packageStage = Resolve-RepoPath ".tools/release-staging/$ModName-local"
+    $packageStage = Resolve-ToolPath ".tools/release-staging/$ModName-local"
     if (Test-Path -LiteralPath $packageStage) {
         Remove-Item -LiteralPath $packageStage -Recurse -Force
     }
@@ -793,7 +802,7 @@ if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
 }
 $steamChangeNote = ConvertTo-SteamChangeNote $modVersion $changeNotes
 
-$stagingRootPath = Resolve-RepoPath $SteamStagingRoot
+$stagingRootPath = Resolve-ToolPath $SteamStagingRoot
 $contentFolder = Expand-PackageForSteam $zipPath (Join-Path $stagingRootPath $ModName)
 $previewFile = Join-Path $contentFolder "thumbnail.jpg"
 if ($workshopData.UpdatePreview -eq $false) {
@@ -803,7 +812,7 @@ elseif (-not (Test-Path -LiteralPath $previewFile)) {
     throw "Steam preview file not found: $previewFile"
 }
 
-$vdfPath = Join-Path (Resolve-RepoPath $VdfRoot) "$ModName.vdf"
+$vdfPath = Join-Path (Resolve-ToolPath $VdfRoot) "$ModName.vdf"
 $localTags = Get-UniqueTags @($workshopData.Tags)
 $tags = Get-TargetSteamTags $localTags $versionFolders $releaseConfig
 $localTagAdds = Get-AddedTags $tags $localTags

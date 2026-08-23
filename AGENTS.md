@@ -482,6 +482,8 @@ export, and focused test commands.
 - `.tools/` contains locally installed external tools and must stay ignored.
 - `_DecompiledGame/` contains generated decompiled game sources and must stay ignored.
 - `_ExtractedGameAssets/` contains generated extracted game modding assets and must stay ignored.
+- Generated-reference caches belong to the selected compatibility-line worktree. Do not use a main-worktree cache as
+  fallback evidence for an older-line worktree, or regenerate an older game into the main worktree's cache.
 - Do not edit game DLLs, generated decompiled game sources, or generated extracted game assets.
 - Before using either generated-reference cache as evidence, verify that its `generation-provenance.json` game identity
   matches the target installed Timberborn build and covers the inputs needed by the task. If provenance is absent,

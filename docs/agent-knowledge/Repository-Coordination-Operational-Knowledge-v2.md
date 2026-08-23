@@ -91,6 +91,19 @@ The `.cmd` entrypoint invokes the adjacent tracked `.ps1` implementation with a 
 agent workflows, do not invoke `commit-repository-changes.ps1` directly, manually reconstruct its PowerShell command,
 or change persistent ExecutionPolicy. Pass multiple exact paths as one quoted comma-separated `-Path` value.
 
+To commit an explicitly targeted compatibility worktree through the current main-repository helper, pass its exact
+root through `-RepositoryRoot`. Paths are then interpreted relative to that target worktree, while
+`-CoordinationRoot` defaults to the main repository that owns the helper and the shared `git-transaction` lock. Do not
+use or copy a historical branch's missing or stale commit helper as a fallback. For example:
+
+```powershell
+tools/commit-repository-changes.cmd `
+  -RepositoryRoot ".tools/worktrees/update-1.0" `
+  -Path "XRay/AGENTS.md" `
+  -Message "Document XRay Update 1.0 release ownership" `
+  -Owner "mentor-thread"
+```
+
 ExecutionPolicy and environment sandbox authorization are separate concerns. The wrapper prevents the predictable
 direct-script policy failure; it does not grant permission to write the Git index or bypass an environment's approval
 boundary. Request the normal scoped Git-mutation authorization when the agent environment requires it.

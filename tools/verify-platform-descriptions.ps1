@@ -1,18 +1,22 @@
 param(
     [string[]] $ModName = @(),
+    [string] $ReleaseRoot = "",
     [switch] $SkipSteam,
     [switch] $SkipModIo
 )
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -66,7 +70,7 @@ function Get-SteamDescriptionTargets() {
 }
 
 function Get-ModIoDescriptionTargets() {
-    $configRoot = Resolve-RepoPath ".tools/modio"
+    $configRoot = Resolve-ToolPath ".tools/modio"
     if (-not (Test-Path -LiteralPath $configRoot)) {
         return @()
     }
@@ -88,7 +92,7 @@ function Get-ModIoDescriptionTargets() {
 }
 
 function Get-ModIoAccessToken() {
-    $configRoot = Resolve-RepoPath ".tools/modio"
+    $configRoot = Resolve-ToolPath ".tools/modio"
     $tokenFiles = @(Get-ChildItem -LiteralPath $configRoot -Filter "*.token.txt" -ErrorAction SilentlyContinue)
     foreach ($tokenFile in $tokenFiles) {
         $token = (Get-Content -Raw -LiteralPath $tokenFile.FullName).Trim()
@@ -104,14 +108,14 @@ function Get-ModIoAccessToken() {
 }
 
 function Get-SteamDescription([string] $PublishedFileId) {
-    $projectPath = Resolve-RepoPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
     Assert-PathExists $projectPath "Steam metadata query project"
     & dotnet build $projectPath -c Release | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Steam metadata query build failed with exit code $LASTEXITCODE."
     }
 
-    $dllPath = Resolve-RepoPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    $dllPath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     try {

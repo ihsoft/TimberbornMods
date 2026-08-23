@@ -1,0 +1,14 @@
+{
+  "SchemaVersion": 1,
+  "CompatibilityLines": [
+    {
+      "ReleaseLine": "update-1.0",
+      "Branch": "update-1.0",
+      "GameVersion": "version-1.0",
+      "VersionPolicy": "BackportPatchOnly",
+      "Mods": [
+        "XRay"
+      ]
+    }
+  ]
+}

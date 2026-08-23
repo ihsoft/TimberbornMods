@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $ConfigPath = "",
     [string] $AccessTokenPath = "",
     [switch] $Publish
@@ -9,13 +10,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-ToolPath([string] $Path) {
+    return Resolve-RepositoryPath $toolRepoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -42,16 +46,16 @@ function Get-LocalDescriptionPath([string] $Name) {
 
 function Resolve-ConfigPath([string] $Path, [string] $Name) {
     if (-not [string]::IsNullOrWhiteSpace($Path)) {
-        return Resolve-RepoPath $Path
+        return Resolve-ToolPath $Path
     }
-    return Resolve-RepoPath ".tools/modio/$Name.local.json"
+    return Resolve-ToolPath ".tools/modio/$Name.local.json"
 }
 
 function Resolve-AccessTokenPath([string] $Path, [string] $Name) {
     if (-not [string]::IsNullOrWhiteSpace($Path)) {
-        return Resolve-RepoPath $Path
+        return Resolve-ToolPath $Path
     }
-    return Resolve-RepoPath ".tools/modio/$Name.token.txt"
+    return Resolve-ToolPath ".tools/modio/$Name.token.txt"
 }
 
 function Get-ModIoDescription([object] $Config, [string] $AccessToken) {

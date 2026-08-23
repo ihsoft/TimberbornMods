@@ -2,13 +2,17 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $ReleaseRoot = "",
     [string] $Version = "",
+    [string] $ReleaseNotesPath = "",
     [switch] $Prepare
 )
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 
@@ -19,10 +23,7 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 }
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
 }
 
 function Get-ChangeNotes([string] $Path, [string] $ReleaseVersion) {
@@ -85,7 +86,14 @@ $descriptionPaths = @(
     (Join-Path $modRoot "workshop/description-ModIO.html")
 )
 $channelUrl = Get-DiscordChannelUrl $descriptionPaths
-$notes = Get-ChangeNotes $changesPath $Version
+$notes = if ([string]::IsNullOrWhiteSpace($ReleaseNotesPath)) {
+    Get-ChangeNotes $changesPath $Version
+}
+else {
+    $resolvedNotesPath = Resolve-RepositoryPath $toolRepoRoot $ReleaseNotesPath
+    Assert-PathExists $resolvedNotesPath "Release notes"
+    (Get-Content -Raw -LiteralPath $resolvedNotesPath).Trim()
+}
 $discordNotes = $notes -replace '(?m)^\* ', '- '
 $message = "# $displayName v$Version`r`n`r`n$discordNotes"
 

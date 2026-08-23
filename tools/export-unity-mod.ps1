@@ -2,6 +2,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $ModName,
 
+    [string] $RepositoryRoot = "",
+    [string] $CoordinationRoot = "",
     [string] $GameVersion = "version-1.1",
     [string] $UnityPath = "",
     [string] $ProjectPath = "ModsUnityProject",
@@ -16,15 +18,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent $PSScriptRoot
+$toolRepoRoot = Split-Path -Parent $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+$repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
+$coordinationRoot = Resolve-RepositoryRoot $CoordinationRoot $toolRepoRoot
 $coordinationModule = Join-Path $PSScriptRoot "repository-coordination.psm1"
 Import-Module $coordinationModule -Force
 
 function Resolve-RepoPath([string] $Path) {
-    if ([System.IO.Path]::IsPathRooted($Path)) {
-        return $Path
-    }
-    return Join-Path $repoRoot $Path
+    return Resolve-RepositoryPath $repoRoot $Path
 }
 
 function Assert-PathExists([string] $Path, [string] $Description) {
@@ -117,7 +119,8 @@ function Assert-UnityProjectNotOpen([string] $ProjectRoot) {
 }
 
 $operation = "Export Unity mod $ModName for $GameVersion"
-Invoke-WithRepositoryLock -RepositoryRoot $repoRoot -Resource "unity-project" -Operation $operation -Owner $LockOwner -Action {
+Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "unity-project" -Operation $operation `
+    -Owner $LockOwner -Action {
     $projectRoot = Resolve-RepoPath $ProjectPath
     Assert-PathExists $projectRoot "Unity project"
     Assert-UnityProjectNotOpen $projectRoot
