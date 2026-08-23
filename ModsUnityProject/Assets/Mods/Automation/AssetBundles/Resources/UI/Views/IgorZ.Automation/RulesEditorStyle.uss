@@ -10,6 +10,32 @@
     color: rgb(0, 255, 0);
 }
 
+.rules-editor-list {
+    flex-grow: 1;
+    width: 100%;
+}
+
+.rules-editor-list__item {
+    flex-grow: 1;
+    width: 100%;
+}
+
+.rules-editor-list .unity-list-view__reorderable-item {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.rules-editor-list .unity-list-view__reorderable-handle {
+    display: none;
+}
+
+.rules-editor-list .unity-list-view__reorderable-item__container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    align-self: stretch;
+    width: 100%;
+}
+
 .original-rule {
     background-color: rgba(255, 255, 255, 0.05);
     padding-top: 5px;

@@ -264,4 +264,10 @@
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
     </ItemGroup>
+    <ItemGroup>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\AssetBundles\Resources\UI\Views\IgorZ.Automation\RulesEditor.uxml"
+            Link="TestAssets\RulesEditor.uxml" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\AssetBundles\Resources\UI\Views\IgorZ.Automation\RulesEditorStyle.uss"
+            Link="TestAssets\RulesEditorStyle.uss" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
 </Project>

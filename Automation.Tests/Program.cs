@@ -115,6 +115,8 @@ static class Program {
           BooleanComparisonTests.AcceptsRecommendedTrueValueForExistingRules),
       ("BooleanComparison rejects comparisons that do not represent Boolean state",
           BooleanComparisonTests.RejectsComparisonsThatDoNotRepresentBooleanState),
+      ("RulesEditor uses runtime drag-and-drop without a visible handle",
+          RulesEditorDragAndDropTests.UsesRuntimeReorderingWithoutVisibleHandle),
 
       // ScriptingEngine.Core
       ("SignalModuleOrder preserves registration order by default",

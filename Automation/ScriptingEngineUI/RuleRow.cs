@@ -17,7 +17,6 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.Common;
 using Timberborn.CoreUI;
 using Timberborn.TooltipSystem;
-using UnityDev.Utils.LogUtilsLite;
 using UnityEngine.UIElements;
 
 namespace IgorZ.Automation.ScriptingEngineUI;
@@ -32,8 +31,7 @@ sealed class RuleRow {
   const string PauseRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.PauseRuleBtn";
   const string ResetChangesBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResetChangesBtn";
   const string ResumeRuleBtnLocKey = "IgorZ.Automation.Scripting.Editor.ResumeRuleBtn";
-  const string GameAutomationBlocksSaveLocKey =
-      "IgorZ.Automation.Scripting.Editor.GameAutomationBlocksSaveRuleHint";
+  const string GameAutomationBlocksSaveLocKey = "IgorZ.Automation.Scripting.Editor.GameAutomationBlocksSaveRuleHint";
   const string GameAutomationWillBeBlockedLocKey =
       "IgorZ.Automation.Scripting.Editor.GameAutomationWillBeBlockedRuleHint";
 
@@ -458,7 +456,6 @@ sealed class RuleRow {
     var rulePos = RulesEditorDialog.RuleRows.IndexOf(this);
     if (rulePos != 0) {
       RulesEditorDialog.SwapRows(rulePos, rulePos - 1);
-      RulesEditorDialog.ContentScrollView.ScrollTo(Root);
     }
   }
 
@@ -466,7 +463,6 @@ sealed class RuleRow {
     var rulePos = RulesEditorDialog.RuleRows.IndexOf(this);
     if (rulePos != RulesEditorDialog.RuleRows.Count - 1) {
       RulesEditorDialog.SwapRows(rulePos, rulePos + 1);
-      RulesEditorDialog.ContentScrollView.ScrollTo(Root);
     }
   }
 

@@ -69,10 +69,6 @@ sealed class RulesEditorDialog : AbstractDialog {
   /// <summary>The rule rows of the dialog.</summary>
   public IReadOnlyList<RuleRow> RuleRows => _ruleRows;
 
-  /// <summary>The scrolling view that holds the rules.</summary>
-  public ScrollView ContentScrollView => _contentScrollView ??= Root.Q<ScrollView>();
-  ScrollView _contentScrollView;
-
   public RulesEditorDialog WithUiHelper(RulesUIHelper rulesUiHelper) {
     _rulesUiHelper = rulesUiHelper;
     return this;
@@ -96,7 +92,14 @@ sealed class RulesEditorDialog : AbstractDialog {
       buttons.Add(btn);
     }
 
-    _ruleRowsContainer = Root.Q2<VisualElement>("RuleRowsContainer");
+    _ruleRowsList = Root.Q2<ListView>("RuleRowsList");
+    // ListView cannot serialize itemsSource, so UI Builder uses a separate authoring-time preview.
+    Root.Q2<ScrollView>("RuleRowsPreview").RemoveFromHierarchy();
+    _ruleRowsList.makeItem = MakeRuleRowContainer;
+    _ruleRowsList.bindItem = BindRuleRow;
+    _ruleRowsList.unbindItem = UnbindRuleRow;
+    _ruleRowsList.itemsSource = _ruleRows;
+    _ruleRowsList.itemIndexChanged += OnItemIndexChanged;
     Reset();
     foreach (var action in _rulesUiHelper.BuildingRules) {
       var ruleRow = CreateScriptedRule();
@@ -111,10 +114,14 @@ sealed class RulesEditorDialog : AbstractDialog {
 
   /// <inheritdoc/>
   public override void Close() {
-    base.Close();
+    if (_ruleRowsList != null) {
+      _ruleRowsList.itemIndexChanged -= OnItemIndexChanged;
+      _ruleRowsList.itemsSource = null;
+    }
     _ruleRows.Clear();
     _rulesUiHelper = null;
-    _ruleRowsContainer = null;
+    _ruleRowsList = null;
+    base.Close();
   }
 
   /// <summary>Creates a new rule row at the end of the list.</summary>
@@ -130,7 +137,7 @@ sealed class RulesEditorDialog : AbstractDialog {
     var ruleRow = RuleRow.CreateFor(this, _rulesUiHelper.AutomationBehavior);
     ruleRow.OnStateChanged += OnRuleStateChanged;
     _ruleRows.Insert(index, ruleRow);
-    _ruleRowsContainer.Insert(index, ruleRow.Root);
+    _ruleRowsList.RefreshItems();
     return ruleRow;
   }
 
@@ -145,9 +152,8 @@ sealed class RulesEditorDialog : AbstractDialog {
     var fromRuleRow = _ruleRows[from];
     _ruleRows.RemoveAt(from);
     _ruleRows.Insert(to, fromRuleRow);
-    var fromRuleRowContainer = _ruleRowsContainer[from];
-    _ruleRowsContainer.RemoveAt(from);
-    _ruleRowsContainer.Insert(to, fromRuleRowContainer);
+    _ruleRowsList.RefreshItems();
+    _ruleRowsList.ScrollToItem(to);
   }
 
   public enum GameAutomationRuleConflictState {
@@ -184,10 +190,10 @@ sealed class RulesEditorDialog : AbstractDialog {
   bool EditsPending => _ruleRows.Any(x => x.IsInEditMode);
   bool HasErrors => _ruleRows.Any(x => x.HasErrors);
 
-  VisualElement _ruleRowsContainer;
+  ListView _ruleRowsList;
   RulesUIHelper _rulesUiHelper;
   readonly List<RuleRow> _ruleRows = [];
-  
+
   RulesEditorDialog(
       IEnumerable<IEditorButtonProvider> editorProviders,
       GameAutomationRuleSaveConflictDetector gameAutomationRuleSaveConflictDetector) {
@@ -196,17 +202,43 @@ sealed class RulesEditorDialog : AbstractDialog {
   }
 
   void Reset() {
-    _ruleRowsContainer.Clear();
     _ruleRows.Clear();
+    _ruleRowsList.RefreshItems();
+  }
+
+  static VisualElement MakeRuleRowContainer() {
+    var container = new VisualElement();
+    container.AddToClassList("rules-editor-list__item");
+    return container;
+  }
+
+  void BindRuleRow(VisualElement container, int index) {
+    container.Clear();
+    var ruleRoot = _ruleRows[index].Root;
+    ruleRoot.RemoveFromHierarchy();
+    container.Add(ruleRoot);
+  }
+
+  static void UnbindRuleRow(VisualElement container, int _) {
+    container.Clear();
+  }
+
+  void OnItemIndexChanged(int _, int newIndex) {
+    _ruleRowsList.ScrollToItem(newIndex);
   }
 
   void OnRuleStateChanged(object obj, EventArgs args) {
+    var rowsChanged = false;
     for (var i = _ruleRows.Count - 1; i >= 0; i--) {
       var ruleRow = _ruleRows[i];
       if (ruleRow.IsDeleted && ruleRow.IsNew) {
         _ruleRows.RemoveAt(i);
         ruleRow.Root.RemoveFromHierarchy();
+        rowsChanged = true;
       }
+    }
+    if (rowsChanged) {
+      _ruleRowsList.RefreshItems();
     }
   }
 
