@@ -56,6 +56,15 @@ authoring-time sample values when runtime binding will safely overwrite them. Ch
 lengths and states so the asset is understandable in UI Builder and can expose layout issues before export. Do not make
 runtime behavior depend on the samples, and do not add localization keys solely for preview data.
 
+When a collection control owns or virtualizes its children, do not assume declarative child elements become collection
+items merely because the UXML imports successfully. Verify the data and binding contract in the target Unity version.
+For `ListView`, runtime rows come from `itemsSource` through `makeItem` or `item-template` plus binding; direct UXML
+children are not row data.
+
+If UI Builder needs representative collection rows and no safe built-in authoring data source exists, use a clearly
+named separate authoring preview that runtime code removes before binding the real collection. Do not reference custom
+editor-only data types or assets from runtime-bundled UXML merely to populate an authoring preview.
+
 Before replacing a UI helper or factory call with UXML, inspect the complete helper contract and reproduce every
 relevant effect. Preserve the concrete control type, USS classes, documented default padding or margins, initialization
 behavior, localization ownership, callbacks, and tooltip registration. Treat documented defaults as behavior, then
