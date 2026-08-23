@@ -76,6 +76,11 @@ Unity exports, `_MODS!` output, staging folders, ZIPs, VDFs, temporary GitHub re
 `.tools/release-preflight/<ModName>-<Version>.json` reports when those artifacts are needed to validate the exact
 package that would be published. It must not pass `-Publish` to platform scripts or change public platform state.
 
+Preflight should materialize the shared package source through one explicit preparation sequence. For a Unity/C#
+package, expose Unity export and the following C# build as distinct ordered operations, then run Steam and Mod.IO dry
+runs against that prepared source with their export/build paths disabled. Platform-specific staging or packaging may
+still run independently, but a platform dry run must not silently rebuild or re-export the shared package source.
+
 `tools/publish-release.ps1` consumes a preflight report and performs the public publish step. It must re-check critical
 preflight invariants before public changes, including the release identity and source/package state captured by the
 report. It may request required host or network elevation up front when practical.
@@ -83,6 +88,11 @@ report. It may request required host or network elevation up front when practica
 Use the unified scripts' compact child output for routine releases. Every distinct child invocation must remain visible
 as a named operation so repeated export, build, package, verification, or publish work is not hidden. Use
 `-DetailedOutput` only when the user requests it or when diagnosing a failure or meaningful plan difference.
+
+This visibility requirement includes nested native or script operations launched inside a named child step. Reporting
+only an outer `Steam dry run` or `Mod.IO dry run` is insufficient when it launches Unity export, C# build, or another
+package-mutating operation internally. The compact output must preserve their identity and order without replaying
+their complete successful logs.
 
 Preserve complete stdout and stderr for every child operation under the ignored
 `.tools/release-logs/<ModName>-<Version>/` tree and record the relevant log paths in the preflight report. Do not load
@@ -93,6 +103,11 @@ hashes or fingerprints, visibility intent, platform IDs, tag equality or mutatio
 warnings, and log paths. On child failure, show the complete child output and saved log path while preserving a nonzero
 exit. If public steps already completed, report them explicitly together with partial-success state and any unknown
 external outcome; do not collapse the result into a generic failure.
+
+Every release-tool native-command wrapper that captures stderr must temporarily use non-terminating collection
+semantics, restore the caller's error preference immediately, preserve the captured diagnostics, and decide success or
+failure from the native exit code. Apply this to direct Git and platform CLI wrappers as well as logged child scripts;
+a benign stderr warning must not become a terminating PowerShell error before the exit code is checked.
 
 Issue closing and Wiki handoff remain explicit user-confirmed follow-up steps, not automatic side effects of the
 publish script.
@@ -150,6 +165,13 @@ If publishing discovers that derived metadata, tags, package contents, or platfo
 stop before the next public change. Apply the change during release preparation or preflight, rebuild the package,
 repeat all affected validation, and create a new final preflight report with the new fingerprints and hashes. Do not
 continue under the old report even when the rebuilt package is expected to be equivalent.
+
+The committed changelog date is part of the immutable release snapshot. Crossing local midnight after final preflight
+does not by itself change source, package, or authorization and does not require an automatic rebuild. It does create a
+date decision: before the first public mutation, show the committed date and the current local date and ask whether to
+preserve the prepared snapshot or create a newly dated release-preparation commit and preflight. Preserve the old date
+only after explicit user confirmation; never silently rewrite the snapshot or guess that platform mutation time owns
+the changelog date.
 
 ## Exceptional Corrective Releases
 
@@ -270,6 +292,10 @@ incomplete and ask whether to restore or locate it.
 Use `tools/find-unpublished-releases.ps1` for this inventory. Its tracked `tools/release-lines.json` registry identifies
 the compatibility branches and mods that participate in release discovery; worktree paths remain local and are
 resolved from Git. Update the registry only after a real committed compatibility-line owner is established.
+
+The default human-readable view and `-AsJson` must represent the same candidate set. Each candidate must render as a
+nonblank row in the default view. Blank rows, missing properties, or disagreement with JSON are a tooling failure, not
+evidence that no unpublished versions exist; stop and inspect the machine-readable result before proceeding.
 
 Group candidates by mod before preparation. If the same mod has `(TBD)` candidates in current and registered older
 lines, prepare one coordinated multi-source package and release transaction under the rules below; do not upload each
@@ -499,6 +525,11 @@ authentication requires diagnosis.
 For Mod.IO, use the target mod's config and a known valid owner token, generate compatibility metadata from the final
 package, and verify that the uploaded file becomes the live file with the intended version. A different known owner
 token file for the same account and game scope may be passed explicitly; never copy, rename, or guess token files.
+
+After scan completion and active-file mutation, perform a final Mod.IO readback and surface its final tuple in compact
+output: mod ID, active file ID, version, `date_scanned`, `virus_status`, `virus_positive`, and file size. The earlier
+upload response is not final scan or activation evidence. Do not enter signoff unless readback proves the intended file
+is active, scanned successfully, and unflagged.
 
 ## Signoff Transition
 
