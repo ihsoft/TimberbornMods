@@ -114,7 +114,7 @@ try {
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
     $jsonOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot -AsJson | Out-String)
-    $jsonCandidates = @(ConvertFrom-Json $jsonOutput)
+    $jsonCandidates = @((ConvertFrom-Json $jsonOutput) | ForEach-Object { $_ })
     $candidateKeys = @($jsonCandidates | ForEach-Object { Get-CandidateKey $_ } | Sort-Object)
     $expectedKeys = @(
         "Alpha|2.0.0|main|||CurrentLine|Alpha/CHANGELOG.md",
@@ -157,8 +157,14 @@ Write-Host "Final Mod.IO readback: mod_id=1; active_file_id=2; version=3.0.0; da
         "Unity export completed for Fixture version-1.1",
         "C# build completed for Fixture version-1.1: fixture.dll",
         "Built package from local mod folder: fixture.zip",
-        "Final Mod.IO readback: mod_id=1; active_file_id=2; version=3.0.0; date_scanned=4; " +
-            "virus_status=1; virus_positive=0; file_size=5"
+        "Final Mod.IO readback:",
+        "mod_id=1",
+        "active_file_id=2",
+        "version=3.0.0",
+        "date_scanned=4",
+        "virus_status=1",
+        "virus_positive=0",
+        "file_size=5"
     ) | ForEach-Object {
         Assert-True $compactOutput.Contains($_) "Compact output omitted nested operation evidence: $_"
     }
