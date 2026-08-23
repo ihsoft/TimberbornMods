@@ -14,10 +14,12 @@ No need to change the terrain layer now! Just press a hotkey or click the tool b
 ✓ Multiple visualization modes
 ✓ Extensive customization options
 ✓ Toggle or Hold-to-X-Ray
+✓ Configurable transparency for buildings and plants
 
 [h1]Default Hotkeys[/h1]
 Ctrl+P — Toggle X-Ray
 P — Hold-to-X-Ray
+H — Toggle or hold object transparency
 
 All keybindings can be changed in the game settings.
 
