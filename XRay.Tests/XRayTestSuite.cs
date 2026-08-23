@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+
+namespace XRay.Tests;
+
+static class XRayTestSuite {
+  static readonly List<(string Name, Action Test)> Tests = [
+      ("XRayModeManager toggles services once per state transition", XRayModeManagerTests.TogglesServices),
+      ("XRayModeManager skips duplicate state changes", XRayModeManagerTests.SkipsDuplicateStateChanges),
+      ("KeyBindingInputProcessor registers itself", KeyBindingInputProcessorTests.RegistersItself),
+      ("KeyBindingInputProcessor activates while show binding is held", KeyBindingInputProcessorTests.ActivatesOnHold),
+      ("KeyBindingInputProcessor ignores hold while toggle mode is active",
+          KeyBindingInputProcessorTests.IgnoresHoldWhenActive),
+      ("Object transparency only activates in X-Ray mode",
+          KeyBindingInputProcessorTests.ObjectTransparencyRequiresXRay),
+      ("Short object transparency press toggles the mode",
+          KeyBindingInputProcessorTests.ShortPressTogglesObjectTransparency),
+      ("Held object transparency binding is temporary",
+          KeyBindingInputProcessorTests.HeldObjectTransparencyIsTemporary),
+      ("TerrainRayCaster returns surface terrain hits", TerrainRayCasterTests.ReturnsSurfaceTerrainHits),
+      ("TerrainRayCaster stops when an object blocks the ray", TerrainRayCasterTests.StopsOnBlockingObject),
+      ("TerrainRayCaster supports side-attached previews", TerrainRayCasterTests.SupportsSideAttachedPreviews),
+      ("TerrainRayCaster prefers underground hits after surface fallback",
+          TerrainRayCasterTests.PrefersUndergroundHitsAfterSurfaceFallback),
+  ];
+
+  public static int Run() {
+    return TestRunner.Run(Tests);
+  }
+}

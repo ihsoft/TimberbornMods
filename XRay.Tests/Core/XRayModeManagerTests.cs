@@ -5,8 +5,10 @@ namespace XRay.Tests;
 static class XRayModeManagerTests {
   public static void TogglesServices() {
     var transparent = new TransparentTerrainMeshService();
+    var transparentBuildings = new TransparentBuildingModelService();
+    var transparentNaturalResources = new TransparentNaturalResourceModelService();
     var wireframe = new WireframeTerrainMeshService();
-    var manager = CreateManager(transparent, wireframe);
+    var manager = CreateManager(transparent, transparentBuildings, transparentNaturalResources, wireframe);
 
     manager.SetActiveMode(true);
 
@@ -27,8 +29,10 @@ static class XRayModeManagerTests {
 
   public static void SkipsDuplicateStateChanges() {
     var transparent = new TransparentTerrainMeshService();
+    var transparentBuildings = new TransparentBuildingModelService();
+    var transparentNaturalResources = new TransparentNaturalResourceModelService();
     var wireframe = new WireframeTerrainMeshService();
-    var manager = CreateManager(transparent, wireframe);
+    var manager = CreateManager(transparent, transparentBuildings, transparentNaturalResources, wireframe);
 
     manager.SetActiveMode(true);
     manager.SetActiveMode(true);
@@ -42,9 +46,13 @@ static class XRayModeManagerTests {
   }
 
   static XRayModeManager CreateManager(
-      TransparentTerrainMeshService transparent, WireframeTerrainMeshService wireframe) {
+      TransparentTerrainMeshService transparent, TransparentBuildingModelService transparentBuildings,
+      TransparentNaturalResourceModelService transparentNaturalResources,
+      WireframeTerrainMeshService wireframe) {
     return TestObjectFactory.Create<XRayModeManager>(
         ("_transparentTerrainMeshService", transparent),
+        ("_transparentBuildingModelService", transparentBuildings),
+        ("_transparentNaturalResourceModelService", transparentNaturalResources),
         ("_wireframeTerrainMeshService", wireframe));
   }
 }

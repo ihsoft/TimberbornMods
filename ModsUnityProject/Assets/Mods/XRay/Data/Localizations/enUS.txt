@@ -1,7 +1,13 @@
 ID,Text,Comment
 IgorZ.XRay.KeyBindingGroup,"X-Ray Mod","The header for the section of the mod settings that allows to customize the key bindings"
+IgorZ.XRay.KeyBinding.ToggleObjectTransparency,"Toggle object transparency","The binding can be held for temporary transparency or pressed briefly to toggle object transparency"
 IgorZ.XRay.KeyBinding.ToggleMode,"Toggle X-Ray mode","The label for the key binding that toggles the X-Ray mode on and off"
 IgorZ.XRay.KeyBinding.ShowMode,"Show X-Ray mode","The label for the key binding that shows the X-Ray mode while held down"
+IgorZ.XRay.ObjectTransparencySettings.Header,"Object transparency","The header for settings that control transparent object models"
+IgorZ.XRay.ObjectTransparencySettings.BuildingColor,"Building fill color","The fill color applied to transparent buildings"
+IgorZ.XRay.ObjectTransparencySettings.BuildingTransparency,"Building transparency","The percentage of transparency applied to buildings"
+IgorZ.XRay.ObjectTransparencySettings.PlantColor,"Plant fill color","The fill color applied to transparent plants"
+IgorZ.XRay.ObjectTransparencySettings.PlantTransparency,"Plant transparency","The percentage of transparency applied to plants"
 IgorZ.XRay.MeshSettings.Color.CliffEdge,"Cliff edge color",
 IgorZ.XRay.MeshSettings.Color.Cliff,"Cliff color",
 IgorZ.XRay.MeshSettings.Color.Grass,"Grass color",
@@ -26,3 +32,4 @@ IgorZ.XRay.MeshSettings.WireframeMode.Grid,"Grid","The name of the visualization
 IgorZ.XRay.MeshSettings.WireframeMode.Contours,"Contours","The name of the visualization mode that renders terrain contours"
 IgorZ.XRay.Visibility.Show,"Show underground structures","The label for the toggle that enables or disables the visibility of underground structures"
 IgorZ.XRay.Visibility.Hide,"Hide underground structures","The label for the toggle that enables or disables the visibility of underground buildings"
+IgorZ.XRay.Visibility.ObjectTransparencyTooltip,"Object transparency: click or hold","The tooltip instruction shown before the object transparency key binding"

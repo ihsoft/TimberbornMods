@@ -1,3 +1,6 @@
+# v1.1.2 (TBD):
+* [Feature] Add configurable transparency for buildings and plants, with click-or-hold activation and underground object selection through surface structures.
+
 # v1.1.1 (July 6th, 2026):
 * [Fix] X-Ray terrain and wireframe now respect the game's visible terrain level when the layer visibility tool is used.
 

@@ -207,7 +207,8 @@ class WireframeTerrainMeshService(
   }
 
   GameObject CreateWireOverlay() {
-    _material = rendererFactory.CreateTransparencyMaterial("WireMaterial", meshSettings.WireframeEdgeColor.Color);
+    _material = rendererFactory.CreateTransparencyMaterial(
+        "WireMaterial", meshSettings.WireframeEdgeColor.Color, rendererFactory.WaterRendererQueue + 2);
     var size = mapSize.TerrainSize;
     var overlayObj = new GameObject("XRayWireframeTerrainMesh");
     for (var startX = 0; startX < size.x; startX += XMeshSize) {
@@ -458,11 +459,7 @@ class WireframeTerrainMeshService(
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   bool ShouldRenderEdge(EdgeInfo info) {
-    return _currentMode switch {
-        Mode.Contours => IsContourEdge(info),
-        Mode.Grid => info.Total > 0,
-        _ => false,
-    };
+    return _currentMode switch { Mode.Contours => IsContourEdge(info), Mode.Grid => info.Total > 0, _ => false };
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
