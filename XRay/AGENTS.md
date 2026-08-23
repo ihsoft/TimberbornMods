@@ -1,32 +1,39 @@
 # X-Ray Agent Notes
 
-These notes apply only when working inside the X-Ray mod.
+These notes apply only when working inside the X-Ray mod on the `update-1.0` compatibility branch.
 
-## Release Package Layout
+## Compatibility-Line Ownership
 
-X-Ray currently publishes as a single-folder cross-game-version package.
+This worktree owns X-Ray's Timberborn Update 1.0 source and `version-1.0` package lane. The first committed backport
+baseline is `aa2a2d23ccce7b996beaa01ab2b81e6c9aacc0d1`, based on the published `XRay_1.1.1` line.
 
-Do not create a `version-1.1` package folder unless the compatibility model changes. The current release package should
-contain only `XRay/version-1.0`, even when publishing mod version `1.1.x` for Timberborn 1.1 compatibility.
+Use the relative owners in this worktree:
 
-Use release metadata compatibility ranges to express supported Timberborn versions. Do not infer that a mod version
-`1.1.x` requires a `version-1.1` package lane.
+- production: `XRay/XRay.csproj`;
+- focused tests: `dotnet run --project XRay.Tests/XRay.Tests.csproj`;
+- Unity data: `ModsUnityProject/Assets/Mods/XRay`;
+- package output: `XRay/version-1.0` under the selected old-game local mod root.
 
-Preserve old ZIP archives as historical artifacts unless the user explicitly asks to remove them.
+Build against the configured Timberborn 1.0 installation and this worktree's Unity project/toolchain. Do not use the
+main worktree's Update 1.1 assemblies, generated references, Unity export, or package as evidence for this line.
 
-## Platform Tags
+## Version And Release
 
-Temporary current-model exception: while X-Ray uses the single `version-1.0` package folder with release metadata
-declaring compatibility through Timberborn 1.1, keep both `Update 1.0` and `Update 1.1` platform tags.
+Backport releases advance patch-only from the latest dated release in this branch's XRay changelog. Features do not
+promote the older line to a new minor version. Use the qualified tag `<ModName>_<Version>_update-1.0`, for example
+`XRay_1.1.2_update-1.0`; the unqualified tag is reserved for the current line.
 
-Do not remove `Update 1.1` only because the final package has no `version-1.1` folder. If the generic platform-tag
-tooling plans to remove `Update 1.1`, stop before publishing and ask for an override or tooling fix.
+Run current provenance-capable release and generated-reference tools from the tooling checkout with this worktree as
+their explicit target root. A historical script in this branch that lacks current provenance or immutable-preflight
+support is not an alternative release path.
 
-Re-evaluate this exception when Timberborn adds a new major/minor game-version lane or when X-Ray's package or
-compatibility model changes.
+A changed Update 1.0 lane must receive its own immutable preflight. Import it into a multi-lane public package only
+through that preflight artifact and verify the lane fingerprint. When current and Update 1.0 lines both change, both
+source commits receive tags and the current-line tag is primary for the GitHub Release. When only Update 1.0 changes,
+the qualified tag is primary and no current-line tag is created.
 
 ## Unity Export
 
-When exporting X-Ray Unity resources, pass `-GameVersion version-1.0` to the repository export tooling under the
-current package layout. Do not let a generic export default create or refresh `version-1.1` unless the X-Ray
-compatibility model changes.
+Export `version-1.0` through this worktree's Unity project first, then build `XRay/XRay.csproj` into the same package.
+Verify the final package contains both the exported Unity layer and `Scripts/XRay.dll` plus `Scripts/XRay.xml` before
+asking the user to test it in Timberborn 1.0.
