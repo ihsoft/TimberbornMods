@@ -1,4 +1,4 @@
-# v4.10.0 (TBD)
+# v4.10.0 (August 22nd, 2026)
 * [Feature] Add a setting to customize the order of signal modules in the rule constructor.
 * [Feature] Allow reordering rules with drag and drop.
 * [Feature] Allow comparing numeric conditions with custom signals in the rule constructor.
