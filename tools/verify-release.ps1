@@ -44,6 +44,7 @@ Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-lines.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $releaseBranch = (& git -C $repoRoot branch --show-current).Trim()
 if ([string]::IsNullOrWhiteSpace($releaseBranch)) {
@@ -217,17 +218,15 @@ function Assert-ReleaseSourceCurrent([object] $Source) {
     if ($criticalPaths.Count -eq 0) {
         throw "Release source $sourceRoot contains no release-critical paths."
     }
-    $laterChanges = @(& git -C $sourceRoot diff --name-only "$sourceCommit..$sourceHead" -- @criticalPaths)
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cannot verify later release-critical changes in $sourceRoot."
-    }
+    $laterChanges = @(Invoke-Git `
+        -Arguments (@("diff", "--name-only", "$sourceCommit..$sourceHead", "--") + $criticalPaths) `
+        -RepositoryRoot $sourceRoot)
     if ($laterChanges.Count -gt 0) {
         throw "Release source has later critical changes: $($laterChanges -join ', ')."
     }
-    $workingChanges = @(& git -C $sourceRoot diff --name-only $sourceCommit -- @criticalPaths)
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cannot verify working-tree release-critical changes in $sourceRoot."
-    }
+    $workingChanges = @(Invoke-Git `
+        -Arguments (@("diff", "--name-only", $sourceCommit, "--") + $criticalPaths) `
+        -RepositoryRoot $sourceRoot)
     if ($workingChanges.Count -gt 0) {
         throw "Release source differs from commit ${sourceCommit}: $($workingChanges -join ', ')."
     }
@@ -316,12 +315,19 @@ if ($AdditionalReleaseSourceReportPath.Count -gt 0 -and $VersionPolicy -ne "Curr
     throw "A multi-source release must use the current compatibility line as its primary source."
 }
 
-function Invoke-Git([string[]] $Arguments) {
-    $output = @(& git -C $repoRoot @Arguments 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        throw "git $($Arguments -join ' ') failed.`n$($output -join [Environment]::NewLine)"
+function Invoke-Git {
+    param(
+        [string[]] $Arguments,
+        [string] $RepositoryRoot = $repoRoot
+    )
+
+    $gitResult = Invoke-ReleaseNativeCommand -Command "git" -Arguments (
+        @("-C", $RepositoryRoot) + $Arguments)
+    if ($gitResult.ExitCode -ne 0) {
+        throw "git $($Arguments -join ' ') failed.`n$($gitResult.Diagnostics -join [Environment]::NewLine)"
     }
-    return [string[]]$output
+    $gitResult.StandardError | ForEach-Object { Write-Warning $_ }
+    return [string[]]$gitResult.Output
 }
 
 function Convert-ToRepositoryPath([string] $Path) {
@@ -465,6 +471,29 @@ if (-not $SkipPlatformDescriptions) {
     $steps.Add((Invoke-ReleaseStep "Platform description verification" "verify-platform-descriptions.ps1" $descriptionArgs.ToArray()))
 }
 
+$preparesLocalModSource = $packageMode -eq "LocalModFolder"
+if ($preparesLocalModSource) {
+    if (-not $SkipUnityExport) {
+        $unityExportArgs = @(
+            "-ModName", $ModName,
+            "-RepositoryRoot", $repoRoot,
+            "-CoordinationRoot", $toolRepoRoot,
+            "-GameVersion", $GameVersion)
+        $steps.Add((Invoke-ReleaseStep `
+            "Unity package source export" "export-unity-mod.ps1" $unityExportArgs))
+    }
+
+    if (-not $SkipBuild) {
+        $buildArgs = @(
+            "-ModName", $ModName,
+            "-ReleaseRoot", $repoRoot,
+            "-Configuration", $Configuration,
+            "-GameVersion", $GameVersion)
+        $steps.Add((Invoke-ReleaseStep `
+            "C# package source build" "build-local-mod-scripts.ps1" $buildArgs))
+    }
+}
+
 $commonPublishArgs = New-Object System.Collections.Generic.List[string]
 $commonPublishArgs.Add("-ModName")
 $commonPublishArgs.Add($ModName)
@@ -480,8 +509,8 @@ $commonPublishArgs.Add("-OutputRoot")
 $commonPublishArgs.Add($OutputRoot)
 Add-OptionalArgument $commonPublishArgs "-LocalModRoot" $LocalModRoot
 Add-SwitchArgument $commonPublishArgs "-IncludeLegacyVersions" $IncludeLegacyVersions
-Add-SwitchArgument $commonPublishArgs "-SkipBuild" $SkipBuild
-Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $SkipUnityExport
+Add-SwitchArgument $commonPublishArgs "-SkipBuild" ($SkipBuild -or $preparesLocalModSource)
+Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" ($SkipUnityExport -or $preparesLocalModSource)
 Add-SwitchArgument $commonPublishArgs "-CorrectiveReplacement" $CorrectiveReplacement
 
 if (-not $SkipSteam) {
@@ -536,11 +565,13 @@ if (-not $SkipPlatformTags) {
 
     $finalPublishArgs = New-Object System.Collections.Generic.List[string]
     $finalPublishArgs.AddRange([string[]]$commonPublishArgs)
-    if (-not $SkipBuild) {
-        $finalPublishArgs.Add("-SkipBuild")
-    }
-    if (-not $SkipUnityExport) {
-        $finalPublishArgs.Add("-SkipUnityExport")
+    if (-not $preparesLocalModSource) {
+        if (-not $SkipBuild) {
+            $finalPublishArgs.Add("-SkipBuild")
+        }
+        if (-not $SkipUnityExport) {
+            $finalPublishArgs.Add("-SkipUnityExport")
+        }
     }
 
     if (-not $SkipSteam) {

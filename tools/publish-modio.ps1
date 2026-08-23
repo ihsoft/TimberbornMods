@@ -486,6 +486,58 @@ function Set-ModfileActive(
         -ContentType "application/x-www-form-urlencoded"
 }
 
+function Wait-FinalModIoReadback(
+    [string] $ApiBase,
+    [string] $GameId,
+    [string] $ModId,
+    [string] $AccessToken,
+    [int] $FileId,
+    [string] $Version,
+    [int] $TimeoutSeconds,
+    [int] $PollSeconds) {
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $lastState = "no response"
+    while ((Get-Date) -lt $deadline) {
+        $mod = Invoke-RestMethod `
+            -Uri "$($ApiBase.TrimEnd('/'))/games/$GameId/mods/$ModId" `
+            -Headers @{ Authorization = "Bearer $AccessToken" }
+        $modfile = Get-Modfile $ApiBase $GameId $ModId $AccessToken $FileId
+        $activeFileId = [int]$mod.modfile.id
+        $activeVersion = [string]$mod.modfile.version
+        $virusStatus = [int]$modfile.virus_status
+        $virusPositive = [int]$modfile.virus_positive
+        $dateScanned = [long]$modfile.date_scanned
+        $fileSize = [long]$modfile.filesize
+        $lastState = (
+            "active_file_id=$activeFileId; version=$activeVersion; date_scanned=$dateScanned; " +
+            "virus_status=$virusStatus; virus_positive=$virusPositive; file_size=$fileSize")
+
+        if ($virusStatus -eq 1 -and $virusPositive -ne 0) {
+            throw "Mod.IO final readback flagged file ${FileId}: virus_positive=$virusPositive."
+        }
+        if ($virusStatus -eq 4 -or $virusStatus -eq 5) {
+            throw "Mod.IO final readback reports failed scan for file ${FileId}: virus_status=$virusStatus."
+        }
+        if ($activeFileId -eq $FileId -and $activeVersion -eq $Version -and
+                $virusStatus -eq 1 -and $virusPositive -eq 0 -and $dateScanned -gt 0 -and $fileSize -gt 0) {
+            return [pscustomobject]@{
+                ModId = [int]$ModId
+                ActiveFileId = $activeFileId
+                Version = $activeVersion
+                DateScanned = $dateScanned
+                VirusStatus = $virusStatus
+                VirusPositive = $virusPositive
+                FileSize = $fileSize
+            }
+        }
+
+        Write-Host "Waiting for final Mod.IO readback. $lastState"
+        Start-Sleep -Seconds $PollSeconds
+    }
+
+    throw "Timed out waiting for final Mod.IO readback for file $FileId after $TimeoutSeconds seconds. Last state: $lastState"
+}
+
 Assert-PathExists $releaseConfigPath "Release config"
 Assert-PathExists $buildScriptPath "Package builder"
 
@@ -711,6 +763,7 @@ if ($null -eq $publishedModfile.id) {
     throw "Mod.IO upload response did not include a modfile id."
 }
 
+Write-Host "Initial Mod.IO upload response (not final state): $responseBody"
 Write-Host "Uploaded to Mod.IO as file id $($publishedModfile.id)."
 $scannedModfile = Wait-ModfileScan `
     $apiBase `
@@ -727,4 +780,17 @@ if ($PublishPage) {
     Set-ModIoPagePublic $apiBase $gameId $modId $accessToken
     Write-Host "Mod.IO page is public and verified."
 }
-Write-Host $responseBody
+$finalReadback = Wait-FinalModIoReadback `
+    $apiBase `
+    $gameId `
+    $modId `
+    $accessToken `
+    ([int]$publishedModfile.id) `
+    $modVersion `
+    $ScanTimeoutSeconds `
+    $ScanPollSeconds
+Write-Host (
+    "Final Mod.IO readback: mod_id=$($finalReadback.ModId); " +
+    "active_file_id=$($finalReadback.ActiveFileId); version=$($finalReadback.Version); " +
+    "date_scanned=$($finalReadback.DateScanned); virus_status=$($finalReadback.VirusStatus); " +
+    "virus_positive=$($finalReadback.VirusPositive); file_size=$($finalReadback.FileSize)")

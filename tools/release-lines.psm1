@@ -1,3 +1,5 @@
+Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
+
 function Get-ReleaseLineRegistry([string] $ToolsRoot) {
     $registryPath = Join-Path $ToolsRoot "release-lines.json"
     if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
@@ -22,10 +24,13 @@ function Get-RegisteredReleaseLine([string] $ToolsRoot, [string] $ReleaseLine, [
 }
 
 function Get-GitWorktrees([string] $RepositoryRoot) {
-    $lines = @(& git -C $RepositoryRoot worktree list --porcelain 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cannot list Git worktrees.`n$($lines -join [Environment]::NewLine)"
+    $gitResult = Invoke-ReleaseNativeCommand -Command "git" -Arguments @(
+        "-C", $RepositoryRoot, "worktree", "list", "--porcelain")
+    if ($gitResult.ExitCode -ne 0) {
+        throw "Cannot list Git worktrees.`n$($gitResult.Diagnostics -join [Environment]::NewLine)"
     }
+    $gitResult.StandardError | ForEach-Object { Write-Warning $_ }
+    $lines = $gitResult.Output
 
     $worktrees = New-Object System.Collections.Generic.List[object]
     $current = $null
@@ -34,7 +39,7 @@ function Get-GitWorktrees([string] $RepositoryRoot) {
             if ($null -ne $current) {
                 $worktrees.Add($current)
             }
-            $current = [ordered]@{
+            $current = [pscustomobject]@{
                 Path = $line.Substring("worktree ".Length)
                 Branch = ""
             }

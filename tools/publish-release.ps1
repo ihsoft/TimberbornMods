@@ -24,6 +24,7 @@ param(
     [switch] $SkipDiscordHandoff,
     [switch] $ReplaceExistingGitHubAsset,
     [switch] $CorrectiveReplacement,
+    [switch] $PreserveChangelogDate,
     [switch] $DetailedOutput
 )
 
@@ -34,6 +35,8 @@ Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-notes.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-date.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $releaseLogDirectory = ""
 $releaseStepIndex = 0
@@ -53,12 +56,19 @@ function Assert-PathExists([string] $Path, [string] $Description) {
     }
 }
 
-function Invoke-Git([string[]] $Arguments) {
-    $output = @(& git -C $repoRoot @Arguments 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        throw "git $($Arguments -join ' ') failed.`n$($output -join [Environment]::NewLine)"
+function Invoke-Git {
+    param(
+        [string[]] $Arguments,
+        [string] $RepositoryRoot = $repoRoot
+    )
+
+    $gitResult = Invoke-ReleaseNativeCommand -Command "git" -Arguments (
+        @("-C", $RepositoryRoot) + $Arguments)
+    if ($gitResult.ExitCode -ne 0) {
+        throw "git $($Arguments -join ' ') failed.`n$($gitResult.Diagnostics -join [Environment]::NewLine)"
     }
-    return [string[]]$output
+    $gitResult.StandardError | ForEach-Object { Write-Warning $_ }
+    return [string[]]$gitResult.Output
 }
 
 function Get-StringSha256([string] $Value) {
@@ -135,17 +145,15 @@ function Assert-ReleaseSourceCurrent([object] $Source) {
     if ($criticalPaths.Count -eq 0) {
         throw "Release source $sourceRoot contains no release-critical paths."
     }
-    $laterChanges = @(& git -C $sourceRoot diff --name-only "$sourceCommit..$sourceHead" -- @criticalPaths)
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cannot verify later release-critical changes in $sourceRoot."
-    }
+    $laterChanges = @(Invoke-Git `
+        -Arguments (@("diff", "--name-only", "$sourceCommit..$sourceHead", "--") + $criticalPaths) `
+        -RepositoryRoot $sourceRoot)
     if ($laterChanges.Count -gt 0) {
         throw "Release source has later critical changes: $($laterChanges -join ', ')."
     }
-    $workingChanges = @(& git -C $sourceRoot diff --name-only $sourceCommit -- @criticalPaths)
-    if ($LASTEXITCODE -ne 0) {
-        throw "Cannot verify working-tree release-critical changes in $sourceRoot."
-    }
+    $workingChanges = @(Invoke-Git `
+        -Arguments (@("diff", "--name-only", $sourceCommit, "--") + $criticalPaths) `
+        -RepositoryRoot $sourceRoot)
     if ($workingChanges.Count -gt 0) {
         throw "Release source differs from commit ${sourceCommit}: $($workingChanges -join ', ')."
     }
@@ -388,6 +396,32 @@ if ($releaseSources.Count -gt 1) {
     }
 }
 Write-Host "  Full child logs: $releaseLogDirectory"
+
+$publishesSteam = -not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam
+$publishesModIo = -not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo
+$publishesPlatformTags = -not $SkipPlatformTags -and
+    -not [bool]$report.PreflightOptions.SkipPlatformTags -and $publishesModIo
+$hasPublicMutation = $publishesSteam -or $publishesModIo -or $publishesPlatformTags -or
+    -not $SkipGitTag -or -not $SkipGitHubRelease
+if ($hasPublicMutation) {
+    $releaseDateRecords = @(Get-ReleaseDateRecords $releaseSources (Get-Date))
+    foreach ($dateRecord in $releaseDateRecords) {
+        Write-Host (
+            "  Committed changelog date ($($dateRecord.TagName)): " +
+            "$($dateRecord.ChangelogDate.ToString('yyyy-MM-dd')); " +
+            "current local date: $($dateRecord.CurrentLocalDate.ToString('yyyy-MM-dd'))")
+    }
+    $dateMismatches = @($releaseDateRecords | Where-Object DateDiffers)
+    if ($dateMismatches.Count -gt 0) {
+        if (-not $PreserveChangelogDate) {
+            throw (
+                "The committed changelog date differs from the current local date. Ask whether to preserve the " +
+                "immutable snapshot or prepare a newly dated release, then rerun with -PreserveChangelogDate only " +
+                "after explicit confirmation.")
+        }
+        Write-Host "  Changelog date preservation: explicitly confirmed"
+    }
+}
 
 if (-not $SkipGitTag) {
     foreach ($releaseSource in $releaseSources) {

@@ -36,7 +36,7 @@ function Get-UnpublishedSections(
             $content,
             "(?m)^#\s+v?(?<version>\d+\.\d+(?:\.\d+)?)[^\r\n]*\(TBD\)[^\r\n]*$")
         foreach ($match in $matches) {
-            [ordered]@{
+            [pscustomobject]@{
                 ModName = ($relativePath -replace "\\", "/").Split('/')[0]
                 Version = $match.Groups["version"].Value
                 ReleaseRoot = $ReleaseRoot
