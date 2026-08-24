@@ -2,6 +2,7 @@
   "ManifestPath": "ModsUnityProject/Assets/Mods/Automation/manifest.json",
   "ChangesPath": "Automation/CHANGELOG.md",
   "ReleaseVersion": "4.0.10",
+  "PreviousSourceModVersion": "4.0.9",
   "ScriptFileBase": "AdvancedAutomation",
   "ReadyForPublish": true,
   "Package": {
