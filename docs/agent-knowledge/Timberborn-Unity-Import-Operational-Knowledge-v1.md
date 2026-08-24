@@ -23,6 +23,16 @@ Do not edit or track them as authoring source. `ImportedAssets` must remain igno
 Imported DLLs and assets are evidence only for the game version and Unity environment that produced them. Verify their
 provenance before relying on their API, data shape, or custom UI types.
 
+## Editor Installation Path Evidence
+
+Before changing Unity Hub's configured Editor install location or installing a duplicate Editor because of disk-space
+concerns, resolve the existing install directory through any junction, symbolic link, or other reparse point. Check
+available space on the volume that owns the resolved target. A displayed path such as `C:\Program Files\Unity` does not
+prove that the Editor consumes space on the `C:` volume.
+
+Do not rewrite Hub configuration or choose a second install root from the displayed drive prefix alone. Preserve the
+standard logical path when its resolved target already satisfies the required physical location and capacity.
+
 ## Refresh Sequence
 
 When the game, Editor, render pipeline, or Unity package graph changes:
