@@ -18,8 +18,10 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
 
   const string GetSignalLocKey = "IgorZ.Automation.Scriptable.Signals.Signal.Get";
   const string SetSignalActionLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set";
-  const string SetSignalActionSignalNameArgLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument";
-  const string SetSignalActionSignalValueArgLocKey = "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument";
+  const string SetSignalActionSignalNameArgLocKey =
+      "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalNameArgument";
+  const string SetSignalActionSignalValueArgLocKey =
+      "IgorZ.Automation.Scriptable.Signals.Action.Set.SignalValueArgument";
 
   const string GetSignalSignalNamePrefix = "Signals.";
   // Used by RulesUIHelper.
@@ -50,6 +52,8 @@ sealed class SignalsScriptableComponent : ScriptableComponentBase, ISaveableSing
     return GetSignalDef with {
         ScriptName = name,
         DisplayName = Loc.T(GetSignalLocKey, signalName),
+        DisplayNameLocKey = GetSignalLocKey,
+        DisplayNameArgument = signalName,
     };
   }
 

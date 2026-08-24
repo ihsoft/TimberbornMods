@@ -145,6 +145,16 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
     #endregion
 
+    #region AbstractStatusTracker overrides
+
+    /// <inheritdoc/>
+    public override void OnPostLoadActivation() {
+      base.OnPostLoadActivation();
+      UpdateState();
+    }
+
+    #endregion
+
     #region API
 
     /// <summary>Returns the number of tiles that offer collectable items.</summary>
@@ -182,6 +192,9 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     }
 
     void ScheduleStateUpdate() {
+      if (!AutomationService.AutomationSystemReady) {
+        return; // The game is loading. Wait for OnRulesBound().
+      }
       _stateUpdateCoroutine ??= MonoBehaviour.StartCoroutine(StateUpdateCoroutine());
     }
     Coroutine _stateUpdateCoroutine;

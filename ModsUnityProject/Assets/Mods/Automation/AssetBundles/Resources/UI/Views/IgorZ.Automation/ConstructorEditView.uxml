@@ -4,7 +4,14 @@
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/RulesEditorStyle.uss?fileID=7433441132597879392&amp;guid=82ba7710a5bad1b489b53edd629e2a56&amp;type=3#RulesEditorStyle" />
     <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/TimberDevStyle.uss?fileID=7433441132597879392&amp;guid=86824deb2a4bc844cbec48367a164254&amp;type=3#TimberDevStyle" />
     <engine:VisualElement>
-        <engine:VisualElement name="RuleConstructor" style="flex-direction: row; align-items: center; justify-content: flex-start;" />
+        <engine:VisualElement name="RuleConstructor" style="align-items: flex-start; justify-content: flex-start;">
+            <engine:VisualElement name="ConditionsRoot" />
+            <engine:VisualElement style="flex-direction: row; margin-top: 3px; margin-bottom: 5px;">
+                <Timberborn.CoreUI.LocalizableButton name="AddAndConditionBtn" text="+ and" text-loc-key="IgorZ.Automation.Scripting.Editor.AddAndConditionBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
+                <Timberborn.CoreUI.LocalizableButton name="AddOrConditionBtn" text="+ or" text-loc-key="IgorZ.Automation.Scripting.Editor.AddOrConditionBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
+            </engine:VisualElement>
+            <engine:VisualElement name="ActionRoot" />
+        </engine:VisualElement>
         <engine:VisualElement style="align-items: flex-start; flex-direction: row; margin-top: 5px;">
             <Timberborn.CoreUI.LocalizableButton name="SaveScriptBtn" text="SaveScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.SaveScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />
             <Timberborn.CoreUI.LocalizableButton name="DiscardScriptBtn" text="DiscardScriptBtn" text-loc-key="IgorZ.Automation.Scripting.Editor.DiscardScriptBtn" class="button-game game-text-small timberdev-button-small--left-aligned" />

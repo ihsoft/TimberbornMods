@@ -147,7 +147,7 @@ static class SignalDispatcherTests {
 
   static BaseComponent Provider(string entityId) {
     var provider = new BaseComponent();
-    provider.SetComponent(new EntityComponent { EntityId = entityId });
+    provider.SetComponent(new EntityComponent { EntityId = Guid.NewGuid() });
     return provider;
   }
 

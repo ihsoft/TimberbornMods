@@ -23,6 +23,26 @@ static class ScriptingServiceTests {
     Assert.True(service.GetActionExecutor("Signals.Set", behavior) != null);
   }
 
+  public static void OrdersModulesWithoutChangingSignalOrderWithinModule() {
+    var behavior = new AutomationBehavior();
+    var inventory = new TestScriptable("Inventory");
+    inventory.RegisterSignal("Inventory.Z", ScriptValue.TypeEnum.Number);
+    inventory.RegisterSignal("Inventory.A", ScriptValue.TypeEnum.Number);
+    var power = new TestScriptable("Power");
+    power.RegisterSignal("Power.B", ScriptValue.TypeEnum.Number);
+    power.RegisterSignal("Power.A", ScriptValue.TypeEnum.Number);
+    var service = TestScripting.CreateService(inventory, power);
+    SignalModuleOrder.Load("Power|Inventory");
+
+    try {
+      var result = service.GetSignalNamesForBuilding(behavior);
+
+      Assert.Equal("Power.B|Power.A|Inventory.Z|Inventory.A", string.Join("|", result));
+    } finally {
+      SignalModuleOrder.Load("");
+    }
+  }
+
   public static void UnknownScriptableReportsParsingError() {
     var behavior = new AutomationBehavior();
     var service = TestScripting.CreateService();

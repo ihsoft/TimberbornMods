@@ -20,13 +20,10 @@ sealed class GameAutomationConflictDetector {
   const string FloodgateHeightProperty = "Floodgate.Height";
   const string FloodgateAutomationHeightProperty = "Floodgate.AutomationHeight";
   const string FlowControlStateProperty = "FlowControl.State";
-  const string InventoryEmptyingProperty = "Inventory.Emptying";
   const string LeverStateProperty = "Lever.State";
   const string ManufactoryRecipeProperty = "Manufactory.Recipe";
   const string PausableBuildingPausedProperty = "PausableBuilding.Paused";
   const string PrioritizableHaulersProperty = "Prioritizable.Haulers";
-  const string ThrottlingValveOutflowLimitProperty = "ThrottlingValve.OutflowLimit";
-  const string ThrottlingValveAutomationOutflowLimitProperty = "ThrottlingValve.AutomationOutflowLimit";
   const string WorkplaceWorkersProperty = "Workplace.Workers";
   const string WorkplacePriorityProperty = "Workplace.Priority";
 
@@ -41,17 +38,12 @@ sealed class GameAutomationConflictDetector {
       ["Floodgate.SetHeight"] = [FloodgateHeightProperty],
       ["FlowControl.Open"] = [FlowControlStateProperty],
       ["FlowControl.Close"] = [FlowControlStateProperty],
-      ["Inventory.StartEmptying"] = [InventoryEmptyingProperty],
-      ["Inventory.StopEmptying"] = [InventoryEmptyingProperty],
       ["Lever.SetState"] = [LeverStateProperty],
       ["Manufactory.SetRecipe"] = [ManufactoryRecipeProperty],
       ["Pausable.Pause"] = [PausableBuildingPausedProperty],
       ["Pausable.Unpause"] = [PausableBuildingPausedProperty],
       ["Prioritizable.SetHaulers"] = [PrioritizableHaulersProperty],
       ["Prioritizable.ResetHaulers"] = [PrioritizableHaulersProperty],
-      ["ThrottlingValve.Open"] = [ThrottlingValveOutflowLimitProperty],
-      ["ThrottlingValve.Close"] = [ThrottlingValveOutflowLimitProperty],
-      ["ThrottlingValve.SetFlow"] = [ThrottlingValveOutflowLimitProperty],
       ["Workplace.RemoveWorkers"] = [WorkplaceWorkersProperty],
       ["Workplace.SetWorkers"] = [WorkplaceWorkersProperty],
       ["Workplace.SetPriority"] = [WorkplacePriorityProperty],
@@ -114,9 +106,6 @@ sealed class GameAutomationConflictDetector {
     }
     if (behavior.GetComponent<Floodgate>()) {
       properties.Add(FloodgateAutomationHeightProperty);
-    }
-    if (behavior.GetComponent<ThrottlingValve>()) {
-      properties.Add(ThrottlingValveAutomationOutflowLimitProperty);
     }
     return properties;
   }

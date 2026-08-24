@@ -100,6 +100,37 @@ static class CollectableScriptableComponentTests {
     Assert.Equal(2, listener.Calls);
   }
 
+  public static void UpdatesReadyYieldersOnPostLoadActivation() {
+    var blockService = new BlockService();
+    var component = CreateComponent(blockService);
+    var behavior = CreateBehavior(blockService);
+    var range = behavior.GetComponent<BuildingTerrainRange>();
+    var readyYielder = CreateYielderBlock(new Vector3Int(1, 2, 0), out _);
+    var listener = new TestSignalListener(behavior);
+
+    try {
+      SetAutomationSystemReady(false);
+
+      component.RegisterSignalChangeCallback(Signal("Collectable.Ready", behavior), listener);
+      behavior.OnEnterFinishedState();
+      range.SetRange(readyYielder.Coordinates);
+      blockService.SetObjectsAt(readyYielder.Coordinates, readyYielder);
+      range.RaiseRangeChanged();
+      MonoBehaviour.RunQueuedCoroutines();
+
+      Assert.Equal(0, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
+      Assert.Equal(0, listener.Calls);
+
+      behavior.ActivateDynamicComponents();
+
+      Assert.Equal(1, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
+      Assert.Equal(1, listener.Calls);
+    } finally {
+      SetAutomationSystemReady(true);
+      MonoBehaviour.ClearQueuedCoroutines();
+    }
+  }
+
   public static void IgnoresYieldersOutsideLumberjackCuttingArea() {
     var blockService = new BlockService();
     var treeCuttingArea = new TreeCuttingArea();
@@ -164,6 +195,13 @@ static class CollectableScriptableComponentTests {
         [typeof(IContainer)],
         null);
     constructor.Invoke([container]);
+  }
+
+  static void SetAutomationSystemReady(bool isReady) {
+    var setter = typeof(AutomationService)
+        .GetProperty(nameof(AutomationService.AutomationSystemReady))
+        ?.GetSetMethod(nonPublic: true);
+    setter.Invoke(null, [isReady]);
   }
 
   sealed class TestLoc : ILoc {

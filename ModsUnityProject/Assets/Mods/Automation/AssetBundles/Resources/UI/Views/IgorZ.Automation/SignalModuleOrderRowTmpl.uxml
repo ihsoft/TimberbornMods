@@ -1,0 +1,16 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalModuleOrderStyle.uss?fileID=7433441132597879392&amp;guid=4c90993be2cc4683bcc931642abae26d&amp;type=3#SignalModuleOrderStyle"/>
+    <engine:VisualElement class="signal-module-order-template-preview">
+        <engine:VisualElement name="ModuleRow" class="signal-module-order-row">
+            <engine:VisualElement class="signal-module-order-row__content">
+                <engine:Label text="ExampleModule" name="ModuleName" class="text--default signal-module-order-row__label"/>
+                <engine:VisualElement class="signal-module-order-row__buttons">
+                    <Timberborn.CoreUI.NineSliceButton name="MoveUpButton" class="button-arrow-up button-square signal-module-order-row__button" style="margin-left: 4px;"/>
+                    <Timberborn.CoreUI.NineSliceButton name="MoveDownButton" class="button-arrow-down button-square signal-module-order-row__button" style="margin-left: 4px;"/>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

@@ -12,6 +12,7 @@ using Timberborn.Goods;
 using Timberborn.InventorySystem;
 using Timberborn.Localization;
 using Timberborn.StatusSystem;
+using Timberborn.StockpilePrioritySystem;
 using Timberborn.Workshops;
 
 namespace Automation.Tests;
@@ -56,6 +57,20 @@ static class InventoryScriptableComponentTests {
     Assert.Equal("Inventory.OutputGood.Plank", signalNames[1]);
   }
 
+  public static void ExposesHaulingModeSignalForStockpilePriority() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory());
+    behavior.SetComponent(new StockpilePriority());
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    var signalDef = component.GetSignalDefinition("Inventory.HaulingMode", behavior);
+
+    Assert.Equal("Inventory.HaulingMode", signalNames[2]);
+    Assert.Equal("Inventory.HaulingMode", signalDef.ScriptName);
+    Assert.Equal("Accept", signalDef.Result.Options[0].Value);
+    Assert.Equal("Supply", signalDef.Result.Options[3].Value);
+  }
+
   public static void ExposesCurrentRecipeSignalsWhenInventoryLimitsAreMissing() {
     var component = CreateComponent();
     var inventory = CreateInventory(
@@ -83,6 +98,38 @@ static class InventoryScriptableComponentTests {
     Assert.Equal((0, 10), outputDef.Result.DisplayNumericFormatRange);
   }
 
+  public static void ExposesAssignedStockpileGoodSignalWhenInventoryCapacityIsHidden() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(inputGoods: ["Water"], outputGoods: ["Water"], capacity: 300);
+    inventory.HideCapacity = true;
+    var behavior = CreateBehavior(inventory);
+    var singleGoodAllower = new SingleGoodAllower();
+    singleGoodAllower.Allow("Water");
+    behavior.SetComponent(singleGoodAllower);
+    behavior.SetComponent(new StockpilePriority());
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+    var outputDef = component.GetSignalDefinition("Inventory.OutputGood.Water", behavior);
+
+    Assert.Equal("Inventory.OutputGood.Water", signalNames[0]);
+    Assert.Equal("Inventory.HaulingMode", signalNames[1]);
+    Assert.Equal((0, 300), outputDef.Result.DisplayNumericFormatRange);
+  }
+
+  public static void HidesStockpileGoodSignalsWhenInventoryCapacityIsHiddenAndNoGoodIsAssigned() {
+    var component = CreateComponent();
+    var inventory = CreateInventory(inputGoods: ["Water"], outputGoods: ["Water"], capacity: 300);
+    inventory.HideCapacity = true;
+    var behavior = CreateBehavior(inventory);
+    behavior.SetComponent(new SingleGoodAllower());
+    behavior.SetComponent(new StockpilePriority());
+
+    var signalNames = component.GetSignalNamesForBuilding(behavior);
+
+    Assert.Equal(1, signalNames.Length);
+    Assert.Equal("Inventory.HaulingMode", signalNames[0]);
+  }
+
   public static void HidesSignalsForMissingInventory() {
     var component = CreateComponent();
 
@@ -97,6 +144,19 @@ static class InventoryScriptableComponentTests {
     Assert.Equal(4, component.GetSignalSource("Inventory.OutputGood.Plank", behavior)().AsInt);
   }
 
+  public static void ReadsHaulingModeSignal() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory());
+    var stockpilePriority = new StockpilePriority();
+    behavior.SetComponent(stockpilePriority);
+
+    Assert.Equal("Accept", component.GetSignalSource("Inventory.HaulingMode", behavior)().AsString);
+
+    stockpilePriority.Obtain();
+
+    Assert.Equal("Obtain", component.GetSignalSource("Inventory.HaulingMode", behavior)().AsString);
+  }
+
   public static void BuildsSignalDefinitions() {
     var component = CreateComponent();
     var behavior = CreateBehavior(CreateInventory());
@@ -106,9 +166,13 @@ static class InventoryScriptableComponentTests {
 
     Assert.Equal("Inventory.InputGood.Log", inputDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.InputGood", inputDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.InputGood", inputDef.DisplayNameLocKey);
+    Assert.Equal("Logs", inputDef.DisplayNameArgument);
     Assert.Equal((0, 30), inputDef.Result.DisplayNumericFormatRange);
     Assert.Equal("Inventory.OutputGood.Plank", outputDef.ScriptName);
     Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood", outputDef.DisplayName);
+    Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood", outputDef.DisplayNameLocKey);
+    Assert.Equal("Planks", outputDef.DisplayNameArgument);
     Assert.Equal((0, 20), outputDef.Result.DisplayNumericFormatRange);
   }
 
@@ -125,6 +189,40 @@ static class InventoryScriptableComponentTests {
     Assert.Equal("Inventory.StopEmptying", actionNames[1]);
     Assert.Equal(0, component.GetActionNamesForBuilding(mixedBehavior).Length);
     Assert.Equal(0, component.GetActionNamesForBuilding(CreateBehavior(CreateInventory())).Length);
+  }
+
+  public static void ExposesSetHaulingModeActionForStockpilePriority() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory(inputGoods: ["Log"], outputGoods: ["Plank"]));
+    behavior.SetComponent(new StockpilePriority());
+
+    var actionNames = component.GetActionNamesForBuilding(behavior);
+    var actionDef = component.GetActionDefinition("Inventory.SetHaulingMode", behavior);
+
+    Assert.Equal(1, actionNames.Length);
+    Assert.Equal("Inventory.SetHaulingMode", actionNames[0]);
+    Assert.Equal("Inventory.SetHaulingMode", actionDef.ScriptName);
+    Assert.Equal("IgorZ.Automation.Scriptable.Inventory.Action.SetHaulingMode", actionDef.DisplayName);
+    Assert.Equal("Empty", actionDef.Arguments[0].Options[1].Value);
+    Assert.Equal("Obtain", actionDef.Arguments[0].Options[2].Value);
+  }
+
+  public static void ExposesEmptyingAndHaulingModeActionsForIndependentComponents() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory(inputGoods: [], outputGoods: ["Plank"]));
+    behavior.SetComponent(new Emptiable());
+    behavior.SetComponent(new StockpilePriority());
+
+    var actionNames = component.GetActionNamesForBuilding(behavior);
+
+    Assert.Equal(3, actionNames.Length);
+    Assert.Equal("Inventory.StartEmptying", actionNames[0]);
+    Assert.Equal("Inventory.StopEmptying", actionNames[1]);
+    Assert.Equal("Inventory.SetHaulingMode", actionNames[2]);
+    Assert.Equal(
+        "Inventory.StartEmptying", component.GetActionDefinition("Inventory.StartEmptying", behavior).ScriptName);
+    Assert.Equal(
+        "Inventory.SetHaulingMode", component.GetActionDefinition("Inventory.SetHaulingMode", behavior).ScriptName);
   }
 
   public static void ExecutesEmptyingActions() {
@@ -148,6 +246,40 @@ static class InventoryScriptableComponentTests {
     Assert.Equal(1, emptiable.UnmarkForEmptyingCalls);
   }
 
+  public static void ExecutesSetHaulingModeAction() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory());
+    var stockpilePriority = new StockpilePriority();
+    behavior.SetComponent(stockpilePriority);
+
+    component.GetActionExecutor("Inventory.SetHaulingMode", behavior)([ScriptValue.FromString("Supply")]);
+
+    Assert.True(stockpilePriority.IsSupplyActive);
+
+    component.GetActionExecutor("Inventory.SetHaulingMode", behavior)([ScriptValue.FromString("Accept")]);
+
+    Assert.True(stockpilePriority.IsAcceptActive);
+  }
+
+  public static void ExecutesEmptyingActionsThroughEmptiableWhenHaulingModeExists() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory(inputGoods: [], outputGoods: ["Plank"]));
+    var emptiable = new Emptiable();
+    var stockpilePriority = new StockpilePriority();
+    behavior.SetComponent(emptiable);
+    behavior.SetComponent(stockpilePriority);
+
+    component.GetActionExecutor("Inventory.StartEmptying", behavior)([]);
+
+    Assert.True(emptiable.IsMarkedForEmptying);
+    Assert.True(stockpilePriority.IsAcceptActive);
+
+    component.GetActionExecutor("Inventory.StopEmptying", behavior)([]);
+
+    Assert.False(emptiable.IsMarkedForEmptying);
+    Assert.True(stockpilePriority.IsAcceptActive);
+  }
+
   public static void NotifiesInventorySignalListeners() {
     var component = CreateComponent();
     var inventory = CreateInventory();
@@ -159,6 +291,22 @@ static class InventoryScriptableComponentTests {
 
     Assert.Equal(1, listener.Calls);
     Assert.Equal("Inventory.InputGood.Log", listener.LastSignalName);
+  }
+
+  public static void NotifiesHaulingModeSignalListeners() {
+    var component = CreateComponent();
+    var behavior = CreateBehavior(CreateInventory(), withDynamicComponents: true);
+    behavior.SetComponent(new StockpilePriority());
+    var listenerComponent = new StockpilePriorityChangeListener();
+    behavior.SetComponent(listenerComponent);
+    var listener = new TestSignalListener(behavior);
+
+    component.RegisterSignalChangeCallback(Signal("Inventory.HaulingMode", behavior), listener);
+    behavior.GetComponent<StockpilePriority>().Supply();
+    listenerComponent.RaisePriorityChanged();
+
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal("Inventory.HaulingMode", listener.LastSignalName);
   }
 
   public static void InstallsEmptyingStatusAction() {
@@ -182,6 +330,8 @@ static class InventoryScriptableComponentTests {
 
     Assert.Throws<ScriptError.BadStateError>(
         () => component.GetSignalDefinition("Inventory.InputGood.Plank", behavior));
+    Assert.Throws<ScriptError.BadStateError>(
+        () => component.GetSignalDefinition("Inventory.HaulingMode", behavior));
     Assert.Throws<ScriptError.ParsingError>(() => component.GetActionDefinition("Inventory.Missing", behavior));
   }
 

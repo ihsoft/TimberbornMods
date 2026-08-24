@@ -140,11 +140,12 @@ sealed class StreamGaugeScriptableComponent : ScriptableComponentBase {
     }
   }
 
-  internal sealed class StreamGaugeTracker : AbstractStatusTracker, IAwakableComponent {
+  internal sealed class StreamGaugeTracker : AbstractStatusTracker {
     StreamGauge _streamGauge;
 
     /// <inheritdoc/>
-    public void Awake() {
+    public override void Start() {
+      base.Start();
       _streamGauge = AutomationBehavior.GetComponentOrFail<StreamGauge>();
       //FIXME: Enable/Disable based on signals.
       AutomationBehavior.GetComponentOrFail<StreamGaugeCheckTicker>().SetTracker(this);

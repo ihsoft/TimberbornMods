@@ -59,8 +59,8 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
 
   /// <summary>Indicates if the game is fully loaded.</summary>
   /// <remarks>
-  /// In this state, all the game loading and initialization logic is done, but the automation system is not yet ready to
-  /// normally process signals.
+  /// In this state, all the game loading and initialization logic is done, but the automation system is not yet ready
+  /// to normally process signals.
   /// </remarks>
   /// <seealso cref="AutomationServiceReadyEvent"/>
   public static bool GameLoaded { get; private set; }
@@ -300,6 +300,7 @@ public sealed class AutomationService : ITickableSingleton, ILoadableSingleton {
         action.Condition.Behavior = behavior;
         action.Behavior = behavior;
       }
+      behavior.ActivateDynamicComponents();
     }
 
     // Activate all rules to restore the state before the game save.

@@ -101,6 +101,22 @@ static class ParserFactoryTests {
     AssertLocError("IgorZ.Automation.Scripting.Editor.ActionMustBeAction", result);
   }
 
+  public static void RejectsNullExpressionsWithoutThrowing() {
+    var factory = CreateFactory();
+    var behavior = new AutomationBehavior();
+
+    var expressionResult = factory.ParseExpression(null, behavior);
+    var condition = factory.ParseCondition(null, behavior, out var conditionResult);
+    var action = factory.ParseAction(null, behavior, out var actionResult);
+
+    Assert.Equal(null, expressionResult.ParsedExpression);
+    Assert.True(expressionResult.LastScriptError is ScriptError.ParsingError);
+    Assert.Equal(null, condition);
+    Assert.True(conditionResult.LastScriptError is ScriptError.ParsingError);
+    Assert.Equal(null, action);
+    Assert.True(actionResult.LastScriptError is ScriptError.ParsingError);
+  }
+
   static ParserFactory CreateFactory() {
     var constructor = typeof(ParserFactory).GetConstructor(
         BindingFlags.Instance | BindingFlags.NonPublic,

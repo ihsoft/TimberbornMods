@@ -29,6 +29,7 @@ MonoBehaviour:
   m_StripUnusedVariants: 1
   m_StripScreenCoordOverrideVariants: 1
   supportRuntimeDebugDisplay: 0
+  m_EnableRenderGraph: 0
   m_Settings:
     m_SettingsList:
       m_List:
@@ -92,6 +93,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1902596437189328896
       type: {class: RenderingDebuggerRuntimeResources, ns: UnityEngine.Rendering,
         asm: Unity.RenderPipelines.Core.Runtime}
@@ -450,6 +453,7 @@ MonoBehaviour:
       type: {class: RenderGraphSettings, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:
         m_Version: 0
+        m_EnableRenderCompatibilityMode: 0
     - rid: 6675213306823704577
       type: {class: UniversalRenderPipelineRuntimeXRResources, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}
@@ -489,9 +493,12 @@ MonoBehaviour:
         m_CoreBlitColorAndDepthPS: {fileID: 4800000, guid: d104b2fc1ca6445babb8e90b0758136b,
           type: 3}
         m_SamplingPS: {fileID: 4800000, guid: 04c410c9937594faa893a11dceb85f7e, type: 3}
-        m_TerrainDetailLit: {fileID: 0}
-        m_TerrainDetailGrassBillboard: {fileID: 0}
-        m_TerrainDetailGrass: {fileID: 0}
+        m_TerrainDetailLit: {fileID: 4800000, guid: f6783ab646d374f94b199774402a5144,
+          type: 3}
+        m_TerrainDetailGrassBillboard: {fileID: 4800000, guid: 29868e73b638e48ca99a19ea58c48d90,
+          type: 3}
+        m_TerrainDetailGrass: {fileID: 4800000, guid: e507fdfead5ca47e8b9a768b51c291a1,
+          type: 3}
     - rid: 6675213306823704581
       type: {class: URPDefaultVolumeProfileSettings, ns: UnityEngine.Rendering.Universal,
         asm: Unity.RenderPipelines.Universal.Runtime}

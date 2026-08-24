@@ -1,0 +1,136 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:Template name="NamedBoxTemplate" src="project://database/Assets/Resources/UI/Views/Common/NamedBoxTemplate.uxml?fileID=9197481963319205126&amp;guid=b27c549e9f96d7843b45412cf82a0c6a&amp;type=3#NamedBoxTemplate"/>
+    <engine:Template name="SignalModuleOrderRowTmpl" src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalModuleOrderRowTmpl.uxml?fileID=9197481963319205126&amp;guid=10889f084a784a8184bca55dc43be7d6&amp;type=3#SignalModuleOrderRowTmpl"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Core/CoreStyle.uss?fileID=7433441132597879392&amp;guid=1ccf410b2ed5dbb4ba82c75edf2281bc&amp;type=3#CoreStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Common/CommonStyle.uss?fileID=7433441132597879392&amp;guid=b4f82a476dd88444986fd884c9037b1f&amp;type=3#CommonStyle"/>
+    <Style src="project://database/Assets/Resources/UI/Views/Options/OptionsStyle.uss?fileID=7433441132597879392&amp;guid=f87f4f59669712f47bfbacc67f7e4fc1&amp;type=3#OptionsStyle"/>
+    <Style src="project://database/Assets/Mods/Automation/AssetBundles/Resources/UI/Views/IgorZ.Automation/SignalModuleOrderStyle.uss?fileID=7433441132597879392&amp;guid=4c90993be2cc4683bcc931642abae26d&amp;type=3#SignalModuleOrderStyle"/>
+    <engine:VisualElement class="content-row-centered signal-module-order-dialog">
+        <engine:Instance template="NamedBoxTemplate" style="width: 650px; height: 650px;">
+            <AttributeOverrides element-name="Header" text-loc-key="IgorZ.Automation.SignalModuleOrder.DialogHeader"/>
+            <Timberborn.CoreUI.LocalizableLabel text="Drag modules to reorder them, or use the arrow buttons." text-loc-key="IgorZ.Automation.SignalModuleOrder.Instructions" class="text--default" style="white-space: normal; margin-bottom: 10px;"/>
+            <engine:VisualElement style="height: 440px; flex-shrink: 0;">
+                <engine:ListView name="ModuleList" fixed-item-height="32" selection-type="None" reorderable="true" reorder-mode="Animated" class="panel-list-view text--default scroll--green-decorated signal-module-order-list" style="flex-grow: 1;"/>
+                <engine:ScrollView name="ModuleListPreview" mode="Vertical" class="panel-list-view text--default scroll--green-decorated signal-module-order-list" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;">
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="StreamGauge"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Time"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="BreedingPod"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Collectable"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Constructable"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Floodgate"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Inventory"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Manufactory"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Plantable"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Power"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Workplace"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Automator"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="District"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="unity-list-view__reorderable-item signal-module-order-list__preview-item">
+                        <engine:VisualElement class="unity-list-view__reorderable-handle"/>
+                        <engine:VisualElement class="unity-list-view__reorderable-item__container">
+                            <engine:Instance template="SignalModuleOrderRowTmpl" class="signal-module-order-list__preview-instance">
+                                <AttributeOverrides element-name="ModuleName" text="Science"/>
+                            </engine:Instance>
+                        </engine:VisualElement>
+                    </engine:VisualElement>
+                </engine:ScrollView>
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-direction: row; align-items: center; justify-content: center; margin-top: 20px; flex-shrink: 0;">
+                <Timberborn.CoreUI.LocalizableButton text="Registration order" name="ResetButton" text-loc-key="IgorZ.Automation.SignalModuleOrder.Reset" class="menu-button menu-button--medium"/>
+                <Timberborn.CoreUI.LocalizableButton text="Cancel" name="CancelButton" text-loc-key="Core.Cancel" class="menu-button menu-button--medium"/>
+                <Timberborn.CoreUI.LocalizableButton text="Save" name="ConfirmButton" text-loc-key="Core.Save" class="menu-button menu-button--medium"/>
+            </engine:VisualElement>
+        </engine:Instance>
+    </engine:VisualElement>
+</engine:UXML>

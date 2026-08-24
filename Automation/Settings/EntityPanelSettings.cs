@@ -15,9 +15,14 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
 
   const string HeaderStringLocKey = "IgorZ.Automation.Settings.EntityPanel.Header";
   const string RulesDescriptionStyleLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle";
-  const string DescriptionHumanReadableLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable";
+  const string DescriptionHumanReadableLocKey =
+      "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable";
   const string DescriptionScriptLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script";
   const string DescriptionScriptShortLocKey = "IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort";
+  const string ShowOptionalLogicalParenthesesLocKey =
+      "IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParentheses";
+  const string ShowOptionalLogicalParenthesesTooltipLocKey =
+      "IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParenthesesTooltip";
   const string EvalValuesInConditionsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions";
   const string EvalValuesInActionArgumentsLocKey = "IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments";
   const string PreventGameAutomationConflictsLocKey =
@@ -43,6 +48,11 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
           new LimitedStringModSettingValue(nameof(DescriptionStyle.Script), DescriptionScriptLocKey),
           new LimitedStringModSettingValue(nameof(DescriptionStyle.ScriptShort), DescriptionScriptShortLocKey),
       ], ModSettingDescriptor.CreateLocalized(RulesDescriptionStyleLocKey));
+
+  public static bool ShowOptionalLogicalParentheses { get; private set; } = true;
+  public ModSetting<bool> ShowOptionalLogicalParenthesesInternal { get; } = new(
+      true, ModSettingDescriptor.CreateLocalized(ShowOptionalLogicalParenthesesLocKey)
+          .SetLocalizedTooltip(ShowOptionalLogicalParenthesesTooltipLocKey));
 
   public static bool EvalValuesInConditions { get; private set; }
   public ModSetting<bool> EvalValuesInConditionsInternal { get; } =
@@ -83,6 +93,8 @@ sealed class EntityPanelSettings : BaseSettings<EntityPanelSettings> {
       RulesDescriptionStyle =
           (DescriptionStyle)Enum.Parse(typeof(DescriptionStyle), RulesDescriptionStyleInternal.Value);
     });
+    InstallSettingCallback(
+        ShowOptionalLogicalParenthesesInternal, v => ShowOptionalLogicalParentheses = v);
     InstallSettingCallback(EvalValuesInConditionsInternal, v => EvalValuesInConditions = v);
     InstallSettingCallback(EvalValuesInActionArgumentsInternal, v => EvalValuesInActionArguments = v);
     InstallSettingCallback(PreventGameAutomationConflictsInternal, v => PreventGameAutomationConflicts = v);

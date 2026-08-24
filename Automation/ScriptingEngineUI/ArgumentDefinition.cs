@@ -37,6 +37,8 @@ sealed record ArgumentDefinition {
               ValueDef.NumericFormatEnum.Integer => uiFactory.T(ConstantTypeWholeNumberLocKey),
               ValueDef.NumericFormatEnum.Float => uiFactory.T(ConstantTypeDecimalsLocKey),
               ValueDef.NumericFormatEnum.Percent => uiFactory.T(ConstantTypePercentLocKey),
+              ValueDef.NumericFormatEnum.Boolean =>
+                  throw new InvalidOperationException("Boolean numeric format must define value options"),
               ValueDef.NumericFormatEnum.Unspecified =>
                   throw new InvalidOperationException("Numeric format must be set"),
           },

@@ -32,6 +32,9 @@
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptError.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptError.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\Core\SignalModuleOrder.cs">
+        <Link>Automation\ScriptingEngine\Core\SignalModuleOrder.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\Core\ScriptingService.cs">
         <Link>Automation\ScriptingEngine\Core\ScriptingService.cs</Link>
       </Compile>
@@ -131,6 +134,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorSignalReferenceManager.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\AutomatorSignalReferenceManager.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ClutchScriptableComponent.cs</Link>
       </Compile>
@@ -163,6 +169,18 @@
       </Compile>
       <Compile Include="..\Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs">
         <Link>Automation\ScriptingEngineUI\InvertRuleButtonProvider.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\ParameterizedItemsGrouper.cs">
+        <Link>Automation\ScriptingEngineUI\ParameterizedItemsGrouper.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\PinnedSignalNames.cs">
+        <Link>Automation\ScriptingEngineUI\PinnedSignalNames.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\ExpressionDescriber.cs">
+        <Link>Automation\ScriptingEngineUI\ExpressionDescriber.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngineUI\BooleanComparison.cs">
+        <Link>Automation\ScriptingEngineUI\BooleanComparison.cs</Link>
       </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ISignalListener.cs</Link>
@@ -209,9 +227,6 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs">
-        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs</Link>
-      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\TimeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\TimeScriptableComponent.cs</Link>
       </Compile>
@@ -245,5 +260,11 @@
       <Compile Include="..\TimberDev\Utils\IObjectLoaderExtensions.cs">
         <Link>TimberDev\Utils\IObjectLoaderExtensions.cs</Link>
       </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\AssetBundles\Resources\UI\Views\IgorZ.Automation\RulesEditor.uxml"
+            Link="TestAssets\RulesEditor.uxml" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\ModsUnityProject\Assets\Mods\Automation\AssetBundles\Resources\UI\Views\IgorZ.Automation\RulesEditorStyle.uss"
+            Link="TestAssets\RulesEditorStyle.uss" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

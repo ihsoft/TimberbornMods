@@ -37,6 +37,8 @@ sealed class ExpressionDescriber(ILoc Loc) {
   public static string FormatValue(ScriptValue scriptValue, ValueDef valueDef) {
     var stringValue = scriptValue.ValueType switch {
         ScriptValue.TypeEnum.Number => valueDef?.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Boolean =>
+                ScriptValue.FromBool(scriptValue.AsRawNumber != 0).AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsFloat.ToString("0%"),
             // If the runtime value happen to be not an integer, it's still formatted as float in UI.
@@ -83,6 +85,9 @@ sealed class ExpressionDescriber(ILoc Loc) {
     if (op.Left is SignalOperator leftSignal && op.Right is SignalOperator rightSignal
         && leftSignal.SignalName == rightSignal.SignalName && op.OperatorType == ComparisonOperator.OpType.Equal) {
       return DescribeExpressionInternal(leftSignal);
+    }
+    if (BooleanComparison.TryGetState(op, out var state)) {
+      return $"{DescribeLeft(op.Left, op)} = {FormatValue(ScriptValue.FromBool(state), op.ResultValueDef)}";
     }
     var sb = new StringBuilder();
     sb.Append(DescribeLeft(op.Left, op));
@@ -135,9 +140,20 @@ sealed class ExpressionDescriber(ILoc Loc) {
 
     // Resolve the multi-operands operators: (add a b c ...)
     var operands = op.GetReducedOperands();
-    var leftValue = DescribeLeft(operands[0], op);
-    var rightValue = DescribeRight(operands[1], op);
+    var leftValue = DescribeLogicalOperand(operands[0], op, isRightOperand: false);
+    var rightValue = DescribeLogicalOperand(operands[1], op, isRightOperand: true);
     return $"{leftValue} {displayName} {rightValue}";
+  }
+
+  string DescribeLogicalOperand(IExpression operand, LogicalOperator parent, bool isRightOperand) {
+    var value = isRightOperand ? DescribeRight(operand, parent) : DescribeLeft(operand, parent);
+    if (!EntityPanelSettings.ShowOptionalLogicalParentheses
+        || operand is not LogicalOperator { OperatorType: not LogicalOperator.OpType.Not } logicalOperand
+        || logicalOperand.OperatorType == parent.OperatorType
+        || InfixExpressionUtil.ResolvePrecedence(parent) >= InfixExpressionUtil.ResolvePrecedence(operand)) {
+      return value;
+    }
+    return $"({value})";
   }
 
   string DescribeMathOperator(MathOperator op) {

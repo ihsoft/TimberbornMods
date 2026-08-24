@@ -1,3 +1,7 @@
+# v4.0.10 (TBD)
+* [Update] Backport the Advanced Automation feature set from versions 4.8.0 through 4.10.0 to the Timberborn 1.0-compatible package.
+* [Compatibility] Throttling Valve actions remain unavailable because Timberborn 1.0 does not have Throttling Valves.
+
 # v4.7.0 (July 5th, 2026)
 * [Feature] Add an action for setting Gate state.
 * [Feature] Add manufactory signals for the current recipe and recipe completion.

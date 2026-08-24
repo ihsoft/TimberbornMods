@@ -20,8 +20,10 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   const string ArgumentMaxValueHintLocKey = "IgorZ.Automation.Scripting.Editor.ArgumentMaxValueHint";
   const string ArgumentMinValueHintLocKey = "IgorZ.Automation.Scripting.Editor.ArgumentMinValueHint";
+  const string SignalValueTypeLocKey = "IgorZ.Automation.Scripting.Editor.SignalValueType";
 
   public const string InputTypeName = "-input-";
+  const string SignalTypeName = "-signal-";
   const int ErrorStatusHighlightDurationMs = 1000;
 
   #region API
@@ -33,6 +35,8 @@ sealed class ArgumentConstructor : BaseConstructor {
     var value = valueDef.ValueType switch {
         ScriptValue.TypeEnum.String => scriptValue.AsString,
         ScriptValue.TypeEnum.Number => valueDef.DisplayNumericFormat switch {
+            ValueDef.NumericFormatEnum.Boolean =>
+                ScriptValue.FromBool(scriptValue.AsRawNumber != 0).AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Percent => scriptValue.AsRawNumber.ToString(),
             ValueDef.NumericFormatEnum.Float => scriptValue.AsFloat.ToString("0.00"),
             ValueDef.NumericFormatEnum.Integer => scriptValue.AsInt.ToString(),
@@ -51,11 +55,25 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
   }
 
-  public void SetDefinition(ArgumentDefinition argumentDef) {
+  /// <summary>Selects a custom signal as the generated value expression.</summary>
+  public void SetSignalValue(string signalName) {
+    if (!_signalSelector.Items.Any(x => x.Value == signalName)) {
+      throw new InvalidOperationException("Custom signal is not available: " + signalName);
+    }
+    _typeSelectionDropdown.SelectedValue = SignalTypeName;
+    _signalSelector.SelectedValue = signalName;
+  }
+
+  public void SetDefinition(ArgumentDefinition argumentDef, DropdownItem[] signalOptions = null) {
     _argumentDefinition = argumentDef;
     var options = _argumentDefinition.ValueOptions;
+    signalOptions ??= [];
+    if (signalOptions.Length > 0) {
+      options = [.. options, new DropdownItem { Value = SignalTypeName, Text = UIFactory.T(SignalValueTypeLocKey) }];
+    }
     _typeSelectionDropdown.Items = options;
     _typeSelectionDropdown.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
+    _signalSelector.Items = signalOptions;
     var valueRange = argumentDef.ValueDef.DisplayNumericFormatRange;
     if (valueRange != default) {
       if (float.IsNaN(valueRange.min)) {
@@ -76,6 +94,9 @@ sealed class ArgumentConstructor : BaseConstructor {
   }
 
   public string Validate() {
+    if (_typeSelectionDropdown.SelectedValue == SignalTypeName) {
+      return null;
+    }
     string error;
     if (_argumentDefinition.ValueType == ScriptValue.TypeEnum.Number) {
       TryGetScriptValueAsNumber(out error);
@@ -90,15 +111,18 @@ sealed class ArgumentConstructor : BaseConstructor {
     return error;
   }
 
-  /// <summary>Gets the value of the argument as a string that can be used in the generated script.</summary>
+  /// <summary>Gets the value expression as a string that can be used in the generated script.</summary>
   /// <remarks>
   /// Make sure to call <see cref="Validate"/> before to ensure that the value is correct, otherwise the behavior is
   /// undefined (it can throw an exception or return an invalid value that will cause the script execution to fail).
   /// The method assumes that the value is already validated and doesn't perform any additional checks.
   /// </remarks>
-  /// <returns>The value in a string form, suitable for consumption as a Lisp constant.</returns>
+  /// <returns>The value in a string form, suitable for consumption as a Lisp expression.</returns>
   /// <exception cref="InvalidOperationException">if the value type is unrecognized.</exception>
   public string GetScriptValue() {
+    if (_typeSelectionDropdown.SelectedValue == SignalTypeName) {
+      return $"(sig {_signalSelector.SelectedValue})";
+    }
     return _argumentDefinition.ValueType switch {
         ScriptValue.TypeEnum.Number => TryGetScriptValueAsNumber(out _).AsRawNumber.ToString(),
         ScriptValue.TypeEnum.String => $"'{TryGetScriptValueAsString(out _).AsString}'",
@@ -117,6 +141,7 @@ sealed class ArgumentConstructor : BaseConstructor {
   const int StringFieldWidth = 300;
 
   readonly ResizableDropdownElement _typeSelectionDropdown;
+  readonly ResizableDropdownElement _signalSelector;
   readonly TextField _textField;
   readonly Label _hintText;
   ArgumentDefinition _argumentDefinition;
@@ -127,15 +152,21 @@ sealed class ArgumentConstructor : BaseConstructor {
 
   public ArgumentConstructor(UiFactory uiFactory) : base(uiFactory) {
     _typeSelectionDropdown = uiFactory.CreateSimpleDropdown(_ => UpdateTypeSelection());
+    _signalSelector = uiFactory.CreateSimpleDropdown();
+    _signalSelector.ToggleDisplayStyle(false);
     _textField = uiFactory.CreateTextField(classes: [UiFactory.GameTextBigClass]);
     _textField.style.height = Length.Percent(100);
     _hintText = uiFactory.CreateLabel(classes: [UiFactory.GameTextBigClass]);
     _hintText.style.color = ArgumentValueHintColor;
-    Root = MakeRow(_typeSelectionDropdown, _textField, "", _hintText);
+    Root = MakeRow(_typeSelectionDropdown, _signalSelector, _textField, "", _hintText);
   }
 
   void UpdateTypeSelection() {
-    _textField.ToggleDisplayStyle(_typeSelectionDropdown.SelectedValue == InputTypeName);
+    var isTextInput = _typeSelectionDropdown.SelectedValue == InputTypeName;
+    var isSignal = _typeSelectionDropdown.SelectedValue == SignalTypeName;
+    _signalSelector.ToggleDisplayStyle(isSignal);
+    _textField.ToggleDisplayStyle(isTextInput);
+    _hintText.ToggleDisplayStyle(isTextInput && _hintText.text.Length > 0);
     _textField.value = "";
   }
 
@@ -152,8 +183,10 @@ sealed class ArgumentConstructor : BaseConstructor {
     }
     var valueDef = _argumentDefinition.ValueDef;
 
-    // Integer & Percent.
-    if (numericFormat is ValueDef.NumericFormatEnum.Integer or ValueDef.NumericFormatEnum.Percent) {
+    // Integer, Percent & Boolean.
+    if (numericFormat is ValueDef.NumericFormatEnum.Integer
+        or ValueDef.NumericFormatEnum.Percent
+        or ValueDef.NumericFormatEnum.Boolean) {
       if (!int.TryParse(strValue, out var intValue)) {
         error = $"Value must be an integer: {strValue}";
         return ScriptValue.InvalidValue;
@@ -169,9 +202,11 @@ sealed class ArgumentConstructor : BaseConstructor {
           return ScriptValue.InvalidValue;
         }
       }
-      var result = numericFormat == ValueDef.NumericFormatEnum.Integer
-          ? ScriptValue.FromInt(intValue)
-          : ScriptValue.Of(intValue);
+      var result = numericFormat switch {
+          ValueDef.NumericFormatEnum.Integer => ScriptValue.FromInt(intValue),
+          ValueDef.NumericFormatEnum.Percent or ValueDef.NumericFormatEnum.Boolean => ScriptValue.Of(intValue),
+          _ => throw new InvalidOperationException($"Unsupported numeric format: {numericFormat}"),
+      };
       return ExecuteValidator(result, out error) ? result : ScriptValue.InvalidValue;
     }
 
@@ -231,7 +266,9 @@ sealed class ArgumentConstructor : BaseConstructor {
   string FormatToArgPrecision(float value) {
     return _argumentDefinition.ValueDef.DisplayNumericFormat switch {
         ValueDef.NumericFormatEnum.Float => value.ToString("0.00"),
-        ValueDef.NumericFormatEnum.Integer or ValueDef.NumericFormatEnum.Percent =>
+        ValueDef.NumericFormatEnum.Integer
+            or ValueDef.NumericFormatEnum.Percent
+            or ValueDef.NumericFormatEnum.Boolean =>
             value.ToString(CultureInfo.InvariantCulture),
         ValueDef.NumericFormatEnum.Unspecified => throw new InvalidOperationException("Numeric format must be set"),
     };

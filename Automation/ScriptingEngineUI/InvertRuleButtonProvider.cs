@@ -51,7 +51,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       }
       ruleRow.ConditionExpression = parserFactory.DefaultParser.Decompile(result.ParsedExpression);
     } else {
-      var inverted = parserFactory.DefaultParser.InvertBooleanExpression(ruleRow.ParsedCondition, ruleRow.ActiveBuilding);
+      var inverted = parserFactory.DefaultParser.InvertBooleanExpression(
+          ruleRow.ParsedCondition, ruleRow.ActiveBuilding);
       ruleRow.ConditionExpression = parserFactory.DefaultParser.Decompile(inverted);
     }
     var invertedActionExpression = MakeInvertedActionExpression(ruleRow.ParsedAction, ruleRow.ActiveBuilding);
@@ -121,17 +122,6 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       }
       return null;
     }
-    if (actioName == "ThrottlingValve.SetFlow") {
-      var valve = automationBehavior.GetComponent<ThrottlingValve>();
-      var argFlow = ((IValueExpr)action.Operands[0]).ValueFn().AsFloat;
-      if (argFlow == 0) {
-        return $"(act ThrottlingValve.SetFlow {valve.MaxOutflowLimit * 100})";
-      }
-      if (argFlow == valve.MaxOutflowLimit) {
-        return "(act ThrottlingValve.SetFlow 0)";
-      }
-      return null;
-    }
     if (actioName is "Workplace.SetWorkers" or "Workplace.RemoveWorkers") {
       var workplace = automationBehavior.GetComponent<Workplace>();
       var argNumWorkers = actioName == "Workplace.SetWorkers" ? ((IValueExpr)action.Operands[0]).ValueFn().AsInt : 0;
@@ -155,7 +145,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       return false;
     }
     foreach (var (first, second) in PairedActionSuffixes) {
-      if (TryMakePairedActionExpression(action.ActionName, first, second, automationBehavior, out invertedActionExpression)
+      if (TryMakePairedActionExpression(
+              action.ActionName, first, second, automationBehavior, out invertedActionExpression)
           || TryMakePairedActionExpression(
               action.ActionName, second, first, automationBehavior, out invertedActionExpression)) {
         return true;
@@ -228,7 +219,8 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
     if (!actionName.EndsWith(currentActionSuffix, StringComparison.Ordinal)) {
       return false;
     }
-    var invertedActionName = actionName.Substring(0, actionName.Length - currentActionSuffix.Length) + "." + invertedSuffix;
+    var invertedActionName = actionName.Substring(0, actionName.Length - currentActionSuffix.Length)
+        + "." + invertedSuffix;
     var candidateExpression = $"(act {invertedActionName})";
     var result = parserFactory.LispSyntaxParser.Parse(candidateExpression, automationBehavior);
     if (result.LastScriptError != null) {

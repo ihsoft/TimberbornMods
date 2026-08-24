@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 namespace Timberborn.BaseComponentSystem {
@@ -45,6 +47,10 @@ namespace Timberborn.BaseComponentSystem {
   public interface IAwakableComponent {
     void Awake();
   }
+
+  public interface IStartableComponent {
+    void Start();
+  }
 }
 
 namespace Timberborn.AutomationBuildings {
@@ -86,6 +92,8 @@ namespace Timberborn.AutomationBuildings {
 }
 
 namespace Timberborn.Automation {
+  using Timberborn.EntitySystem;
+
   public enum AutomatorState {
     Off,
     On,
@@ -95,6 +103,25 @@ namespace Timberborn.Automation {
     public bool IsTransmitter { get; init; }
     public AutomatorState State { get; set; }
     public string AutomatorName { get; set; }
+  }
+
+  public sealed class AutomatorRegistry {
+    readonly List<Automator> _transmitters = [];
+
+    public ReadOnlyCollection<string> SortedTransmitterIds =>
+        _transmitters.Select(x => x.GetComponent<EntityComponent>().EntityId.ToString()).ToList().AsReadOnly();
+
+    public Automator FindTransmitterById(Guid entityId) {
+      return _transmitters.FirstOrDefault(x => x.GetComponent<EntityComponent>().EntityId == entityId);
+    }
+
+    public void Register(Automator automator) {
+      _transmitters.Add(automator);
+    }
+
+    public void Unregister(Automator automator) {
+      _transmitters.Remove(automator);
+    }
   }
 }
 
@@ -307,10 +334,7 @@ namespace Timberborn.DwellingSystem {
 
 namespace Timberborn.EntitySystem {
   public sealed class EntityComponent : Timberborn.BaseComponentSystem.BaseComponent {
-    public object EntityId { get; set; } = "entity";
-  }
-
-  public sealed class Citizen : Timberborn.BaseComponentSystem.BaseComponent {
+    public Guid EntityId { get; set; } = Guid.NewGuid();
   }
 
   public interface IInitializableEntity {
@@ -322,17 +346,17 @@ namespace Timberborn.EntitySystem {
   }
 
   public sealed class EntityInitializedEvent {
-    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+    public EntityComponent Entity { get; }
 
-    public EntityInitializedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+    public EntityInitializedEvent(EntityComponent entity) {
       Entity = entity;
     }
   }
 
   public sealed class EntityDeletedEvent {
-    public Timberborn.BaseComponentSystem.BaseComponent Entity { get; }
+    public EntityComponent Entity { get; }
 
-    public EntityDeletedEvent(Timberborn.BaseComponentSystem.BaseComponent entity) {
+    public EntityDeletedEvent(EntityComponent entity) {
       Entity = entity;
     }
   }
@@ -456,7 +480,9 @@ namespace Timberborn.GameDistricts {
   using System;
   using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
-  using Timberborn.EntitySystem;
+
+  public sealed class Citizen : BaseComponent {
+  }
 
   public sealed class DistrictBuilding : BaseComponent {
     public event EventHandler ReassignedDistrict;
@@ -621,6 +647,10 @@ namespace Timberborn.SingletonSystem {
   }
 
   public interface IPostLoadableSingleton {
+  }
+
+  public interface IUnloadableSingleton {
+    void Unload();
   }
 
   public sealed class EventBus {
@@ -834,11 +864,12 @@ namespace Timberborn.InventorySystem {
     }
 
     public string ComponentName { get; init; } = "Storage";
+    public bool HideCapacity { get; set; }
     public bool IsOutput => _outputGoods.Count > 0;
     public IReadOnlyList<StorableGoodAmount> AllowedGoods => _allowedGoods;
     public IReadOnlyCollection<string> InputGoods => _inputGoods;
     public IReadOnlyCollection<string> OutputGoods => _outputGoods;
-    public event EventHandler<InventoryStockChangedEventArgs> InventoryStockChanged;
+    public event EventHandler<InventoryAmountChangedEventArgs> InventoryStockChanged;
 
     public void AddInputGood(string goodId, int capacity) {
       _inputGoods.Add(goodId);
@@ -852,7 +883,7 @@ namespace Timberborn.InventorySystem {
 
     public void SetAmount(string goodId, int amount) {
       _amounts[goodId] = amount;
-      InventoryStockChanged?.Invoke(this, new InventoryStockChangedEventArgs(new GoodAmount(goodId, amount)));
+      InventoryStockChanged?.Invoke(this, new InventoryAmountChangedEventArgs(new GoodAmount(goodId, amount)));
     }
 
     public int AmountInStock(string goodId) {
@@ -864,6 +895,9 @@ namespace Timberborn.InventorySystem {
     }
 
     public void GetCapacity(List<GoodAmount> capacity) {
+      if (HideCapacity) {
+        return;
+      }
       foreach (var good in _allowedGoods) {
         if (good.Amount > 0) {
           capacity.Add(new GoodAmount(good.StorableGood.GoodId, good.Amount));
@@ -872,10 +906,23 @@ namespace Timberborn.InventorySystem {
     }
   }
 
-  public readonly struct InventoryStockChangedEventArgs {
+  public sealed class SingleGoodAllower : BaseComponent {
+    public string AllowedGood { get; private set; }
+    public bool HasAllowedGood => AllowedGood != null;
+
+    public void Allow(string goodId) {
+      AllowedGood = goodId;
+    }
+
+    public void Disallow() {
+      AllowedGood = null;
+    }
+  }
+
+  public readonly struct InventoryAmountChangedEventArgs {
     public GoodAmount GoodAmount { get; }
 
-    public InventoryStockChangedEventArgs(GoodAmount goodAmount) {
+    public InventoryAmountChangedEventArgs(GoodAmount goodAmount) {
       GoodAmount = goodAmount;
     }
   }
@@ -1076,6 +1123,47 @@ namespace Timberborn.StatusSystem {
   }
 }
 
+namespace Timberborn.StockpilePrioritySystem {
+  using System;
+  using Timberborn.BaseComponentSystem;
+
+  public sealed class StockpilePriority : BaseComponent {
+    public bool IsAcceptActive => !IsEmptyActive && !IsObtainActive && !IsSupplyActive;
+    public bool IsEmptyActive { get; private set; }
+    public bool IsObtainActive { get; private set; }
+    public bool IsSupplyActive { get; private set; }
+
+    public void Accept() {
+      IsEmptyActive = false;
+      IsObtainActive = false;
+      IsSupplyActive = false;
+    }
+
+    public void Empty() {
+      Accept();
+      IsEmptyActive = true;
+    }
+
+    public void Obtain() {
+      Accept();
+      IsObtainActive = true;
+    }
+
+    public void Supply() {
+      Accept();
+      IsSupplyActive = true;
+    }
+  }
+
+  public sealed class StockpilePriorityChangeListener : BaseComponent {
+    public event EventHandler PriorityChanged;
+
+    public void RaisePriorityChanged() {
+      PriorityChanged?.Invoke(this, EventArgs.Empty);
+    }
+  }
+}
+
 namespace Timberborn.TickSystem {
   public interface ITickableSingleton {
     void Tick();
@@ -1124,6 +1212,18 @@ namespace Timberborn.ToolButtonSystem {
 }
 
 namespace Timberborn.WaterBuildings {
+  public sealed class SluiceState : Timberborn.BaseComponentSystem.BaseComponent {
+    public bool IsOpen { get; private set; }
+
+    public void Open() {
+      IsOpen = true;
+    }
+
+    public void Close() {
+      IsOpen = false;
+    }
+  }
+
   public sealed class Floodgate : Timberborn.BaseComponentSystem.BaseComponent {
     public float Height { get; set; }
     public int MaxHeight { get; init; } = 1;
@@ -1151,24 +1251,6 @@ namespace Timberborn.WaterBuildings {
     public void SetTargetHeightAndSynchronize(float value) {
       TargetHeight = value;
       SetTargetHeightCalls++;
-    }
-  }
-
-  public sealed class ThrottlingValve : Timberborn.BaseComponentSystem.BaseComponent {
-    public float MaxOutflowLimit { get; init; } = 1;
-    public float OutflowLimit { get; private set; }
-    public bool OutflowLimitEnabled { get; private set; }
-    public int SetOutflowLimitCalls { get; private set; }
-    public int SetOutflowLimitEnabledCalls { get; private set; }
-
-    public void SetOutflowLimitEnabledAndSynchronize(bool value) {
-      OutflowLimitEnabled = value;
-      SetOutflowLimitEnabledCalls++;
-    }
-
-    public void SetOutflowLimitAndSynchronize(float value) {
-      OutflowLimit = value;
-      SetOutflowLimitCalls++;
     }
   }
 
@@ -1208,14 +1290,28 @@ namespace Timberborn.ResourceCountingSystem {
   }
 
   public sealed class DistrictResourceCounter : BaseComponent {
+    private readonly Dictionary<string, int> _availableCarriedStock = [];
+
     public readonly StockCounter _stockCounter = new();
     public readonly CapacityCounter _capacityCounter = new();
+    public int GetResourceCountCalls { get; private set; }
+
+    public void SetAvailableCarriedStock(string goodId, int value) {
+      _availableCarriedStock[goodId] = value;
+    }
 
     public ResourceCount GetResourceCount(string goodId) {
+      GetResourceCountCalls++;
       return new ResourceCount {
-          AvailableStock = _stockCounter.GetInputOutputStock(goodId) + _stockCounter.GetOutputStock(goodId),
+          AvailableStock = _stockCounter.GetInputOutputStock(goodId)
+              + _stockCounter.GetOutputStock(goodId)
+              + _availableCarriedStock.GetValueOrDefault(goodId),
           InputOutputCapacity = _capacityCounter.GetInputOutputCapacity(goodId),
       };
+    }
+
+    public void ResetGetResourceCountCalls() {
+      GetResourceCountCalls = 0;
     }
   }
 
@@ -1243,6 +1339,7 @@ namespace Timberborn.ResourceCountingSystem {
   public sealed class CapacityCounter {
     public readonly Dictionary<string, int> _inputOutputCapacity = [];
     public readonly Dictionary<string, int> _outputCapacity = [];
+    public int GetInputOutputCapacityCalls { get; private set; }
 
     public void SetInputOutputCapacity(string goodId, int value) {
       _inputOutputCapacity[goodId] = value;
@@ -1253,7 +1350,12 @@ namespace Timberborn.ResourceCountingSystem {
     }
 
     public int GetInputOutputCapacity(string goodId) {
+      GetInputOutputCapacityCalls++;
       return _inputOutputCapacity.GetValueOrDefault(goodId);
+    }
+
+    public void ResetGetInputOutputCapacityCalls() {
+      GetInputOutputCapacityCalls = 0;
     }
   }
 }

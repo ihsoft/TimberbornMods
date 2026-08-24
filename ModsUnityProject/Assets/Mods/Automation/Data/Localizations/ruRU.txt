@@ -112,6 +112,7 @@ IgorZ.Automation.Scripting.Error.ValueOutOfRange,"ОШИБКА: Значение
 IgorZ.Automation.Scripting.Error.DivisionByZero,"ОШИБКА: Деление на ноль","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.BadValue,"ОШИБКА: Неверное значение","Localizable generic message for the related exception"
 IgorZ.Automation.Scripting.Error.InternalError,"ОШИБКА: Внутренняя ошибка","Localizable generic message for the related exception"
+IgorZ.Automation.Scripting.Error.AutomatorSignalUnavailable,"ОШИБКА: Источник сигнала автоматизации недоступен","Shown when a rule references a stock automation transmitter that no longer exists"
 IgorZ.Automation.Scripting.Error.StackOverflow,"ОШИБКА: Стек переполнен","Localizable generic message for the related exception"
 =,=,"UI fragment strings"
 IgorZ.Automation.AutomationFragment.AndMoreRow,"...и ещё {0} правил...","Indicates that there are more rules that are not shown in the panel"
@@ -135,13 +136,14 @@ IgorZ.Automation.PinnedCustomSignals.DeleteManualSignal,"Удалить ручн
 IgorZ.Automation.PinnedCustomSignals.NoMoreSignals,"Все сигналы прикреплены","Dropdown placeholder shown when every custom signal is already pinned"
 IgorZ.Automation.PinnedCustomSignals.NoSignals,"Нет пользовательских сигналов","Dropdown placeholder shown when no custom signals exist"
 IgorZ.Automation.PinnedCustomSignals.SignalValue,"{0}: {1}","Pinned custom signal row text. Parameters are signal name and current value"
-IgorZ.Automation.PinnedCustomSignals.SetSignalValue,"Изменить значение сигнала","Tooltip for clicking a pinned custom signal value"
-IgorZ.Automation.PinnedCustomSignals.SetValue.DialogHeader,"Изменить значение сигнала","Dialog header for manually changing a custom signal value"
+IgorZ.Automation.PinnedCustomSignals.SetSignalValue,"Настроить прикреплённый сигнал","Tooltip for clicking a pinned custom signal value or name"
+IgorZ.Automation.PinnedCustomSignals.SetValue.DialogHeader,"Настройки сигнала","Dialog header for changing a custom signal value or its pinned panel name"
 IgorZ.Automation.PinnedCustomSignals.SetValue.DuplicateSignalName,"Сигнал уже существует: {0}","Error shown when creating a manual custom signal with an existing name"
 IgorZ.Automation.PinnedCustomSignals.SetValue.InvalidValueFormat,"Некорректное значение сигнала: {0}
 После точки можно указать не больше двух цифр.","Error shown when the manually entered signal value has too many fractional digits"
 IgorZ.Automation.PinnedCustomSignals.SetValue.InvalidValueNumber,"Некорректное значение сигнала: {0}
 Введите число, например: 1, 1.5 или -2.25.","Error shown when the manually entered signal value is not a number"
+IgorZ.Automation.PinnedCustomSignals.SetValue.PinnedNameLabel,"Имя на панели","Label for the unrestricted custom name shown on the pinned signals panel"
 IgorZ.Automation.PinnedCustomSignals.SetValue.SignalName,"Сигнал: {0}","Dialog text showing the custom signal being edited"
 IgorZ.Automation.PinnedCustomSignals.SetValue.SignalNameLabel,"Имя сигнала","Label for the new manual custom signal name field"
 IgorZ.Automation.PinnedCustomSignals.SetValue.ValueLabel,"Значение","Label for the manual custom signal value field"
@@ -150,6 +152,7 @@ IgorZ.Automation.Tool.CopyRules.Text,"Копировать правила: {0}",
 IgorZ.Automation.Tool.CopyRules.Title,"Копировать правила автоматизации",
 =,=,"Scriptable components strings"
 IgorZ.Automation.Scriptable.Automator.Signal.State,"сигнал автоматизации","Name of the condition for the automator state checking"
+IgorZ.Automation.Scriptable.Automator.Signal.RemoteState,"сигнал автоматизации: {0}","Name of a condition that reads the stock automation state from another building"
 IgorZ.Automation.Scriptable.BreedingPod.Signal.Progress,"прогресс инкубации","Name of the condition for the breeding pod progress checking"
 IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady,"можно собрать","Name of the condition for the number of cuttable or gatherable items ready to be collected"
 IgorZ.Automation.Scriptable.Constructable.Signal.Progress,"прогресс строительства","Name of the condition for the construction progress checking"
@@ -162,7 +165,8 @@ IgorZ.Automation.Scriptable.Debug.Signal.Ticker,"тикер","Name of the condit
 IgorZ.Automation.Scriptable.District.Signal.Beavers,"бобров в районе","Name of the condition for the current beaver population checking"
 IgorZ.Automation.Scriptable.District.Signal.Bots,"ботов в районе","Name of the condition for the current bot population checking"
 IgorZ.Automation.Scriptable.District.Signal.NumberOfBeds,"постелей в районе","Name of the condition for the current number of beds checking"
-IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity,"вместимость района: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
+IgorZ.Automation.Scriptable.District.Signal.ResourceCapacity,"ёмкость района: {0}","Name of the condition that returns the current district stock output capacity of the specified good"
+IgorZ.Automation.Scriptable.District.Signal.ResourceFill,"загрузка района: {0}","Name of the condition that returns available district stock divided by fillable storage capacity, capped at 100%"
 IgorZ.Automation.Scriptable.District.Signal.ResourceStock,"запас района: {0}","Name of the condition that returns the current district stock output of the specified good"
 IgorZ.Automation.Scriptable.Dynamite.Action.Detonate,"активировать динамит","Name of the action that immediately detonates the dynamite"
 IgorZ.Automation.Scriptable.Dynamite.Action.DetonateAndRepeat,"активировать динамит и повторить ещё <GreenHighlight>{0} раза</GreenHighlight>","Name of the action that detonates the dynamite and places new dynamites the specified number of times"
@@ -179,6 +183,8 @@ IgorZ.Automation.Scriptable.Gate.Action.SetState,"выставить состо�
 IgorZ.Automation.Scriptable.Inventory.Action.EmptyingStatus,"Склад освобождается в приоритетном порядке.",
 IgorZ.Automation.Scriptable.Inventory.Action.StartEmptyingStock,"начать освобождать","Name of the action that starts emptying the storage"
 IgorZ.Automation.Scriptable.Inventory.Action.StopEmptyingStock,"прекратить освобождать","Name of the action that stops emptying the storage"
+IgorZ.Automation.Scriptable.Inventory.Action.SetHaulingMode,"задать режим склада: {0}","Name of the action that changes the storage hauling mode"
+IgorZ.Automation.Scriptable.Inventory.Signal.HaulingMode,"режим склада","Name of the signal that reports the current storage hauling mode"
 IgorZ.Automation.Scriptable.Inventory.Signal.InputGood,"вход: {0}","Name of the condition for the inventory input goods"
 IgorZ.Automation.Scriptable.Inventory.Signal.OutputGood,"выход: {0}","Name of the condition for the inventory output goods"
 IgorZ.Automation.Scriptable.Lever.Action.SetState,"рычаг в состояние: {0}","Name of the action that sets the lever state to the specified value"
@@ -229,6 +235,8 @@ IgorZ.Automation.Scripting.Expressions.NotOperator,"НЕ","NOT operator name to 
 IgorZ.Automation.Scripting.Expressions.ParseError,"ОШИБКА ОБРАБОТКИ","String to show when the scriptable condition or action cannot be parsed"
 =,=,"Rules editor strings"
 IgorZ.Automation.Scripting.Editor.ActionLabel,"Тогда",
+IgorZ.Automation.Scripting.Editor.AddAndConditionBtn,"+ и","Button that adds a condition joined with AND"
+IgorZ.Automation.Scripting.Editor.AddOrConditionBtn,"+ или","Button that adds a condition joined with OR"
 IgorZ.Automation.Scripting.Editor.ActionMustBeAction,"Действие должно быть оператором 'act'","A message to show when the action is not an action"
 IgorZ.Automation.Scripting.Editor.ActionArgumentName,"Аргумент #{0}","The generic name of the action arguments when there is no display name specified"
 IgorZ.Automation.Scripting.Editor.AddRuleFromScriptBtn,"Добавить скрипт",
@@ -242,6 +250,7 @@ IgorZ.Automation.Scripting.Editor.ConstantTypeDecimals,"дробное числ�
 IgorZ.Automation.Scripting.Editor.ConstantTypeString,"строка","Name of the string constant type"
 IgorZ.Automation.Scripting.Editor.ConstantTypePercent,"проценты","Name of the percent constant type"
 IgorZ.Automation.Scripting.Editor.ConstantTypeWholeNumber,"целое число","Name of the whole number constant type"
+IgorZ.Automation.Scripting.Editor.SignalValueType,"сигнал","Right condition operand type that selects a custom signal"
 IgorZ.Automation.Scripting.Editor.CopyRuleBtn,"Создать копию",
 IgorZ.Automation.Scripting.Editor.DeleteRuleBtn,"Удалить правило",
 IgorZ.Automation.Scripting.Editor.DeletedRule,"Правило удалено","A message to show over the deleted rule"
@@ -254,7 +263,6 @@ IgorZ.Automation.Scripting.Editor.ExportRulesBtn,"Экспортировать �
 IgorZ.Automation.Scripting.Editor.ImportRulesBtn,"Импортировать правила",
 IgorZ.Automation.Scripting.Editor.InvertRuleBtn,"Инвертировать",
 IgorZ.Automation.Scripting.Editor.MoreInfoBtn,"Читать о скриптах"
-IgorZ.Automation.Scripting.Editor.NumberConstantType,"число","Name of the number constant type"
 IgorZ.Automation.Scripting.Editor.PauseRuleBtn,"Выключить правило",
 IgorZ.Automation.Scripting.Editor.PendingEditsNotification,"Некоторые правила в режиме редактирования. Сначала завершите их.",
 IgorZ.Automation.Scripting.Editor.GameAutomationConflictNotification,"Игровая автоматизация уже включена.
@@ -304,6 +312,8 @@ IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle,"Стиль опис
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.HumanReadable,"Текст","Human readable style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.Script,"Скрипт","Script style of the rule description."
 IgorZ.Automation.Settings.EntityPanel.RulesDescriptionStyle.ScriptShort,"Псевдо-скрипт","Shortened script style of the rule description."
+IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParentheses,"Показывать необязательные логические скобки","Controls whether nested logical groups are wrapped in parentheses when operator precedence already establishes their evaluation order."
+IgorZ.Automation.Settings.EntityPanel.ShowOptionalLogicalParenthesesTooltip,"Показывать скобки вокруг вложенных групп И и ИЛИ, даже если порядок вычисления понятен без них.","Tooltip for the optional logical parentheses setting."
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInConditions,"Вычислять значение правого аргумента в условиях",
 IgorZ.Automation.Settings.EntityPanel.EvalValuesInActionArguments,"Вычислять значения в аргументах действий",
 IgorZ.Automation.Settings.EntityPanel.PreventGameAutomationConflicts,"Предотвращать конфликты с игровой автоматизацией",
@@ -314,10 +324,20 @@ IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxLisp,"языка Ли�
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxPython,"языка Питон",
 IgorZ.Automation.Settings.ScriptEditor.DefaultScriptSyntaxTooltip,"Синтаксис может быть переопределен внутри тела выражения путем
 добавления префикса '#PY' для Питона и '#LP' для Лиспа.",
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrder,"Порядок модулей сигналов","Name of the setting that opens the signal module order dialog."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderTooltip,"Определяет порядок модулей сигналов в конструкторе правил.","Tooltip for the signal module order setting."
+IgorZ.Automation.Settings.ScriptEditor.SignalModuleOrderUnavailable,"Доступно после загрузки поселения.","Tooltip shown when signal module order cannot be configured from the main menu."
 IgorZ.Automation.Settings.ScriptEngine.Header,"Настройки движка скриптов",
 IgorZ.Automation.Settings.ScriptEngine.CheckArgumentValues,"Проверять значения аргументов во время исполнения",
 IgorZ.Automation.Settings.ScriptEngine.PinnedCustomSignals,"Показывать панель прикрепленных сигналов",
 IgorZ.Automation.Settings.ScriptEngine.SignalExecutionStackSize,"Размер стека исполнения сигналов",
+=,=,Signal module order dialog
+IgorZ.Automation.SignalModuleOrder.Configure,"Настроить...","Button that opens the signal module order dialog."
+IgorZ.Automation.SignalModuleOrder.DialogHeader,"Порядок модулей сигналов","Header of the dialog that configures signal module order."
+IgorZ.Automation.SignalModuleOrder.Instructions,"Перетаскивайте модули или используйте кнопки со стрелками.","Short instructions shown above the module list."
+IgorZ.Automation.SignalModuleOrder.MoveDown,"Переместить модуль вниз","Tooltip for the button that moves a module down."
+IgorZ.Automation.SignalModuleOrder.MoveUp,"Переместить модуль вверх","Tooltip for the button that moves a module up."
+IgorZ.Automation.SignalModuleOrder.Reset,"Порядок регистрации","Button that restores component registration order."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

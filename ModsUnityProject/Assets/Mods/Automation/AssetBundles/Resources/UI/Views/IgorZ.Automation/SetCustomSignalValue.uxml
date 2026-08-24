@@ -13,6 +13,10 @@
                     <Timberborn.CoreUI.LocalizableLabel text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.SignalNameLabel" class="game-text-big" />
                     <Timberborn.CoreUI.NineSliceTextField select-all-on-mouse-up="false" select-all-on-focus="true" name="SignalNameInput" class="text-field game-text-big" style="flex-grow: 1; margin-top: 4px;" />
                 </engine:VisualElement>
+                <engine:VisualElement name="PinnedNameInputWrapper" style="margin-bottom: 12px;">
+                    <Timberborn.CoreUI.LocalizableLabel text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.PinnedNameLabel" class="game-text-big" />
+                    <Timberborn.CoreUI.NineSliceTextField select-all-on-mouse-up="false" select-all-on-focus="true" name="PinnedNameInput" class="text-field game-text-big" style="flex-grow: 1; margin-top: 4px;" />
+                </engine:VisualElement>
                 <Timberborn.CoreUI.LocalizableLabel text-loc-key="IgorZ.Automation.PinnedCustomSignals.SetValue.ValueLabel" class="game-text-big" />
                 <Timberborn.CoreUI.NineSliceTextField select-all-on-mouse-up="false" select-all-on-focus="true" name="SignalValue" class="text-field game-text-big" style="flex-grow: 1; margin-top: 4px;" />
             </engine:VisualElement>

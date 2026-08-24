@@ -90,8 +90,8 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
   /// <summary>True if the component has any actions.</summary>
   public bool HasActions => _actions.Count > 0;
 
-  /// <summary>Adds signal to the given host. The host will be notified when the signal is scheduled.</summary>
-  /// <seealso cref="TriggerSignalUpdate"/>
+  /// <summary>Adds a signal to the given host. The host will be notified when the signal is scheduled.</summary>
+  /// <seealso cref="TriggerSignalUpdate(string)"/>
   /// <returns><c>true</c> if the first listener for the signal was added.</returns>
   public virtual bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
     if (!_signals.TryGetValue(signalOperator.SignalName, out var signalSink)) {
@@ -146,6 +146,19 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
     if (!_signals.TryGetValue(signalName, out var signalSink) || !signalSink.UpdateLastValue()) {
       return;
     }
+    NotifySignalListeners(signalName, signalSink);
+  }
+
+  /// <summary>Notifies all signal listeners if the supplied value has changed.</summary>
+  /// <remarks>Use this overload when the caller has already computed the current value.</remarks>
+  public void TriggerSignalUpdate(string signalName, ScriptValue currentValue) {
+    if (!_signals.TryGetValue(signalName, out var signalSink) || !signalSink.UpdateLastValue(currentValue)) {
+      return;
+    }
+    NotifySignalListeners(signalName, signalSink);
+  }
+
+  static void NotifySignalListeners(string signalName, SignalSink signalSink) {
     foreach (var listener in signalSink.Listeners) {
       ScriptingService.Instance.NotifySignalListener(signalName, listener);
     }
@@ -153,7 +166,7 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
 
   #endregion
 
-  #region Imlementation
+  #region Implementation
 
   sealed record SignalSink {
     public ScriptValue LastValue;
@@ -165,7 +178,13 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
       if (_registrants.Count == 0) {
         return false;
       }
-      var newValue = _registrants[0].signalOperator.ValueFn();
+      return UpdateLastValue(_registrants[0].signalOperator.ValueFn());
+    }
+
+    public bool UpdateLastValue(ScriptValue newValue) {
+      if (_registrants.Count == 0) {
+        return false;
+      }
       var isChanged = LastValue != newValue;
       LastValue = newValue;
       return isChanged;

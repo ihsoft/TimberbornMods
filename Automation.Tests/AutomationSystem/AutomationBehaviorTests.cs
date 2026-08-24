@@ -41,6 +41,25 @@ static class AutomationBehaviorTests {
     Assert.Same(harness.Behavior, component.AutomationBehavior);
   }
 
+  public static void StartForwardsToExistingDynamicComponents() {
+    var harness = new Harness();
+    harness.Behavior._componentCache.StartIsEnabled = false;
+    var component = harness.Behavior.GetOrCreate<RecordingDynamicComponent>();
+
+    harness.Behavior.Start();
+
+    Assert.True(component.Started);
+  }
+
+  public static void GetOrCreateAfterStartCallsStart() {
+    var harness = new Harness();
+    harness.Behavior._componentCache.StartIsEnabled = true;
+
+    var component = harness.Behavior.GetOrCreate<RecordingDynamicComponent>();
+
+    Assert.True(component.Started);
+  }
+
   public static void GetOrCreateAfterFinished() {
     var harness = new Harness();
 
@@ -89,6 +108,16 @@ static class AutomationBehaviorTests {
     harness.Behavior.DeleteEntity();
 
     Assert.Equal("DeleteEntity", component.EventsText);
+  }
+
+  public static void ActivateDynamicComponentsForwardsPostLoadActivation() {
+    var harness = new Harness();
+    var component = harness.Behavior.GetOrCreate<RecordingDynamicComponent>();
+    component.ClearEvents();
+
+    harness.Behavior.ActivateDynamicComponents();
+
+    Assert.Equal("PostLoadActivation", component.EventsText);
   }
 
   public static void SharedDynamicComponentInstanceIsRejected() {
@@ -176,6 +205,10 @@ static class AutomationBehaviorTests {
 
     public void DeleteEntity() {
       _events.Add("DeleteEntity");
+    }
+
+    public override void OnPostLoadActivation() {
+      _events.Add("PostLoadActivation");
     }
   }
 }

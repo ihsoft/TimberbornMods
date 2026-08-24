@@ -14,6 +14,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<SignalDispatcher>().AsSingleton();
     containerDefinition.Bind<ReferenceManager>().AsTransient();
+    containerDefinition.Bind<AutomatorSignalReferenceManager>().AsSingleton();
 
     // The building-specific components. The declaring order defines the order of teh items in UI.
     containerDefinition.Bind<BreedingPodScriptableComponent>().AsSingleton();
@@ -34,6 +35,7 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<InventoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<InventoryScriptableComponent.EmptyingStatusBehavior>().AsTransient();
     containerDefinition.Bind<InventoryScriptableComponent.InventoryChangeTracker>().AsTransient();
+    containerDefinition.Bind<InventoryScriptableComponent.StockpilePriorityChangeTracker>().AsTransient();
     containerDefinition.Bind<LeverScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ManufactoryScriptableComponent>().AsSingleton();
     containerDefinition.Bind<ManufactoryScriptableComponent.ManufactoryRecipeTracker>().AsTransient();
@@ -46,7 +48,6 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<StreamGaugeScriptableComponent>().AsSingleton();
     containerDefinition.Bind<StreamGaugeScriptableComponent.StreamGaugeCheckTicker>().AsTransient();
     containerDefinition.Bind<StreamGaugeScriptableComponent.StreamGaugeTracker>().AsTransient();
-    containerDefinition.Bind<ThrottlingValveScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WorkplaceScriptableComponent>().AsSingleton();
     containerDefinition.Bind<WorkplaceScriptableComponent.WorkplaceChangeTracker>().AsTransient();
     containerDefinition.Bind<AutomatorScriptableComponent>().AsSingleton();

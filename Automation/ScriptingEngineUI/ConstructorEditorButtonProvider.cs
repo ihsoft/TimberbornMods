@@ -19,6 +19,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
   const string AddRuleViaConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.AddRuleViaConstructorBtn";
   const string EditInConstructorBtnLocKey = "IgorZ.Automation.Scripting.Editor.EditInConstructorBtn";
+  const string CustomSignalPrefix = "Signals.";
 
   #region IEditorProvider implementation
 
@@ -30,9 +31,13 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
   /// <inheritdoc/>
   public void OnRuleRowBtnAction(RuleRow ruleRow) {
+    var compilationError = ruleRow.GetCompilationError();
+    if (compilationError != null) {
+      ruleRow.ReportError(compilationError);
+      return;
+    }
     var root = _uiFactory.LoadVisualElement("IgorZ.Automation/ConstructorEditView");
-    var ruleConstructor = new RuleConstructor(_uiFactory);
-    root.Q("RuleConstructor").Add(ruleConstructor.Root);
+    var ruleConstructor = new RuleConstructor(_uiFactory, root.Q2<VisualElement>("RuleConstructor"));
 
     PopulateConstructor(ruleRow.ActiveBuilding, ruleConstructor);
     PopulateCondition(ruleRow, ruleConstructor);
@@ -40,13 +45,18 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
 
     // Buttons.
     root.Q<Button>("SaveScriptBtn").clicked += () => {
-      var error = ruleConstructor.ConditionConstructor.Validate() ?? ruleConstructor.ActionConstructor.Validate();
+      var error = ruleConstructor.Validate();
       if (error != null) {
         ruleRow.ReportError(error);
         return;
       }
-      ruleRow.ConditionExpression = ToDefaultSyntax(ruleConstructor.ConditionConstructor.GetLispScript(), ruleRow);
-      ruleRow.ActionExpression = ToDefaultSyntax(ruleConstructor.ActionConstructor.GetLispScript(), ruleRow);
+      if (!TryToDefaultSyntax(ruleConstructor.GetConditionLispScript(), ruleRow, out var conditionExpression)
+          || !TryToDefaultSyntax(
+              ruleConstructor.ActionConstructor.GetLispScript(), ruleRow, out var actionExpression)) {
+        return;
+      }
+      ruleRow.ConditionExpression = conditionExpression;
+      ruleRow.ActionExpression = actionExpression;
       ruleRow.SwitchToViewMode();
     };
     root.Q<Button>("DiscardScriptBtn").clicked += ruleRow.DiscardChangesAndSwitchToViewMode;
@@ -60,17 +70,16 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedCondition == null || action == null) {
       return false;
     }
-    if (ruleRow.ParsedCondition is not ComparisonOperator condition) {
+    if (!TryGetConditionEntries(ruleRow.ParsedCondition, out var conditions)) {
       return false;
     }
-    if (condition.Left is not SignalOperator signal || condition.Right is not ConstantValueExpr) {
-      return false;
-    }
-    if (!_scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).Contains(signal.SignalName)
+    var signalNames = _scriptingService.GetSignalNamesForBuilding(ruleRow.ActiveBuilding).ToHashSet();
+    if (conditions.Any(x => !IsSupportedComparison(x.Comparison, signalNames))
         || !_scriptingService.GetActionNamesForBuilding(ruleRow.ActiveBuilding).Contains(action.FullActionName)) {
       return false;
     }
-    if (signal.Operands.Count != 0 || action.Operands.Any(x => x is not ConstantValueExpr)) {
+    if (conditions.Any(x => ((SignalOperator)x.Comparison.Left).Operands.Count != 0)
+        || action.Operands.Any(x => x is not ConstantValueExpr)) {
       return false;
     }
     return true;
@@ -95,9 +104,11 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
         .Select(t => _scriptingService.GetSignalDefinition(t, behavior))
         .Select(t => new ConditionConstructor.ConditionDefinition {
             Name = (t.ScriptName, t.DisplayName),
+            DisplayNameLocKey = t.DisplayNameLocKey,
+            DisplayNameArgument = t.DisplayNameArgument,
             Argument = new ArgumentDefinition(_uiFactory, t.Result),
         });
-    ruleConstructor.ConditionConstructor.SetDefinitions(conditions);
+    ruleConstructor.SetConditionDefinitions(conditions);
 
     var actions = _scriptingService.GetActionNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
@@ -108,16 +119,17 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     ruleConstructor.ActionConstructor.SetDefinitions(actions);
   }
 
-  string ToDefaultSyntax(string lispSyntax, RuleRow ruleRow) {
-    if (ScriptEditorSettings.DefaultScriptSyntax == ScriptEditorSettings.ScriptSyntax.Lisp) {
-      return lispSyntax;
-    }
+  bool TryToDefaultSyntax(string lispSyntax, RuleRow ruleRow, out string resultSyntax) {
     var result = _parserFactory.LispSyntaxParser.Parse(lispSyntax, ruleRow.ActiveBuilding);
     if (result.LastScriptError != null) {
-      //FXIME: maybe deal with it better?
-      throw result.LastScriptError;  // Not expected!
+      ruleRow.ReportError(result.LastScriptError);
+      resultSyntax = null;
+      return false;
     }
-    return _parserFactory.DefaultParser.Decompile(result.ParsedExpression);
+    resultSyntax = ScriptEditorSettings.DefaultScriptSyntax == ScriptEditorSettings.ScriptSyntax.Lisp
+        ? lispSyntax
+        : _parserFactory.DefaultParser.Decompile(result.ParsedExpression);
+    return true;
   }
 
   static void PopulateAction(RuleRow ruleRow, RuleConstructor ruleConstructor) {
@@ -143,17 +155,75 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     if (ruleRow.ParsedCondition == null) {
       return;
     }
-    var conditionConstructor = ruleConstructor.ConditionConstructor;
-    if (ruleRow.ParsedCondition is not ComparisonOperator comparisonOperator) {
-      throw new InvalidOperationException("Binary operator is expected, but found: " + ruleRow.ParsedCondition);
+    if (!TryGetConditionEntries(ruleRow.ParsedCondition, out var conditions)) {
+      throw new InvalidOperationException("A flat condition chain is expected, but found: " + ruleRow.ParsedCondition);
     }
-    conditionConstructor.SignalSelector.SelectedValue = (comparisonOperator.Left as SignalOperator)!.SignalName;
-    conditionConstructor.OperatorSelector.SelectedValue =
-        LispSyntaxParser.ComparisonOperators[comparisonOperator.OperatorType];
-    if (comparisonOperator.Right is not ConstantValueExpr constantValue) {
-      throw new InvalidOperationException("Constant value is expected");
+    ruleConstructor.SetConditions(conditions);
+  }
+
+  static bool TryGetConditionEntries(
+      BooleanOperator expression, out IReadOnlyList<RuleConstructor.ConditionEntry> conditions) {
+    var result = new List<RuleConstructor.ConditionEntry>();
+    if (expression is ComparisonOperator comparison) {
+      result.Add(new RuleConstructor.ConditionEntry(LogicalOperator.OpType.And, comparison));
+      conditions = result;
+      return true;
     }
-    conditionConstructor.ValueSelector.SetScriptValue(constantValue.ValueFn());
+    if (expression is not LogicalOperator logical || logical.OperatorType == LogicalOperator.OpType.Not) {
+      conditions = null;
+      return false;
+    }
+
+    var topLevelOperands = logical.OperatorType == LogicalOperator.OpType.Or
+        ? FlattenLogicalOperands(logical, LogicalOperator.OpType.Or)
+        : [logical];
+    foreach (var topLevelOperand in topLevelOperands) {
+      var groupOperands = topLevelOperand is LogicalOperator { OperatorType: LogicalOperator.OpType.And } andGroup
+          ? FlattenLogicalOperands(andGroup, LogicalOperator.OpType.And)
+          : [topLevelOperand];
+      var firstInGroup = true;
+      foreach (var operand in groupOperands) {
+        if (operand is not ComparisonOperator groupComparison) {
+          conditions = null;
+          return false;
+        }
+        var joinOperator = result.Count == 0 || !firstInGroup
+            ? LogicalOperator.OpType.And
+            : LogicalOperator.OpType.Or;
+        result.Add(new RuleConstructor.ConditionEntry(joinOperator, groupComparison));
+        firstInGroup = false;
+      }
+    }
+    conditions = result;
+    return result.Count > 0;
+  }
+
+  static IReadOnlyList<IExpression> FlattenLogicalOperands(
+      LogicalOperator expression, LogicalOperator.OpType operatorType) {
+    var result = new List<IExpression>();
+    foreach (var operand in expression.Operands) {
+      if (operand is LogicalOperator nested && nested.OperatorType == operatorType) {
+        result.AddRange(FlattenLogicalOperands(nested, operatorType));
+      } else {
+        result.Add(operand);
+      }
+    }
+    return result;
+  }
+
+  static bool IsSupportedComparison(ComparisonOperator comparison, HashSet<string> signalNames) {
+    if (comparison.Left is not SignalOperator leftSignal || !signalNames.Contains(leftSignal.SignalName)) {
+      return false;
+    }
+    if (BooleanComparison.IsBoolean(leftSignal.SignalDef.Result)) {
+      return BooleanComparison.TryGetState(comparison, out _);
+    }
+    return comparison.Right switch {
+        ConstantValueExpr => true,
+        SignalOperator rightSignal => rightSignal.SignalName.StartsWith(CustomSignalPrefix, StringComparison.Ordinal)
+            && signalNames.Contains(rightSignal.SignalName),
+        _ => false,
+    };
   }
 
   #endregion

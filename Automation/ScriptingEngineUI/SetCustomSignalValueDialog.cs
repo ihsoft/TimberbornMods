@@ -48,30 +48,39 @@ sealed class SetCustomSignalValueDialog(SignalDispatcher signalDispatcher) : Abs
 
   /// <inheritdoc/>
   protected override void ApplyInput() {
-    var rawValue = ScriptValue.FromFloat(float.Parse(_valueField.value)).AsRawNumber;
     if (_canEditName) {
       _signalName = SignalNamePrefix + _signalNameField.value.Trim();
     }
-    signalDispatcher.SetManualSignalValue(_signalName, rawValue);
+    if (_canEditName || _valueField.value != _originalValue) {
+      var rawValue = ScriptValue.FromFloat(float.Parse(_valueField.value)).AsRawNumber;
+      signalDispatcher.SetManualSignalValue(_signalName, rawValue);
+    }
     _onSignalSaved?.Invoke(_signalName);
+    if (!_canEditName && _pinnedNameField.value != _originalPinnedName) {
+      _onPinnedNameSaved?.Invoke(_pinnedNameField.value);
+    }
   }
 
   /// <inheritdoc/>
   protected override bool CheckHasChanges() {
     return _valueField.value != _originalValue
-        || _canEditName && _signalNameField.value.Trim() != _originalSignalName;
+        || _canEditName && _signalNameField.value.Trim() != _originalSignalName
+        || !_canEditName && _pinnedNameField.value != _originalPinnedName;
   }
 
   #endregion
 
   #region API
 
-  public SetCustomSignalValueDialog WithSignal(string signalName, string displayName, int rawValue) {
+  public SetCustomSignalValueDialog WithSignal(
+      string signalName, string displayName, string pinnedName, int rawValue, Action<string> onPinnedNameSaved) {
     _signalName = signalName;
     _displayName = displayName;
     _originalSignalName = displayName;
+    _originalPinnedName = pinnedName;
     _originalValue = ScriptValue.Of(rawValue).AsFloat.ToString("0.##");
     _canEditName = false;
+    _onPinnedNameSaved = onPinnedNameSaved;
     return this;
   }
 
@@ -79,6 +88,7 @@ sealed class SetCustomSignalValueDialog(SignalDispatcher signalDispatcher) : Abs
     _signalName = null;
     _displayName = null;
     _originalSignalName = "";
+    _originalPinnedName = "";
     _originalValue = "0";
     _canEditName = true;
     _existingSignals = existingSignals.ToHashSet();
@@ -90,11 +100,15 @@ sealed class SetCustomSignalValueDialog(SignalDispatcher signalDispatcher) : Abs
     base.Show();
     var signalNameLabel = Root.Q2<Label>("SignalName");
     var signalNameInputWrapper = Root.Q2<VisualElement>("SignalNameInputWrapper");
+    var pinnedNameInputWrapper = Root.Q2<VisualElement>("PinnedNameInputWrapper");
     _signalNameField = Root.Q2<TextField>("SignalNameInput");
+    _pinnedNameField = Root.Q2<TextField>("PinnedNameInput");
     signalNameLabel.ToggleDisplayStyle(!_canEditName);
     signalNameInputWrapper.ToggleDisplayStyle(_canEditName);
+    pinnedNameInputWrapper.ToggleDisplayStyle(!_canEditName);
     signalNameLabel.text = UiFactory.T(SignalNameLocKey, _displayName);
     _signalNameField.value = _originalSignalName;
+    _pinnedNameField.value = _originalPinnedName;
     _signalNameField.RegisterCallback<ChangeEvent<string>>(_ => UpdateSignalNameValidation());
     _valueField = Root.Q2<TextField>("SignalValue");
     _valueField.value = _originalValue;
@@ -113,11 +127,14 @@ sealed class SetCustomSignalValueDialog(SignalDispatcher signalDispatcher) : Abs
     _signalName = null;
     _displayName = null;
     _originalSignalName = null;
+    _originalPinnedName = null;
     _originalValue = null;
     _canEditName = false;
     _existingSignals = [];
     _onSignalSaved = null;
+    _onPinnedNameSaved = null;
     _signalNameField = null;
+    _pinnedNameField = null;
     _valueField = null;
   }
 
@@ -167,11 +184,14 @@ sealed class SetCustomSignalValueDialog(SignalDispatcher signalDispatcher) : Abs
   string _signalName;
   string _displayName;
   string _originalSignalName;
+  string _originalPinnedName;
   string _originalValue;
   bool _canEditName;
   HashSet<string> _existingSignals = [];
   Action<string> _onSignalSaved;
+  Action<string> _onPinnedNameSaved;
   TextField _signalNameField;
+  TextField _pinnedNameField;
   TextField _valueField;
 
   #endregion

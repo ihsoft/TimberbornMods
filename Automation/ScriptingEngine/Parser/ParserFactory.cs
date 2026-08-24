@@ -38,6 +38,11 @@ class ParserFactory {
   /// </param>
   public ParsingResult ParseExpression(
       string expression, AutomationBehavior behavior, ParserBase preferredParser = null) {
+    if (expression == null) {
+      return new ParsingResult {
+          LastScriptError = new ScriptError.ParsingError("Expression must not be null"),
+      };
+    }
     if (expression.StartsWith(PythonSyntaxPrefix)) {
       return PythonSyntaxParser.Parse(expression[PythonSyntaxPrefix.Length..], behavior);
     }

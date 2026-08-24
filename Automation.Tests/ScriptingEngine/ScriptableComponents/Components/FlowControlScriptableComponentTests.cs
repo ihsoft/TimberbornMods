@@ -2,6 +2,7 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using Timberborn.Localization;
+using Timberborn.WaterBuildings;
 using Timberborn.WaterSourceSystem;
 
 namespace Automation.Tests;
@@ -11,6 +12,17 @@ static class FlowControlScriptableComponentTests {
     var component = CreateComponent();
     var behavior = new AutomationBehavior();
     behavior.SetComponent(new WaterSourceRegulator());
+
+    var actionNames = component.GetActionNamesForBuilding(behavior);
+
+    Assert.Equal("FlowControl.Open", actionNames[0]);
+    Assert.Equal("FlowControl.Close", actionNames[1]);
+  }
+
+  public static void ExposesActionsForSluice() {
+    var component = CreateComponent();
+    var behavior = new AutomationBehavior();
+    behavior.SetComponent(new SluiceState());
 
     var actionNames = component.GetActionNamesForBuilding(behavior);
 
@@ -37,6 +49,21 @@ static class FlowControlScriptableComponentTests {
     component.GetActionExecutor("FlowControl.Close", behavior)([]);
 
     Assert.False(regulator.IsOpen);
+  }
+
+  public static void ExecutesOpenAndCloseActionsForSluice() {
+    var component = CreateComponent();
+    var behavior = new AutomationBehavior();
+    var sluice = new SluiceState();
+    behavior.SetComponent(sluice);
+
+    component.GetActionExecutor("FlowControl.Open", behavior)([]);
+
+    Assert.True(sluice.IsOpen);
+
+    component.GetActionExecutor("FlowControl.Close", behavior)([]);
+
+    Assert.False(sluice.IsOpen);
   }
 
   public static void ReportsUnknownAction() {

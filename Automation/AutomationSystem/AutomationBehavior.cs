@@ -22,7 +22,8 @@ namespace IgorZ.Automation.AutomationSystem;
 
 /// <summary>The component that keeps all the automation state on the building.</summary>
 public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IInitializableEntity,
-                                         IFinishedStateListener, IPersistentEntity, IDeletableEntity,
+                                         IFinishedStateListener, IStartableComponent, IPersistentEntity,
+                                         IDeletableEntity,
                                          IDuplicable<AutomationBehavior> {
 
   const string AutomationErrorIcon = "IgorZ.Automation/error-icon-script-failed";
@@ -165,7 +166,8 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
   /// <remarks>
   /// <p>
   /// The newly created components will receive all callbacks that they would receive if were created at the behavior
-  /// creation time. Callback sequence: Awake, OnEnterFinishedState (if finished), InitializeEntity (if initialized).
+  /// creation time. Callback sequence: Awake, Start (if enabled), OnEnterFinishedState (if finished),
+  /// InitializeEntity (if initialized).
   /// </p>
   /// <p>
   /// It's important to understand that the dynamic components only try to behave like Unity objects, but they are not!
@@ -207,6 +209,14 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
   public T GetComponentOrFail<T>() where T : BaseComponent {
     return GetComponent<T>()
         ?? throw new InvalidOperationException($"Cannot find {typeof(T).FullName} on {DebugEx.ObjectToString(this)}");
+  }
+
+  /// <summary>Activates all dynamic components before automation rules are activated.</summary>
+  /// <seealso cref="AbstractDynamicComponent.OnPostLoadActivation"/>
+  public void ActivateDynamicComponents() {
+    foreach (var component in _dynamicComponents.Values) {
+      component.OnPostLoadActivation();
+    }
   }
 
   #endregion
@@ -323,6 +333,17 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
 
   #endregion
 
+  #region IStartableComponent implementation
+
+  /// <inheritdoc/>
+  public void Start() {
+    foreach (var component in _dynamicComponents.Values) {
+      component.Start();
+    }
+  }
+
+  #endregion
+
   #region IDuplicable implementation
 
   /// <inheritdoc/>
@@ -368,6 +389,9 @@ public sealed class AutomationBehavior : BaseComponent, IAwakableComponent, IIni
     component.Initialize(this);
     if (component is IAwakableComponent awakableComponent) {
       awakableComponent.Awake();
+    }
+    if (component.Enabled && _componentCache.StartIsEnabled) {
+      component.Start();
     }
     if (_isFinished && component is IFinishedStateListener finishedStateListener) {
       finishedStateListener.OnEnterFinishedState();

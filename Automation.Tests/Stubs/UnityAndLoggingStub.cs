@@ -25,6 +25,7 @@ namespace UnityEngine {
     static readonly List<IEnumerator> QueuedCoroutines = [];
 
     public GameObject gameObject { get; set; } = new("MonoBehaviour");
+    public bool StartIsEnabled { get; set; } = true;
     public static int QueuedCoroutineCount => QueuedCoroutines.Count;
 
     public Coroutine StartCoroutine(IEnumerator enumerator) {
