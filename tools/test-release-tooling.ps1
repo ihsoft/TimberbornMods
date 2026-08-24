@@ -5,6 +5,8 @@ $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-date.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
 
 function Assert-True([bool] $Condition, [string] $Message) {
     if (-not $Condition) {
@@ -133,6 +135,54 @@ try {
         "The registered-line candidate did not render as a real table row."
     Write-Host "PASS: inventory default/JSON parity for current and registered release lines"
 
+    $backportChangesPath = Join-Path $testRoot "backport-changelog.md"
+    Write-TestFile $backportChangesPath @'
+# v4.0.10 (Timberborn v1.0) (August 23rd, 2026)
+
+* [Update] Backport the current feature set.
+
+# v4.7.0 (June 30th, 2026)
+
+* [Feature] Current-line feature.
+'@
+    Assert-ReleaseVersionMatchesChangelog `
+        $backportChangesPath "4.0.10" "BackportPatchOnly" "4.0.9"
+    $implicitBaselineRejected = $false
+    try {
+        Assert-ReleaseVersionMatchesChangelog $backportChangesPath "4.0.10" "BackportPatchOnly"
+    }
+    catch {
+        $implicitBaselineRejected = $_.Exception.Message.Contains("requires 4.7.1 after 4.7.0")
+    }
+    Assert-True $implicitBaselineRejected `
+        "Shared changelog history must require an explicit previous source mod version for a backport."
+    Write-Host "PASS: explicit backport source-version baseline"
+
+    $packageFixtureRoot = Join-Path $testRoot "package-fixture"
+    Write-TestFile `
+        (Join-Path $packageFixtureRoot "Automation/version-1.0/manifest.json") `
+        '{"Name":"Advanced Automation","Version":"4.0.10"}'
+    Write-TestFile `
+        (Join-Path $packageFixtureRoot "Automation/version-1.0/Scripts/AdvancedAutomation.dll") `
+        "legacy-lane"
+    Write-TestFile `
+        (Join-Path $packageFixtureRoot "Automation/version-1.1/manifest.json") `
+        '{"Name":"Advanced Automation","Version":"4.10.0"}'
+    Write-TestFile `
+        (Join-Path $packageFixtureRoot "Automation/version-1.1/Scripts/AdvancedAutomation.dll") `
+        "current-lane"
+    $packageFixtureZip = Join-Path $testRoot "Automation.zip"
+    Compress-Archive -LiteralPath (Join-Path $packageFixtureRoot "Automation") `
+        -DestinationPath $packageFixtureZip
+    $packageFingerprints = @(Get-PackageLaneFingerprints $packageFixtureZip)
+    $legacyFingerprint = @($packageFingerprints | Where-Object GameVersion -eq "version-1.0")
+    Assert-Equal 1 $legacyFingerprint.Count "Legacy package lane fingerprint count"
+    Assert-Equal "4.0.10" $legacyFingerprint[0].ManifestVersion "Legacy package lane manifest version"
+    $publicPackageLane = Get-PublicPackageLaneFingerprint $packageFingerprints
+    Assert-Equal "version-1.1" $publicPackageLane.GameVersion "Public package lane"
+    Assert-Equal "4.10.0" $publicPackageLane.ManifestVersion "Public package version"
+    Write-Host "PASS: source/public package version separation from final manifest lanes"
+
     $summaryChild = Join-Path $testRoot "summary-child.ps1"
     Write-TestFile $summaryChild @'
 param([string] $FixtureName)
@@ -196,6 +246,10 @@ Assert-True $verifyText.Contains('Add-SwitchArgument $commonPublishArgs "-SkipBu
 Assert-True $verifyText.Contains(
     'Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" ($SkipUnityExport -or $preparesLocalModSource)') `
     "Platform dry runs are not forced to skip the shared Unity export."
+Assert-True $verifyText.Contains("SchemaVersion = 5") `
+    "Preflight report schema does not record the source/public version contract."
+Assert-True $verifyText.Contains("PublicPackageVersion = `$publicPackageVersion") `
+    "Preflight report is missing PublicPackageVersion."
 
 $publishText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-release.ps1")
 Assert-True $publishText.Contains('[switch] $PreserveChangelogDate') `
@@ -210,6 +264,10 @@ $initialResponseIndex = $modIoText.IndexOf("Initial Mod.IO upload response", [Sy
 $finalReadbackIndex = $modIoText.LastIndexOf("Final Mod.IO readback:", [System.StringComparison]::Ordinal)
 Assert-True ($initialResponseIndex -ge 0 -and $initialResponseIndex -lt $finalReadbackIndex) `
     "The final Mod.IO readback must follow the initial upload response."
+Assert-True $modIoText.Contains('[switch] $BackportPackageUpdate') `
+    "Mod.IO publishing is missing explicit backport package update mode."
+Assert-True $modIoText.Contains("Mod.IO backport upload did not create a distinct file id.") `
+    "Mod.IO publishing does not require a distinct file id for a backport package update."
 Write-Host "PASS: preflight ordering, platform skip contract, rollover gate, and final readback ordering"
 
 Write-Host "All release tooling tests passed."

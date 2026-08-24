@@ -14,6 +14,7 @@ param(
     [string] $SteamCmdPath = "",
     [string] $SteamUserName = "",
     [string] $ChangeNotesPrefix = "",
+    [string] $ChangeNoteTitle = "",
     [string] $ExpectedPackageSha256 = "",
     [switch] $CorrectiveReplacement,
     [switch] $IncludeLegacyVersions,
@@ -328,7 +329,7 @@ function ConvertTo-VdfString([string] $Value) {
     return $Value.Replace("\", "\\").Replace('"', '\"')
 }
 
-function ConvertTo-SteamChangeNote([string] $Version, [string] $ChangeNotes) {
+function ConvertTo-SteamChangeNote([string] $Title, [string] $ChangeNotes) {
     $lines = $ChangeNotes.Trim() -split "\r?\n"
     $convertedLines = $lines | ForEach-Object {
         if ($_ -match "^\*\s+(?<text>.+)$") {
@@ -338,7 +339,7 @@ function ConvertTo-SteamChangeNote([string] $Version, [string] $ChangeNotes) {
             $_
         }
     }
-    return "[h3]v$Version[/h3]`r`n" + (($convertedLines -join "`r`n").Trim())
+    return "[h3]$Title[/h3]`r`n" + (($convertedLines -join "`r`n").Trim())
 }
 
 function Format-Tags([string[]] $Tags) {
@@ -800,7 +801,11 @@ $changeNotes = Get-LatestChangeNotes $changesPath $modVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
     $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
 }
-$steamChangeNote = ConvertTo-SteamChangeNote $modVersion $changeNotes
+$resolvedChangeNoteTitle = $ChangeNoteTitle
+if ([string]::IsNullOrWhiteSpace($resolvedChangeNoteTitle)) {
+    $resolvedChangeNoteTitle = "v$modVersion"
+}
+$steamChangeNote = ConvertTo-SteamChangeNote $resolvedChangeNoteTitle $changeNotes
 
 $stagingRootPath = Resolve-ToolPath $SteamStagingRoot
 $contentFolder = Expand-PackageForSteam $zipPath (Join-Path $stagingRootPath $ModName)

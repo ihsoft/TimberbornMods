@@ -7,6 +7,7 @@ param(
     [string] $OutputRoot = ".tools/release-preview",
     [string] $Repository = "ihsoft/TimberbornMods",
     [string] $TagName = "",
+    [string] $Title = "",
     [string] $ReleaseNotesPath = "",
     [string] $ExpectedPackageSha256 = "",
     [switch] $ReplaceExistingAsset,
@@ -218,9 +219,12 @@ else {
     Assert-PathExists $resolvedNotesPath "Release notes"
     (Get-Content -Raw -LiteralPath $resolvedNotesPath).Trim()
 }
-$releaseTitle = "$([string]$manifest.Name) v$modVersion"
-if ([string]::IsNullOrWhiteSpace($manifest.Name)) {
-    $releaseTitle = "$ModName v$modVersion"
+$releaseTitle = $Title
+if ([string]::IsNullOrWhiteSpace($releaseTitle)) {
+    $releaseTitle = "$([string]$manifest.Name) v$modVersion"
+    if ([string]::IsNullOrWhiteSpace($manifest.Name)) {
+        $releaseTitle = "$ModName v$modVersion"
+    }
 }
 $hash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
 if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256) -and

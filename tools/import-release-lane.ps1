@@ -29,8 +29,8 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 $reportPath = Resolve-ToolPath $SourcePreflightReportPath
 Assert-PathExists $reportPath "Source preflight report"
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
-if ([int]$report.SchemaVersion -ne 4 -or $report.ReadyForPublish -ne $true) {
-    throw "Source report must be a publish-ready schema-4 preflight report."
+if ([int]$report.SchemaVersion -ne 5 -or $report.ReadyForPublish -ne $true) {
+    throw "Source report must be a publish-ready schema-5 preflight report."
 }
 
 $sources = @($report.ReleaseSources)
@@ -55,6 +55,9 @@ $fingerprints = @(Get-PackageLaneFingerprints $packagePath)
 $sourceFingerprint = @($fingerprints | Where-Object { $_.GameVersion -eq $GameVersion })
 if ($sourceFingerprint.Count -ne 1 -or $sourceFingerprint[0].Sha256 -ne [string]$source.PackageLaneSha256) {
     throw "Source package lane $GameVersion does not match its preflight evidence."
+}
+if ([string]$sourceFingerprint[0].ManifestVersion -ne [string]$source.SourceModVersion) {
+    throw "Source package lane $GameVersion manifest version does not match its source mod version."
 }
 
 $destinationConfigPath = Join-Path $destinationRoot "$($report.ModName)/release.json"

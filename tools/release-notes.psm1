@@ -17,7 +17,7 @@ function Get-ReleaseChangeNotes([string] $ChangesPath, [string] $Version) {
 function Get-ReleaseLineDisplayName([object] $Source) {
     $gameVersion = [string]$Source.GameVersion
     if ($gameVersion -match "^version-(?<version>\d+\.\d+)$") {
-        return "Update $($Matches['version'])"
+        return "Timberborn v$($Matches['version'])"
     }
     return $gameVersion
 }
@@ -28,12 +28,12 @@ function Get-CombinedReleaseNotes([object[]] $ReleaseSources) {
     }
     if ($ReleaseSources.Count -eq 1) {
         return Get-ReleaseChangeNotes ([string]$ReleaseSources[0].ChangesPath) `
-            ([string]$ReleaseSources[0].ModVersion)
+            ([string]$ReleaseSources[0].SourceModVersion)
     }
 
     $sections = @($ReleaseSources | ForEach-Object {
         $lineName = Get-ReleaseLineDisplayName $_
-        $version = [string]$_.ModVersion
+        $version = [string]$_.SourceModVersion
         $notes = Get-ReleaseChangeNotes ([string]$_.ChangesPath) $version
         "## $lineName - v$version`r`n`r`n$notes"
     })

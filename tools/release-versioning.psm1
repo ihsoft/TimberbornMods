@@ -41,10 +41,16 @@ function Assert-ReleaseVersionMatchesChangelog(
     [string] $ChangesPath,
     [string] $Version,
     [ValidateSet("CurrentLine", "BackportPatchOnly")]
-    [string] $VersionPolicy
+    [string] $VersionPolicy,
+    [string] $PreviousSourceModVersion = ""
 ) {
     $section = Get-ReleaseSection $ChangesPath $Version
-    $previous = Get-PreviousDatedReleaseVersion $ChangesPath $Version
+    $previous = if ([string]::IsNullOrWhiteSpace($PreviousSourceModVersion)) {
+        Get-PreviousDatedReleaseVersion $ChangesPath $Version
+    }
+    else {
+        $PreviousSourceModVersion
+    }
 
     if ($VersionPolicy -eq "BackportPatchOnly") {
         if ($null -eq $previous) {

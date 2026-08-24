@@ -197,6 +197,74 @@ function Get-LaneFingerprint([object[]] $Fingerprints, [string] $Lane, [string] 
     return $matches[0]
 }
 
+function Get-ConfiguredPublicPackageLane(
+    [object] $ReleaseConfig,
+    [string] $FallbackGameVersion,
+    [string] $FallbackVersion) {
+    $manifestVersions = Get-ObjectPropertyValue $ReleaseConfig "ManifestVersions"
+    if ($null -eq $manifestVersions) {
+        return [ordered]@{
+            GameVersion = $FallbackGameVersion
+            ManifestVersion = $FallbackVersion
+        }
+    }
+
+    $ranked = @($manifestVersions.PSObject.Properties | ForEach-Object {
+        if ($_.Name -notmatch "^version-(?<version>\d+\.\d+(?:\.\d+)?)$") {
+            throw "Unsupported ManifestVersions lane name: $($_.Name)"
+        }
+        $manifestVersion = [string]$_.Value
+        if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
+            throw "ManifestVersions.$($_.Name) is empty."
+        }
+        [pscustomobject]@{
+            GameVersion = [string]$_.Name
+            LaneVersion = [version]$Matches["version"]
+            ManifestVersion = $manifestVersion
+        }
+    } | Sort-Object LaneVersion)
+    if ($ranked.Count -eq 0) {
+        throw "ManifestVersions contains no compatibility lanes."
+    }
+
+    return [ordered]@{
+        GameVersion = [string]$ranked[-1].GameVersion
+        ManifestVersion = [string]$ranked[-1].ManifestVersion
+    }
+}
+
+function Get-TimberbornGameLine([string] $VersionFolder) {
+    if ($VersionFolder -notmatch "^version-(?<version>\d+\.\d+)$") {
+        throw "Cannot derive a Timberborn release line from $VersionFolder."
+    }
+    return $Matches["version"]
+}
+
+function Get-ModIoActiveFileSnapshot([string] $ConfigPath, [string] $AccessTokenPath) {
+    Assert-PathExists $ConfigPath "Mod.IO config"
+    Assert-PathExists $AccessTokenPath "Mod.IO access token"
+
+    $config = Get-Content -Raw -LiteralPath $ConfigPath | ConvertFrom-Json
+    $token = (Get-Content -Raw -LiteralPath $AccessTokenPath).Trim()
+    if ([string]::IsNullOrWhiteSpace($token)) {
+        throw "Mod.IO access token is empty: $AccessTokenPath"
+    }
+    $mod = Invoke-RestMethod `
+        -Uri "$($config.ApiBase.TrimEnd('/'))/games/$($config.GameId)/mods/$($config.ModId)" `
+        -Headers @{ Authorization = "Bearer $token" }
+    if ($null -eq $mod.modfile -or [int]$mod.modfile.id -le 0) {
+        throw "Mod.IO mod $($config.ModId) has no active file."
+    }
+
+    return [ordered]@{
+        ModId = [long]$config.ModId
+        FileId = [long]$mod.modfile.id
+        Version = [string]$mod.modfile.version
+        Md5 = [string]$mod.modfile.filehash.md5
+        FileSize = [long]$mod.modfile.filesize
+    }
+}
+
 function Assert-ReleaseSourceCurrent([object] $Source) {
     $sourceRoot = Resolve-RepositoryRoot ([string]$Source.ReleaseRoot) $toolRepoRoot
     $sourceBranch = (& git -C $sourceRoot branch --show-current).Trim()
@@ -266,11 +334,17 @@ $releaseConfigPath = Join-Path $modRoot "release.json"
 Assert-PathExists $releaseConfigPath "Release config"
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
-$modVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVersion")
-if ([string]::IsNullOrWhiteSpace($modVersion)) {
+$sourceModVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVersion")
+if ([string]::IsNullOrWhiteSpace($sourceModVersion)) {
     throw "ReleaseVersion is empty in $releaseConfigPath."
 }
-$releaseLogDirectory = New-ReleaseLogDirectory -RepoRoot $repoRoot -ModName $ModName -Version $modVersion -Phase "verify"
+$previousSourceModVersion = [string](Get-ObjectPropertyValue $releaseConfig "PreviousSourceModVersion")
+$configuredPublicLane = Get-ConfiguredPublicPackageLane $releaseConfig $GameVersion $sourceModVersion
+$expectedPublicPackageVersion = [string]$configuredPublicLane.ManifestVersion
+$isBackportPackageUpdate = $VersionPolicy -eq "BackportPatchOnly" -and
+    $expectedPublicPackageVersion -ne $sourceModVersion
+$releaseLogDirectory = New-ReleaseLogDirectory `
+    -RepoRoot $repoRoot -ModName $ModName -Version $sourceModVersion -Phase "verify"
 
 $changesPath = Resolve-RepoPath ([string](Get-ObjectPropertyValue $releaseConfig "ChangesPath"))
 $packageMode = [string](Get-ObjectPropertyValue $releaseConfig.Package "Mode")
@@ -278,15 +352,18 @@ if ([string]::IsNullOrWhiteSpace($packageMode)) {
     $packageMode = "ExistingZip"
 }
 
-$changelogHeading = Get-ReleaseHeading $changesPath $modVersion
+$changelogHeading = Get-ReleaseHeading $changesPath $sourceModVersion
 $topChangelogVersion = Get-TopReleaseVersion $changesPath
-if (-not $CorrectiveReplacement -and $topChangelogVersion -ne $modVersion) {
-    throw "ReleaseVersion $modVersion does not match top changelog version $topChangelogVersion in $changesPath."
+if (-not $CorrectiveReplacement -and $topChangelogVersion -ne $sourceModVersion) {
+    throw "ReleaseVersion $sourceModVersion does not match top changelog version $topChangelogVersion in $changesPath."
 }
 if ($changelogHeading -match "\(TBD\)") {
-    throw "Changelog heading for $ModName v$modVersion is still marked (TBD). Set and commit the concrete release date before final preflight."
+    throw (
+        "Changelog heading for $ModName v$sourceModVersion is still marked (TBD). " +
+        "Set and commit the concrete release date before final preflight.")
 }
-Assert-ReleaseVersionMatchesChangelog $changesPath $modVersion $VersionPolicy
+Assert-ReleaseVersionMatchesChangelog `
+    $changesPath $sourceModVersion $VersionPolicy $previousSourceModVersion
 if ($VersionPolicy -eq "BackportPatchOnly") {
     if ([string]::IsNullOrWhiteSpace($ReleaseLine)) {
         throw "BackportPatchOnly requires a release-line identifier such as update-1.0."
@@ -437,17 +514,59 @@ $resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
 else {
     Resolve-ToolPath $ModIoConfigPath
 }
+$resolvedModIoAccessTokenPath = if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
+    Resolve-ToolPath ".tools/modio/$ModName.token.txt"
+}
+else {
+    Resolve-ToolPath $ModIoAccessTokenPath
+}
 $modIoId = ""
 if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
     $modIoConfig = Get-Content -Raw -LiteralPath $resolvedModIoConfigPath | ConvertFrom-Json
     $modIoId = [string](Get-ObjectPropertyValue $modIoConfig "ModId")
 }
 
-Write-Host "Release preflight: $ModName v$modVersion"
+$displayModName = $ModName
+if (-not [string]::IsNullOrWhiteSpace($manifestPathValue)) {
+    $displayManifestPath = Resolve-RepoPath $manifestPathValue
+    Assert-PathExists $displayManifestPath "Release manifest"
+    $displayManifest = Get-Content -Raw -LiteralPath $displayManifestPath | ConvertFrom-Json
+    if (-not [string]::IsNullOrWhiteSpace([string]$displayManifest.Name)) {
+        $displayModName = [string]$displayManifest.Name
+    }
+}
+$sourceReleaseLabel = "v$sourceModVersion"
+if ($VersionPolicy -eq "BackportPatchOnly") {
+    $sourceReleaseLabel += " (Timberborn v$(Get-TimberbornGameLine $GameVersion))"
+}
+$sourceReleaseTitle = "$displayModName $sourceReleaseLabel"
+
+$modIoBackportPackageUpdate = $null
+if ($isBackportPackageUpdate -and -not $SkipModIo) {
+    $activeModIoFile = Get-ModIoActiveFileSnapshot `
+        $resolvedModIoConfigPath $resolvedModIoAccessTokenPath
+    if ([string]$activeModIoFile.Version -ne $expectedPublicPackageVersion) {
+        throw (
+            "Backport package update requires the active Mod.IO file to remain on public package version " +
+            "$expectedPublicPackageVersion, found $($activeModIoFile.Version).")
+    }
+    $modIoBackportPackageUpdate = [ordered]@{
+        Enabled = $true
+        ExistingActiveFileId = [long]$activeModIoFile.FileId
+        ExistingActiveVersion = [string]$activeModIoFile.Version
+        ExistingActiveMd5 = [string]$activeModIoFile.Md5
+        ExistingActiveFileSize = [long]$activeModIoFile.FileSize
+        NewFileRequired = $true
+    }
+}
+
+Write-Host "Release preflight: $sourceReleaseTitle"
 Write-Host "  Release root: $repoRoot ($releaseBranch)"
 Write-Host "  Release commit: $($gitSnapshot.ReleaseCommit)"
 Write-Host "  Game compatibility lane: $GameVersion"
 Write-Host "  Version policy: $VersionPolicy"
+Write-Host "  Source mod version: $sourceModVersion"
+Write-Host "  Expected public package version: $expectedPublicPackageVersion ($($configuredPublicLane.GameVersion))"
 if (-not $SkipSteam) {
     $steamVisibilityIntent = if ($PublishSteamVisibility) { "publish requested" } else { "unchanged" }
     Write-Host "  Steam: PublishedFileId=$steamPublishedFileId; visibility=$steamVisibilityIntent"
@@ -455,6 +574,13 @@ if (-not $SkipSteam) {
 if (-not $SkipModIo) {
     $modIoVisibilityIntent = if ($PublishModIoPage) { "publish requested" } else { "unchanged" }
     Write-Host "  Mod.IO: ModId=$modIoId; page visibility=$modIoVisibilityIntent"
+    if ($null -ne $modIoBackportPackageUpdate) {
+        Write-Host (
+            "  Mod.IO backport package update: existing active file " +
+            "$($modIoBackportPackageUpdate.ExistingActiveFileId) " +
+            "v$($modIoBackportPackageUpdate.ExistingActiveVersion); " +
+            "new distinct file required as v$expectedPublicPackageVersion")
+    }
 }
 Write-Host "  Full child logs: $releaseLogDirectory"
 
@@ -519,6 +645,7 @@ if (-not $SkipSteam) {
     Add-OptionalArgument $steamArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $steamArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $steamArgs "-SteamUserName" $SteamUserName
+    Add-OptionalArgument $steamArgs "-ChangeNoteTitle" $sourceReleaseLabel
     Add-SwitchArgument $steamArgs "-UpdateVisibility" $PublishSteamVisibility
     $steps.Add((Invoke-ReleaseStep "Steam release dry run" "publish-steam.ps1" $steamArgs.ToArray()))
 }
@@ -528,6 +655,15 @@ if (-not $SkipModIo) {
     $modIoArgs.AddRange([string[]]$commonPublishArgs)
     Add-OptionalArgument $modIoArgs "-ConfigPath" $ModIoConfigPath
     Add-OptionalArgument $modIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+    if ($VersionPolicy -eq "BackportPatchOnly") {
+        Add-OptionalArgument $modIoArgs "-ChangeNotesPrefix" $sourceReleaseTitle
+    }
+    Add-OptionalArgument $modIoArgs "-PublicPackageVersion" $expectedPublicPackageVersion
+    if ($null -ne $modIoBackportPackageUpdate) {
+        Add-OptionalArgument $modIoArgs "-ExpectedActiveFileId" `
+            ([string]$modIoBackportPackageUpdate.ExistingActiveFileId)
+    }
+    Add-SwitchArgument $modIoArgs "-BackportPackageUpdate" $isBackportPackageUpdate
     Add-SwitchArgument $modIoArgs "-PublishPage" $PublishModIoPage
     $steps.Add((Invoke-ReleaseStep "Mod.IO release dry run" "publish-modio.ps1" $modIoArgs.ToArray()))
 }
@@ -580,6 +716,7 @@ if (-not $SkipPlatformTags) {
         Add-OptionalArgument $finalSteamArgs "-SteamConfigPath" $SteamConfigPath
         Add-OptionalArgument $finalSteamArgs "-SteamCmdPath" $SteamCmdPath
         Add-OptionalArgument $finalSteamArgs "-SteamUserName" $SteamUserName
+        Add-OptionalArgument $finalSteamArgs "-ChangeNoteTitle" $sourceReleaseLabel
         Add-SwitchArgument $finalSteamArgs "-UpdateVisibility" $PublishSteamVisibility
         $steps.Add((Invoke-ReleaseStep "Final Steam release dry run" "publish-steam.ps1" $finalSteamArgs.ToArray()))
     }
@@ -589,6 +726,15 @@ if (-not $SkipPlatformTags) {
         $finalModIoArgs.AddRange([string[]]$finalPublishArgs)
         Add-OptionalArgument $finalModIoArgs "-ConfigPath" $ModIoConfigPath
         Add-OptionalArgument $finalModIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+        if ($VersionPolicy -eq "BackportPatchOnly") {
+            Add-OptionalArgument $finalModIoArgs "-ChangeNotesPrefix" $sourceReleaseTitle
+        }
+        Add-OptionalArgument $finalModIoArgs "-PublicPackageVersion" $expectedPublicPackageVersion
+        if ($null -ne $modIoBackportPackageUpdate) {
+            Add-OptionalArgument $finalModIoArgs "-ExpectedActiveFileId" `
+                ([string]$modIoBackportPackageUpdate.ExistingActiveFileId)
+        }
+        Add-SwitchArgument $finalModIoArgs "-BackportPackageUpdate" $isBackportPackageUpdate
         Add-SwitchArgument $finalModIoArgs "-PublishPage" $PublishModIoPage
         $steps.Add((Invoke-ReleaseStep "Final Mod.IO release dry run" "publish-modio.ps1" $finalModIoArgs.ToArray()))
     }
@@ -602,13 +748,27 @@ $packagePath = Get-PackagePath $releaseConfig
 $packageSnapshot = Get-FileSnapshot $packagePath "Release package"
 $packageLaneFingerprints = @(Get-PackageLaneFingerprints $packagePath)
 $primaryLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $GameVersion "Primary release package"
+$publicPackageLaneFingerprint = Get-PublicPackageLaneFingerprint $packageLaneFingerprints
+$publicPackageVersion = [string]$publicPackageLaneFingerprint.ManifestVersion
+if ([string]$primaryLaneFingerprint.ManifestVersion -ne $sourceModVersion) {
+    throw (
+        "Primary release package lane $GameVersion has manifest version " +
+        "$($primaryLaneFingerprint.ManifestVersion), expected source mod version $sourceModVersion.")
+}
+if ([string]$publicPackageLaneFingerprint.GameVersion -ne [string]$configuredPublicLane.GameVersion -or
+        $publicPackageVersion -ne $expectedPublicPackageVersion) {
+    throw (
+        "Final package public identity differs from release configuration. " +
+        "Expected $($configuredPublicLane.GameVersion) v$expectedPublicPackageVersion; " +
+        "actual $($publicPackageLaneFingerprint.GameVersion) v$publicPackageVersion.")
+}
 $sourceSnapshot = Get-SourceSnapshot $releaseConfig
 $gitStatus = @(& git -C $repoRoot status --porcelain=v1 --untracked-files=normal)
 $tagName = if ($VersionPolicy -eq "BackportPatchOnly") {
-    "$($ModName)_${modVersion}_$ReleaseLine"
+    "$($ModName)_${sourceModVersion}_$ReleaseLine"
 }
 else {
-    "$($ModName)_$modVersion"
+    "$($ModName)_$sourceModVersion"
 }
 $tagExists = $false
 & git -C $repoRoot rev-parse -q --verify "refs/tags/$tagName" *> $null
@@ -622,11 +782,12 @@ $releaseSources.Add([ordered]@{
     Branch = $releaseBranch
     Commit = $gitSnapshot.ReleaseCommit
     GameVersion = $GameVersion
-    ModVersion = $modVersion
+    SourceModVersion = $sourceModVersion
     ReleaseLine = $ReleaseLine
     VersionPolicy = $VersionPolicy
     TagName = $tagName
     TagExistsBeforePublish = $tagExists
+    PackageLaneManifestVersion = [string]$primaryLaneFingerprint.ManifestVersion
     PackageLaneSha256 = [string]$primaryLaneFingerprint.Sha256
     ChangesPath = (Resolve-Path -LiteralPath $changesPath).Path
     ChangelogHeading = $changelogHeading
@@ -639,8 +800,8 @@ foreach ($additionalReportValue in $AdditionalReleaseSourceReportPath) {
     $additionalReportPath = Resolve-ToolPath $additionalReportValue
     Assert-PathExists $additionalReportPath "Additional release-source preflight report"
     $additionalReport = Get-Content -Raw -LiteralPath $additionalReportPath | ConvertFrom-Json
-    if ([int]$additionalReport.SchemaVersion -ne 4 -or $additionalReport.ReadyForPublish -ne $true) {
-        throw "Additional release source must be a publish-ready schema-4 preflight report: $additionalReportPath"
+    if ([int]$additionalReport.SchemaVersion -ne 5 -or $additionalReport.ReadyForPublish -ne $true) {
+        throw "Additional release source must be a publish-ready schema-5 preflight report: $additionalReportPath"
     }
     if ([string]$additionalReport.ModName -ne $ModName) {
         throw "Additional release source is for $($additionalReport.ModName), expected $ModName."
@@ -672,6 +833,11 @@ foreach ($additionalReportValue in $AdditionalReleaseSourceReportPath) {
     if ([string]$additionalLaneFingerprint.Sha256 -ne [string]$additionalSource.PackageLaneSha256) {
         throw "Additional release-source lane no longer matches its preflight evidence: $additionalLane"
     }
+    if ([string]$additionalLaneFingerprint.ManifestVersion -ne [string]$additionalSource.SourceModVersion) {
+        throw (
+            "Additional release-source lane manifest version no longer matches its source mod version: " +
+            $additionalLane)
+    }
     $finalLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $additionalLane "Final combined package"
     if ([string]$finalLaneFingerprint.Sha256 -ne [string]$additionalLaneFingerprint.Sha256) {
         throw "Final package lane $additionalLane does not match the additional release-source package."
@@ -682,11 +848,12 @@ foreach ($additionalReportValue in $AdditionalReleaseSourceReportPath) {
         Branch = [string]$additionalSource.Branch
         Commit = [string]$additionalSource.Commit
         GameVersion = $additionalLane
-        ModVersion = [string]$additionalSource.ModVersion
+        SourceModVersion = [string]$additionalSource.SourceModVersion
         ReleaseLine = [string]$additionalSource.ReleaseLine
         VersionPolicy = [string]$additionalSource.VersionPolicy
         TagName = [string]$additionalSource.TagName
         TagExistsBeforePublish = [bool]$additionalSource.TagExistsBeforePublish
+        PackageLaneManifestVersion = [string]$additionalSource.PackageLaneManifestVersion
         PackageLaneSha256 = [string]$additionalSource.PackageLaneSha256
         ChangesPath = [string]$additionalSource.ChangesPath
         ChangelogHeading = [string]$additionalSource.ChangelogHeading
@@ -779,7 +946,7 @@ if ($CorrectiveReplacement) {
 }
 
 $report = [ordered]@{
-    SchemaVersion = 4
+    SchemaVersion = 5
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     RepoRoot = $repoRoot
     ReleaseRoot = $repoRoot
@@ -794,9 +961,12 @@ $report = [ordered]@{
     LaterReleaseCriticalChanges = $gitSnapshot.LaterCriticalChanges
     WorkingTreeReleaseCriticalChanges = $gitSnapshot.WorkingTreeCriticalChanges
     CorrectiveReplacement = $correctiveSnapshot
+    ModIoBackportPackageUpdate = $modIoBackportPackageUpdate
     GitStatus = [string[]]$gitStatus
     ModName = $ModName
-    Version = $modVersion
+    SourceModVersion = $sourceModVersion
+    PublicPackageVersion = $publicPackageVersion
+    PublicPackageGameVersion = [string]$publicPackageLaneFingerprint.GameVersion
     TagName = $tagName
     ReleaseSources = [object[]]$releaseSources.ToArray()
     TagExistsBeforePublish = $tagExists
@@ -828,15 +998,17 @@ $report = [ordered]@{
 
 $reportDirectory = Resolve-RepoPath $ReportRoot
 New-Item -ItemType Directory -Path $reportDirectory -Force | Out-Null
-$reportPath = Join-Path $reportDirectory "$ModName-$modVersion.json"
+$reportPath = Join-Path $reportDirectory "$ModName-$sourceModVersion.json"
 Write-Host "Writing preflight report..."
 $report | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $reportPath -Encoding UTF8
 
 Write-Host ""
-Write-Host "Release preflight completed for $ModName v$modVersion."
+Write-Host "Release preflight completed for $sourceReleaseTitle."
 Write-Host "Report: $reportPath"
 Write-Host "Package: $($packageSnapshot.Path)"
 Write-Host "Package SHA256: $($packageSnapshot.Sha256)"
+Write-Host "Source mod version: $sourceModVersion"
+Write-Host "Public package version: $publicPackageVersion ($($publicPackageLaneFingerprint.GameVersion))"
 if ($null -ne $sourceSnapshot) {
     Write-Host "Source fingerprint: $($sourceSnapshot.Sha256)"
 }

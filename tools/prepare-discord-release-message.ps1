@@ -4,6 +4,7 @@ param(
 
     [string] $ReleaseRoot = "",
     [string] $Version = "",
+    [string] $Title = "",
     [string] $ReleaseNotesPath = "",
     [switch] $Prepare
 )
@@ -80,6 +81,10 @@ $displayName = [string]$manifest.Name
 if ([string]::IsNullOrWhiteSpace($displayName)) {
     $displayName = $ModName
 }
+$releaseTitle = $Title
+if ([string]::IsNullOrWhiteSpace($releaseTitle)) {
+    $releaseTitle = "$displayName v$Version"
+}
 
 $descriptionPaths = @(
     (Join-Path $modRoot "workshop/description.txt"),
@@ -95,14 +100,14 @@ else {
     (Get-Content -Raw -LiteralPath $resolvedNotesPath).Trim()
 }
 $discordNotes = $notes -replace '(?m)^\* ', '- '
-$message = "# $displayName v$Version`r`n`r`n$discordNotes"
+$message = "# $releaseTitle`r`n`r`n$discordNotes"
 
 if ($message.Length -gt 2000) {
     throw "Discord release message is $($message.Length) characters; review it manually before posting because " +
         "Discord messages are limited to 2000 characters."
 }
 
-Write-Host "Discord release handoff for $ModName v$Version"
+Write-Host "Discord release handoff for $releaseTitle"
 Write-Host "Channel: $channelUrl"
 Write-Host "Message length: $($message.Length) characters"
 Write-Host ""

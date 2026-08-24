@@ -11,7 +11,10 @@ param(
     [string] $ConfigPath = "",
     [string] $AccessTokenPath = "",
     [string] $ChangeNotesPrefix = "",
+    [string] $PublicPackageVersion = "",
+    [string] $ExpectedActiveFileId = "",
     [string] $ExpectedPackageSha256 = "",
+    [switch] $BackportPackageUpdate,
     [switch] $CorrectiveReplacement,
     [int] $ScanTimeoutSeconds = 600,
     [int] $ScanPollSeconds = 15,
@@ -562,6 +565,21 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ReleaseVersion)) {
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Manifest version is empty: $manifestPath"
 }
+$uploadVersion = $PublicPackageVersion
+if ([string]::IsNullOrWhiteSpace($uploadVersion)) {
+    $uploadVersion = $modVersion
+}
+if ($BackportPackageUpdate) {
+    if ([string]::IsNullOrWhiteSpace($PublicPackageVersion)) {
+        throw "Backport package update requires -PublicPackageVersion."
+    }
+    if ([string]::IsNullOrWhiteSpace($ExpectedActiveFileId)) {
+        throw "Backport package update requires -ExpectedActiveFileId from final preflight."
+    }
+    if ($CorrectiveReplacement) {
+        throw "Backport package update is a new line-qualified release and cannot use corrective replacement mode."
+    }
+}
 
 $scriptFileBase = $ModName
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
@@ -701,12 +719,44 @@ if (-not [string]::IsNullOrWhiteSpace($apiBase) -and
     $endpoint = "$($apiBase.TrimEnd("/"))/games/$gameId/mods/$modId/files"
 }
 
+$accessToken = ""
+$currentMod = $null
+if ($BackportPackageUpdate) {
+    if ($null -eq $modIoConfig) {
+        throw "Backport package update requires Mod.IO config for active-file verification."
+    }
+    $accessToken = Read-ModIoAccessToken $AccessTokenPath
+    if ([string]::IsNullOrWhiteSpace($accessToken)) {
+        throw "Backport package update requires a Mod.IO access token for active-file verification."
+    }
+    $currentMod = Invoke-RestMethod `
+        -Uri "$($apiBase.TrimEnd('/'))/games/$gameId/mods/$modId" `
+        -Headers @{ Authorization = "Bearer $accessToken" }
+    if ([string]$currentMod.modfile.id -ne $ExpectedActiveFileId) {
+        throw (
+            "Active Mod.IO file changed since final preflight. Expected file $ExpectedActiveFileId, " +
+            "found $($currentMod.modfile.id).")
+    }
+    if ([string]$currentMod.modfile.version -ne $uploadVersion) {
+        throw (
+            "Backport package update requires active public package version $uploadVersion, " +
+            "found $($currentMod.modfile.version).")
+    }
+}
+
 Write-Host ""
-Write-Host "Mod.IO publish plan for $ModName v$modVersion"
+Write-Host "Mod.IO publish plan for $ModName source v$modVersion"
+Write-Host "Public package version: $uploadVersion"
 Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"
 Write-Host "Corrective same-version replacement: $([bool]$CorrectiveReplacement)"
+Write-Host "Backport package update: $([bool]$BackportPackageUpdate)"
+if ($BackportPackageUpdate) {
+    Write-Host (
+        "Existing Mod.IO active file: id=$($currentMod.modfile.id); version=$($currentMod.modfile.version); " +
+        "new distinct file required with version=$uploadVersion")
+}
 Write-Host "Publish page after verified upload: $([bool]$PublishPage)"
 if ($releaseConfig.ReadyForPublish -eq $false) {
     Write-Host "Ready for publish: false"
@@ -740,7 +790,9 @@ if ([string]::IsNullOrWhiteSpace($apiBase) -or
     throw "Cannot publish: Mod.IO config must define ApiBase, GameId, and ModId."
 }
 
-$accessToken = Read-ModIoAccessToken $AccessTokenPath
+if ([string]::IsNullOrWhiteSpace($accessToken)) {
+    $accessToken = Read-ModIoAccessToken $AccessTokenPath
+}
 if ([string]::IsNullOrWhiteSpace($accessToken)) {
     throw "Cannot publish: create .tools/modio/$ModName.token.txt."
 }
@@ -749,18 +801,30 @@ $currentMod = Invoke-RestMethod `
     -Uri "$($apiBase.TrimEnd('/'))/games/$gameId/mods/$modId" `
     -Headers @{ Authorization = "Bearer $accessToken" }
 $currentPublishedVersion = [string]$currentMod.modfile.version
-if ($CorrectiveReplacement -and $currentPublishedVersion -ne $modVersion) {
-    throw "Corrective replacement expected existing Mod.IO version $modVersion, found $currentPublishedVersion."
+if ($BackportPackageUpdate) {
+    if ([string]$currentMod.modfile.id -ne $ExpectedActiveFileId -or $currentPublishedVersion -ne $uploadVersion) {
+        throw (
+            "Mod.IO active file changed after the publish plan. Expected file $ExpectedActiveFileId " +
+            "version $uploadVersion; found file $($currentMod.modfile.id) version $currentPublishedVersion.")
+    }
 }
-if (-not $CorrectiveReplacement -and $currentPublishedVersion -eq $modVersion) {
-    throw "Mod.IO already has active version $modVersion. Use explicit corrective replacement mode only with user authorization and a corrective preflight."
+elseif ($CorrectiveReplacement -and $currentPublishedVersion -ne $uploadVersion) {
+    throw "Corrective replacement expected existing Mod.IO version $uploadVersion, found $currentPublishedVersion."
+}
+elseif (-not $CorrectiveReplacement -and $currentPublishedVersion -eq $uploadVersion) {
+    throw (
+        "Mod.IO already has active version $uploadVersion. Use explicit corrective replacement mode only " +
+        "with user authorization and a corrective preflight.")
 }
 
 Write-Host "Publishing to Mod.IO..."
-$responseBody = Publish-Modfile $apiBase $gameId $modId $accessToken $zipPath $modVersion $modIoChangeNotes
+$responseBody = Publish-Modfile $apiBase $gameId $modId $accessToken $zipPath $uploadVersion $modIoChangeNotes
 $publishedModfile = $responseBody | ConvertFrom-Json
 if ($null -eq $publishedModfile.id) {
     throw "Mod.IO upload response did not include a modfile id."
+}
+if ($BackportPackageUpdate -and [string]$publishedModfile.id -eq $ExpectedActiveFileId) {
+    throw "Mod.IO backport upload did not create a distinct file id."
 }
 
 Write-Host "Initial Mod.IO upload response (not final state): $responseBody"
@@ -786,7 +850,7 @@ $finalReadback = Wait-FinalModIoReadback `
     $modId `
     $accessToken `
     ([int]$publishedModfile.id) `
-    $modVersion `
+    $uploadVersion `
     $ScanTimeoutSeconds `
     $ScanPollSeconds
 Write-Host (

@@ -124,6 +124,13 @@ function Get-LaneFingerprint([object[]] $Fingerprints, [string] $Lane) {
     return $matches[0]
 }
 
+function Get-TimberbornGameLine([string] $VersionFolder) {
+    if ($VersionFolder -notmatch "^version-(?<version>\d+\.\d+)$") {
+        throw "Cannot derive a Timberborn release line from $VersionFolder."
+    }
+    return $Matches["version"]
+}
+
 function Assert-ReleaseSourceCurrent([object] $Source) {
     $sourceRoot = Resolve-RepositoryRoot ([string]$Source.ReleaseRoot) $toolRepoRoot
     $sourceBranch = (& git -C $sourceRoot branch --show-current).Trim()
@@ -205,7 +212,7 @@ $reportPath = Resolve-RepoPath $PreflightReportPath
 Assert-PathExists $reportPath "Preflight report"
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
 
-if ([int]$report.SchemaVersion -ne 4) {
+if ([int]$report.SchemaVersion -ne 5) {
     throw "Unsupported preflight report schema version: $($report.SchemaVersion)"
 }
 
@@ -249,6 +256,18 @@ if ($CorrectiveReplacement -ne $reportCorrective) {
 if ($CorrectiveReplacement -and $releaseSources.Count -gt 1) {
     throw "Multi-source corrective replacement is not supported by the routine release workflow."
 }
+$reportBackportPackageUpdate = $null -ne $report.ModIoBackportPackageUpdate -and
+    $report.ModIoBackportPackageUpdate.Enabled -eq $true
+if ($reportBackportPackageUpdate) {
+    if ($CorrectiveReplacement -or [string]$primarySource.VersionPolicy -ne "BackportPatchOnly") {
+        throw "Mod.IO backport package update evidence is invalid for this release mode."
+    }
+    if ([long]$report.ModIoBackportPackageUpdate.ExistingActiveFileId -le 0 -or
+            [string]$report.ModIoBackportPackageUpdate.ExistingActiveVersion -ne
+                [string]$report.PublicPackageVersion) {
+        throw "Mod.IO backport package update evidence has an invalid active file identity."
+    }
+}
 if ($CorrectiveReplacement) {
     $replacementPlatforms = @($report.CorrectiveReplacement.Platforms | ForEach-Object { [string]$_ })
     if ("Steam" -in $replacementPlatforms -and $SkipSteam) {
@@ -266,18 +285,22 @@ if ($CorrectiveReplacement) {
 }
 
 $modName = [string]$report.ModName
-$modVersion = [string]$report.Version
+$sourceModVersion = [string]$report.SourceModVersion
+$publicPackageVersion = [string]$report.PublicPackageVersion
 $tagName = [string]$report.TagName
 $releaseCommit = [string]$report.ReleaseCommit
-if ([string]::IsNullOrWhiteSpace($modName) -or [string]::IsNullOrWhiteSpace($modVersion) -or
+if ([string]::IsNullOrWhiteSpace($modName) -or [string]::IsNullOrWhiteSpace($sourceModVersion) -or
+    [string]::IsNullOrWhiteSpace($publicPackageVersion) -or
     [string]::IsNullOrWhiteSpace($releaseCommit)) {
-    throw "Preflight report is missing mod name, version, or release commit."
+    throw "Preflight report is missing mod name, source/public version, or release commit."
 }
-if ([string]$primarySource.Commit -ne $releaseCommit -or [string]$primarySource.ModVersion -ne $modVersion -or
+if ([string]$primarySource.Commit -ne $releaseCommit -or
+    [string]$primarySource.SourceModVersion -ne $sourceModVersion -or
     [string]$primarySource.TagName -ne $tagName) {
     throw "Primary release source does not match the report's public release identity."
 }
-$releaseLogDirectory = New-ReleaseLogDirectory -RepoRoot $repoRoot -ModName $modName -Version $modVersion -Phase "publish"
+$releaseLogDirectory = New-ReleaseLogDirectory `
+    -RepoRoot $repoRoot -ModName $modName -Version $sourceModVersion -Phase "publish"
 
 if ([string]::IsNullOrWhiteSpace($Configuration)) {
     $Configuration = [string]$report.Configuration
@@ -320,8 +343,8 @@ $releaseConfigPath = [string]$report.ReleaseConfigPath
 Assert-PathExists $releaseConfigPath "Release config"
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
 $currentVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVersion")
-if ($currentVersion -ne $modVersion) {
-    throw "ReleaseVersion changed since preflight. Preflight: $modVersion; current: $currentVersion"
+if ($currentVersion -ne $sourceModVersion) {
+    throw "ReleaseVersion changed since preflight. Preflight: $sourceModVersion; current: $currentVersion"
 }
 
 if ($null -ne $report.Source) {
@@ -339,11 +362,24 @@ if ($currentPackageHash -ne [string]$report.Package.Sha256) {
     throw "Release package changed since preflight. Preflight: $($report.Package.Sha256); current: $currentPackageHash"
 }
 $packageLaneFingerprints = @(Get-PackageLaneFingerprints $packagePath)
+$publicPackageLaneFingerprint = Get-PublicPackageLaneFingerprint $packageLaneFingerprints
+if ([string]$publicPackageLaneFingerprint.GameVersion -ne [string]$report.PublicPackageGameVersion -or
+        [string]$publicPackageLaneFingerprint.ManifestVersion -ne $publicPackageVersion) {
+    throw (
+        "Public package identity changed since preflight. Expected $($report.PublicPackageGameVersion) " +
+        "v$publicPackageVersion; current $($publicPackageLaneFingerprint.GameVersion) " +
+        "v$($publicPackageLaneFingerprint.ManifestVersion).")
+}
 foreach ($releaseSource in $releaseSources) {
     Assert-ReleaseSourceCurrent $releaseSource
     $laneFingerprint = Get-LaneFingerprint $packageLaneFingerprints ([string]$releaseSource.GameVersion)
     if ([string]$laneFingerprint.Sha256 -ne [string]$releaseSource.PackageLaneSha256) {
         throw "Final package lane $($releaseSource.GameVersion) does not match release source $($releaseSource.Commit)."
+    }
+    if ([string]$laneFingerprint.ManifestVersion -ne [string]$releaseSource.SourceModVersion) {
+        throw (
+            "Final package lane $($releaseSource.GameVersion) has manifest version " +
+            "$($laneFingerprint.ManifestVersion), expected source mod version $($releaseSource.SourceModVersion).")
     }
 }
 
@@ -370,11 +406,28 @@ if (Test-Path -LiteralPath $resolvedModIoConfigPath) {
     $modIoId = [string](Get-ObjectPropertyValue $summaryModIoConfig "ModId")
 }
 
-Write-Host "Release publish: $modName v$modVersion"
+$sourceReleaseLabel = "v$sourceModVersion"
+if ($VersionPolicy -eq "BackportPatchOnly") {
+    $sourceReleaseLabel += " (Timberborn v$(Get-TimberbornGameLine $GameVersion))"
+}
+$manifestPath = Resolve-RepoPath ([string](Get-ObjectPropertyValue $releaseConfig "ManifestPath"))
+Assert-PathExists $manifestPath "Release manifest"
+$releaseManifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+$displayModName = [string]$releaseManifest.Name
+if ([string]::IsNullOrWhiteSpace($displayModName)) {
+    $displayModName = $modName
+}
+$sourceReleaseTitle = "$displayModName $sourceReleaseLabel"
+$isBackportPackageUpdate = $null -ne $report.ModIoBackportPackageUpdate -and
+    $report.ModIoBackportPackageUpdate.Enabled -eq $true
+
+Write-Host "Release publish: $sourceReleaseTitle"
 Write-Host "  Release root: $repoRoot ($currentBranch)"
 Write-Host "  Release commit: $releaseCommit"
 Write-Host "  Game compatibility lane: $GameVersion"
 Write-Host "  Version policy: $VersionPolicy"
+Write-Host "  Source mod version: $sourceModVersion"
+Write-Host "  Public package version: $publicPackageVersion ($($report.PublicPackageGameVersion))"
 Write-Host "  Package: $($report.Package.Path)"
 Write-Host "  Package SHA256: $($report.Package.Sha256)"
 if ($null -ne $report.Source) {
@@ -387,6 +440,13 @@ if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
 if (-not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo) {
     $modIoVisibilityIntent = if ([bool]$report.PreflightOptions.PublishModIoPage) { "publish requested" } else { "unchanged" }
     Write-Host "  Mod.IO: ModId=$modIoId; page visibility=$modIoVisibilityIntent"
+    if ($isBackportPackageUpdate) {
+        Write-Host (
+            "  Mod.IO backport package update: existing active file " +
+            "$($report.ModIoBackportPackageUpdate.ExistingActiveFileId) " +
+            "v$($report.ModIoBackportPackageUpdate.ExistingActiveVersion); " +
+            "new distinct file required as v$publicPackageVersion")
+    }
 }
 Write-Host "  Git tag: $tagName"
 if ($releaseSources.Count -gt 1) {
@@ -460,6 +520,7 @@ if (-not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam) {
     Add-OptionalArgument $steamArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $steamArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $steamArgs "-SteamUserName" $SteamUserName
+    Add-OptionalArgument $steamArgs "-ChangeNoteTitle" $sourceReleaseLabel
     Add-SwitchArgument $steamArgs "-UpdateVisibility" ([bool]$report.PreflightOptions.PublishSteamVisibility)
     $steamArgs.Add("-Publish")
     Invoke-ReleaseStep "Steam release publish" "publish-steam.ps1" $steamArgs.ToArray()
@@ -470,6 +531,15 @@ if (-not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo) {
     $modIoArgs.AddRange([string[]]$commonPublishArgs)
     Add-OptionalArgument $modIoArgs "-ConfigPath" $ModIoConfigPath
     Add-OptionalArgument $modIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
+    Add-OptionalArgument $modIoArgs "-PublicPackageVersion" $publicPackageVersion
+    if ($VersionPolicy -eq "BackportPatchOnly") {
+        Add-OptionalArgument $modIoArgs "-ChangeNotesPrefix" $sourceReleaseTitle
+    }
+    if ($isBackportPackageUpdate) {
+        Add-OptionalArgument $modIoArgs "-ExpectedActiveFileId" `
+            ([string]$report.ModIoBackportPackageUpdate.ExistingActiveFileId)
+    }
+    Add-SwitchArgument $modIoArgs "-BackportPackageUpdate" $isBackportPackageUpdate
     Add-SwitchArgument $modIoArgs "-PublishPage" ([bool]$report.PreflightOptions.PublishModIoPage)
     $modIoArgs.Add("-Publish")
     Invoke-ReleaseStep "Mod.IO release publish" "publish-modio.ps1" $modIoArgs.ToArray()
@@ -538,6 +608,7 @@ if (-not $SkipGitHubRelease) {
     $githubArgs.Add($Repository)
     $githubArgs.Add("-TagName")
     $githubArgs.Add($tagName)
+    Add-OptionalArgument $githubArgs "-Title" $sourceReleaseTitle
     Add-OptionalArgument $githubArgs "-ReleaseNotesPath" $combinedReleaseNotesPath
     Add-OptionalArgument $githubArgs "-ExpectedPackageSha256" ([string]$report.Package.Sha256)
     Add-SwitchArgument $githubArgs "-ReplaceExistingAsset" ($ReplaceExistingGitHubAsset -or $CorrectiveReplacement)
@@ -552,7 +623,8 @@ if (-not $SkipDiscordHandoff) {
     $discordArgs.Add("-ReleaseRoot")
     $discordArgs.Add($repoRoot)
     $discordArgs.Add("-Version")
-    $discordArgs.Add($modVersion)
+    $discordArgs.Add($sourceModVersion)
+    Add-OptionalArgument $discordArgs "-Title" $sourceReleaseTitle
     Add-OptionalArgument $discordArgs "-ReleaseNotesPath" $combinedReleaseNotesPath
     $discordArgs.Add("-Prepare")
     try {
@@ -565,5 +637,5 @@ if (-not $SkipDiscordHandoff) {
 }
 
 Write-Host ""
-Write-Host "Release publish completed for $modName v$modVersion."
+Write-Host "Release publish completed for $sourceReleaseTitle."
 Write-Host "Discord message sending, issue closing, and Wiki handoff remain explicit follow-up steps."
