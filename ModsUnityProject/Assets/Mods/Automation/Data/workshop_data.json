@@ -1,6 +1,9 @@
 {
   "ItemId": "3324234282",
   "Name": "Automation",
+  "Tags": [
+    "Quality of life"
+  ],
   "Visibility": "Private",
   "UpdateDescription": false,
   "UpdateVisibility": false,
