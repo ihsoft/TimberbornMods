@@ -54,10 +54,13 @@ After the release tag is created and pushed, create a GitHub Release for the sam
 Use `tools/publish-github-release.ps1` for this step. The script dry-runs by default and publishes only with
 `-Publish`.
 
-The GitHub Release title should be `<display mod name> v<primary Version>`. For a single-source release, the description
-uses that version's changelog section as-is, without Steam or Mod.IO formatting conversion. For a multi-source release,
-include one clearly labelled section per changed compatibility line and preserve each source changelog text. Attach the
-exact release ZIP that was published to Steam Workshop and Mod.IO.
+The GitHub Release title should be `<display mod name> v<primary SourceModVersion>`. When the primary source is an older
+line, append ` (Timberborn v<TargetGameLine>)`; for example,
+`X-Ray v1.1.2 (Timberborn v1.0)`. For a single-source release, the description uses that version's changelog section
+as-is, without Steam or Mod.IO formatting conversion. For a multi-source release, include one clearly labelled section
+per changed compatibility line, preserve each source changelog text, and line-qualify every older-source label. Attach
+the exact release ZIP that was published to Steam Workshop and Mod.IO. The title's source version is independent of the
+package-wide `PublicPackageVersion` used for the Mod.IO file.
 
 Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
 publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.
@@ -72,7 +75,9 @@ The announcement contains only the release title and exact changelog section. Do
 Release link, or other acquisition instructions; subscribers in the dedicated mod channel already know where to obtain
 the current version.
 
-Format the release title as the neutral Markdown heading `# <display mod name> v<Version>`, followed by a blank line.
+Format the release title as the neutral Markdown heading `# <display mod name> v<SourceModVersion>`, followed by a
+blank line. For an older-line-only release, append ` (Timberborn v<TargetGameLine>)`. For a coordinated release whose
+current line is primary, keep the current-line heading and identify every older source in its release-note section.
 Render each top-level changelog item as a Markdown `-` bullet for Discord, even when the source changelog uses `*`.
 Changing the bullet marker is formatting only; preserve the changelog item text exactly.
 
@@ -148,6 +153,10 @@ For each closed issue, add a release comment such as:
 ```text
 Released in Automation v4.5.0.
 ```
+
+When the issue was delivered only by an older-line backport, line-qualify that comment, for example
+`Released in X-Ray v1.1.2 (Timberborn v1.0).` For a coordinated release, identify each changed line relevant to the
+issue instead of implying that one source version applies to every game line.
 
 After closing, verify the issue state with `gh issue view`.
 

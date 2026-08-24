@@ -91,6 +91,12 @@ Describe the net player-visible delta from the latest published version of the t
 `[Feature]`, `[Fix]`, or other established entry categories; patch-only numbering is a line-management exception, not a
 reason to misclassify the delivered behavior.
 
+Give every new backport changelog section a line-qualified identity. Use
+`# v<SourceModVersion> (Timberborn v<TargetGameLine>) (TBD)` while it is pending and preserve the Timberborn qualifier
+when replacing `(TBD)` with the concrete release date. For example, X-Ray 1.1.2 for the Update 1.0 line is identified as
+`X-Ray v1.1.2 (Timberborn v1.0)` in player-facing release titles. Do not silently rewrite an already dated historical
+heading; correcting published history requires explicit user direction.
+
 Before editing a shared changelog or release configuration, verify that current tooling can represent the target older
 line without losing or misidentifying a current-line `(TBD)` section. If simultaneous pending lines conflict with a
 top-section assumption, stop and establish a deliberate per-mod representation or tooling change instead of reordering
@@ -133,12 +139,44 @@ Use a line-qualified Git tag for a backport source commit: `<ModName>_<Version>_
 `XRay_1.1.2_update-1.0`. The ordinary unqualified tag remains reserved for the current line. One Git tag cannot identify
 two commits.
 
+Keep two version concepts separate throughout preflight, publication, and signoff:
+
+- `SourceModVersion` is the version of one changed source line. It owns that source's changelog section, manifest,
+  immutable source record, and Git tag. For an older source, its release identity also includes the target Timberborn
+  line.
+- `PublicPackageVersion` is the current-line manifest version present in the final multi-lane package. It owns the
+  package-wide version field on platforms that expose one, including the Mod.IO file version. When only an older line
+  changes, this value remains the unchanged current-line version; do not replace it with `SourceModVersion` or present
+  the combined package as a downgrade.
+
+Discord headings, GitHub Release titles, Wiki handoffs, and signoff summaries that identify an older-line source must
+use the line-qualified form `<display mod name> v<SourceModVersion> (Timberborn v<TargetGameLine>)`. Steam Workshop
+change-note headings and release-note section labels may omit the repeated mod name, but must retain
+`v<SourceModVersion> (Timberborn v<TargetGameLine>)`. Mod.IO change notes must name the same changed source and game
+line even though the Mod.IO file version is `PublicPackageVersion`.
+
 If current and older lines both change for one public package, create one source record and one tag per changed line.
 The current-line source is primary: its ordinary tag owns the GitHub Release and public release title; the qualified
 older-line tag points to the older worktree commit. Build and verify each changed lane independently, import the older
 lane only from its immutable preflight package, and require the final combined preflight to match each lane fingerprint
-and both source commits before any upload. Include both changelog sections in release notes and handoffs.
+and both source commits before any upload. `PublicPackageVersion` is the current source's `SourceModVersion`. Include
+both changelog sections in release notes and handoffs, and line-qualify every older-source section.
 
 If only the older line changes, its qualified tag is the primary GitHub Release tag. Preserve any unchanged current lane
 only through verified published-artifact provenance; do not create a new current-line tag or imply that current-line
-code changed.
+code changed. The older source's `SourceModVersion` owns the GitHub Release title and other line-qualified release
+identity, while the unchanged current lane owns `PublicPackageVersion`.
+
+A new older-line-only package upload may therefore publish another Mod.IO file with the same visible
+`PublicPackageVersion`. This is a normal backport package update, not a same-version corrective replacement, only when
+immutable preflight proves all of the following:
+
+- the release has a new line-qualified older-source identity and tag;
+- the final current lane is byte-for-byte identical to verified provenance for the active published package;
+- the changed older lane matches its new immutable source and differs from the previously published lane fingerprint;
+- the active Mod.IO file already reports the recorded `PublicPackageVersion`;
+- publication creates a distinct file ID, and final readback verifies that new file as active, scanned, unflagged, and
+  still labelled with `PublicPackageVersion`.
+
+Do not apply this exception to a changed current lane, an unqualified source, an unchanged package, or an arbitrary
+same-version replacement. Those cases remain governed by the corrective-release rules.

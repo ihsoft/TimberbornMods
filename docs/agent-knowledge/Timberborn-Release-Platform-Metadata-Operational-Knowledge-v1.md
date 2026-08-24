@@ -286,6 +286,17 @@ Use:
 [*] Change item.
 ```
 
+For an older-line backport, line-qualify the source release in the heading:
+
+```text
+[h3]v1.1.2 (Timberborn v1.0)[/h3]
+[*] Change item.
+```
+
+Use the changed line's `SourceModVersion` here, not the package-wide `PublicPackageVersion` used as the Mod.IO file
+version. When a coordinated release contains several changed lines, identify every older source and target game line in
+its release-note section.
+
 Convert changelog bullet lines from:
 
 ```text

@@ -143,11 +143,13 @@ The unified preflight report must record the selected commit and the checked rel
 evidence that those inputs match it. `tools/publish-release.ps1` must re-check that invariant before its first public
 change and fail on drift; a warning or interactive "continue anyway" prompt is not sufficient for this condition.
 
-Schema-4 reports also record the release root, branch, version policy, line identifier, final package lane
+Immutable preflight reports also record the release root, branch, version policy, line identifier, final package lane
 fingerprints, and one or more release-source records. Each changed compatibility line owns its source worktree, commit,
-changelog version, tag, critical-path evidence, and expected `version-X.X` lane fingerprint. Exactly one source is
-primary. Publishing must re-check every source and every changed lane before the first public mutation; do not collapse
-a multi-worktree release into one `ReleaseCommit`.
+`SourceModVersion`, tag, critical-path evidence, and expected `version-X.X` lane fingerprint. The report separately
+records one package-wide `PublicPackageVersion`, derived from the current-line manifest in the final package. Exactly
+one source is primary. Publishing must re-check every source, every changed lane, and both version roles before the
+first public mutation; do not collapse a multi-worktree release into one `ReleaseCommit` or overload one `Version`
+field with both meanings.
 
 When publishing includes an explicitly authorized platform-state transition, the final preflight report must capture
 the action and exact target state for each platform, including Steam visibility and Mod.IO page publication. Publishing
@@ -178,6 +180,12 @@ the changelog date.
 Do not use the routine workflow to replace already published contents under the same mod version. This requires
 explicit user authorization for the named mod, version, and platforms plus the Release Recovery Operational Knowledge.
 Do not infer corrective-replacement mode from a packaging defect or an existing platform release.
+
+An older-line-only backport may legitimately upload a new combined Mod.IO package under the unchanged current-line
+`PublicPackageVersion`. This is not a corrective replacement when it introduces a new line-qualified
+`SourceModVersion` and only the older lane changed. Apply the narrow fingerprint, existing-version, distinct-file-ID,
+and final-readback gates in Backport Operational Knowledge. Do not use this exception for same-version current-line
+changes or general package replacement.
 
 ## Network checks
 
@@ -325,7 +333,9 @@ release notes. Changelog workflow rules live in `docs/timberborn-repository-note
 Apply the version policy of the selected source worktree. Current-line releases keep the ordinary category-based
 versioning rule. An explicitly requested older-line backport uses the next patch after that line's latest dated release,
 even when it contains `[Feature]` entries and the current line has advanced to a higher minor version. Final preflight
-must require `ReleaseVersion` to match the top changelog version in that worktree and record the chosen policy.
+must require the source `ReleaseVersion` and `SourceModVersion` to match the top changelog version in that worktree and
+record the chosen policy. Do not compare an older source's release configuration with `PublicPackageVersion`; they have
+different owners.
 
 If the requested version matches the top package changelog section and that section is marked `(TBD)`, treat stale
 release metadata as normal release-preparation work. Update `release.json`, `directory.build.props`, Unity manifest
@@ -416,12 +426,15 @@ line identifier: `<ModName>_<Version>_<ReleaseLine>`, such as `XRay_1.1.2_update
 for an older-line commit or choose one of two source commits arbitrarily.
 
 When current and older lines both changed, the current-line source is primary. Its unqualified tag owns the GitHub
-Release, public title, and platform file version; every changed older line receives its qualified source tag. Release
-notes, Discord text, Wiki handoff, and signoff must identify the versions delivered for every changed line.
+Release and public title, and its `SourceModVersion` is `PublicPackageVersion`; every changed older line receives its
+qualified source tag. Release notes, Discord text, Wiki handoff, and signoff must identify the versions delivered for
+every changed line and line-qualify each older source with its target Timberborn version.
 
 When only an older line changed, its qualified tag is primary for the GitHub Release and no new current-line tag is
 created. The public package must still preserve every required unchanged lane through verified release-recovery
-provenance. A changed older lane comes from its own preflight, never from historical recovery.
+provenance. A changed older lane comes from its own preflight, never from historical recovery. Its
+`SourceModVersion` owns the qualified GitHub, Steam change-note, Discord, Wiki, and signoff identity. The unchanged
+current-line manifest owns `PublicPackageVersion`, including the Mod.IO file version.
 
 Do not start platform publishing from separate single-source reports. Only the final combined report may authorize the
 single public package mutation. If the tooling cannot represent all changed source commits, tags, and lane
@@ -507,7 +520,8 @@ If `ManifestVersions` is configured, each manifest version must match its config
 ## Routine Platform Verification Gates
 
 The compact preflight and publish plans must show platform IDs, compatibility tags, description equality, visibility
-intent, and Mod.IO file/version intent. Stop if any of those fields is absent or differs from the requested release.
+intent, every changed source's `SourceModVersion` and game line, `PublicPackageVersion`, and Mod.IO file/version intent.
+Stop if any of those fields is absent or differs from the requested release.
 
 Derive compatibility claims and update tags from the final package's actual `version-*` lanes plus explicit documented
 release-config exceptions. Do not infer support for an absent lane. Verify exact target/live tags through the supported
@@ -525,6 +539,12 @@ authentication requires diagnosis.
 For Mod.IO, use the target mod's config and a known valid owner token, generate compatibility metadata from the final
 package, and verify that the uploaded file becomes the live file with the intended version. A different known owner
 token file for the same account and game scope may be passed explicitly; never copy, rename, or guess token files.
+
+For an older-line-only backport, the intended Mod.IO version is `PublicPackageVersion`, not the changed older source's
+`SourceModVersion`. Its change notes must explicitly identify the changed source version and target Timberborn line.
+Treat a repeated visible Mod.IO version as valid only under the narrow Backport Operational Knowledge exception; the
+plan must prove the unchanged current lane, changed older lane, active version equality, and expected new file identity
+before mutation.
 
 After scan completion and active-file mutation, perform a final Mod.IO readback and surface its final tuple in compact
 output: mod ID, active file ID, version, `date_scanned`, `virus_status`, `virus_positive`, and file size. The earlier

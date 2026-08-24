@@ -238,6 +238,17 @@ If the changelog has no top section marked `(TBD)`, start one using this heading
 # v4.4.0 (TBD)
 ```
 
+For an explicitly requested older-line backport, include the target game line in every new section heading:
+
+```text
+# v1.1.2 (Timberborn v1.0) (TBD)
+```
+
+Preserve that qualifier when dating the section, for example
+`# v1.1.2 (Timberborn v1.0) (August 23rd, 2026):`. The source mod version and target Timberborn line together form the
+backport release identity. Do not remove the qualifier merely because the same multi-lane package also contains an
+unchanged current line.
+
 Treat changelog sections with a concrete release date as published history.
 
 Do not add new entries to dated changelog sections unless the user explicitly asks to correct historical release notes.
