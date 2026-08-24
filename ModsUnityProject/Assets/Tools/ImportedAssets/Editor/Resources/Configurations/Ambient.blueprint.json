@@ -1,7 +1,0 @@
-{
-  "AmbientSpec": {
-    "DayAmbient": "Environment.Ambient.Day",
-    "NightAmbient": "Environment.Ambient.Night",
-    "WaterAmbient": "Environment.Ambient.Water"
-  }
-}

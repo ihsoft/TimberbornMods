@@ -1,7 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "SettlementPanel",
-    "Order": 50,
-    "LocKey": "KeyBindingGroup.SettlementPanel"
-  }
-}

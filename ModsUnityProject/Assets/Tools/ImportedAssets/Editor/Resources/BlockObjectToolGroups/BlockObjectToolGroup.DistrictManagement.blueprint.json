@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "DistrictManagement",
-    "Order": 30,
-    "NameLocKey": "ToolGroups.DistrictManagement",
-    "Icon": "Sprites/BottomBar/BuildingGroups/DistrictManagement",
-    "FallbackGroup": false
-  }
-}

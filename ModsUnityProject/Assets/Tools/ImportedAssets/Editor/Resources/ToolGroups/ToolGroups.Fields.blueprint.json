@@ -1,8 +1,0 @@
-{
-  "ToolGroupSpec": {
-    "Id": "Fields",
-    "DisplayNameLocKey": "ToolGroups.FieldsPlanting",
-    "Icon": "Sprites/BottomBar/FieldsPlantingToolGroupIcon"
-  },
-  "PlantingToolGroupSpec": {}
-}

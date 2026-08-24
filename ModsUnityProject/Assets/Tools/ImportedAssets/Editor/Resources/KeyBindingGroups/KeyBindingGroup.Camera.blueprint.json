@@ -1,7 +1,0 @@
-{
-  "KeyBindingGroupSpec": {
-    "Id": "Camera",
-    "Order": 10,
-    "LocKey": "KeyBindingGroup.Camera"
-  }
-}

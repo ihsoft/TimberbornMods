@@ -1,9 +1,0 @@
-{
-  "BlockObjectToolGroupSpec": {
-    "Id": "Paths",
-    "Order": 1,
-    "NameLocKey": "ToolGroups.Paths",
-    "Icon": "Sprites/BottomBar/BuildingGroups/Paths",
-    "FallbackGroup": false
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "NeedGroupSpec": {
-    "Id": "Fun",
-    "Order": 60,
-    "DisplayNameLocKey": "NeedGroup.Fun.DisplayName"
-  }
-}
