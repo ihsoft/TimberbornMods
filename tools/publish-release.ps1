@@ -461,6 +461,14 @@ $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
 if ([int]$report.SchemaVersion -ne 5) {
     throw "Unsupported preflight report schema version: $($report.SchemaVersion)"
 }
+$preflightModIoAccessTokenPath = [string]$report.PreflightOptions.ModIoAccessTokenPath
+if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
+    $ModIoAccessTokenPath = $preflightModIoAccessTokenPath
+}
+elseif (-not [string]::IsNullOrWhiteSpace($preflightModIoAccessTokenPath) -and
+        (Resolve-ToolPath $ModIoAccessTokenPath) -ne (Resolve-ToolPath $preflightModIoAccessTokenPath)) {
+    throw "Mod.IO owner token argument does not match the credential bound by immutable preflight."
+}
 
 $releaseSources = @($report.ReleaseSources)
 if ($releaseSources.Count -eq 0) {

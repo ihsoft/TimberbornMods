@@ -355,6 +355,30 @@ if ([int]$readinessReport.SchemaVersion -ne 1 -or
 if ($readinessReport.ReadyForPreflight -ne $true) {
     throw "Release readiness report is not ready for immutable preflight: $resolvedReadinessReportPath"
 }
+$gate1Arguments = [string[]]@($readinessReport.Gate1Plan.Arguments)
+function Get-Gate1Argument([string] $Name) {
+    $index = [Array]::IndexOf($gate1Arguments, $Name)
+    if ($index -lt 0 -or $index + 1 -ge $gate1Arguments.Count) {
+        return ""
+    }
+    return [string]$gate1Arguments[$index + 1]
+}
+$plannedReadinessReportPath = Get-Gate1Argument "-ReadinessReportPath"
+if ([string]::IsNullOrWhiteSpace($plannedReadinessReportPath) -or
+        (Resolve-ToolPath $plannedReadinessReportPath) -ne $resolvedReadinessReportPath) {
+    throw "Gate 1 plan does not bind the readiness artifact being consumed. Rerun compact readiness."
+}
+$plannedModIoAccessTokenPath = Get-Gate1Argument "-ModIoAccessTokenPath"
+if ([string]::IsNullOrWhiteSpace($plannedModIoAccessTokenPath)) {
+    throw "Gate 1 plan does not bind the Mod.IO owner token validated by readiness."
+}
+if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
+    $ModIoAccessTokenPath = $plannedModIoAccessTokenPath
+}
+elseif ([string]::IsNullOrWhiteSpace($plannedModIoAccessTokenPath) -or
+        (Resolve-ToolPath $plannedModIoAccessTokenPath) -ne (Resolve-ToolPath $ModIoAccessTokenPath)) {
+    throw "Mod.IO owner token argument does not match the credential bound by compact readiness."
+}
 if ([string]$readinessReport.Candidate.ModName -ne $ModName -or
         [string]$readinessReport.Candidate.SourceModVersion -ne $sourceModVersion -or
         [string]$readinessReport.Candidate.ReleaseRoot -ne $repoRoot -or
@@ -1030,6 +1054,7 @@ $report = [ordered]@{
         CorrectiveReplacement = [bool]$CorrectiveReplacement
         PublishSteamVisibility = [bool]$PublishSteamVisibility
         PublishModIoPage = [bool]$PublishModIoPage
+        ModIoAccessTokenPath = $ModIoAccessTokenPath
     }
     Steps = [object[]]$steps.ToArray()
     ReleaseLogDirectory = $releaseLogDirectory

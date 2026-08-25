@@ -26,6 +26,12 @@ is unavailable to that readiness process; it does not by itself prove that the W
 invalid. Before logout, token deletion, or device reauthentication, rerun the same readiness command through the
 approved release execution boundary. GitHub Desktop and `gh` remain separate sessions.
 
+Mod.IO readiness prefers `.tools/modio/<ModName>.token.txt`. If that file is absent, pass another already-known valid
+owner token under `.tools/modio/` for the same account and game scope with `-ModIoAccessTokenPath`; readiness checks
+only that the selected file is present and nonempty. The report records a portable credential-source classification,
+never token contents, and carries the selected runtime argument through `Gate1Plan`, immutable preflight, and
+publication. It does not copy, rename, inspect, or select alternate token files merely from their filenames.
+
 Steam publication uses the Steamworks-documented `steamcmd +login <configured-user> +workshop_build_item ... +quit`
 shape. The tooling has no `logout` or `logoff` command; `quit` terminates SteamCMD. Readiness reports whether the
 desktop Steam client is running so a Publisher can correlate any client or Steam Cloud disruption with the concurrent

@@ -205,6 +205,7 @@ function Get-ReadinessProbeResults(
     [string] $ReleaseRoot,
     [string] $ModName,
     [string] $UnityPath,
+    [string] $ModIoAccessTokenPath,
     [object] $ProbeOverride
 ) {
     if ($null -ne $ProbeOverride) {
@@ -255,7 +256,48 @@ function Get-ReadinessProbeResults(
     }
     $steamConfigPath = Join-Path $ToolsRoot ".tools/steam/steam.local.json"
     $modIoConfigPath = Join-Path $ToolsRoot ".tools/modio/$ModName.local.json"
-    $modIoTokenPath = Join-Path $ToolsRoot ".tools/modio/$ModName.token.txt"
+    $defaultModIoTokenArgument = ".tools/modio/$ModName.token.txt"
+    $modIoTokenArgument = if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
+        $defaultModIoTokenArgument
+    }
+    else {
+        $ModIoAccessTokenPath
+    }
+    $modIoTokenPath = if ([System.IO.Path]::IsPathRooted($modIoTokenArgument)) {
+        [System.IO.Path]::GetFullPath($modIoTokenArgument)
+    }
+    else {
+        [System.IO.Path]::GetFullPath((Join-Path $ToolsRoot $modIoTokenArgument))
+    }
+    $modIoTokenSelection = if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
+        "PreferredPerModOwnerToken"
+    }
+    elseif ($modIoTokenPath -eq [System.IO.Path]::GetFullPath((
+            Join-Path $ToolsRoot $defaultModIoTokenArgument))) {
+        "ExplicitPerModOwnerToken"
+    }
+    else {
+        "ExplicitAlternateOwnerToken"
+    }
+    $modIoCredentialRoot = [System.IO.Path]::GetFullPath(
+        (Join-Path $ToolsRoot ".tools/modio")).TrimEnd('\', '/')
+    $modIoCredentialRootPrefix = $modIoCredentialRoot + [System.IO.Path]::DirectorySeparatorChar
+    $modIoTokenPathIsPortable = $modIoTokenPath.StartsWith(
+        $modIoCredentialRootPrefix, [System.StringComparison]::OrdinalIgnoreCase)
+    $toolsRootPath = [System.IO.Path]::GetFullPath($ToolsRoot).TrimEnd('\', '/')
+    $toolsRootPrefix = $toolsRootPath + [System.IO.Path]::DirectorySeparatorChar
+    $modIoTokenRuntimeArgument = if ($modIoTokenPathIsPortable) {
+        $modIoTokenPath.Substring($toolsRootPrefix.Length).Replace('\', '/')
+    }
+    else {
+        ""
+    }
+    $modIoTokenPathScope = if ($modIoTokenPathIsPortable) {
+        "RepositoryRelative"
+    }
+    else {
+        "UnsupportedExternalPath"
+    }
     $steamCmdPath = ""
     $steamUserName = ""
     if (Test-Path -LiteralPath $steamConfigPath -PathType Leaf) {
@@ -320,7 +362,11 @@ function Get-ReadinessProbeResults(
             ConfigPath = $modIoConfigPath
             ConfigExists = Test-Path -LiteralPath $modIoConfigPath -PathType Leaf
             AccessTokenPath = $modIoTokenPath
-            AccessTokenExists = (Test-Path -LiteralPath $modIoTokenPath -PathType Leaf) -and
+            AccessTokenArgument = $modIoTokenRuntimeArgument
+            AccessTokenSelection = $modIoTokenSelection
+            AccessTokenPathScope = $modIoTokenPathScope
+            AccessTokenExists = $modIoTokenPathIsPortable -and
+                (Test-Path -LiteralPath $modIoTokenPath -PathType Leaf) -and
                 (Get-Item -LiteralPath $modIoTokenPath).Length -gt 0
             ModId = $modIoId
             GameId = $modIoGameId
@@ -342,6 +388,7 @@ function Get-ReleaseReadinessReport {
 
         [string] $ReleaseLine = "",
         [string] $UnityPath = "",
+        [string] $ModIoAccessTokenPath = "",
         [object] $ProbeOverride = $null
     )
 
@@ -645,6 +692,8 @@ function Get-ReleaseReadinessReport {
     if (-not [string]::IsNullOrWhiteSpace($changesPathValue)) {
         $identityPaths += $changesPathValue
     }
+    $headResult = Invoke-ReadinessGit $releaseRoot @("rev-parse", "HEAD")
+    $headAtDiscovery = if ($headResult.Output.Count -gt 0) { [string]$headResult.Output[0] } else { "" }
     $releaseCommitResult = Invoke-ReadinessGit $releaseRoot (@("log", "-1", "--format=%H", "--") + $identityPaths)
     $releaseCommit = if ($releaseCommitResult.Output.Count -gt 0) { [string]$releaseCommitResult.Output[0] } else { "" }
     if ([string]::IsNullOrWhiteSpace($releaseCommit)) {
@@ -673,7 +722,8 @@ function Get-ReleaseReadinessReport {
         ""
     }
 
-    $probe = Get-ReadinessProbeResults $toolsRoot $releaseRoot $ModName $UnityPath $ProbeOverride
+    $probe = Get-ReadinessProbeResults `
+        $toolsRoot $releaseRoot $ModName $UnityPath $ModIoAccessTokenPath $ProbeOverride
     if ([bool]$probe.Steam.DesktopClientRunning) {
         $warnings.Add(
             "Desktop Steam is running. Publication will authenticate a separate SteamCMD process with the " +
@@ -707,7 +757,13 @@ function Get-ReleaseReadinessReport {
         $blockers.Add([ordered]@{ Code = "ModIoConfigMissing"; Message = "Mod.IO config or ModId is missing." })
     }
     if (-not [bool]$probe.ModIO.AccessTokenExists) {
-        $blockers.Add([ordered]@{ Code = "ModIoCredentialMissing"; Message = "Mod.IO owner token file is missing." })
+        $blockers.Add([ordered]@{
+            Code = "ModIoCredentialMissing"
+            Message = (
+                "Selected Mod.IO owner token is missing or empty. Prefer the per-mod token when present; " +
+                "otherwise rerun readiness with -ModIoAccessTokenPath pointing to another known valid owner " +
+                "token under .tools/modio for the same account/game scope. Do not copy, rename, or guess token files.")
+        })
     }
 
     $steamPublishedFileId = $publicSteamPublishedFileId
@@ -734,6 +790,11 @@ function Get-ReleaseReadinessReport {
     if (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
         $gate1Arguments += @("-ReleaseLine", $ReleaseLine)
     }
+    $selectedModIoTokenArgument = [string]$probe.ModIO.AccessTokenArgument
+    if ([bool]$probe.ModIO.AccessTokenExists -and
+            -not [string]::IsNullOrWhiteSpace($selectedModIoTokenArgument)) {
+        $gate1Arguments += @("-ModIoAccessTokenPath", $selectedModIoTokenArgument)
+    }
     return [ordered]@{
         SchemaVersion = 1
         ArtifactType = "TimberbornReleaseReadiness"
@@ -755,6 +816,7 @@ function Get-ReleaseReadinessReport {
         }
         Changelog = $changelog
         Git = [ordered]@{
+            HeadAtDiscovery = $headAtDiscovery
             ReleaseCommit = $releaseCommit
             BaselineTag = $baselineTag
             IntendedTag = $tagName
@@ -788,7 +850,8 @@ function Get-ReleaseReadinessReport {
             ModIO = [ordered]@{
                 ModId = [string]$probe.ModIO.ModId
                 ConfigSource = "MainToolingOwnerConfig"
-                CredentialSource = "MainToolingNamedOwnerToken"
+                CredentialSource = [string]$probe.ModIO.AccessTokenSelection
+                CredentialPathScope = [string]$probe.ModIO.AccessTokenPathScope
                 PageVisibilityIntent = "Unchanged"
                 ConfigReady = [bool]$probe.ModIO.ConfigExists
                 CredentialReady = [bool]$probe.ModIO.AccessTokenExists
@@ -813,6 +876,7 @@ function Get-ReleaseReadinessReport {
         Gate1Plan = [ordered]@{
             EntryPoint = "tools/verify-release.ps1"
             Arguments = [string[]]$gate1Arguments
+            ExpectedHeadForPreparation = $headAtDiscovery
             PreparationRequired = $preparationRequired
             PreparationState = if ($preparationRequired) { "AwaitingMetadataPreparation" } else { "Prepared" }
             NextAction = if ($preparationRequired) {
@@ -829,7 +893,12 @@ function Get-ReleaseReadinessReport {
             RerunReadinessCommand = @(
                 "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
                 "tools/get-release-readiness.ps1", "-ModName", $ModName) + $(if (
-                    [string]::IsNullOrWhiteSpace($ReleaseLine)) { @() } else { @("-ReleaseLine", $ReleaseLine) })
+                    [string]::IsNullOrWhiteSpace($ReleaseLine)) { @() } else { @("-ReleaseLine", $ReleaseLine) }) +
+                $(if ([bool]$probe.ModIO.AccessTokenExists -and
+                        -not [string]::IsNullOrWhiteSpace($selectedModIoTokenArgument)) {
+                    @("-ModIoAccessTokenPath", $selectedModIoTokenArgument)
+                }
+                else { @() })
             MutatesPublicPlatforms = $false
             OperationOrder = [string[]]@(
                 "Platform description verification",

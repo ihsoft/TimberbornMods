@@ -297,6 +297,13 @@ try {
         '{"Name":"Advanced Automation","Version":"4.0.11"}'
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "."))
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add unmaterialized SmartPower fixture"))
+    Write-TestFile (Join-Path $lineRoot "UnrelatedLineWork.txt") "later unrelated release-line work"
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "UnrelatedLineWork.txt"))
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add unrelated release-line work"))
+    Write-TestFile (Join-Path $fixtureRoot ".tools/modio/SmartPower.local.json") `
+        '{"GameId":"3659","ModId":"3168318","ApiBase":"https://example.invalid/v1"}'
+    Write-TestFile (Join-Path $fixtureRoot ".tools/modio/Automation.token.txt") `
+        "fixture-known-owner-token"
 
     $readinessArtifact = Join-Path `
         $fixtureRoot ".tools/release-readiness/SmartPower-1.16.4-update-1.0.json"
@@ -351,10 +358,53 @@ try {
         "Stale compatibility ReleaseVersion must not become a changelog blocker."
     Assert-True ("SteamIdentityMissing" -notin $endToEndBlockers) `
         "Registered readiness must inherit the public Steam identity."
+    Assert-Equal ".tools/release-readiness/SmartPower-1.16.4-update-1.0.json" `
+        $endToEndReadiness.Gate1Plan.ReadinessReportPath `
+        "Gate 1 plan must bind its exact readiness artifact"
+    Assert-True ("-ReadinessReportPath" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
+        "Gate 1 arguments must carry the matching readiness artifact."
+    Assert-Equal $endToEndReadiness.Git.HeadAtDiscovery `
+        $endToEndReadiness.Gate1Plan.ExpectedHeadForPreparation `
+        "Metadata preparation must use worktree HEAD rather than the prior release identity commit"
+    Assert-True ($endToEndReadiness.Git.ReleaseCommit -ne $endToEndReadiness.Git.HeadAtDiscovery) `
+        "Fixture must distinguish the release identity commit from later unrelated worktree HEAD."
     Assert-True `
         (-not (($endToEndOutput | Out-String) -match "Cannot bind argument to parameter 'Path'")) `
         "Optional empty paths must not escape as PowerShell parameter-binding failures."
     Write-Host "PASS: exact registered readiness command models public ownership and metadata preparation"
+
+    Push-Location $fixtureRoot
+    try {
+        $alternateTokenOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File tools/get-release-readiness.ps1 -ModName SmartPower -ReleaseLine update-1.0 `
+            -ModIoAccessTokenPath .tools/modio/Automation.token.txt 2>&1)
+        $alternateTokenExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+    Assert-Equal 0 $alternateTokenExitCode "Registered alternate-owner-token readiness exit code"
+    $alternateTokenReadiness = Get-Content -Raw -LiteralPath $readinessArtifact | ConvertFrom-Json
+    Assert-Equal "ExplicitAlternateOwnerToken" `
+        $alternateTokenReadiness.Platforms.ModIO.CredentialSource `
+        "Alternate owner-token credential classification"
+    Assert-Equal "RepositoryRelative" $alternateTokenReadiness.Platforms.ModIO.CredentialPathScope `
+        "Alternate owner-token portable path scope"
+    Assert-True $alternateTokenReadiness.Platforms.ModIO.CredentialReady `
+        "Known explicit alternate owner token must satisfy credential readiness."
+    Assert-True ("ModIoCredentialMissing" -notin @($alternateTokenReadiness.Blockers | ForEach-Object Code)) `
+        "Known explicit alternate owner token must not produce a false blocker."
+    $alternateGate1Arguments = [string[]]@($alternateTokenReadiness.Gate1Plan.Arguments)
+    $tokenArgumentIndex = [Array]::IndexOf($alternateGate1Arguments, "-ModIoAccessTokenPath")
+    Assert-True ($tokenArgumentIndex -ge 0) "Gate 1 plan omitted the selected alternate owner token."
+    Assert-Equal ".tools/modio/Automation.token.txt" $alternateGate1Arguments[$tokenArgumentIndex + 1] `
+        "Gate 1 alternate owner-token argument"
+    Assert-True (-not (($alternateTokenReadiness.Platforms.ModIO | ConvertTo-Json -Depth 4) -match
+            [regex]::Escape($fixtureRoot))) `
+        "Readiness credential evidence must not serialize the fixture's machine-specific root."
+    Assert-True (-not (($alternateTokenOutput | Out-String).Contains("fixture-known-owner-token"))) `
+        "Readiness output leaked alternate owner-token contents."
+    Write-Host "PASS: registered readiness carries a known alternate Mod.IO owner token without secret leakage"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
@@ -450,6 +500,9 @@ try {
             ConfigPath = "modio.local.json"
             ConfigExists = $true
             AccessTokenPath = "modio.token.txt"
+            AccessTokenArgument = ".tools/modio/ReadyMod.token.txt"
+            AccessTokenSelection = "PreferredPerModOwnerToken"
+            AccessTokenPathScope = "RepositoryRelative"
             AccessTokenExists = $true
             ModId = "24680"
             GameId = "1974"
@@ -553,6 +606,9 @@ try {
             ConfigPath = "missing"
             ConfigExists = $false
             AccessTokenPath = "secret-sentinel-must-not-leak"
+            AccessTokenArgument = ""
+            AccessTokenSelection = "PreferredPerModOwnerToken"
+            AccessTokenPathScope = "RepositoryRelative"
             AccessTokenExists = $false
             ModId = ""
             GameId = ""
@@ -877,6 +933,12 @@ Assert-True $verifyText.Contains('Assert-PathExists $resolvedReadinessReportPath
     "Preflight does not require the compact readiness artifact."
 Assert-True $verifyText.Contains('$readinessReport.ReadyForPreflight -ne $true') `
     "Immutable preflight must reject a pre-preparation readiness artifact."
+Assert-True $verifyText.Contains('Get-Gate1Argument "-ReadinessReportPath"') `
+    "Immutable preflight does not bind the exact readiness artifact from Gate 1."
+Assert-True $verifyText.Contains('Get-Gate1Argument "-ModIoAccessTokenPath"') `
+    "Immutable preflight does not consume the readiness-bound Mod.IO owner token."
+Assert-True $verifyText.Contains('ModIoAccessTokenPath = $ModIoAccessTokenPath') `
+    "Immutable preflight does not preserve the selected Mod.IO owner token for publication."
 Assert-True $verifyText.Contains("Readiness = [ordered]@{") `
     "Preflight does not retain discovery/readiness evidence."
 
@@ -895,6 +957,8 @@ Assert-True $publishText.Contains("Get-OpenGitHubIssues") `
     "Release publication does not collect compact issue evidence candidates."
 Assert-True $publishText.Contains("Get-ReleaseWikiCandidates") `
     "Release publication does not collect compact Wiki evidence candidates."
+Assert-True $publishText.Contains('$preflightModIoAccessTokenPath = [string]$report.PreflightOptions.ModIoAccessTokenPath') `
+    "Release publication does not reuse the preflight-bound Mod.IO owner token."
 
 $modIoText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-modio.ps1")
 $initialResponseIndex = $modIoText.IndexOf("Initial Mod.IO upload response", [System.StringComparison]::Ordinal)

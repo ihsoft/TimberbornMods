@@ -5,6 +5,7 @@ param(
     [string] $RepositoryRoot = "",
     [string] $ReleaseLine = "",
     [string] $UnityPath = "",
+    [string] $ModIoAccessTokenPath = "",
     [string] $ReportRoot = ".tools/release-readiness",
     [switch] $AsJson,
     [switch] $NoReport
@@ -27,14 +28,27 @@ $report = Get-ReleaseReadinessReport `
     -RepositoryRoot $repoRoot `
     -ModName $ModName `
     -ReleaseLine $ReleaseLine `
-    -UnityPath $UnityPath
+    -UnityPath $UnityPath `
+    -ModIoAccessTokenPath $ModIoAccessTokenPath
 
 if (-not $NoReport) {
     $reportDirectory = Resolve-RepositoryPath $toolRepoRoot $ReportRoot
     [void](New-Item -ItemType Directory -Path $reportDirectory -Force)
     $lineSuffix = if ([string]::IsNullOrWhiteSpace($ReleaseLine)) { "current" } else { $ReleaseLine }
     $reportPath = Join-Path $reportDirectory "$ModName-$($report.Candidate.SourceModVersion)-$lineSuffix.json"
+    $toolRootPath = [System.IO.Path]::GetFullPath($toolRepoRoot).TrimEnd('\', '/')
+    $toolRootPrefix = $toolRootPath + [System.IO.Path]::DirectorySeparatorChar
+    $reportPathArgument = if ($reportPath.StartsWith(
+            $toolRootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        $reportPath.Substring($toolRootPrefix.Length).Replace('\', '/')
+    }
+    else {
+        $reportPath
+    }
     $report["ReportPath"] = $reportPath
+    $report.Gate1Plan["ReadinessReportPath"] = $reportPathArgument
+    $report.Gate1Plan.Arguments = [string[]]@(
+        $report.Gate1Plan.Arguments + @("-ReadinessReportPath", $reportPathArgument))
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $reportPath -Encoding UTF8
 }
 
