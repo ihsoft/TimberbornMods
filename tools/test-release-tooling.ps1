@@ -425,7 +425,16 @@ try {
             Ready = $true
             Error = ""
         }
-        GitHub = [pscustomobject]@{ CliAvailable = $true; AuthReady = $true; Account = "fixture" }
+        GitHub = [pscustomobject]@{
+            CliAvailable = $true
+            AuthReady = $true
+            AuthStatusExitCode = 0
+            ApiUserExitCode = 0
+            Account = "fixture"
+            EvidenceScope = "CurrentProcessCredentialAccessBoundary"
+            StoredCredentialValidity = "ConfirmedInExecutionBoundary"
+            CredentialMutationRecommended = $false
+        }
         Steam = [pscustomobject]@{
             ConfigPath = "steam.local.json"
             ConfigExists = $true
@@ -519,7 +528,16 @@ try {
 
     $blockedProbe = [pscustomobject]@{
         Unity = [pscustomobject]@{ ProjectVersion = "6000.5.2f1"; CanonicalEditorPath = ""; Ready = $false; Error = "missing" }
-        GitHub = [pscustomobject]@{ CliAvailable = $true; AuthReady = $false; Account = "" }
+        GitHub = [pscustomobject]@{
+            CliAvailable = $true
+            AuthReady = $false
+            AuthStatusExitCode = 1
+            ApiUserExitCode = 1
+            Account = ""
+            EvidenceScope = "CurrentProcessCredentialAccessBoundary"
+            StoredCredentialValidity = "Unknown"
+            CredentialMutationRecommended = $false
+        }
         Steam = [pscustomobject]@{
             ConfigPath = "missing"
             ConfigExists = $false
@@ -552,6 +570,17 @@ try {
     $blockedJson = $blockedReadiness | ConvertTo-Json -Depth 8
     Assert-True (-not $blockedJson.Contains("secret-sentinel-must-not-leak")) `
         "Readiness artifact leaked a credential path supplied only to the probe."
+    Assert-Equal "CurrentProcessCredentialAccessBoundary" `
+        $blockedReadiness.Platforms.GitHub.EvidenceScope "GitHub auth evidence scope"
+    Assert-Equal "Unknown" $blockedReadiness.Platforms.GitHub.StoredCredentialValidity `
+        "Sandbox-only GitHub failure must not classify the stored credential as invalid"
+    Assert-True (-not $blockedReadiness.Platforms.GitHub.CredentialMutationRecommended) `
+        "Readiness must not recommend credential mutation from boundary-local failure evidence."
+    $blockedHumanReadiness = Format-ReleaseReadinessReport $blockedReadiness | Out-String
+    Assert-True $blockedHumanReadiness.Contains("current credential-access boundary") `
+        "Human readiness output must scope GitHub auth evidence to the current execution boundary."
+    Assert-True $blockedHumanReadiness.Contains("stored credential validity=Unknown") `
+        "Human readiness output must not imply that the stored GitHub credential is invalid."
     Write-Host "PASS: current/backport readiness, human/JSON parity, blockers, and secret boundary"
 
     $backportChangesPath = Join-Path $testRoot "backport-changelog.md"

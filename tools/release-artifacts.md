@@ -20,6 +20,12 @@ version and platform identity come from the current public owner in the main wor
 metadata changes. After the authorized preparation commit, rerun the same readiness command; immutable preflight
 requires `ReadyForPreflight` and never accepts the pre-preparation artifact.
 
+GitHub readiness is evidence from the process's current credential-access boundary. It runs read-only `gh auth status`
+and `gh api user` checks without trying to escape that boundary. A failure, including HTTP 401, means auth/API access
+is unavailable to that readiness process; it does not by itself prove that the Windows Credential Manager secret is
+invalid. Before logout, token deletion, or device reauthentication, rerun the same readiness command through the
+approved release execution boundary. GitHub Desktop and `gh` remain separate sessions.
+
 Steam publication uses the Steamworks-documented `steamcmd +login <configured-user> +workshop_build_item ... +quit`
 shape. The tooling has no `logout` or `logoff` command; `quit` terminates SteamCMD. Readiness reports whether the
 desktop Steam client is running so a Publisher can correlate any client or Steam Cloud disruption with the concurrent

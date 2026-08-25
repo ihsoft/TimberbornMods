@@ -235,11 +235,23 @@ function Get-ReadinessProbeResults(
     }
 
     $ghCommand = Get-Command gh -ErrorAction SilentlyContinue
-    $ghResult = if ($null -eq $ghCommand) {
+    $ghAuthResult = if ($null -eq $ghCommand) {
         [pscustomobject]@{ ExitCode = -1; Output = [string[]]@(); Diagnostics = [string[]]@("gh not found") }
     }
     else {
         Invoke-ReleaseNativeCommand -Command "gh" -Arguments @("auth", "status", "--hostname", "github.com")
+    }
+    $ghApiResult = if ($null -eq $ghCommand) {
+        [pscustomobject]@{ ExitCode = -1; Output = [string[]]@(); Diagnostics = [string[]]@("gh not found") }
+    }
+    else {
+        Invoke-ReleaseNativeCommand -Command "gh" -Arguments @("api", "user", "--jq", ".login")
+    }
+    $ghAccount = if ($ghApiResult.ExitCode -eq 0 -and $ghApiResult.Output.Count -gt 0) {
+        [string]$ghApiResult.Output[0]
+    }
+    else {
+        ""
     }
     $steamConfigPath = Join-Path $ToolsRoot ".tools/steam/steam.local.json"
     $modIoConfigPath = Join-Path $ToolsRoot ".tools/modio/$ModName.local.json"
@@ -279,8 +291,18 @@ function Get-ReadinessProbeResults(
         }
         GitHub = [ordered]@{
             CliAvailable = $null -ne $ghCommand
-            AuthReady = $ghResult.ExitCode -eq 0
-            Account = ""
+            AuthReady = $ghAuthResult.ExitCode -eq 0 -and $ghApiResult.ExitCode -eq 0
+            AuthStatusExitCode = [int]$ghAuthResult.ExitCode
+            ApiUserExitCode = [int]$ghApiResult.ExitCode
+            Account = $ghAccount
+            EvidenceScope = "CurrentProcessCredentialAccessBoundary"
+            StoredCredentialValidity = if ($ghAuthResult.ExitCode -eq 0 -and $ghApiResult.ExitCode -eq 0) {
+                "ConfirmedInExecutionBoundary"
+            }
+            else {
+                "Unknown"
+            }
+            CredentialMutationRecommended = $false
         }
         Steam = [ordered]@{
             ConfigPath = $steamConfigPath
@@ -664,7 +686,13 @@ function Get-ReleaseReadinessReport {
         })
     }
     if (-not [bool]$probe.GitHub.CliAvailable -or -not [bool]$probe.GitHub.AuthReady) {
-        $blockers.Add([ordered]@{ Code = "GitHubAuthMissing"; Message = "GitHub CLI authentication is not ready." })
+        $blockers.Add([ordered]@{
+            Code = "GitHubAuthMissing"
+            Message = (
+                "GitHub auth/API access is unavailable in the readiness process credential-access boundary. " +
+                "This does not prove that the stored credential is invalid; rerun readiness with the approved " +
+                "release execution boundary before any logout or device reauthentication.")
+        })
     }
     if (-not [bool]$probe.Steam.ConfigExists -or -not [bool]$probe.Steam.SteamCmdExists -or
             -not [bool]$probe.Steam.UserNameConfigured) {
@@ -768,6 +796,17 @@ function Get-ReleaseReadinessReport {
             GitHub = [ordered]@{
                 CliAvailable = [bool]$probe.GitHub.CliAvailable
                 AuthReady = [bool]$probe.GitHub.AuthReady
+                AuthStatusExitCode = [int](Get-ReadinessProperty $probe.GitHub "AuthStatusExitCode")
+                ApiUserExitCode = [int](Get-ReadinessProperty $probe.GitHub "ApiUserExitCode")
+                Account = [string](Get-ReadinessProperty $probe.GitHub "Account")
+                EvidenceScope = "CurrentProcessCredentialAccessBoundary"
+                StoredCredentialValidity = if ([bool]$probe.GitHub.AuthReady) {
+                    "ConfirmedInExecutionBoundary"
+                }
+                else {
+                    "Unknown"
+                }
+                CredentialMutationRecommended = $false
             }
         }
         Unity = $probe.Unity
@@ -779,10 +818,13 @@ function Get-ReleaseReadinessReport {
             NextAction = if ($preparationRequired) {
                 "ApplyPlannedMetadataChangesCommitAndRerunReadiness"
             }
+            elseif ($externalPrerequisiteBlockers.Count -gt 0) {
+                "ResolveExternalPrerequisitesAndRerunReadiness"
+            }
             else {
                 "RunImmutablePreflight"
             }
-            EntryPointAvailable = -not $preparationRequired
+            EntryPointAvailable = $readyForPreflight
             PlannedMetadataChanges = [object[]]$plannedMetadataChanges.ToArray()
             RerunReadinessCommand = @(
                 "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
@@ -811,6 +853,11 @@ function Get-ReleaseReadinessReport {
 function Format-ReleaseReadinessReport([object] $Report) {
     $status = if ($Report.ReadyForPreflight) {
         "READY FOR PREFLIGHT"
+    }
+    elseif (-not $Report.Gate1Plan.PreparationRequired -and
+            @($Report.ExternalPrerequisiteBlockers).Count -gt 0 -and
+            @($Report.Gate1Blockers).Count -eq 0) {
+        "WAITING FOR PREFLIGHT PREREQUISITES"
     }
     elseif ($Report.ReadyForGate1) {
         "READY FOR GATE 1"
@@ -846,7 +893,10 @@ function Format-ReleaseReadinessReport([object] $Report) {
         "desktop client running=$($Report.Platforms.Steam.DesktopClientRunning)")
     $lines.Add("  Mod.IO: $($Report.Platforms.ModIO.ModId); page visibility=unchanged")
     $lines.Add("  Unity: $($Report.Unity.ProjectVersion); editor=$($Report.Unity.CanonicalEditorPath)")
-    $lines.Add("  GitHub auth: $($Report.Platforms.GitHub.AuthReady)")
+    $lines.Add(
+        "  GitHub auth in current credential-access boundary: $($Report.Platforms.GitHub.AuthReady); " +
+        "stored credential validity=$($Report.Platforms.GitHub.StoredCredentialValidity); " +
+        "credential mutation recommended=False")
     if (@($Report.Gate1Blockers).Count -gt 0) {
         $lines.Add("  Gate 1 blockers ($(@($Report.Gate1Blockers).Count)):")
         foreach ($blocker in @($Report.Gate1Blockers)) {
