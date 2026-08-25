@@ -37,5 +37,8 @@
       <Compile Include="..\TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs">
         <Link>TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs">
+        <Link>TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

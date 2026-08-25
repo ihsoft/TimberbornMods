@@ -66,6 +66,9 @@ static class TimberCommonsTestSuite {
           IrrigationTowerSpecDescriberTests.ShowsOnlyEfficiencyForUnfinishedTower),
       ("IrrigationTowerSpecDescriber shows range and distinct effects",
           IrrigationTowerSpecDescriberTests.ShowsRangeAndDistinctEffectsForFinishedTower),
+      ("ModListView filter hides inactive mods and restores the full list",
+          ModListViewInitializePatchTests.FiltersInactiveModsAndRestoresFullList),
+      ("ModListView adds the filter button only once", ModListViewInitializePatchTests.AddsFilterButtonOnlyOnce),
   ];
 
   public static int Run() {

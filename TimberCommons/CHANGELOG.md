@@ -1,4 +1,5 @@
 # v1.15.3 (Timberborn v1.0) (TBD)
+* [Feature] The mod manager can filter the list to active mods, with localized button text.
 * [Feature] Irrigation tower descriptions and recipe outputs now show their range and special effects.
 * [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
 * [Fix] Irrigation tower recipe toggles did not show the currently selected mode.
