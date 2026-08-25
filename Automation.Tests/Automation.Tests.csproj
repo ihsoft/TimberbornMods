@@ -227,6 +227,9 @@
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\StreamGaugeScriptableComponent.cs</Link>
       </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Components\ThrottlingValveScriptableComponent.cs</Link>
+      </Compile>
       <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\TimeScriptableComponent.cs">
         <Link>Automation\ScriptingEngine\ScriptableComponents\Components\TimeScriptableComponent.cs</Link>
       </Compile>

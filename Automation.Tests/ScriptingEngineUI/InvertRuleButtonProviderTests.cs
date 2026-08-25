@@ -67,6 +67,34 @@ static class InvertRuleButtonProviderTests {
     Assert.Equal(null, MakeInvertedActionExpression(parserFactory, automatedAction, behavior));
   }
 
+  public static void InvertsThrottlingValveSetFlowArgumentWithoutChangingAction() {
+    var behavior = new AutomationBehavior();
+    behavior.SetComponent(new Valve { MaxOutflowLimit = 2 });
+    var parserFactory = CreateParserFactory();
+    RegisterThrottlingValveScriptableComponent();
+
+    var zeroAction = ParseAction(parserFactory, behavior, "ThrottlingValve.SetFlow(0)");
+    var maxAction = ParseAction(parserFactory, behavior, "ThrottlingValve.SetFlow(2)");
+
+    Assert.Equal(
+        "(act ThrottlingValve.SetFlow 200)",
+        MakeInvertedActionExpression(parserFactory, zeroAction, behavior));
+    Assert.Equal("(act ThrottlingValve.SetFlow 0)", MakeInvertedActionExpression(parserFactory, maxAction, behavior));
+  }
+
+  public static void InvertsThrottlingValveOpenAndCloseActions() {
+    var behavior = new AutomationBehavior();
+    behavior.SetComponent(new Valve { MaxOutflowLimit = 2 });
+    var parserFactory = CreateParserFactory();
+    RegisterThrottlingValveScriptableComponent();
+
+    var openAction = ParseAction(parserFactory, behavior, "ThrottlingValve.Open()");
+    var closeAction = ParseAction(parserFactory, behavior, "ThrottlingValve.Close()");
+
+    Assert.Equal("(act ThrottlingValve.Close)", MakeInvertedActionExpression(parserFactory, openAction, behavior));
+    Assert.Equal("(act ThrottlingValve.Open)", MakeInvertedActionExpression(parserFactory, closeAction, behavior));
+  }
+
   public static void InvertsClutchEngageAndDisengageActions() {
     var behavior = new AutomationBehavior();
     behavior.SetComponent(new Clutch());
@@ -179,6 +207,13 @@ static class InvertRuleButtonProviderTests {
   static void RegisterFillValveScriptableComponent() {
     var service = TestScripting.CreateService();
     var component = new FillValveScriptableComponent();
+    component.InjectDependencies(new TestLoc(), service);
+    component.Load();
+  }
+
+  static void RegisterThrottlingValveScriptableComponent() {
+    var service = TestScripting.CreateService();
+    var component = new ThrottlingValveScriptableComponent();
     component.InjectDependencies(new TestLoc(), service);
     component.Load();
   }

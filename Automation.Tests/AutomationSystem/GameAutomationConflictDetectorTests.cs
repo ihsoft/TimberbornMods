@@ -2,7 +2,6 @@ using System.Reflection;
 using IgorZ.Automation.Actions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.Conditions;
-using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.Parser;
 using Timberborn.AutomationBuildings;
@@ -18,6 +17,14 @@ static class GameAutomationConflictDetectorTests {
     var behavior = CreateBehavior(new FillValve());
 
     AddRule(behavior, "FillValve.SetHeight(1)");
+
+    Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
+  }
+
+  public static void IgnoresThrottlingValveManualFlowRules() {
+    var behavior = CreateBehavior(new Valve());
+
+    AddRule(behavior, "ThrottlingValve.SetFlow(1)");
 
     Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
@@ -82,9 +89,9 @@ static class GameAutomationConflictDetectorTests {
   }
 
   public static void IgnoresDisabledRules() {
-    var behavior = CreateBehavior(new FillValve());
+    var behavior = CreateBehavior(new Valve());
 
-    AddRule(behavior, "FillValve.Close()", enabled: false);
+    AddRule(behavior, "ThrottlingValve.Close()", enabled: false);
 
     Assert.False(new GameAutomationConflictDetector().HasConflictingRules(behavior));
   }
@@ -94,6 +101,8 @@ static class GameAutomationConflictDetectorTests {
 
     Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
         ParseAction(behavior, "FillValve.Open()")));
+    Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
+        ParseAction(behavior, "ThrottlingValve.SetFlow(1)")));
     Assert.True(new GameAutomationConflictDetector().IsBuildingStateChangingAction(
         ParseAction(behavior, "Clutch.Disengage()")));
   }
@@ -111,18 +120,25 @@ static class GameAutomationConflictDetectorTests {
         ParseAction(behavior, "Inventory.StartEmptying()")));
   }
 
-  public static void IgnoresManualFillValveRuleSaveConflicts() {
+  public static void IgnoresManualWaterValveRuleSaveConflicts() {
     var fillValveBehavior = CreateBehavior(new FillValve());
+    var throttlingValveBehavior = CreateBehavior(new Valve());
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
     var fillValveRules = new[] {
         Rule(1, ParseAction(fillValveBehavior, "Signals.Set('notice', 1)")),
         Rule(2, ParseAction(fillValveBehavior, "FillValve.Open()")),
     };
+    var throttlingValveRules = new[] {
+        Rule(1, ParseAction(throttlingValveBehavior, "ThrottlingValve.SetFlow(1)")),
+    };
 
     var fillValveConflicts = detector.GetConflictingRuleNumbers(
         fillValveBehavior, gameAutomationEnabled: true, fillValveRules);
+    var throttlingValveConflicts = detector.GetConflictingRuleNumbers(
+        throttlingValveBehavior, gameAutomationEnabled: true, throttlingValveRules);
 
     Assert.Equal(0, fillValveConflicts.Count);
+    Assert.Equal(0, throttlingValveConflicts.Count);
   }
 
   public static void FindsFlowControlRuleSaveConflicts() {
@@ -185,7 +201,7 @@ static class GameAutomationConflictDetectorTests {
     var detector = new GameAutomationRuleSaveConflictDetector(new GameAutomationConflictDetector());
     var rules = new[] {
         Rule(1, ParseAction(behavior, "FillValve.Open()"), isEnabled: false),
-        Rule(2, ParseAction(behavior, "FillValve.Close()"), isDeleted: true),
+        Rule(2, ParseAction(behavior, "ThrottlingValve.Close()"), isDeleted: true),
     };
 
     var conflicts = detector.GetConflictingRuleNumbers(behavior, gameAutomationEnabled: true, rules);
@@ -266,6 +282,11 @@ static class GameAutomationConflictDetectorTests {
     fillValve.RegisterAction("FillValve.Close");
     fillValve.RegisterAction("FillValve.SetHeight", ScriptValue.TypeEnum.Number);
 
+    var throttlingValve = new TestScriptable("ThrottlingValve");
+    throttlingValve.RegisterAction("ThrottlingValve.Open");
+    throttlingValve.RegisterAction("ThrottlingValve.Close");
+    throttlingValve.RegisterAction("ThrottlingValve.SetFlow", ScriptValue.TypeEnum.Number);
+
     var pausable = new TestScriptable("Pausable");
     pausable.RegisterAction("Pausable.Pause");
     pausable.RegisterAction("Pausable.Unpause");
@@ -298,7 +319,7 @@ static class GameAutomationConflictDetectorTests {
     inventory.RegisterAction("Inventory.StopEmptying");
 
     TestScripting.CreateService(
-        fillValve, pausable, workplace, signals, notifications, flowControl, clutch, gate, inventory);
+        fillValve, throttlingValve, pausable, workplace, signals, notifications, flowControl, clutch, gate, inventory);
   }
 
   static ParserFactory CreateParserFactory() {

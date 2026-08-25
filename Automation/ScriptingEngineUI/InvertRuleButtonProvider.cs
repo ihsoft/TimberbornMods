@@ -122,6 +122,17 @@ sealed class InvertRuleButtonProvider(ParserFactory parserFactory) : IEditorButt
       }
       return null;
     }
+    if (actioName == "ThrottlingValve.SetFlow") {
+      var valve = automationBehavior.GetComponent<Valve>();
+      var argFlow = ((IValueExpr)action.Operands[0]).ValueFn().AsFloat;
+      if (argFlow == 0) {
+        return $"(act ThrottlingValve.SetFlow {valve.MaxOutflowLimit * 100})";
+      }
+      if (argFlow == valve.MaxOutflowLimit) {
+        return "(act ThrottlingValve.SetFlow 0)";
+      }
+      return null;
+    }
     if (actioName is "Workplace.SetWorkers" or "Workplace.RemoveWorkers") {
       var workplace = automationBehavior.GetComponent<Workplace>();
       var argNumWorkers = actioName == "Workplace.SetWorkers" ? ((IValueExpr)action.Operands[0]).ValueFn().AsInt : 0;

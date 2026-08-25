@@ -1,3 +1,6 @@
+# v4.0.11 (Timberborn v1.0) (TBD)
+* [Feature] Add Throttling Valve actions through Timberborn 1.0's internal `Valve` component.
+
 # v4.0.10 (Timberborn v1.0) (August 23rd, 2026)
 * [Update] Backport the Advanced Automation feature set from versions 4.8.0 through 4.10.0 to the Timberborn 1.0-compatible package.
 * [Compatibility] Throttling Valve actions remain unavailable because Timberborn 1.0 does not have Throttling Valves.

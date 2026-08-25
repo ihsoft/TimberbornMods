@@ -24,6 +24,8 @@ sealed class GameAutomationConflictDetector {
   const string ManufactoryRecipeProperty = "Manufactory.Recipe";
   const string PausableBuildingPausedProperty = "PausableBuilding.Paused";
   const string PrioritizableHaulersProperty = "Prioritizable.Haulers";
+  const string ThrottlingValveOutflowLimitProperty = "Valve.OutflowLimit";
+  const string ThrottlingValveAutomationOutflowLimitProperty = "Valve.AutomationOutflowLimit";
   const string WorkplaceWorkersProperty = "Workplace.Workers";
   const string WorkplacePriorityProperty = "Workplace.Priority";
 
@@ -44,6 +46,9 @@ sealed class GameAutomationConflictDetector {
       ["Pausable.Unpause"] = [PausableBuildingPausedProperty],
       ["Prioritizable.SetHaulers"] = [PrioritizableHaulersProperty],
       ["Prioritizable.ResetHaulers"] = [PrioritizableHaulersProperty],
+      ["ThrottlingValve.Open"] = [ThrottlingValveOutflowLimitProperty],
+      ["ThrottlingValve.Close"] = [ThrottlingValveOutflowLimitProperty],
+      ["ThrottlingValve.SetFlow"] = [ThrottlingValveOutflowLimitProperty],
       ["Workplace.RemoveWorkers"] = [WorkplaceWorkersProperty],
       ["Workplace.SetWorkers"] = [WorkplaceWorkersProperty],
       ["Workplace.SetPriority"] = [WorkplacePriorityProperty],
@@ -106,6 +111,10 @@ sealed class GameAutomationConflictDetector {
     }
     if (behavior.GetComponent<Floodgate>()) {
       properties.Add(FloodgateAutomationHeightProperty);
+    }
+    // Timberborn 1.0 keeps the pre-rename component type for the Throttling Valve.
+    if (behavior.GetComponent<Valve>()) {
+      properties.Add(ThrottlingValveAutomationOutflowLimitProperty);
     }
     return properties;
   }
