@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 using UnityEngine;
 
 namespace Timberborn.Common;
@@ -11,6 +12,12 @@ public static class CollectionExtensions {
 
   public static bool IsEmpty<T>(this ImmutableArray<T> collection) {
     return collection.IsDefaultOrEmpty;
+  }
+}
+
+public static class StringBuilderExtensions {
+  public static string ToStringWithoutNewLineEnd(this StringBuilder builder) {
+    return builder.ToString().TrimEnd('\r', '\n');
   }
 }
 

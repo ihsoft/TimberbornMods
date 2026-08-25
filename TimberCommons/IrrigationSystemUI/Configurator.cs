@@ -4,8 +4,10 @@
 
 using System;
 using Bindito.Core;
+using IgorZ.TimberCommons.IrrigationSystem;
 using IgorZ.TimberDev.Utils;
 using Timberborn.EntityPanelSystem;
+using Timberborn.TemplateInstantiation;
 
 namespace IgorZ.TimberCommons.IrrigationSystemUI;
 
@@ -15,15 +17,28 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(GoodConsumingBuildingFragmentPatch),
+      typeof(GoodConsumingIrrigationTowerOutputPatch),
+      typeof(ManufactoryIrrigationTowerOutputPatch),
       typeof(ManufactoryRecipeSliderToggleFactoryPatch),
   ];
 
   /// <inheritdoc/>
   public void Configure(IContainerDefinition containerDefinition) {
+    containerDefinition.Bind<IrrigationTowerOutputFactory>().AsSingleton();
+    containerDefinition.Bind<IrrigationTowerOutputInitializer>().AsSingleton();
+    containerDefinition.Bind<IrrigationTowerSpecDescriber>().AsTransient();
     containerDefinition.Bind<IrrigationTowerFragment>().AsSingleton();
     containerDefinition.Bind<GrowthRateModifierFragment>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+  }
+
+  static TemplateModule ProvideTemplateModule() {
+    var builder = new TemplateModule.Builder();
+    builder.AddDecorator<GoodConsumingIrrigationTowerSpec, IrrigationTowerSpecDescriber>();
+    builder.AddDecorator<ManufactoryIrrigationTowerSpec, IrrigationTowerSpecDescriber>();
+    return builder.Build();
   }
 
   /// <summary>UI for the irrigation related components.</summary>

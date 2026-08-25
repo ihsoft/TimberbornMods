@@ -28,5 +28,14 @@
       <Compile Include="..\TimberCommons\IrrigationSystem\GoodConsumingIrrigationTowerSpec.cs">
         <Link>TimberCommons\IrrigationSystem\GoodConsumingIrrigationTowerSpec.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\BlockContaminationRangeEffectSpec.cs">
+        <Link>TimberCommons\IrrigationSystem\BlockContaminationRangeEffectSpec.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffectSpec.cs">
+        <Link>TimberCommons\IrrigationSystem\ModifyGrowableGrowthRangeEffectSpec.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs">
+        <Link>TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

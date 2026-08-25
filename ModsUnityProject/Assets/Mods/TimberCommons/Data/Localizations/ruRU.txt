@@ -3,6 +3,16 @@ IgorZ.TimberCommons.WaterTower.Utilization,"Используемый потен�
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Площадь покрытия: {0}",
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Дистанция орошения: {0}",
 IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Нет доступных клеток для орошения",
+IgorZ.TimberCommons.IrrigationTower.Efficient,"<YellowHighlight>Эффективно: </YellowHighlight>Не тратит воду впустую.","Building description bullet. Explains that irrigation towers consume water only for tiles they can irrigate."
+IgorZ.TimberCommons.IrrigationTower.MaxRange,"Макс. дистанция: {0}","Building description bullet. Shows irrigation tower maximum range."
+IgorZ.TimberCommons.IrrigationTower.GrowthBoost,"Ускорение роста: <GreenHighlight>+{0:0.#}%</GreenHighlight>","Full standalone building description bullet for a positive growth effect."
+IgorZ.TimberCommons.IrrigationTower.GrowthSlowdown,"Замедление роста: <RedHighlight>-{0:0.#}%</RedHighlight>","Full standalone building description bullet for a negative growth effect."
+IgorZ.TimberCommons.IrrigationTower.ContaminationBlock,"Блокирует загрязнение","Building description phrase. Shows contamination blocking effect."
+IgorZ.TimberCommons.IrrigationTower.OutputRangeAmount,"{0}","Compact virtual recipe output. {0} is the maximum irrigation range in tiles."
+IgorZ.TimberCommons.IrrigationTower.OutputRangeTooltip,"Максимальная дистанция орошения","Tooltip for the virtual recipe output that represents maximum irrigation range."
+IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierAmount,"{0:+0.#;-0.#;0}%","Compact virtual recipe output. {0} is the growth rate modifier percentage."
+IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierTooltip,"Модификатор скорости роста","Tooltip for the virtual recipe output that represents a growth rate modifier."
+IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,"Блокирует загрязнение","Tooltip for the virtual recipe output that represents contamination blocking."
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Ускорение роста: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%",
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Замедление роста: <RedHighlight>🡇</RedHighlight>{0:0.#}%",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Остановить при глубине на водосбросе: {0}",

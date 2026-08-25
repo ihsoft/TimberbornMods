@@ -3,6 +3,16 @@ IgorZ.TimberCommons.WaterTower.Utilization,"Potentiel utilisé : {0:0.#}%",
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Zone couverte : {0}",
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Portée effective : {0}",
 IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Pas de tuiles atteignables pour irriguer",
+IgorZ.TimberCommons.IrrigationTower.Efficient,"<YellowHighlight>Efficace : </YellowHighlight>Ne gaspille pas d'eau.","Building description bullet. Explains that irrigation towers consume water only for tiles they can irrigate."
+IgorZ.TimberCommons.IrrigationTower.MaxRange,"Portée max. : {0}","Building description bullet. Shows irrigation tower maximum range."
+IgorZ.TimberCommons.IrrigationTower.GrowthBoost,"Stimulation de croissance : <GreenHighlight>+{0:0.#}%</GreenHighlight>","Full standalone building description bullet for a positive growth effect."
+IgorZ.TimberCommons.IrrigationTower.GrowthSlowdown,"Ralentissement de croissance : <RedHighlight>-{0:0.#}%</RedHighlight>","Full standalone building description bullet for a negative growth effect."
+IgorZ.TimberCommons.IrrigationTower.ContaminationBlock,"Bloque la contamination","Building description phrase. Shows contamination blocking effect."
+IgorZ.TimberCommons.IrrigationTower.OutputRangeAmount,"{0}","Compact virtual recipe output. {0} is the maximum irrigation range in tiles."
+IgorZ.TimberCommons.IrrigationTower.OutputRangeTooltip,"Portée d'irrigation maximale","Tooltip for the virtual recipe output that represents maximum irrigation range."
+IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierAmount,"{0:+0.#;-0.#;0}%","Compact virtual recipe output. {0} is the growth rate modifier percentage."
+IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierTooltip,"Modificateur de vitesse de croissance","Tooltip for the virtual recipe output that represents a growth rate modifier."
+IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,"Bloque la contamination","Tooltip for the virtual recipe output that represents contamination blocking."
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Stimulation de croissance : <GreenHighlight>🡅</GreenHighlight>{0:0.#}%","It indicates growth boost, it's a good effect."
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Ralentissement de croissance : <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Près du niveau de profondeur du déversoir : {0}",

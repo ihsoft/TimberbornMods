@@ -28,7 +28,7 @@ namespace Timberborn.Localization {
 namespace TimberCommons.Tests {
   sealed class FakeLoc : Timberborn.Localization.ILoc {
     public string T(string key, params object[] args) {
-      return key;
+      return args.Length == 0 ? key : $"{key}:{string.Join(",", args)}";
     }
   }
 }

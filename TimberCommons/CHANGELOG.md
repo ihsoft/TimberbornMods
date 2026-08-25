@@ -1,4 +1,5 @@
 # v1.15.3 (Timberborn v1.0) (TBD)
+* [Feature] Irrigation tower descriptions and recipe outputs now show their range and special effects.
 * [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
 * [Fix] Irrigation tower recipe toggles did not show the currently selected mode.
 * [Fix] Good-consuming irrigation towers could keep a stale consumption rate after their coverage changed.

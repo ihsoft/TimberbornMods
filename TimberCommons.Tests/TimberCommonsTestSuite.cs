@@ -62,6 +62,10 @@ static class TimberCommonsTestSuite {
           IrrigationTowerTests.TerrainObstaclesCutOffDisconnectedTiles),
       ("IrrigationTower soil barriers cut off disconnected tiles",
           IrrigationTowerTests.SoilBarriersCutOffDisconnectedTiles),
+      ("IrrigationTowerSpecDescriber hides unfinished tower details",
+          IrrigationTowerSpecDescriberTests.ShowsOnlyEfficiencyForUnfinishedTower),
+      ("IrrigationTowerSpecDescriber shows range and distinct effects",
+          IrrigationTowerSpecDescriberTests.ShowsRangeAndDistinctEffectsForFinishedTower),
   ];
 
   public static int Run() {
