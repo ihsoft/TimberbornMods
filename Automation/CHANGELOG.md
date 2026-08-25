@@ -1,4 +1,4 @@
-# v4.0.11 (Timberborn v1.0) (TBD)
+# v4.0.11 (Timberborn v1.0) (August 24th, 2026)
 * [Feature] Add Throttling Valve actions through Timberborn 1.0's internal `Valve` component.
 
 # v4.0.10 (Timberborn v1.0) (August 23rd, 2026)
