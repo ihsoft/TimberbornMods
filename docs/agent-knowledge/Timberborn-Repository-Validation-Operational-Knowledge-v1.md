@@ -38,14 +38,16 @@ testing is unnecessary or that an unrelated package's tests should be substitute
 | FillTheGap | `FillTheGap/FillTheGap.csproj` | `dotnet run --project FillTheGap.Tests/FillTheGap.Tests.csproj -c Release` | `FillTheGap/Mod` | None |
 | MapBrowser | `MapBrowser/MapBrowser.csproj` | No focused tests | `ModsUnityProject/Assets/Mods/MapBrowser` | `MapBrowser/AGENTS.md` |
 | SmartHaulers | `SmartHaulers/SmartHaulers.csproj` | No focused tests | Split between `SmartHaulers/Mod` and `ModsUnityProject/Assets/Mods/SmartHaulers` | `SmartHaulers/AGENTS.md` |
-| SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | None |
+| SmartPower | `SmartPower/SmartPower.csproj` | `dotnet run --project SmartPower.Tests/SmartPower.Tests.csproj` | `ModsUnityProject/Assets/Mods/SmartPower` | `SmartPower/AGENTS.md` |
 | TimberCommons | `TimberCommons/TimberCommons.csproj` | `dotnet run --project TimberCommons.Tests/TimberCommons.Tests.csproj` | `ModsUnityProject/Assets/Mods/TimberCommons` | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
 | TimberDev source | No standalone production project in the current checkout | `dotnet run --project TimberDev.Tests/TimberDev.Tests.csproj` | No standalone mod package | `docs/timberborn-repository-notes.md` |
 | XRay | `XRay/XRay.csproj` | `dotnet run --project XRay.Tests/XRay.Tests.csproj` | `ModsUnityProject/Assets/Mods/XRay` | `XRay/AGENTS.md` |
 
-XRay's committed Update 1.0 backport uses the same relative project, test, and Unity-owner paths in the registered
-`update-1.0` worktree. Select that worktree's Timberborn 1.0 assemblies, Unity project, and `version-1.0` package output;
-do not use the current worktree's Update 1.1 build or export as evidence for that line.
+For every mod registered under `update-1.0` in `tools/release-lines.json`, use the matrix's relative project, test, and
+Unity-owner paths in that registered worktree unless closer local instructions define a different owner. Select the
+worktree's Timberborn 1.0 assemblies, Unity project, and `version-1.0` package output; do not use the current worktree's
+Update 1.1 build or export as evidence for the older line. Follow each mod's local `AGENTS.md` for its established
+baseline and compatibility-specific package contract.
 
 `CustomResources`, `TestSupport`, `UnityDevLite`, and projects under `tools/` are not active mod packages
 in this matrix. Inspect their specific project purpose before applying a mod build, export, test, or release workflow.
