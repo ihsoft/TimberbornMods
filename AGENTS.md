@@ -126,6 +126,10 @@ through complete signoff and any partial-success recovery. A persistent Publishe
 inbox for rule and role notifications, but should not accumulate release execution history. Task titles and thread IDs
 are not durable role contracts; use the role assignment and current repository context.
 
+A Publisher final signoff is incomplete unless it explicitly records one of `Mentor handoff: sent` or
+`Mentor handoff: not needed` after reviewing the task's errors, recoveries, workarounds, and user corrections for
+durable lessons. Perform this check before sending the final response, not only when the user asks afterward.
+
 ### Wiki editor
 
 The Wiki editor owns the separate GitHub Wiki checkout. The expected local layout is a sibling repository named

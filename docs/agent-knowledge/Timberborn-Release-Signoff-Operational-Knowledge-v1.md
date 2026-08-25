@@ -110,6 +110,11 @@ released version, release commit, relevant changelog bullets, and the Wiki areas
 
 Do not edit the Wiki directly as part of the publisher role unless the user explicitly expands the task.
 
+Sending the audit handoff is role coordination, not a Wiki mutation, and does not require a Publisher approval gate.
+Do not ask whether the Publisher may update the Wiki or describe proposed Wiki edits as Publisher-owned work. If the
+Wiki editor recommends substantive edits, that role owns the proposal, user review or authorization, commit, push, and
+resulting evidence in its own task.
+
 Do not send a Wiki handoff for releases with no plausible Wiki impact. If uncertain, send a concise "may need review"
 note instead of silently skipping.
 
@@ -118,12 +123,26 @@ note instead of silently skipping.
 At the end of a non-trivial publishing, release-preparation, platform-description, platform-tag, or post-release
 investigation task, perform the root `AGENTS.md` role learning handoff check before signing off.
 
+Before drafting the final response, inventory every error, recovery, partial or ambiguous operation, workaround,
+unexpected platform or tooling behavior, and user correction encountered during the task. Decide whether each item is
+already clearly covered or is a durable candidate for Mentor. Do not let a successful final platform state erase the
+learning evidence from the path taken to reach it.
+
 Do not wait for the user to ask for a mentor handoff. If the publisher task exposed a durable release, platform,
 artifact, credential, staging, verification, or tooling lesson that is not already clearly covered by the rules, send a
 concise delegated note to the mentor with the observation, evidence, suggested scope, and risk.
 
 Do not send a mentor handoff only to say that an incident is understood or that an existing rule already covers it. In
 that case, mention in the publisher's final report that no new mentor-rule update seems needed.
+
+The final Publisher response is incomplete without one explicit labelled outcome:
+
+- `Mentor handoff: sent` with a concise description of what was delegated; or
+- `Mentor handoff: not needed` with a concise reason that the reviewed incidents are already covered or produced no
+  durable lesson.
+
+Do not emit this line from memory or as boilerplate. Complete the incident inventory first, and do not defer the check
+until after signoff or until the user asks whether Mentor was notified.
 
 ## Closing GitHub Issues After Release
 
