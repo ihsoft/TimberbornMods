@@ -71,6 +71,13 @@ Before build or release work, verify the tools required by the task:
 
 Secrets and account-specific configs must stay local and ignored. Do not copy, rename, guess, or commit token files.
 
+GitHub Desktop sign-in and GitHub CLI authentication are separate account sessions. Do not infer `gh` readiness from
+the desktop client. Verify both `gh auth status` and a read-only API call such as `gh api user --jq .login` in the same
+credential-access boundary that will run the release. In a sandboxed agent process, `gh` may see account metadata but
+not the Windows Credential Manager secret and may therefore report a false invalid-token or HTTP 401 result. Before
+logging out, reauthorizing, or asking the user to repeat device authorization, rerun the read-only checks with approved
+unsandboxed credential access. Mutate the stored CLI session only if that check also fails.
+
 Before the first interactive or batch Unity validation on a clean machine, verify Hub sign-in and Editor licensing.
 If licensing is not ready, explain that the user must complete the interactive Unity Hub sign-in/license step before
 batch compilation or export; do not diagnose the resulting startup failure as a project-code problem.
@@ -272,7 +279,8 @@ For a clean checkout, verify only the capabilities needed by the current task:
   Operational Knowledge gates pass before batch compilation or export, and the Unity project is not already open before
   batch export,
 - SteamCMD path/user config exists if publishing to Steam,
-- `gh auth status` succeeds if GitHub releases or issue work are needed,
+- `gh auth status` and `gh api user --jq .login` succeed in the release process's actual credential-access boundary if
+  GitHub releases or issue work are needed,
 - Mod.IO configs/tokens exist for the target mod or a shared explicit owner token path is available,
 - `_MODS!/<ModName>` exists or can be generated for `LocalModFolder` releases,
 - generated references exist only when the current research task needs them.
