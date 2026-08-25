@@ -96,9 +96,11 @@ try {
     [void](New-Item -ItemType Directory -Path $fixtureTools)
     @(
         "find-unpublished-releases.ps1",
+        "get-release-readiness.ps1",
         "release-lines.json",
         "release-lines.psm1",
         "release-native-command.psm1",
+        "release-package-provenance.psm1",
         "release-readiness.psm1",
         "release-unity.psm1",
         "repository-paths.psm1"
@@ -132,6 +134,22 @@ try {
   "Steam": { "PublishedFileId": "12345" }
 }
 '@
+    Write-TestFile (Join-Path $fixtureRoot "PathlessMod/release.json") @'
+{
+  "ManifestPath": "",
+  "ChangesPath": "",
+  "ReleaseVersion": "1.0.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "",
+    "OutputPath": ""
+  },
+  "ManifestVersions": {
+    "version-1.1": "1.0.0"
+  },
+  "Steam": { "PublishedFileId": "13579" }
+}
+'@
     Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json") `
         '{"Name":"Ready Mod","Version":"3.0.0"}'
@@ -155,6 +173,60 @@ try {
     Write-TestFile (Join-Path $lineRoot "XRay/CHANGELOG.md") "# v1.2.0 (TBD)`n"
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "XRay/CHANGELOG.md"))
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add backport candidate"))
+
+    Write-TestFile (Join-Path $lineRoot "SmartPower/CHANGELOG.md") @'
+# v1.16.4 (Timberborn v1.0) (August 24th, 2026)
+
+* [Fix] Prepare an older-line fixture.
+'@
+    Write-TestFile (Join-Path $lineRoot "SmartPower/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/SmartPower/manifest.json",
+  "ChangesPath": "SmartPower/CHANGELOG.md",
+  "ReleaseVersion": "1.16.4",
+  "Package": {
+    "Mode": "ExistingZip",
+    "Path": "package/SmartPower_v1.16.4.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.16.4",
+    "version-1.1": "1.17.0"
+  }
+}
+'@
+    Write-TestFile `
+        (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/SmartPower/manifest.json") `
+        '{"Name":"Smart Power","Version":"1.16.4"}'
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "."))
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add unmaterialized SmartPower fixture"))
+
+    $readinessArtifact = Join-Path `
+        $fixtureRoot ".tools/release-readiness/SmartPower-1.16.4-update-1.0.json"
+    Push-Location $fixtureRoot
+    try {
+        $endToEndOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File tools/get-release-readiness.ps1 -ModName SmartPower -ReleaseLine update-1.0 2>&1)
+        $endToEndExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+    Assert-Equal 2 $endToEndExitCode "Unmaterialized registered readiness exit code"
+    Assert-True (Test-Path -LiteralPath $readinessArtifact -PathType Leaf) `
+        "Blocked registered readiness must still emit a schema-1 artifact."
+    $endToEndReadiness = Get-Content -Raw -LiteralPath $readinessArtifact | ConvertFrom-Json
+    Assert-Equal 1 $endToEndReadiness.SchemaVersion "Unmaterialized registered readiness schema"
+    Assert-Equal "TimberbornReleaseReadiness" $endToEndReadiness.ArtifactType `
+        "Unmaterialized registered readiness artifact type"
+    Assert-Equal "BlockedMissingExistingArtifact" $endToEndReadiness.Package.PreparationState `
+        "Unmaterialized registered package preparation state"
+    Assert-True `
+        ("PackageArtifactMissing" -in @($endToEndReadiness.Blockers | ForEach-Object Code)) `
+        "Unmaterialized ExistingZip must be a structured readiness blocker."
+    Assert-True `
+        (-not (($endToEndOutput | Out-String) -match "Cannot bind argument to parameter 'Path'")) `
+        "Optional empty paths must not escape as PowerShell parameter-binding failures."
+    Write-Host "PASS: exact registered readiness command emits structured unmaterialized-package artifact"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
@@ -258,6 +330,19 @@ try {
     Assert-True (@($currentReadiness.Warnings | Where-Object { $_ -match "Desktop Steam" }).Count -eq 1) `
         "Readiness must surface the concurrent desktop Steam/SteamCMD session boundary."
 
+    $pathlessReadiness = Get-ReleaseReadinessReport `
+        -ToolsRoot $fixtureRoot `
+        -RepositoryRoot $fixtureRoot `
+        -ModName "PathlessMod" `
+        -ProbeOverride $readyProbe
+    $pathlessBlockers = @($pathlessReadiness.Blockers | ForEach-Object Code)
+    @("ChangelogPathMissing", "ManifestPathMissing", "PackageSourcePathMissing", "PackageOutputPathMissing") |
+        ForEach-Object {
+            Assert-True ($_ -in $pathlessBlockers) "Missing structured optional-path blocker: $_"
+        }
+    Assert-Equal "BlockedMissingSourcePath" $pathlessReadiness.Package.PreparationState `
+        "Empty LocalModFolder source preparation state"
+
     $backportReadiness = Get-ReleaseReadinessReport `
         -ToolsRoot $fixtureRoot `
         -RepositoryRoot $fixtureRoot `
@@ -278,7 +363,8 @@ try {
         $jsonReadiness.Candidate.PublicPackageVersion,
         $jsonReadiness.Candidate.ReleaseRoot,
         $jsonReadiness.Git.ReleaseCommit,
-        $jsonReadiness.Git.IntendedTag
+        $jsonReadiness.Git.IntendedTag,
+        $jsonReadiness.Package.PreparationState
     ) | ForEach-Object {
         Assert-True $humanReadiness.Contains([string]$_) "Readiness human/JSON parity omitted: $_"
     }

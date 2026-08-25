@@ -84,29 +84,75 @@ function Get-ReadinessPublicPackageLane([object] $ReleaseConfig, [string] $Fallb
     }
 }
 
-function Get-ReadinessPackageLanes([string] $SourcePath, [object] $ReleaseConfig) {
+function Get-ReadinessPackageLanes(
+    [string] $SourcePath,
+    [string] $ArtifactPath,
+    [string] $PackageMode,
+    [object] $ReleaseConfig
+) {
     $configured = Get-ReadinessProperty $ReleaseConfig "ManifestVersions"
     $lanes = New-Object System.Collections.Generic.List[object]
     if ($null -eq $configured) {
         return [object[]]$lanes.ToArray()
     }
 
+    $sourcePathConfigured = -not [string]::IsNullOrWhiteSpace($SourcePath)
+    $artifactFingerprints = [object[]]@()
+    $artifactInspectionError = ""
+    if ($PackageMode -eq "ExistingZip" -and
+            -not [string]::IsNullOrWhiteSpace($ArtifactPath) -and
+            (Test-Path -LiteralPath $ArtifactPath -PathType Leaf)) {
+        try {
+            $artifactFingerprints = [object[]]@(Get-PackageLaneFingerprints $ArtifactPath)
+        }
+        catch {
+            $artifactInspectionError = $_.Exception.Message
+        }
+    }
     foreach ($property in $configured.PSObject.Properties | Sort-Object Name) {
-        $manifestPath = Join-Path $SourcePath "$($property.Name)/manifest.json"
+        $manifestPath = if ($sourcePathConfigured) {
+            Join-Path $SourcePath "$($property.Name)/manifest.json"
+        }
+        else {
+            ""
+        }
         $actualVersion = ""
-        if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
+        $sourceManifestVersion = ""
+        $manifestEvidence = "Unavailable"
+        $artifactFingerprint = @($artifactFingerprints | Where-Object {
+            [string]$_.GameVersion -eq [string]$property.Name
+        } | Select-Object -First 1)
+        $sourceManifestExists = $sourcePathConfigured -and
+            (Test-Path -LiteralPath $manifestPath -PathType Leaf)
+        $manifestExists = $sourceManifestExists
+        if ($sourceManifestExists) {
+            $manifestEvidence = "SourceFolder"
             try {
                 $actualVersion = [string]((Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json).Version)
             }
             catch {
                 $actualVersion = "(invalid JSON)"
             }
+            $sourceManifestVersion = $actualVersion
+        }
+        elseif ($artifactFingerprint.Count -eq 1) {
+            $manifestExists = $true
+            $manifestEvidence = "PackageArtifact"
+            $actualVersion = [string]$artifactFingerprint[0].ManifestVersion
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($artifactInspectionError)) {
+            $manifestEvidence = "PackageArtifactInspectionFailed"
         }
         $lanes.Add([ordered]@{
             GameVersion = [string]$property.Name
             ExpectedManifestVersion = [string]$property.Value
-            SourceManifestExists = Test-Path -LiteralPath $manifestPath -PathType Leaf
-            SourceManifestVersion = $actualVersion
+            SourceManifestPath = $manifestPath
+            SourceManifestExists = $sourceManifestExists
+            SourceManifestVersion = $sourceManifestVersion
+            ManifestExists = $manifestExists
+            ManifestVersion = $actualVersion
+            ManifestEvidence = $manifestEvidence
+            InspectionError = $artifactInspectionError
             MatchesExpected = $actualVersion -eq [string]$property.Value
         })
     }
@@ -130,14 +176,18 @@ function Get-ReadinessProbeResults(
     $unityError = ""
     try {
         $unityVersion = Get-UnityProjectVersion $projectRoot
-        $configuredUnityPath = if ([string]::IsNullOrWhiteSpace($UnityPath) -or
-                [System.IO.Path]::IsPathRooted($UnityPath)) {
-            $UnityPath
+        $canonicalEditor = if ([string]::IsNullOrWhiteSpace($UnityPath)) {
+            Resolve-CanonicalUnityPath -EditorVersion $unityVersion -AllowMissing
         }
         else {
-            Join-Path $ReleaseRoot $UnityPath
+            $configuredUnityPath = if ([System.IO.Path]::IsPathRooted($UnityPath)) {
+                $UnityPath
+            }
+            else {
+                Join-Path $ReleaseRoot $UnityPath
+            }
+            Resolve-CanonicalUnityPath -ConfiguredPath $configuredUnityPath -EditorVersion $unityVersion -AllowMissing
         }
-        $canonicalEditor = Resolve-CanonicalUnityPath $configuredUnityPath $unityVersion -AllowMissing
     }
     catch {
         $unityError = $_.Exception.Message
@@ -256,8 +306,27 @@ function Get-ReleaseReadinessReport {
     $sourceModVersion = [string](Get-ReadinessProperty $releaseConfig "ReleaseVersion")
     $configReadyForPublish = Get-ReadinessProperty $releaseConfig "ReadyForPublish"
     $publicLane = Get-ReadinessPublicPackageLane $releaseConfig $gameVersion
-    $changesPath = Join-Path $releaseRoot ([string](Get-ReadinessProperty $releaseConfig "ChangesPath"))
-    $changelog = Get-ReadinessChangelogIdentity $changesPath $sourceModVersion
+    $changesPathValue = [string](Get-ReadinessProperty $releaseConfig "ChangesPath")
+    $changesPath = if ([string]::IsNullOrWhiteSpace($changesPathValue)) {
+        ""
+    }
+    else {
+        Join-Path $releaseRoot $changesPathValue
+    }
+    $changelog = if ([string]::IsNullOrWhiteSpace($changesPath)) {
+        [ordered]@{
+            Path = ""
+            Heading = ""
+            Version = ""
+            Date = ""
+            IsPending = $false
+            Exists = $false
+            MatchesSourceModVersion = $false
+        }
+    }
+    else {
+        Get-ReadinessChangelogIdentity $changesPath $sourceModVersion
+    }
 
     if ([string]::IsNullOrWhiteSpace($sourceModVersion)) {
         $blockers.Add([ordered]@{ Code = "ReleaseVersionMissing"; Message = "ReleaseVersion is empty." })
@@ -268,7 +337,10 @@ function Get-ReleaseReadinessReport {
             Message = "release.json explicitly marks the candidate as not ready for publish."
         })
     }
-    if (-not $changelog.Exists) {
+    if ([string]::IsNullOrWhiteSpace($changesPathValue)) {
+        $blockers.Add([ordered]@{ Code = "ChangelogPathMissing"; Message = "ChangesPath is empty." })
+    }
+    elseif (-not $changelog.Exists) {
         $blockers.Add([ordered]@{ Code = "ChangelogMissing"; Message = "Changelog is missing: $changesPath" })
     }
     elseif (-not $changelog.MatchesSourceModVersion) {
@@ -284,11 +356,24 @@ function Get-ReleaseReadinessReport {
         })
     }
 
-    $manifestPath = Join-Path $releaseRoot ([string](Get-ReadinessProperty $releaseConfig "ManifestPath"))
-    if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+    $manifestPathValue = [string](Get-ReadinessProperty $releaseConfig "ManifestPath")
+    $manifestPath = if ([string]::IsNullOrWhiteSpace($manifestPathValue)) {
+        ""
+    }
+    else {
+        Join-Path $releaseRoot $manifestPathValue
+    }
+    if ([string]::IsNullOrWhiteSpace($manifestPathValue)) {
+        $blockers.Add([ordered]@{ Code = "ManifestPathMissing"; Message = "ManifestPath is empty." })
+    }
+    elseif (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
         $blockers.Add([ordered]@{ Code = "ManifestMissing"; Message = "Release manifest is missing: $manifestPath" })
     }
 
+    $packageMode = [string](Get-ReadinessProperty $releaseConfig.Package "Mode")
+    if ([string]::IsNullOrWhiteSpace($packageMode)) {
+        $packageMode = "ExistingZip"
+    }
     $packageSourceValue = [string](Get-ReadinessProperty $releaseConfig.Package "SourcePath")
     $packageSourcePath = if ([string]::IsNullOrWhiteSpace($packageSourceValue)) {
         ""
@@ -296,9 +381,67 @@ function Get-ReleaseReadinessReport {
     else {
         [System.IO.Path]::GetFullPath((Join-Path $releaseRoot $packageSourceValue))
     }
-    $packageLanes = Get-ReadinessPackageLanes $packageSourcePath $releaseConfig
-    if (-not [string]::IsNullOrWhiteSpace($packageSourcePath) -and
-            -not (Test-Path -LiteralPath $packageSourcePath -PathType Container)) {
+    $packageSourceExists = -not [string]::IsNullOrWhiteSpace($packageSourcePath) -and
+        (Test-Path -LiteralPath $packageSourcePath -PathType Container)
+    $packageArtifactValue = if ($packageMode -eq "LocalModFolder") {
+        [string](Get-ReadinessProperty $releaseConfig.Package "OutputPath")
+    }
+    else {
+        [string](Get-ReadinessProperty $releaseConfig.Package "Path")
+    }
+    $packageArtifactPath = if ([string]::IsNullOrWhiteSpace($packageArtifactValue)) {
+        ""
+    }
+    else {
+        [System.IO.Path]::GetFullPath((Join-Path $releaseRoot $packageArtifactValue))
+    }
+    $packageArtifactExists = -not [string]::IsNullOrWhiteSpace($packageArtifactPath) -and
+        (Test-Path -LiteralPath $packageArtifactPath -PathType Leaf)
+    $packageLanes = Get-ReadinessPackageLanes `
+        $packageSourcePath $packageArtifactPath $packageMode $releaseConfig
+    $packagePreparationState = "Ready"
+    if ($packageMode -eq "LocalModFolder") {
+        if ([string]::IsNullOrWhiteSpace($packageSourceValue)) {
+            $packagePreparationState = "BlockedMissingSourcePath"
+            $blockers.Add([ordered]@{
+                Code = "PackageSourcePathMissing"
+                Message = "LocalModFolder package mode requires Package.SourcePath."
+            })
+        }
+        elseif (-not $packageSourceExists) {
+            $packagePreparationState = "AwaitingGate1Materialization"
+        }
+        if ([string]::IsNullOrWhiteSpace($packageArtifactValue)) {
+            $blockers.Add([ordered]@{
+                Code = "PackageOutputPathMissing"
+                Message = "LocalModFolder package mode requires Package.OutputPath."
+            })
+        }
+    }
+    elseif ($packageMode -eq "ExistingZip") {
+        if ([string]::IsNullOrWhiteSpace($packageArtifactValue)) {
+            $packagePreparationState = "BlockedMissingArtifactPath"
+            $blockers.Add([ordered]@{
+                Code = "PackageArtifactPathMissing"
+                Message = "ExistingZip package mode requires Package.Path."
+            })
+        }
+        elseif (-not $packageArtifactExists) {
+            $packagePreparationState = "BlockedMissingExistingArtifact"
+            $blockers.Add([ordered]@{
+                Code = "PackageArtifactMissing"
+                Message = "ExistingZip package artifact is missing: $packageArtifactPath"
+            })
+        }
+    }
+    else {
+        $packagePreparationState = "BlockedUnsupportedMode"
+        $blockers.Add([ordered]@{
+            Code = "PackageModeUnsupported"
+            Message = "Unsupported package mode: $packageMode"
+        })
+    }
+    if ($packagePreparationState -eq "AwaitingGate1Materialization") {
         $warnings.Add("Package source is not materialized yet; Gate 1 must export/build it at the configured path.")
     }
     foreach ($lane in @($packageLanes | Where-Object { -not $_.MatchesExpected })) {
@@ -349,7 +492,10 @@ function Get-ReleaseReadinessReport {
         })
     }
 
-    $identityPaths = @("$ModName/release.json", [string](Get-ReadinessProperty $releaseConfig "ChangesPath"))
+    $identityPaths = @("$ModName/release.json")
+    if (-not [string]::IsNullOrWhiteSpace($changesPathValue)) {
+        $identityPaths += $changesPathValue
+    }
     $releaseCommitResult = Invoke-ReadinessGit $releaseRoot (@("log", "-1", "--format=%H", "--") + $identityPaths)
     $releaseCommit = if ($releaseCommitResult.Output.Count -gt 0) { [string]$releaseCommitResult.Output[0] } else { "" }
     if ([string]::IsNullOrWhiteSpace($releaseCommit)) {
@@ -444,10 +590,15 @@ function Get-ReleaseReadinessReport {
             ReleaseCriticalDirt = [string[]]$releaseCriticalDirt
         }
         Package = [ordered]@{
-            Mode = [string](Get-ReadinessProperty $releaseConfig.Package "Mode")
+            Mode = $packageMode
             SourcePath = $packageSourcePath
-            SourceExists = -not [string]::IsNullOrWhiteSpace($packageSourcePath) -and
-                (Test-Path -LiteralPath $packageSourcePath -PathType Container)
+            SourcePathConfigured = -not [string]::IsNullOrWhiteSpace($packageSourceValue)
+            SourceExists = $packageSourceExists
+            ArtifactPath = $packageArtifactPath
+            ArtifactPathConfigured = -not [string]::IsNullOrWhiteSpace($packageArtifactValue)
+            ArtifactExists = $packageArtifactExists
+            PreparationState = $packagePreparationState
+            Gate1MaterializesSource = $packageMode -eq "LocalModFolder"
             Lanes = [object[]]$packageLanes
         }
         Platforms = [ordered]@{
@@ -504,6 +655,9 @@ function Format-ReleaseReadinessReport([object] $Report) {
         "  Line: $($Report.Candidate.GameVersion); policy=$($Report.Candidate.VersionPolicy); " +
         "release-line=$($Report.Candidate.ReleaseLine)")
     $lines.Add("  Changelog: $($Report.Changelog.Heading)")
+    $lines.Add(
+        "  Package: mode=$($Report.Package.Mode); preparation=$($Report.Package.PreparationState); " +
+        "source materialized=$($Report.Package.SourceExists); artifact materialized=$($Report.Package.ArtifactExists)")
     $lines.Add("  Commit: $($Report.Git.ReleaseCommit); baseline=$($Report.Git.BaselineTag); tag=$($Report.Git.IntendedTag)")
     $lines.Add("  Steam: $($Report.Platforms.Steam.PublishedFileId); visibility=unchanged")
     $lines.Add(
