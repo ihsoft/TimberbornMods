@@ -97,6 +97,7 @@ try {
     @(
         "find-unpublished-releases.ps1",
         "get-release-readiness.ps1",
+        "materialize-release-package.ps1",
         "release-lines.json",
         "release-lines.psm1",
         "release-native-command.psm1",
@@ -363,6 +364,16 @@ try {
         "Gate 1 plan must bind its exact readiness artifact"
     Assert-True ("-ReadinessReportPath" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
         "Gate 1 arguments must carry the matching readiness artifact."
+    Assert-Equal $fixtureRoot $endToEndReadiness.Package.OwnerRoot `
+        "Registered readiness public package owner root"
+    Assert-Equal (Join-Path $fixtureRoot "SmartPower/release.json") `
+        $endToEndReadiness.Package.OwnerConfigPath `
+        "Registered readiness public package owner config"
+    Assert-Equal (Join-Path $fixtureRoot "package/SmartPower_v1.18.0.zip") `
+        $endToEndReadiness.Package.ArtifactPath `
+        "Registered readiness public package artifact"
+    Assert-True ("-PackageOwnerRoot" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
+        "Gate 1 arguments must carry public package ownership."
     Assert-Equal $endToEndReadiness.Git.HeadAtDiscovery `
         $endToEndReadiness.Gate1Plan.ExpectedHeadForPreparation `
         "Metadata preparation must use worktree HEAD rather than the prior release identity commit"
@@ -405,6 +416,53 @@ try {
     Assert-True (-not (($alternateTokenOutput | Out-String).Contains("fixture-known-owner-token"))) `
         "Readiness output leaked alternate owner-token contents."
     Write-Host "PASS: registered readiness carries a known alternate Mod.IO owner token without secret leakage"
+
+    @(
+        (Join-Path $fixtureRoot "package/SmartPower/version-1.0/Scripts/SmartPower.dll"),
+        (Join-Path $fixtureRoot "package/SmartPower/version-1.0/Scripts/SmartPower.xml"),
+        (Join-Path $fixtureRoot "package/SmartPower/version-1.1/Scripts/SmartPower.dll"),
+        (Join-Path $fixtureRoot "package/SmartPower/version-1.1/Scripts/SmartPower.xml"),
+        (Join-Path $lineRoot "package/SmartPower/version-1.0/Scripts/SmartPower.dll"),
+        (Join-Path $lineRoot "package/SmartPower/version-1.0/Scripts/SmartPower.xml")
+    ) | ForEach-Object { Write-TestFile $_ "fixture-package-content" }
+    Write-TestFile (Join-Path $lineRoot "package/SmartPower_v1.17.0.zip") "stale-registered-artifact"
+    $staleRegisteredHash = (Get-FileHash `
+        -LiteralPath (Join-Path $lineRoot "package/SmartPower_v1.17.0.zip") `
+        -Algorithm SHA256).Hash
+    $ownerConfigHash = (Get-FileHash `
+        -LiteralPath (Join-Path $fixtureRoot "SmartPower/release.json") `
+        -Algorithm SHA256).Hash
+    & (Join-Path $fixtureTools "materialize-release-package.ps1") `
+        -ModName SmartPower `
+        -PackageOwnerRoot $fixtureRoot `
+        -SourceReleaseRoot $lineRoot `
+        -GameVersion version-1.0 `
+        -SourceModVersion 1.16.4 `
+        -Operation ImportLane `
+        -ExpectedOwnerConfigSha256 $ownerConfigHash
+    & (Join-Path $fixtureTools "materialize-release-package.ps1") `
+        -ModName SmartPower `
+        -PackageOwnerRoot $fixtureRoot `
+        -SourceReleaseRoot $lineRoot `
+        -GameVersion version-1.0 `
+        -SourceModVersion 1.16.4 `
+        -Operation Package `
+        -ExpectedOwnerConfigSha256 $ownerConfigHash
+    $combinedPackagePath = Join-Path $fixtureRoot "package/SmartPower_v1.18.0.zip"
+    Assert-True (Test-Path -LiteralPath $combinedPackagePath -PathType Leaf) `
+        "Combined package was not materialized at the public owner's artifact path."
+    $combinedLanes = @(Get-PackageLaneFingerprints $combinedPackagePath)
+    Assert-Equal "1.16.4" `
+        (@($combinedLanes | Where-Object GameVersion -eq "version-1.0")[0].ManifestVersion) `
+        "Combined package changed older lane"
+    Assert-Equal "1.18.0" `
+        (@($combinedLanes | Where-Object GameVersion -eq "version-1.1")[0].ManifestVersion) `
+        "Combined package unchanged public lane"
+    Assert-Equal $staleRegisteredHash `
+        (Get-FileHash -LiteralPath (Join-Path $lineRoot "package/SmartPower_v1.17.0.zip") `
+            -Algorithm SHA256).Hash `
+        "Stale registered-worktree artifact must not be selected or overwritten"
+    Write-Host "PASS: registered source lane materializes once into the current public package owner"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
@@ -918,13 +976,25 @@ $verifyText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "verify-rel
 $unityStepIndex = $verifyText.IndexOf('"Unity package source export"', [System.StringComparison]::Ordinal)
 $buildStepIndex = $verifyText.IndexOf('"C# package source build"', [System.StringComparison]::Ordinal)
 $steamStepIndex = $verifyText.IndexOf('"Steam release dry run"', [System.StringComparison]::Ordinal)
-Assert-True ($unityStepIndex -ge 0 -and $unityStepIndex -lt $buildStepIndex -and $buildStepIndex -lt $steamStepIndex) `
-    "Preflight must order shared Unity export, shared C# build, then platform dry runs."
-Assert-True $verifyText.Contains('Add-SwitchArgument $commonPublishArgs "-SkipBuild" ($SkipBuild -or $preparesLocalModSource)') `
+$assemblyStepIndex = $verifyText.IndexOf('"Combined package lane assembly"', [System.StringComparison]::Ordinal)
+$materializeStepIndex = $verifyText.IndexOf('"Combined package materialization"', [System.StringComparison]::Ordinal)
+$modIoStepIndex = $verifyText.IndexOf('"Mod.IO release dry run"', [System.StringComparison]::Ordinal)
+Assert-True ($unityStepIndex -ge 0 -and $unityStepIndex -lt $buildStepIndex -and
+        $buildStepIndex -lt $assemblyStepIndex -and $assemblyStepIndex -lt $materializeStepIndex -and
+        $materializeStepIndex -lt $steamStepIndex -and $steamStepIndex -lt $modIoStepIndex) `
+    "Preflight must materialize the final combined package before either platform dry run."
+Assert-True $verifyText.Contains('Add-SwitchArgument $commonPublishArgs "-SkipBuild" $true') `
     "Platform dry runs are not forced to skip the shared C# build."
 Assert-True $verifyText.Contains(
-    'Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" ($SkipUnityExport -or $preparesLocalModSource)') `
+    'Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $true') `
     "Platform dry runs are not forced to skip the shared Unity export."
+Assert-True $verifyText.Contains(
+    'Add-OptionalArgument $commonPublishArgs "-ExpectedPackageSha256" ([string]$packageSnapshot.Sha256)') `
+    "Platform dry runs are not bound to the once-materialized package hash."
+Assert-True $verifyText.Contains('$commonPublishArgs.Add($resolvedPackageOwnerRoot)') `
+    "Platform dry runs do not use the readiness-bound public package owner."
+Assert-True $verifyText.Contains('$commonPublishArgs.Add("-SourceReleaseRoot")') `
+    "Platform dry runs do not retain the registered source/changelog owner."
 Assert-True $verifyText.Contains("SchemaVersion = 5") `
     "Preflight report schema does not record the source/public version contract."
 Assert-True $verifyText.Contains("PublicPackageVersion = `$publicPackageVersion") `
@@ -959,8 +1029,12 @@ Assert-True $publishText.Contains("Get-ReleaseWikiCandidates") `
     "Release publication does not collect compact Wiki evidence candidates."
 Assert-True $publishText.Contains('$preflightModIoAccessTokenPath = [string]$report.PreflightOptions.ModIoAccessTokenPath') `
     "Release publication does not reuse the preflight-bound Mod.IO owner token."
+Assert-True $publishText.Contains('$commonPublishArgs.Add($packageOwnerRoot)') `
+    "Release publication does not consume the preflight-bound public package owner."
 
 $modIoText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-modio.ps1")
+Assert-True $modIoText.Contains('$changeNotes = Get-LatestChangeNotes $changesPath $sourceVersion') `
+    "Mod.IO publication does not retain source-line changelog ownership."
 $initialResponseIndex = $modIoText.IndexOf("Initial Mod.IO upload response", [System.StringComparison]::Ordinal)
 $finalReadbackIndex = $modIoText.LastIndexOf("Final Mod.IO readback:", [System.StringComparison]::Ordinal)
 Assert-True ($initialResponseIndex -ge 0 -and $initialResponseIndex -lt $finalReadbackIndex) `
@@ -971,6 +1045,8 @@ Assert-True $modIoText.Contains("Mod.IO backport upload did not create a distinc
     "Mod.IO publishing does not require a distinct file id for a backport package update."
 
 $steamText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-steam.ps1")
+Assert-True $steamText.Contains('$changeNotes = Get-LatestChangeNotes $changesPath $sourceVersion') `
+    "Steam publication does not retain source-line changelog ownership."
 Assert-True $steamText.Contains('& $SteamCmd +login $UserName +workshop_build_item $VdfPath +quit') `
     "Steam publication no longer uses the documented login, workshop upload, and SteamCMD quit sequence."
 Assert-True ($steamText -notmatch "(?i)\+(logout|logoff)\b") `

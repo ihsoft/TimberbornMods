@@ -20,6 +20,13 @@ version and platform identity come from the current public owner in the main wor
 metadata changes. After the authorized preparation commit, rerun the same readiness command; immutable preflight
 requires `ReadyForPreflight` and never accepts the pre-preparation artifact.
 
+For a registered older-line release, readiness also binds the public package owner's root, release-config hash,
+package source, and output artifact into `Gate1Plan`. Immutable preflight keeps the older worktree as the source,
+changelog, and release-commit owner, but exports and builds its changed lane into the current owner's combined package
+source. It assembles the lane, materializes local tags, creates the combined package once, snapshots its hash and lane
+fingerprints, and only then runs Steam and Mod.IO dry runs with build and export disabled. Platform dry runs and final
+publication consume that exact current-owner artifact; a stale ZIP in the registered worktree is not a fallback.
+
 GitHub readiness is evidence from the process's current credential-access boundary. It runs read-only `gh auth status`
 and `gh api user` checks without trying to escape that boundary. A failure, including HTTP 401, means auth/API access
 is unavailable to that readiness process; it does not by itself prove that the Windows Credential Manager secret is

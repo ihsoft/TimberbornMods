@@ -563,6 +563,13 @@ function Get-ReleaseReadinessReport {
     else {
         $repositoryRoot
     }
+    $packageOwnerConfigPath = Join-Path $packageOwnerRoot "$ModName/release.json"
+    $packageOwnerConfigSha256 = if (Test-Path -LiteralPath $packageOwnerConfigPath -PathType Leaf) {
+        (Get-FileHash -LiteralPath $packageOwnerConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    else {
+        ""
+    }
     $packageMode = [string](Get-ReadinessProperty $packageOwnerConfig.Package "Mode")
     if ([string]::IsNullOrWhiteSpace($packageMode)) {
         $packageMode = "ExistingZip"
@@ -576,6 +583,12 @@ function Get-ReleaseReadinessReport {
     }
     $packageSourceExists = -not [string]::IsNullOrWhiteSpace($packageSourcePath) -and
         (Test-Path -LiteralPath $packageSourcePath -PathType Container)
+    $sourceLaneMaterializationPath = if ([string]::IsNullOrWhiteSpace($packageSourceValue)) {
+        ""
+    }
+    else {
+        [System.IO.Path]::GetFullPath((Join-Path $releaseRoot $packageSourceValue))
+    }
     $packageArtifactValue = if ($packageMode -eq "LocalModFolder") {
         [string](Get-ReadinessProperty $packageOwnerConfig.Package "OutputPath")
     }
@@ -658,6 +671,7 @@ function Get-ReleaseReadinessReport {
         "tools/export-unity-mod.ps1",
         "tools/get-release-readiness.ps1",
         "tools/import-release-lane.ps1",
+        "tools/materialize-release-package.ps1",
         "tools/prepare-discord-release-message.ps1",
         "tools/publish-github-release.ps1",
         "tools/publish-modio.ps1",
@@ -786,7 +800,8 @@ function Get-ReleaseReadinessReport {
     $readyForPreflight = $blockers.Count -eq 0 -and -not $preparationRequired
 
     $gate1Arguments = @("-ModName", $ModName, "-ReleaseRoot", $releaseRoot, "-GameVersion", $gameVersion,
-        "-VersionPolicy", $versionPolicy, "-ReleaseCommit", $releaseCommit)
+        "-VersionPolicy", $versionPolicy, "-ReleaseCommit", $releaseCommit,
+        "-PackageOwnerRoot", $packageOwnerRoot)
     if (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
         $gate1Arguments += @("-ReleaseLine", $ReleaseLine)
     }
@@ -824,11 +839,17 @@ function Get-ReleaseReadinessReport {
             ReleaseCriticalDirt = [string[]]$releaseCriticalDirt
         }
         Package = [ordered]@{
+            OwnerRoot = $packageOwnerRoot
+            OwnerConfigPath = $packageOwnerConfigPath
+            OwnerConfigSha256 = $packageOwnerConfigSha256
             Mode = $packageMode
             SourcePath = $packageSourcePath
+            SourcePathArgument = $packageSourceValue
+            SourceLaneMaterializationPath = $sourceLaneMaterializationPath
             SourcePathConfigured = -not [string]::IsNullOrWhiteSpace($packageSourceValue)
             SourceExists = $packageSourceExists
             ArtifactPath = $packageArtifactPath
+            ArtifactPathArgument = $packageArtifactValue
             ArtifactPathConfigured = -not [string]::IsNullOrWhiteSpace($packageArtifactValue)
             ArtifactExists = $packageArtifactExists
             PreparationState = $packagePreparationState
@@ -904,9 +925,12 @@ function Get-ReleaseReadinessReport {
                 "Platform description verification",
                 "Unity package source export",
                 "C# package source build",
+                "Combined package lane assembly",
+                "Local release tag materialization",
+                "Combined package materialization",
                 "Steam release dry run",
                 "Mod.IO release dry run",
-                "Platform tag dry run",
+                "Final platform tag dry run",
                 "Immutable preflight report")
         }
         Warnings = [string[]]$warnings.ToArray()

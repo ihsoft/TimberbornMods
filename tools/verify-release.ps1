@@ -3,6 +3,7 @@ param(
     [string] $ModName,
 
     [string] $ReleaseRoot = "",
+    [string] $PackageOwnerRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [ValidateSet("CurrentLine", "BackportPatchOnly")]
@@ -123,45 +124,6 @@ function Get-FileSnapshot([string] $Path, [string] $Description) {
         LastWriteTimeUtc = $item.LastWriteTimeUtc.ToString("o")
         Sha256 = (Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
     }
-}
-
-function Get-PackagePath([object] $ReleaseConfig) {
-    $packageMode = [string](Get-ObjectPropertyValue $ReleaseConfig.Package "Mode")
-    if ([string]::IsNullOrWhiteSpace($packageMode)) {
-        $packageMode = "ExistingZip"
-    }
-
-    if ($packageMode -eq "ExistingZip") {
-        $path = [string](Get-ObjectPropertyValue $ReleaseConfig.Package "Path")
-        if ([string]::IsNullOrWhiteSpace($path)) {
-            throw "ExistingZip package mode requires Package.Path."
-        }
-        return Resolve-RepoPath $path
-    }
-
-    if ($packageMode -eq "LocalModFolder") {
-        $path = [string](Get-ObjectPropertyValue $ReleaseConfig.Package "OutputPath")
-        if ([string]::IsNullOrWhiteSpace($path)) {
-            throw "LocalModFolder package mode requires Package.OutputPath."
-        }
-        return Resolve-RepoPath $path
-    }
-
-    throw "Unsupported package mode: $packageMode"
-}
-
-function Get-SourceSnapshot([object] $ReleaseConfig) {
-    $packageMode = [string](Get-ObjectPropertyValue $ReleaseConfig.Package "Mode")
-    if ($packageMode -ne "LocalModFolder") {
-        return $null
-    }
-
-    $sourcePath = [string](Get-ObjectPropertyValue $ReleaseConfig.Package "SourcePath")
-    if ([string]::IsNullOrWhiteSpace($sourcePath)) {
-        throw "LocalModFolder package mode requires Package.SourcePath."
-    }
-
-    return Get-DirectoryFingerprint (Resolve-RepoPath $sourcePath)
 }
 
 function Get-ReleaseHeading([string] $ChangesPath, [string] $Version) {
@@ -386,8 +348,67 @@ if ([string]$readinessReport.Candidate.ModName -ne $ModName -or
         [string]$readinessReport.Candidate.VersionPolicy -ne $VersionPolicy) {
     throw "Release readiness identity does not match the requested preflight."
 }
+$readinessPackageOwnerRoot = [string]$readinessReport.Package.OwnerRoot
+if ([string]::IsNullOrWhiteSpace($readinessPackageOwnerRoot)) {
+    throw "Release readiness does not bind a public package owner root."
+}
+$resolvedPackageOwnerRoot = Resolve-RepositoryRoot $readinessPackageOwnerRoot $toolRepoRoot
+if ([string]::IsNullOrWhiteSpace($PackageOwnerRoot)) {
+    $PackageOwnerRoot = $resolvedPackageOwnerRoot
+}
+elseif ((Resolve-RepositoryRoot $PackageOwnerRoot $toolRepoRoot) -ne $resolvedPackageOwnerRoot) {
+    throw "Public package owner root does not match compact readiness."
+}
+$packageOwnerConfigPath = Join-Path $resolvedPackageOwnerRoot "$ModName/release.json"
+if ([string]$readinessReport.Package.OwnerConfigPath -ne $packageOwnerConfigPath) {
+    throw "Public package owner config path changed after readiness discovery."
+}
+Assert-PathExists $packageOwnerConfigPath "Public package owner config"
+$packageOwnerConfigSha256 = (Get-FileHash -LiteralPath $packageOwnerConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($packageOwnerConfigSha256 -ne [string]$readinessReport.Package.OwnerConfigSha256) {
+    throw "Public package owner config changed after readiness discovery. Rerun compact readiness."
+}
+$packageReleaseConfig = Get-Content -Raw -LiteralPath $packageOwnerConfigPath | ConvertFrom-Json
+$packageMode = [string](Get-ObjectPropertyValue $packageReleaseConfig.Package "Mode")
+if ([string]::IsNullOrWhiteSpace($packageMode)) {
+    $packageMode = "ExistingZip"
+}
+$packageSourceArgument = [string](Get-ObjectPropertyValue $packageReleaseConfig.Package "SourcePath")
+$packageArtifactArgument = if ($packageMode -eq "LocalModFolder") {
+    [string](Get-ObjectPropertyValue $packageReleaseConfig.Package "OutputPath")
+}
+else {
+    [string](Get-ObjectPropertyValue $packageReleaseConfig.Package "Path")
+}
+if ([string]::IsNullOrWhiteSpace($packageArtifactArgument)) {
+    throw "Public package owner config does not define the release artifact path."
+}
+$packageSourcePath = if ([string]::IsNullOrWhiteSpace($packageSourceArgument)) {
+    ""
+}
+else {
+    Resolve-RepositoryPath $resolvedPackageOwnerRoot $packageSourceArgument
+}
+$packagePath = Resolve-RepositoryPath $resolvedPackageOwnerRoot $packageArtifactArgument
+if ($packageMode -ne [string]$readinessReport.Package.Mode -or
+        $packageSourceArgument -ne [string]$readinessReport.Package.SourcePathArgument -or
+        $packageArtifactArgument -ne [string]$readinessReport.Package.ArtifactPathArgument -or
+        $packageSourcePath -ne [string]$readinessReport.Package.SourcePath -or
+        $packagePath -ne [string]$readinessReport.Package.ArtifactPath) {
+    throw "Public package mode or paths changed after readiness discovery."
+}
+$sourceLaneMaterializationPath = if ([string]::IsNullOrWhiteSpace($packageSourceArgument)) {
+    ""
+}
+else {
+    Resolve-RepositoryPath $repoRoot $packageSourceArgument
+}
+if ($resolvedPackageOwnerRoot -ne [string]$readinessReport.Candidate.PublicPackageOwnerRoot -or
+        $sourceLaneMaterializationPath -ne [string]$readinessReport.Package.SourceLaneMaterializationPath) {
+    throw "Public package owner or source-lane materialization path changed after readiness discovery."
+}
 $previousSourceModVersion = [string](Get-ObjectPropertyValue $releaseConfig "PreviousSourceModVersion")
-$configuredPublicLane = Get-ConfiguredPublicPackageLane $releaseConfig $GameVersion $sourceModVersion
+$configuredPublicLane = Get-ConfiguredPublicPackageLane $packageReleaseConfig $GameVersion $sourceModVersion
 $expectedPublicPackageVersion = [string]$configuredPublicLane.ManifestVersion
 if ([string]$readinessReport.Candidate.PublicPackageVersion -ne $expectedPublicPackageVersion -or
         [string]$readinessReport.Candidate.GameVersion -ne $GameVersion) {
@@ -399,10 +420,6 @@ $releaseLogDirectory = New-ReleaseLogDirectory `
     -RepoRoot $repoRoot -ModName $ModName -Version $sourceModVersion -Phase "verify"
 
 $changesPath = Resolve-RepoPath ([string](Get-ObjectPropertyValue $releaseConfig "ChangesPath"))
-$packageMode = [string](Get-ObjectPropertyValue $releaseConfig.Package "Mode")
-if ([string]::IsNullOrWhiteSpace($packageMode)) {
-    $packageMode = "ExistingZip"
-}
 
 $changelogHeading = Get-ReleaseHeading $changesPath $sourceModVersion
 $topChangelogVersion = Get-TopReleaseVersion $changesPath
@@ -562,7 +579,7 @@ if ([string]$readinessReport.Git.ReleaseCommit -ne [string]$gitSnapshot.ReleaseC
     throw "Release preparation commit changed after readiness discovery. Rerun compact readiness."
 }
 
-$steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
+$steamPublishedFileId = [string](Get-ObjectPropertyValue $packageReleaseConfig.Steam "PublishedFileId")
 $resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
     Resolve-ToolPath ".tools/modio/$ModName.local.json"
 }
@@ -646,7 +663,7 @@ if (-not $SkipPlatformDescriptions) {
     $descriptionArgs.Add("-ModName")
     $descriptionArgs.Add($ModName)
     $descriptionArgs.Add("-ReleaseRoot")
-    $descriptionArgs.Add($repoRoot)
+    $descriptionArgs.Add($resolvedPackageOwnerRoot)
     Add-SwitchArgument $descriptionArgs "-SkipSteam" $SkipSteam
     Add-SwitchArgument $descriptionArgs "-SkipModIo" $SkipModIo
     $steps.Add((Invoke-ReleaseStep "Platform description verification" "verify-platform-descriptions.ps1" $descriptionArgs.ToArray()))
@@ -669,17 +686,76 @@ if ($preparesLocalModSource) {
             "-ModName", $ModName,
             "-ReleaseRoot", $repoRoot,
             "-Configuration", $Configuration,
-            "-GameVersion", $GameVersion)
+            "-GameVersion", $GameVersion,
+            "-PackageSourcePath", $packageSourceArgument)
         $steps.Add((Invoke-ReleaseStep `
             "C# package source build" "build-local-mod-scripts.ps1" $buildArgs))
     }
+
+    $materializeArgs = @(
+        "-ModName", $ModName,
+        "-PackageOwnerRoot", $resolvedPackageOwnerRoot,
+        "-SourceReleaseRoot", $repoRoot,
+        "-GameVersion", $GameVersion,
+        "-SourceModVersion", $sourceModVersion,
+        "-ExpectedOwnerConfigSha256", $packageOwnerConfigSha256)
+    $steps.Add((Invoke-ReleaseStep `
+        "Combined package lane assembly" "materialize-release-package.ps1" `
+        ($materializeArgs + @("-Operation", "ImportLane"))))
+}
+
+if (-not $SkipPlatformTags) {
+    $materializeTagArgs = New-Object System.Collections.Generic.List[string]
+    $materializeTagArgs.Add("-ModName")
+    $materializeTagArgs.Add($ModName)
+    $materializeTagArgs.Add("-ReleaseRoot")
+    $materializeTagArgs.Add($resolvedPackageOwnerRoot)
+    Add-OptionalArgument $materializeTagArgs "-LocalModRoot" $LocalModRoot
+    $materializeTagArgs.Add("-MaterializeLocalOnly")
+    $steps.Add((Invoke-ReleaseStep "Local release tag materialization" "update-platform-tags.ps1" $materializeTagArgs.ToArray()))
+}
+
+if ($preparesLocalModSource) {
+    $steps.Add((Invoke-ReleaseStep `
+        "Combined package materialization" "materialize-release-package.ps1" `
+        ($materializeArgs + @("-Operation", "Package"))))
+}
+
+Write-Host ""
+Write-Host "Collecting release artifact snapshots before platform dry runs..."
+$packageSnapshot = Get-FileSnapshot $packagePath "Release package"
+$packageLaneFingerprints = @(Get-PackageLaneFingerprints $packagePath)
+$primaryLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $GameVersion "Primary release package"
+$publicPackageLaneFingerprint = Get-PublicPackageLaneFingerprint $packageLaneFingerprints
+$publicPackageVersion = [string]$publicPackageLaneFingerprint.ManifestVersion
+if ([string]$primaryLaneFingerprint.ManifestVersion -ne $sourceModVersion) {
+    throw (
+        "Primary release package lane $GameVersion has manifest version " +
+        "$($primaryLaneFingerprint.ManifestVersion), expected source mod version $sourceModVersion.")
+}
+if ([string]$publicPackageLaneFingerprint.GameVersion -ne [string]$configuredPublicLane.GameVersion -or
+        $publicPackageVersion -ne $expectedPublicPackageVersion) {
+    throw (
+        "Final package public identity differs from release configuration. " +
+        "Expected $($configuredPublicLane.GameVersion) v$expectedPublicPackageVersion; " +
+        "actual $($publicPackageLaneFingerprint.GameVersion) v$publicPackageVersion.")
+}
+$sourceSnapshot = if ($packageMode -eq "LocalModFolder") {
+    Get-DirectoryFingerprint $packageSourcePath
+}
+else {
+    $null
 }
 
 $commonPublishArgs = New-Object System.Collections.Generic.List[string]
 $commonPublishArgs.Add("-ModName")
 $commonPublishArgs.Add($ModName)
 $commonPublishArgs.Add("-ReleaseRoot")
+$commonPublishArgs.Add($resolvedPackageOwnerRoot)
+$commonPublishArgs.Add("-SourceReleaseRoot")
 $commonPublishArgs.Add($repoRoot)
+$commonPublishArgs.Add("-SourceModVersion")
+$commonPublishArgs.Add($sourceModVersion)
 $commonPublishArgs.Add("-Configuration")
 $commonPublishArgs.Add($Configuration)
 $commonPublishArgs.Add("-GameVersion")
@@ -690,8 +766,9 @@ $commonPublishArgs.Add("-OutputRoot")
 $commonPublishArgs.Add($OutputRoot)
 Add-OptionalArgument $commonPublishArgs "-LocalModRoot" $LocalModRoot
 Add-SwitchArgument $commonPublishArgs "-IncludeLegacyVersions" $IncludeLegacyVersions
-Add-SwitchArgument $commonPublishArgs "-SkipBuild" ($SkipBuild -or $preparesLocalModSource)
-Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" ($SkipUnityExport -or $preparesLocalModSource)
+Add-SwitchArgument $commonPublishArgs "-SkipBuild" $true
+Add-SwitchArgument $commonPublishArgs "-SkipUnityExport" $true
+Add-OptionalArgument $commonPublishArgs "-ExpectedPackageSha256" ([string]$packageSnapshot.Sha256)
 Add-SwitchArgument $commonPublishArgs "-CorrectiveReplacement" $CorrectiveReplacement
 
 if (-not $SkipSteam) {
@@ -728,7 +805,7 @@ if (-not $SkipPlatformTags) {
     $tagArgs.Add("-ModName")
     $tagArgs.Add($ModName)
     $tagArgs.Add("-ReleaseRoot")
-    $tagArgs.Add($repoRoot)
+    $tagArgs.Add($resolvedPackageOwnerRoot)
     if ($SkipSteam) {
         $tagArgs.Add("-Platform")
         $tagArgs.Add("ModIO")
@@ -743,81 +820,8 @@ if (-not $SkipPlatformTags) {
     Add-OptionalArgument $tagArgs "-SteamUserName" $SteamUserName
     Add-OptionalArgument $tagArgs "-ModIoConfigPath" $ModIoConfigPath
     Add-OptionalArgument $tagArgs "-ModIoAccessTokenPath" $ModIoAccessTokenPath
-    $steps.Add((Invoke-ReleaseStep "Platform tag dry run" "update-platform-tags.ps1" $tagArgs.ToArray()))
-
-    $materializeTagArgs = New-Object System.Collections.Generic.List[string]
-    $materializeTagArgs.Add("-ModName")
-    $materializeTagArgs.Add($ModName)
-    $materializeTagArgs.Add("-ReleaseRoot")
-    $materializeTagArgs.Add($repoRoot)
-    Add-OptionalArgument $materializeTagArgs "-LocalModRoot" $LocalModRoot
-    $materializeTagArgs.Add("-MaterializeLocalOnly")
-    $steps.Add((Invoke-ReleaseStep "Local release tag materialization" "update-platform-tags.ps1" $materializeTagArgs.ToArray()))
-
-    $finalPublishArgs = New-Object System.Collections.Generic.List[string]
-    $finalPublishArgs.AddRange([string[]]$commonPublishArgs)
-    if (-not $preparesLocalModSource) {
-        if (-not $SkipBuild) {
-            $finalPublishArgs.Add("-SkipBuild")
-        }
-        if (-not $SkipUnityExport) {
-            $finalPublishArgs.Add("-SkipUnityExport")
-        }
-    }
-
-    if (-not $SkipSteam) {
-        $finalSteamArgs = New-Object System.Collections.Generic.List[string]
-        $finalSteamArgs.AddRange([string[]]$finalPublishArgs)
-        Add-OptionalArgument $finalSteamArgs "-SteamConfigPath" $SteamConfigPath
-        Add-OptionalArgument $finalSteamArgs "-SteamCmdPath" $SteamCmdPath
-        Add-OptionalArgument $finalSteamArgs "-SteamUserName" $SteamUserName
-        Add-OptionalArgument $finalSteamArgs "-ChangeNoteTitle" $sourceReleaseLabel
-        Add-SwitchArgument $finalSteamArgs "-UpdateVisibility" $PublishSteamVisibility
-        $steps.Add((Invoke-ReleaseStep "Final Steam release dry run" "publish-steam.ps1" $finalSteamArgs.ToArray()))
-    }
-
-    if (-not $SkipModIo) {
-        $finalModIoArgs = New-Object System.Collections.Generic.List[string]
-        $finalModIoArgs.AddRange([string[]]$finalPublishArgs)
-        Add-OptionalArgument $finalModIoArgs "-ConfigPath" $ModIoConfigPath
-        Add-OptionalArgument $finalModIoArgs "-AccessTokenPath" $ModIoAccessTokenPath
-        if ($VersionPolicy -eq "BackportPatchOnly") {
-            Add-OptionalArgument $finalModIoArgs "-ChangeNotesPrefix" $sourceReleaseTitle
-        }
-        Add-OptionalArgument $finalModIoArgs "-PublicPackageVersion" $expectedPublicPackageVersion
-        if ($null -ne $modIoBackportPackageUpdate) {
-            Add-OptionalArgument $finalModIoArgs "-ExpectedActiveFileId" `
-                ([string]$modIoBackportPackageUpdate.ExistingActiveFileId)
-        }
-        Add-SwitchArgument $finalModIoArgs "-BackportPackageUpdate" $isBackportPackageUpdate
-        Add-SwitchArgument $finalModIoArgs "-PublishPage" $PublishModIoPage
-        $steps.Add((Invoke-ReleaseStep "Final Mod.IO release dry run" "publish-modio.ps1" $finalModIoArgs.ToArray()))
-    }
-
     $steps.Add((Invoke-ReleaseStep "Final platform tag dry run" "update-platform-tags.ps1" $tagArgs.ToArray()))
 }
-
-Write-Host ""
-Write-Host "Collecting release artifact snapshots..."
-$packagePath = Get-PackagePath $releaseConfig
-$packageSnapshot = Get-FileSnapshot $packagePath "Release package"
-$packageLaneFingerprints = @(Get-PackageLaneFingerprints $packagePath)
-$primaryLaneFingerprint = Get-LaneFingerprint $packageLaneFingerprints $GameVersion "Primary release package"
-$publicPackageLaneFingerprint = Get-PublicPackageLaneFingerprint $packageLaneFingerprints
-$publicPackageVersion = [string]$publicPackageLaneFingerprint.ManifestVersion
-if ([string]$primaryLaneFingerprint.ManifestVersion -ne $sourceModVersion) {
-    throw (
-        "Primary release package lane $GameVersion has manifest version " +
-        "$($primaryLaneFingerprint.ManifestVersion), expected source mod version $sourceModVersion.")
-}
-if ([string]$publicPackageLaneFingerprint.GameVersion -ne [string]$configuredPublicLane.GameVersion -or
-        $publicPackageVersion -ne $expectedPublicPackageVersion) {
-    throw (
-        "Final package public identity differs from release configuration. " +
-        "Expected $($configuredPublicLane.GameVersion) v$expectedPublicPackageVersion; " +
-        "actual $($publicPackageLaneFingerprint.GameVersion) v$publicPackageVersion.")
-}
-$sourceSnapshot = Get-SourceSnapshot $releaseConfig
 $gitStatus = @(& git -C $repoRoot status --porcelain=v1 --untracked-files=normal)
 $tagName = if ($VersionPolicy -eq "BackportPatchOnly") {
     "$($ModName)_${sourceModVersion}_$ReleaseLine"
@@ -1037,6 +1041,9 @@ $report = [ordered]@{
     GameVersion = $GameVersion
     Configuration = $Configuration
     ReleaseConfigPath = (Resolve-Path -LiteralPath $releaseConfigPath).Path
+    PackageOwnerRoot = $resolvedPackageOwnerRoot
+    PackageOwnerConfigPath = $packageOwnerConfigPath
+    PackageOwnerConfigSha256 = $packageOwnerConfigSha256
     ChangesPath = (Resolve-Path -LiteralPath $changesPath).Path
     ChangelogHeading = $changelogHeading
     PackageMode = $packageMode

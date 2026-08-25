@@ -4,7 +4,8 @@ param(
 
     [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
-    [string] $GameVersion = "version-1.1"
+    [string] $GameVersion = "version-1.1",
+    [string] $PackageSourcePath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,11 +30,18 @@ Assert-PathExists $projectPath "Project file"
 Assert-PathExists $propsPath "Directory build props"
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
-if ([string]$releaseConfig.Package.Mode -ne "LocalModFolder") {
+if ([string]::IsNullOrWhiteSpace($PackageSourcePath) -and
+        [string]$releaseConfig.Package.Mode -ne "LocalModFolder") {
     throw "C# package-source build requires Package.Mode=LocalModFolder in $releaseConfigPath"
 }
 
-$sourcePath = Resolve-RepositoryPath $repoRoot ([string]$releaseConfig.Package.SourcePath)
+$sourcePathArgument = if ([string]::IsNullOrWhiteSpace($PackageSourcePath)) {
+    [string]$releaseConfig.Package.SourcePath
+}
+else {
+    $PackageSourcePath
+}
+$sourcePath = Resolve-RepositoryPath $repoRoot $sourcePathArgument
 Assert-PathExists $sourcePath "Local mod package source"
 $versionPath = Join-Path $sourcePath $GameVersion
 $exportedManifestPath = Join-Path $versionPath "manifest.json"

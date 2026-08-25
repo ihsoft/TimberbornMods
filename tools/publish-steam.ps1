@@ -3,6 +3,8 @@ param(
     [string] $ModName,
 
     [string] $ReleaseRoot = "",
+    [string] $SourceReleaseRoot = "",
+    [string] $SourceModVersion = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [string] $GameRoot = "_GAME!",
@@ -30,6 +32,12 @@ $ErrorActionPreference = "Stop"
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
+$sourceRepoRoot = if ([string]::IsNullOrWhiteSpace($SourceReleaseRoot)) {
+    $repoRoot
+}
+else {
+    Resolve-RepositoryRoot $SourceReleaseRoot $toolRepoRoot
+}
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
 $buildScriptPath = Join-Path $PSScriptRoot "build-mod-package.ps1"
@@ -43,6 +51,10 @@ function Assert-PathExists([string] $Path, [string] $Description) {
 
 function Resolve-RepoPath([string] $Path) {
     return Resolve-RepositoryPath $repoRoot $Path
+}
+
+function Resolve-SourceRepoPath([string] $Path) {
+    return Resolve-RepositoryPath $sourceRepoRoot $Path
 }
 
 function Resolve-ToolPath([string] $Path) {
@@ -68,7 +80,9 @@ function Get-LatestChangeNotes([string] $Path, [string] $Version) {
 function Test-ZipPackage(
     [string] $ZipPath,
     [string] $ScriptFileBase,
-    [object] $ReleaseConfig) {
+    [object] $ReleaseConfig,
+    [string] $SourceGameVersion,
+    [string] $ExpectedSourceVersion) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
     try {
@@ -119,6 +133,10 @@ function Test-ZipPackage(
             }
 
             $expectedVersion = $ReleaseConfig.ManifestVersions.$versionFolder
+            if ($versionFolder -eq $SourceGameVersion -and
+                    -not [string]::IsNullOrWhiteSpace($ExpectedSourceVersion)) {
+                $expectedVersion = $ExpectedSourceVersion
+            }
             if ($null -ne $expectedVersion -and $manifestVersion -ne [string]$expectedVersion) {
                 throw "Package folder $versionFolder has manifest Version=$manifestVersion, expected $expectedVersion."
             }
@@ -624,13 +642,16 @@ if ($LoginOnly) {
 }
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+$sourceReleaseConfigPath = Join-Path $sourceRepoRoot "$ModName/release.json"
+Assert-PathExists $sourceReleaseConfigPath "Source release config"
+$sourceReleaseConfig = Get-Content -Raw -LiteralPath $sourceReleaseConfigPath | ConvertFrom-Json
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ManifestPath)) {
     $manifestPath = Resolve-RepoPath ([string]$releaseConfig.ManifestPath)
 }
-$changesPath = Join-Path $modRoot "CHANGES.md"
-if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ChangesPath)) {
-    $changesPath = Resolve-RepoPath ([string]$releaseConfig.ChangesPath)
+$changesPath = Join-Path (Join-Path $sourceRepoRoot $ModName) "CHANGES.md"
+if (-not [string]::IsNullOrWhiteSpace($sourceReleaseConfig.ChangesPath)) {
+    $changesPath = Resolve-SourceRepoPath ([string]$sourceReleaseConfig.ChangesPath)
 }
 
 Assert-PathExists $manifestPath "Manifest"
@@ -643,6 +664,15 @@ if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ReleaseVersion)) {
 }
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Release version is empty."
+}
+$sourceVersion = if ([string]::IsNullOrWhiteSpace($SourceModVersion)) {
+    [string]$sourceReleaseConfig.ReleaseVersion
+}
+else {
+    $SourceModVersion
+}
+if ([string]$sourceReleaseConfig.ReleaseVersion -ne $sourceVersion) {
+    throw "Source release version changed before Steam operation: $sourceReleaseConfigPath"
 }
 
 $scriptFileBase = $ModName
@@ -744,7 +774,7 @@ if (-not [string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
     }
 }
 
-$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
+$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig $GameVersion $sourceVersion
 
 $allowSingleGameVersion = $releaseConfig.Steam.AllowSingleGameVersion -eq $true
 if ($versionFolders.Count -lt 2 -and -not $allowSingleGameVersion) {
@@ -797,7 +827,7 @@ if ($UpdateVisibility) {
     $visibilityValue = $visibilityMap[$visibilityName]
 }
 
-$changeNotes = Get-LatestChangeNotes $changesPath $modVersion
+$changeNotes = Get-LatestChangeNotes $changesPath $sourceVersion
 if (-not [string]::IsNullOrWhiteSpace($ChangeNotesPrefix)) {
     $changeNotes = $ChangeNotesPrefix.Trim() + "`r`n" + $changeNotes.TrimStart()
 }
@@ -836,7 +866,7 @@ Write-WorkshopVdf $vdfPath $appId $publishedFileId $contentFolder $previewFile $
     ([string]$workshopData.Name) $tags $steamChangeNote
 
 Write-Host ""
-Write-Host "Steam publish plan for $ModName v$modVersion"
+Write-Host "Steam publish plan for $ModName source v$sourceVersion; public package v$modVersion"
 Write-Host "Package: $zipPath"
 Write-Host "Content folder: $contentFolder"
 Write-Host "VDF: $vdfPath"

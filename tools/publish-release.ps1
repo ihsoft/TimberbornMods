@@ -600,6 +600,18 @@ $currentVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVersio
 if ($currentVersion -ne $sourceModVersion) {
     throw "ReleaseVersion changed since preflight. Preflight: $sourceModVersion; current: $currentVersion"
 }
+$packageOwnerRoot = (Resolve-Path -LiteralPath ([string]$report.PackageOwnerRoot)).Path
+$packageOwnerConfigPath = [string]$report.PackageOwnerConfigPath
+Assert-PathExists $packageOwnerConfigPath "Public package owner config"
+if ((Resolve-Path -LiteralPath $packageOwnerConfigPath).Path -ne
+        (Join-Path $packageOwnerRoot "$modName/release.json")) {
+    throw "Public package owner config path does not match immutable preflight."
+}
+$packageOwnerConfigHash = (Get-FileHash -LiteralPath $packageOwnerConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($packageOwnerConfigHash -ne [string]$report.PackageOwnerConfigSha256) {
+    throw "Public package owner config changed after immutable preflight."
+}
+$packageReleaseConfig = Get-Content -Raw -LiteralPath $packageOwnerConfigPath | ConvertFrom-Json
 
 if ($null -ne $report.Source) {
     $sourcePath = [string]$report.Source.Path
@@ -647,7 +659,7 @@ if ($releaseSources.Count -gt 1) {
     [System.IO.File]::WriteAllText($combinedReleaseNotesPath, $combinedNotes, $utf8NoBom)
 }
 
-$steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
+$steamPublishedFileId = [string](Get-ObjectPropertyValue $packageReleaseConfig.Steam "PublishedFileId")
 $resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
     Resolve-ToolPath ".tools/modio/$modName.local.json"
 }
@@ -752,7 +764,11 @@ $commonPublishArgs = New-Object System.Collections.Generic.List[string]
 $commonPublishArgs.Add("-ModName")
 $commonPublishArgs.Add($modName)
 $commonPublishArgs.Add("-ReleaseRoot")
+$commonPublishArgs.Add($packageOwnerRoot)
+$commonPublishArgs.Add("-SourceReleaseRoot")
 $commonPublishArgs.Add($repoRoot)
+$commonPublishArgs.Add("-SourceModVersion")
+$commonPublishArgs.Add($sourceModVersion)
 $commonPublishArgs.Add("-Configuration")
 $commonPublishArgs.Add($Configuration)
 $commonPublishArgs.Add("-GameVersion")
@@ -805,7 +821,7 @@ if (-not $SkipPlatformTags -and -not [bool]$report.PreflightOptions.SkipPlatform
     $tagArgs.Add("-ModName")
     $tagArgs.Add($modName)
     $tagArgs.Add("-ReleaseRoot")
-    $tagArgs.Add($repoRoot)
+    $tagArgs.Add($packageOwnerRoot)
     $tagArgs.Add("-Platform")
     $tagArgs.Add("ModIO")
     Add-OptionalArgument $tagArgs "-LocalModRoot" $LocalModRoot
