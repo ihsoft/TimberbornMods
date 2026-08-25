@@ -40,6 +40,14 @@ For a registered compatibility worktree, treat its branch and worktree root as t
 tooling with an explicit target root when historical branch scripts lack required checks; do not copy current scripts
 into the older branch or let a tool silently resolve source paths from its own checkout.
 
+The current main checkout owns repository-wide workflow, safety, release, and backport instructions even when source
+edits occur in a historical compatibility worktree. At task start, locate the main checkout through the registered
+worktree or `git worktree list --porcelain`, then load its current root `AGENTS.md`, this operational document, and any
+other currently routed workflow rules. Treat rule copies on the historical branch as historical context, not as proof
+that a current workflow rule does not exist. Still load the target worktree's closest local `AGENTS.md` for source- and
+package-specific constraints; it may narrow the work but cannot weaken current repository safety or workflow gates. If
+the current main checkout cannot be identified, stop and ask instead of falling back to historical workflow rules.
+
 Register a proven release owner in `tools/release-lines.json` by stable branch, release-line identifier, game lane,
 version policy, and mod name. Do not store a machine-local worktree path there; discovery resolves the branch through
 Git and stops when its worktree is absent.
@@ -105,6 +113,19 @@ history or overwriting another line's pending release.
 When the older line lives in its own worktree, its changelog is authoritative for that line. Candidate discovery and
 version validation must inspect that worktree directly. The next backport version is the next patch after that
 changelog's latest dated release, even when the current line has a higher minor version.
+
+Before creating, renaming, dating, or adding entries to a backport changelog section, complete this decision gate:
+
+1. Name the target release line, worktree, and Timberborn game line.
+2. Identify the latest dated `SourceModVersion` in that target changelog and treat its complete section as immutable
+   published history unless the user explicitly requested a historical correction.
+3. Calculate the pending `SourceModVersion` as the next patch on that older line, regardless of whether the new entry is
+   a feature or a fix.
+4. State the exact line-qualified pending heading before editing it.
+
+Do not apply the ordinary feature-to-next-minor rule until this gate has first established that the task is not an
+explicit older-line backport. A factual error discovered in an already dated release note normally becomes a new
+corrective `(TBD)` entry; it does not authorize rewriting the published section.
 
 Ordinary implementation does not authorize release metadata changes. Leave lane-specific `release.json`, manifest,
 package version, and platform metadata updates to explicit release preparation unless the user included them in the

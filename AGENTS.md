@@ -425,8 +425,10 @@ not start from them.
 - For player-visible or user-visible mod behavior changes, this includes re-checking the package changelog rule in
   `docs/timberborn-repository-notes.md`.
 - Re-checking the changelog means comparing every new entry category with the top `(TBD)` heading and the package's last
-  dated version. A changelog entry's presence alone does not close the gate; a feature inside a patch-numbered pending
-  section must promote that section to the next minor version before commit.
+  dated version. A changelog entry's presence alone does not close the gate. For ordinary current-line work, a feature
+  inside a patch-numbered pending section must promote that section to the next minor version before commit. An
+  explicitly requested older-line backport is the exception: follow Timberborn Backport Operational Knowledge and
+  advance both features and fixes by patch only on that older line.
 - Do not carry forward only the investigation checklist into the final commit.
 
 ### Real-game validation gate
