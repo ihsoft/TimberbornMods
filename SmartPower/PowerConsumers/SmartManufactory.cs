@@ -5,6 +5,7 @@
 using System;
 using Bindito.Core;
 using IgorZ.SmartPower.Core;
+using IgorZ.SmartPower.Settings;
 using Timberborn.BaseComponentSystem;
 using Timberborn.EnterableSystem;
 using Timberborn.Localization;
@@ -82,8 +83,12 @@ public class SmartManufactory : BaseComponent, IAwakableComponent, IAdjustablePo
     BlockedOutput = !_manufactory.HasUnreservedCapacityForCurrentProducts();
     NoFuel = !_manufactory.HasFuel;
     StandbyMode = AllWorkersOut || MissingIngredients || NoFuel || BlockedOutput;
-    var newInput = Math.Max(
-        Mathf.RoundToInt(_nominalPowerInput * (StandbyMode ? NonFuelRecipeIdleStateConsumption : 1f)), 1);
+    var newInput = _nominalPowerInput;
+    if (StandbyMode) {
+      newInput = ManufactorySettings.ConsumeOneHorsepowerInPowerSavingMode
+          ? 1
+          : Math.Max(Mathf.RoundToInt(_nominalPowerInput * NonFuelRecipeIdleStateConsumption), 1);
+    }
     if (_powerInputLimiter) {
       _powerInputLimiter.SetDesiredPower(newInput);
     }

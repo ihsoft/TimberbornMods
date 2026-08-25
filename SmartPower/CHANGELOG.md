@@ -1,3 +1,6 @@
+# v1.16.4 (Timberborn v1.0) (TBD)
+* [Feature] Add an option to consume only 1 hp in manufactory power saving mode.
+
 # v1.17.0 (June 13th, 2026)
 * [Update] Support game version `v1.1`.
 
