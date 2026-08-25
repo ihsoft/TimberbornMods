@@ -14,7 +14,11 @@ worktree from `tools/release-lines.json`; it does not accept or persist a machin
 Readiness is discovery only. It reads release configuration, Git, local package state, Unity installation state,
 GitHub CLI auth state, and platform prerequisite presence. It does not edit release metadata, build, export, package,
 authenticate interactively, or mutate a public platform. `Gate1Plan` is the prepared argument and operation inventory
-for `tools/verify-release.ps1`; the preflight requires the matching ready artifact.
+for `tools/verify-release.ps1`. A registered older-line candidate may first be `ReadyForGate1` with
+`PreparationRequired`: candidate and previous source versions come from that line's changelog, while the public package
+version and platform identity come from the current public owner in the main worktree. The report lists exact stale
+metadata changes. After the authorized preparation commit, rerun the same readiness command; immutable preflight
+requires `ReadyForPreflight` and never accepts the pre-preparation artifact.
 
 Steam publication uses the Steamworks-documented `steamcmd +login <configured-user> +workshop_build_item ... +quit`
 shape. The tooling has no `logout` or `logoff` command; `quit` terminates SteamCMD. Readiness reports whether the

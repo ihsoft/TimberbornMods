@@ -18,6 +18,7 @@ Import-Module (Join-Path $PSScriptRoot "release-lines.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-unity.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-readiness.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
 
@@ -47,6 +48,6 @@ else {
     }
 }
 
-if (-not $report.Ready) {
+if (-not $report.ReadyForGate1) {
     exit 2
 }

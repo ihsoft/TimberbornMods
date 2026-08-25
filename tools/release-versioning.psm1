@@ -10,11 +10,15 @@ function Get-ReleaseSection([string] $ChangesPath, [string] $Version) {
     return $match.Groups["body"].Value
 }
 
-function Get-PreviousDatedReleaseVersion([string] $ChangesPath, [string] $Version) {
+function Get-PreviousDatedReleaseVersion(
+    [string] $ChangesPath,
+    [string] $Version,
+    [string] $GameLine = ""
+) {
     $content = Get-Content -Raw -LiteralPath $ChangesPath
     $headings = [regex]::Matches(
         $content,
-        "(?m)^#\s+v(?<version>\d+\.\d+\.\d+|\d+\.\d+)(?:\s+\((?<date>[^)]+)\))?")
+        "(?m)^#\s+v(?<version>\d+\.\d+\.\d+|\d+\.\d+)(?<suffix>[^\r\n]*)\r?$")
     $currentIndex = -1
     for ($index = 0; $index -lt $headings.Count; $index++) {
         if ($headings[$index].Groups["version"].Value -eq $Version) {
@@ -27,10 +31,23 @@ function Get-PreviousDatedReleaseVersion([string] $ChangesPath, [string] $Versio
         throw "Cannot locate changelog heading for version $Version in $ChangesPath."
     }
 
+    $candidateParts = $Version.Split('.')
+    $candidatePatchLine = if ($candidateParts.Count -ge 2) {
+        "$($candidateParts[0]).$($candidateParts[1])."
+    }
+    else {
+        ""
+    }
     for ($index = $currentIndex + 1; $index -lt $headings.Count; $index++) {
-        $date = $headings[$index].Groups["date"].Value
-        if (-not [string]::IsNullOrWhiteSpace($date) -and $date -ne "TBD") {
-            return $headings[$index].Groups["version"].Value
+        $suffix = $headings[$index].Groups["suffix"].Value
+        $headingVersion = $headings[$index].Groups["version"].Value
+        $matchesGameLine = [string]::IsNullOrWhiteSpace($GameLine) -or
+            $suffix -match "\(Timberborn\s+v$([regex]::Escape($GameLine))\)" -or
+            (-not [string]::IsNullOrWhiteSpace($candidatePatchLine) -and
+                $headingVersion.StartsWith($candidatePatchLine, [System.StringComparison]::Ordinal))
+        $hasDatedQualifier = $suffix -match "\([^)]+\)" -and $suffix -notmatch "\(TBD\)"
+        if ($matchesGameLine -and $hasDatedQualifier) {
+            return $headingVersion
         }
     }
 
@@ -84,4 +101,4 @@ function Assert-ReleaseVersionMatchesChangelog(
     }
 }
 
-Export-ModuleMember -Function Assert-ReleaseVersionMatchesChangelog
+Export-ModuleMember -Function Get-PreviousDatedReleaseVersion, Assert-ReleaseVersionMatchesChangelog

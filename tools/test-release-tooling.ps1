@@ -103,6 +103,7 @@ try {
         "release-package-provenance.psm1",
         "release-readiness.psm1",
         "release-unity.psm1",
+        "release-versioning.psm1",
         "repository-paths.psm1"
     ) | ForEach-Object {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $_) -Destination (Join-Path $fixtureTools $_)
@@ -150,6 +151,57 @@ try {
   "Steam": { "PublishedFileId": "13579" }
 }
 '@
+    Write-TestFile (Join-Path $fixtureRoot "XRay/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/XRay/manifest.json",
+  "ChangesPath": "XRay/CHANGELOG.md",
+  "ReleaseVersion": "1.3.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/XRayPublic",
+    "OutputPath": "package/XRay_v1.3.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.1.9",
+    "version-1.1": "1.3.0"
+  },
+  "Steam": { "PublishedFileId": "67890" }
+}
+'@
+    Write-TestFile (Join-Path $fixtureRoot "SmartPower/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/SmartPower/manifest.json",
+  "ChangesPath": "SmartPower/CHANGELOG.md",
+  "ReleaseVersion": "1.18.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/SmartPower",
+    "OutputPath": "package/SmartPower_v1.18.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.16.3",
+    "version-1.1": "1.18.0"
+  },
+  "Steam": { "PublishedFileId": "3305038022" }
+}
+'@
+    Write-TestFile (Join-Path $fixtureRoot "Automation/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/Automation/manifest.json",
+  "ChangesPath": "Automation/CHANGELOG.md",
+  "ReleaseVersion": "4.10.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/Automation",
+    "OutputPath": "package/Automation_v4.10.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "4.0.10",
+    "version-1.1": "4.10.0"
+  },
+  "Steam": { "PublishedFileId": "3324234282" }
+}
+'@
     Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json") `
         '{"Name":"Ready Mod","Version":"3.0.0"}'
@@ -162,6 +214,18 @@ try {
     Write-TestFile `
         (Join-Path $fixtureRoot "package/ReadyMod/version-1.1/manifest.json") `
         '{"Name":"Ready Mod","Version":"3.0.0"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/XRayPublic/version-1.0/manifest.json") `
+        '{"Name":"X-Ray","Version":"1.2.0"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/XRayPublic/version-1.1/manifest.json") `
+        '{"Name":"X-Ray","Version":"1.3.0"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/SmartPower/version-1.0/manifest.json") `
+        '{"Name":"Smart Power","Version":"1.16.4"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/SmartPower/version-1.1/manifest.json") `
+        '{"Name":"Smart Power","Version":"1.18.0"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/Automation/version-1.0/manifest.json") `
+        '{"Name":"Advanced Automation","Version":"4.0.11"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/Automation/version-1.1/manifest.json") `
+        '{"Name":"Advanced Automation","Version":"4.10.0"}'
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "init", "-b", "main"))
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "config", "user.name", "Release Tooling Test"))
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "config", "user.email", "release-tooling@example.invalid"))
@@ -175,21 +239,25 @@ try {
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add backport candidate"))
 
     Write-TestFile (Join-Path $lineRoot "SmartPower/CHANGELOG.md") @'
-# v1.16.4 (Timberborn v1.0) (August 24th, 2026)
+# v1.16.4 (Timberborn v1.0) (TBD)
 
 * [Fix] Prepare an older-line fixture.
+
+# v1.16.3 (Timberborn v1.0) (August 1st, 2026)
+
+* [Fix] Previous older-line release.
 '@
     Write-TestFile (Join-Path $lineRoot "SmartPower/release.json") @'
 {
   "ManifestPath": "ModsUnityProject/Assets/Mods/SmartPower/manifest.json",
   "ChangesPath": "SmartPower/CHANGELOG.md",
-  "ReleaseVersion": "1.16.4",
+  "ReleaseVersion": "1.17.0",
   "Package": {
     "Mode": "ExistingZip",
-    "Path": "package/SmartPower_v1.16.4.zip"
+    "Path": "package/SmartPower_v1.17.0.zip"
   },
   "ManifestVersions": {
-    "version-1.0": "1.16.4",
+    "version-1.0": "1.16.3",
     "version-1.1": "1.17.0"
   }
 }
@@ -197,6 +265,36 @@ try {
     Write-TestFile `
         (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/SmartPower/manifest.json") `
         '{"Name":"Smart Power","Version":"1.16.4"}'
+    Write-TestFile (Join-Path $lineRoot "Automation/CHANGELOG.md") @'
+# v4.0.11 (Timberborn v1.0) (August 24th, 2026)
+
+* [Fix] Prepared older-line release.
+
+# v4.0.10 (Timberborn v1.0) (August 1st, 2026)
+
+* [Fix] Previous older-line release.
+'@
+    Write-TestFile (Join-Path $lineRoot "Automation/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/Automation/manifest.json",
+  "ChangesPath": "Automation/CHANGELOG.md",
+  "ReleaseVersion": "4.0.11",
+  "PreviousSourceModVersion": "4.0.10",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/Automation",
+    "OutputPath": "package/Automation_v4.0.11.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "4.0.11",
+    "version-1.1": "4.10.0"
+  },
+  "Steam": { "PublishedFileId": "3324234282" }
+}
+'@
+    Write-TestFile `
+        (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/Automation/manifest.json") `
+        '{"Name":"Advanced Automation","Version":"4.0.11"}'
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "."))
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add unmaterialized SmartPower fixture"))
 
@@ -211,22 +309,52 @@ try {
     finally {
         Pop-Location
     }
-    Assert-Equal 2 $endToEndExitCode "Unmaterialized registered readiness exit code"
+    Assert-Equal 0 $endToEndExitCode "Registered metadata-preparation readiness exit code"
     Assert-True (Test-Path -LiteralPath $readinessArtifact -PathType Leaf) `
-        "Blocked registered readiness must still emit a schema-1 artifact."
+        "Registered metadata-preparation readiness must emit a schema-1 artifact."
     $endToEndReadiness = Get-Content -Raw -LiteralPath $readinessArtifact | ConvertFrom-Json
-    Assert-Equal 1 $endToEndReadiness.SchemaVersion "Unmaterialized registered readiness schema"
+    Assert-Equal 1 $endToEndReadiness.SchemaVersion "Registered metadata-preparation readiness schema"
     Assert-Equal "TimberbornReleaseReadiness" $endToEndReadiness.ArtifactType `
-        "Unmaterialized registered readiness artifact type"
-    Assert-Equal "BlockedMissingExistingArtifact" $endToEndReadiness.Package.PreparationState `
-        "Unmaterialized registered package preparation state"
-    Assert-True `
-        ("PackageArtifactMissing" -in @($endToEndReadiness.Blockers | ForEach-Object Code)) `
-        "Unmaterialized ExistingZip must be a structured readiness blocker."
+        "Registered metadata-preparation readiness artifact type"
+    Assert-Equal "1.16.4" $endToEndReadiness.Candidate.SourceModVersion `
+        "Registered candidate source version"
+    Assert-Equal "1.16.3" $endToEndReadiness.Candidate.PreviousSourceModVersion `
+        "Registered candidate previous source version"
+    Assert-Equal "1.18.0" $endToEndReadiness.Candidate.PublicPackageVersion `
+        "Registered candidate public package version"
+    Assert-Equal "3305038022" $endToEndReadiness.Platforms.Steam.PublishedFileId `
+        "Registered candidate inherited public Steam identity"
+    Assert-True $endToEndReadiness.Gate1Plan.PreparationRequired `
+        "Stale compatibility metadata must produce a preparation plan."
+    Assert-True $endToEndReadiness.ReadyForGate1 `
+        "Metadata preparation must be allowed without a second user gate."
+    Assert-True (-not $endToEndReadiness.ReadyForPreflight) `
+        "A pre-preparation artifact must not satisfy immutable preflight."
+    Assert-Equal 0 @($endToEndReadiness.Gate1Blockers).Count `
+        "External prerequisites must remain distinct from Gate 1 blockers"
+    $plannedChangesByField = @{}
+    foreach ($plannedChange in @($endToEndReadiness.Gate1Plan.PlannedMetadataChanges)) {
+        $plannedChangesByField[[string]$plannedChange.Field] = [string]$plannedChange.DesiredValue
+    }
+    Assert-Equal "1.16.4" $plannedChangesByField["ReleaseVersion"] `
+        "Planned compatibility ReleaseVersion"
+    Assert-Equal "1.16.3" $plannedChangesByField["PreviousSourceModVersion"] `
+        "Planned compatibility previous source version"
+    Assert-Equal "1.16.4" $plannedChangesByField["ManifestVersions.version-1.0"] `
+        "Planned target-lane manifest version"
+    Assert-Equal "1.18.0" $plannedChangesByField["ManifestVersions.version-1.1"] `
+        "Planned public-lane manifest version"
+    Assert-Equal "3305038022" $plannedChangesByField["Steam.PublishedFileId"] `
+        "Planned inherited Steam identity"
+    $endToEndBlockers = @($endToEndReadiness.Blockers | ForEach-Object Code)
+    Assert-True ("ChangelogVersionMismatch" -notin $endToEndBlockers) `
+        "Stale compatibility ReleaseVersion must not become a changelog blocker."
+    Assert-True ("SteamIdentityMissing" -notin $endToEndBlockers) `
+        "Registered readiness must inherit the public Steam identity."
     Assert-True `
         (-not (($endToEndOutput | Out-String) -match "Cannot bind argument to parameter 'Path'")) `
         "Optional empty paths must not escape as PowerShell parameter-binding failures."
-    Write-Host "PASS: exact registered readiness command emits structured unmaterialized-package artifact"
+    Write-Host "PASS: exact registered readiness command models public ownership and metadata preparation"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
@@ -235,11 +363,12 @@ try {
     $candidateKeys = @($jsonCandidates | ForEach-Object { Get-CandidateKey $_ } | Sort-Object)
     $expectedKeys = @(
         "Alpha|2.0.0|main|||CurrentLine|Alpha/CHANGELOG.md",
+        "SmartPower|1.16.4|update-1.0|update-1.0|version-1.0|BackportPatchOnly|SmartPower/CHANGELOG.md",
         "XRay|1.2.0|update-1.0|update-1.0|version-1.0|BackportPatchOnly|XRay/CHANGELOG.md"
     ) | Sort-Object
     Assert-Equal ($expectedKeys -join "`n") ($candidateKeys -join "`n") "Inventory JSON candidate set"
 
-    $humanRows = @($humanOutput -split "`r?`n" | Where-Object { $_ -match "^(Alpha|XRay)\s+\d" })
+    $humanRows = @($humanOutput -split "`r?`n" | Where-Object { $_ -match "^(Alpha|SmartPower|XRay)\s+\d" })
     Assert-Equal $jsonCandidates.Count $humanRows.Count "Inventory default/JSON candidate count parity"
     Assert-True ($humanOutput -match "(?m)^Alpha\s+2\.0\.0\s+main\s+CurrentLine\s+Alpha/CHANGELOG\.md\s*$") `
         "The current-line candidate did not render as a real table row."
@@ -354,6 +483,25 @@ try {
     Assert-Equal "1.3.0" $backportReadiness.Candidate.PublicPackageVersion "Backport public package version"
     Assert-Equal "BackportPatchOnly" $backportReadiness.Candidate.VersionPolicy "Backport version policy"
     Assert-Equal "XRay_1.2.0_update-1.0" $backportReadiness.Git.IntendedTag "Qualified backport tag"
+
+    $preparedBackportReadiness = Get-ReleaseReadinessReport `
+        -ToolsRoot $fixtureRoot `
+        -RepositoryRoot $fixtureRoot `
+        -ModName "Automation" `
+        -ReleaseLine "update-1.0" `
+        -ProbeOverride $readyProbe
+    Assert-Equal "4.0.11" $preparedBackportReadiness.Candidate.SourceModVersion `
+        "Prepared backport source version"
+    Assert-Equal "4.0.10" $preparedBackportReadiness.Candidate.PreviousSourceModVersion `
+        "Prepared backport previous source version"
+    Assert-Equal "4.10.0" $preparedBackportReadiness.Candidate.PublicPackageVersion `
+        "Prepared backport public package version"
+    Assert-Equal "3324234282" $preparedBackportReadiness.Platforms.Steam.PublishedFileId `
+        "Prepared backport public Steam identity"
+    Assert-True (-not $preparedBackportReadiness.Gate1Plan.PreparationRequired) `
+        "Already-prepared older-line metadata must not receive a false preparation plan."
+    Assert-True $preparedBackportReadiness.ReadyForPreflight `
+        "Already-prepared older-line metadata should be ready for immutable preflight."
 
     $humanReadiness = Format-ReleaseReadinessReport $backportReadiness | Out-String
     $jsonReadiness = $backportReadiness | ConvertTo-Json -Depth 8 | ConvertFrom-Json
@@ -698,6 +846,8 @@ Assert-True $verifyText.Contains("PublicPackageVersion = `$publicPackageVersion"
     "Preflight report is missing PublicPackageVersion."
 Assert-True $verifyText.Contains('Assert-PathExists $resolvedReadinessReportPath "Release readiness report"') `
     "Preflight does not require the compact readiness artifact."
+Assert-True $verifyText.Contains('$readinessReport.ReadyForPreflight -ne $true') `
+    "Immutable preflight must reject a pre-preparation readiness artifact."
 Assert-True $verifyText.Contains("Readiness = [ordered]@{") `
     "Preflight does not retain discovery/readiness evidence."
 

@@ -352,8 +352,8 @@ if ([int]$readinessReport.SchemaVersion -ne 1 -or
         [string]$readinessReport.ArtifactType -ne "TimberbornReleaseReadiness") {
     throw "Unsupported release readiness report: $resolvedReadinessReportPath"
 }
-if ($readinessReport.Ready -ne $true) {
-    throw "Release readiness report is blocked: $resolvedReadinessReportPath"
+if ($readinessReport.ReadyForPreflight -ne $true) {
+    throw "Release readiness report is not ready for immutable preflight: $resolvedReadinessReportPath"
 }
 if ([string]$readinessReport.Candidate.ModName -ne $ModName -or
         [string]$readinessReport.Candidate.SourceModVersion -ne $sourceModVersion -or
@@ -982,7 +982,10 @@ $report = [ordered]@{
     Readiness = [ordered]@{
         ReportPath = $resolvedReadinessReportPath
         CreatedAtUtc = [string]$readinessReport.CreatedAtUtc
-        Ready = [bool]$readinessReport.Ready
+        Ready = [bool]$readinessReport.ReadyForPreflight
+        ReadyForGate1 = [bool]$readinessReport.ReadyForGate1
+        ReadyForPreflight = [bool]$readinessReport.ReadyForPreflight
+        PreparationRequired = [bool]$readinessReport.Gate1Plan.PreparationRequired
         ReleaseCommit = [string]$readinessReport.Git.ReleaseCommit
     }
     RepoRoot = $repoRoot
