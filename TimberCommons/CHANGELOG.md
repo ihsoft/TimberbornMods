@@ -1,3 +1,9 @@
+# v1.15.3 (Timberborn v1.0) (TBD)
+* [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
+* [Fix] Irrigation tower recipe toggles did not show the currently selected mode.
+* [Fix] Good-consuming irrigation towers could keep a stale consumption rate after their coverage changed.
+* [Fix] Irrigation towers continued reacting to terrain or blocking changes after leaving the finished state.
+
 # v1.15.2 (March 25th, 2026)
 * [Update] Support game version `1.0.12.7`.
 * [Change] No more mod versions for the pre-1.0 game version.

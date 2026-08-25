@@ -15,6 +15,7 @@ sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
       typeof(GoodConsumingBuildingFragmentPatch),
+      typeof(ManufactoryRecipeSliderToggleFactoryPatch),
   ];
 
   /// <inheritdoc/>

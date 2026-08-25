@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+
+namespace TimberCommons.Tests;
+
+static class TimberCommonsTestSuite {
+  static readonly List<(string Name, Action Test)> Tests = [
+      ("GoodConsumingIrrigationTower scales consumption from coverage",
+          GoodConsumingIrrigationTowerTests.ScalesConsumptionFromCoverage),
+      ("GoodConsumingIrrigationTower toggles consumption from coverage",
+          GoodConsumingIrrigationTowerTests.TogglesConsumptionFromCoverage),
+      ("GoodConsumingIrrigationTower moisturizes only when consumption can run",
+          GoodConsumingIrrigationTowerTests.MoisturizesOnlyWhenConsumptionCanRun),
+      ("GoodConsumingIrrigationTower multiplies finished-building efficiency providers",
+          GoodConsumingIrrigationTowerTests.MultipliesFinishedBuildingEfficiencyProviders),
+      ("IrrigationTower initializes flat-foundation coverage from lifecycle",
+          IrrigationTowerTests.InitializesFlatFoundationCoverageFromLifecycle),
+      ("IrrigationTower starts moisture override once and removes it on exit",
+          IrrigationTowerTests.StartsMoistureOverrideOnceAndRemovesItOnExit),
+      ("IrrigationTower starts moisture override with distance-based desert levels",
+          IrrigationTowerTests.StartsMoistureOverrideWithDistanceBasedDesertLevels),
+      ("IrrigationTower unsubscribes from runtime events on exit",
+          IrrigationTowerTests.UnsubscribesFromRuntimeEventsOnExit),
+      ("IrrigationTower removes moisture override when blocked",
+          IrrigationTowerTests.RemovesMoistureOverrideWhenBlocked),
+      ("IrrigationTower recalculates coverage when efficiency changes",
+          IrrigationTowerTests.RecalculatesCoverageWhenEfficiencyChanges),
+      ("IrrigationTower saves and claims active moisture override",
+          IrrigationTowerTests.SavesAndClaimsActiveMoistureOverride),
+      ("IrrigationTower restores saved efficiency", IrrigationTowerTests.RestoresSavedEfficiency),
+      ("IrrigationTower recalculates coverage when terrain eligibility changes",
+          IrrigationTowerTests.RecalculatesCoverageWhenTerrainEligibilityChanges),
+      ("IrrigationTower refreshes moisture override when coverage changes",
+          IrrigationTowerTests.RefreshesMoistureOverrideWhenCoverageChanges),
+      ("IrrigationTower recalculates coverage when soil barrier is built",
+          IrrigationTowerTests.RecalculatesCoverageWhenSoilBarrierIsBuilt),
+      ("IrrigationTower recalculates coverage when soil barrier is deleted",
+          IrrigationTowerTests.RecalculatesCoverageWhenSoilBarrierIsDeleted),
+      ("IrrigationTower returns preview range for unfinished building",
+          IrrigationTowerTests.ReturnsPreviewRangeForUnfinishedBuilding),
+      ("IrrigationTower returns reachable or eligible range for finished building",
+          IrrigationTowerTests.ReturnsReachableOrEligibleRangeForFinishedBuilding),
+      ("IrrigationTower post-placement change recalculates preview positioning",
+          IrrigationTowerTests.PostPlacementChangeRecalculatesPreviewPositioning),
+      ("IrrigationTower post-initialize recalculates preview positioning",
+          IrrigationTowerTests.PostInitializeEntityRecalculatesPreviewPositioning),
+      ("IrrigationTower delays mechanical efficiency changes",
+          IrrigationTowerTests.DelaysMechanicalEfficiencyChanges),
+      ("IrrigationTower refreshes range highlight only while selected",
+          IrrigationTowerTests.RefreshesRangeHighlightOnlyWhileSelected),
+      ("IrrigationTower ignores irrelevant terrain events", IrrigationTowerTests.IgnoresIrrelevantTerrainEvents),
+      ("IrrigationTower ignores irrelevant soil barrier build events",
+          IrrigationTowerTests.IgnoresIrrelevantSoilBarrierBuildEvents),
+      ("IrrigationTower ignores irrelevant soil barrier delete events",
+          IrrigationTowerTests.IgnoresIrrelevantSoilBarrierDeleteEvents),
+      ("IrrigationTower calculates coverage from two-by-two foundation boundary",
+          IrrigationTowerTests.CalculatesCoverageFromTwoByTwoFoundationBoundary),
+      ("IrrigationTower uses all foundation tiles when ground-only is disabled",
+          IrrigationTowerTests.UsesAllFoundationTilesWhenGroundOnlyIsDisabled),
+      ("IrrigationTower clips coverage at map bounds", IrrigationTowerTests.ClipsCoverageAtMapBounds),
+      ("IrrigationTower terrain obstacles cut off disconnected tiles",
+          IrrigationTowerTests.TerrainObstaclesCutOffDisconnectedTiles),
+      ("IrrigationTower soil barriers cut off disconnected tiles",
+          IrrigationTowerTests.SoilBarriersCutOffDisconnectedTiles),
+  ];
+
+  public static int Run() {
+    return TestRunner.Run(Tests);
+  }
+}

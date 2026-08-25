@@ -86,7 +86,7 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
   /// <seealso cref="ReachableTiles"/>
   /// <seealso cref="MaxCoveredTilesCount"/>
   /// <seealso cref="UpdateConsumptionRate"/>
-  public float Coverage { get; private set; }
+  public float Coverage { get; internal set; } // Internal setter is used by unit tests for derived tower logic.
 
   /// <summary>Tells if the building is being irrigating the tiles in range.</summary>
   /// <seealso cref="ReachableTiles"/>
@@ -154,6 +154,10 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
   /// <inheritdoc/>
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
+    _terrainMap.TerrainAdded -= OnTerrainChanged;
+    _terrainMap.TerrainRemoved -= OnTerrainChanged;
+    BlockableObject.ObjectBlocked -= OnBlockedStateChanged;
+    BlockableObject.ObjectUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
     DisableComponent();
   }
