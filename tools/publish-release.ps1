@@ -16,6 +16,8 @@ param(
     [string] $ModIoConfigPath = "",
     [string] $ModIoAccessTokenPath = "",
     [string] $Repository = "ihsoft/TimberbornMods",
+    [string] $SignoffReportRoot = ".tools/release-signoff",
+    [string[]] $EvidenceTerm = @(),
     [switch] $SkipSteam,
     [switch] $SkipModIo,
     [switch] $SkipPlatformTags,
@@ -37,10 +39,14 @@ Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-notes.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-date.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-signoff.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $releaseLogDirectory = ""
 $releaseStepIndex = 0
 $completedPublicSteps = New-Object System.Collections.Generic.List[string]
+$publishOperations = New-Object System.Collections.Generic.List[object]
+$publishWarnings = New-Object System.Collections.Generic.List[string]
+$signoffReportPath = ""
 
 function Resolve-RepoPath([string] $Path) {
     return Resolve-RepositoryPath $repoRoot $Path
@@ -179,10 +185,21 @@ function Invoke-ReleaseStep([string] $Name, [string] $ScriptName, [string[]] $Ar
     $scriptPath = Join-Path $PSScriptRoot $ScriptName
     $script:releaseStepIndex++
     try {
-        Invoke-LoggedReleaseStep -Name $Name -ScriptPath $scriptPath -Arguments $Arguments `
-            -LogDirectory $releaseLogDirectory -StepIndex $releaseStepIndex -DetailedOutput:$DetailedOutput | Out-Null
+        $operation = Invoke-LoggedReleaseStep -Name $Name -ScriptPath $scriptPath -Arguments $Arguments `
+            -LogDirectory $releaseLogDirectory -StepIndex $releaseStepIndex -DetailedOutput:$DetailedOutput
+        if ($Name -eq "Discord release handoff") {
+            $operation.AffectsReleaseCompletion = $false
+        }
+        $publishOperations.Add($operation)
     }
     catch {
+        $failedOperation = $_.Exception.Data["ReleaseOperation"]
+        if ($null -ne $failedOperation) {
+            if ($Name -eq "Discord release handoff") {
+                $failedOperation.AffectsReleaseCompletion = $false
+            }
+            $publishOperations.Add($failedOperation)
+        }
         if ($completedPublicSteps.Count -gt 0) {
             Write-Warning "Partial success before failure: $($completedPublicSteps -join ', ')."
         }
@@ -208,10 +225,239 @@ function Add-SwitchArgument([System.Collections.Generic.List[string]] $Arguments
     }
 }
 
+function Get-SignoffExternalEvidence([bool] $FinalSuccess) {
+    $steamOperations = @($publishOperations | Where-Object Name -eq "Steam release publish")
+    $modIoOperations = @($publishOperations | Where-Object Name -eq "Mod.IO release publish")
+    $steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
+    $steamReadback = $null
+    if ($FinalSuccess -and $steamOperations.Count -gt 0 -and
+            -not [string]::IsNullOrWhiteSpace($steamPublishedFileId)) {
+        try {
+            $steamResponse = Invoke-RestMethod -Method Post `
+                -Uri "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/" `
+                -Body @{ itemcount = "1"; "publishedfileids[0]" = $steamPublishedFileId }
+            $steamItem = $steamResponse.response.publishedfiledetails[0]
+            if ([int]$steamItem.result -eq 1) {
+                $steamReadback = [ordered]@{
+                    PublishedFileId = [string]$steamItem.publishedfileid
+                    Result = [int]$steamItem.result
+                    TimeUpdated = [long]$steamItem.time_updated
+                    FileSize = [long]$steamItem.file_size
+                    Visibility = [int]$steamItem.visibility
+                }
+            }
+            else {
+                $publishWarnings.Add("Final public Steam readback returned result $($steamItem.result).")
+            }
+        }
+        catch {
+            $publishWarnings.Add("Final public Steam readback failed: $($_.Exception.Message)")
+        }
+    }
+    $gitEvidence = New-Object System.Collections.Generic.List[object]
+    foreach ($releaseSource in @($report.ReleaseSources)) {
+        $sourceTag = [string]$releaseSource.TagName
+        $sourceCommit = [string]$releaseSource.Commit
+        $localResult = Invoke-ReleaseNativeCommand -Command "git" -Arguments @(
+            "-C", [string]$releaseSource.ReleaseRoot, "rev-list", "-n", "1", $sourceTag)
+        $localCommit = if ($localResult.ExitCode -eq 0 -and $localResult.Output.Count -gt 0) {
+            [string]$localResult.Output[0]
+        }
+        else {
+            ""
+        }
+        $remoteCommit = ""
+        if ($FinalSuccess -and -not $SkipGitTag) {
+            $remoteResult = Invoke-ReleaseNativeCommand -Command "git" -Arguments @(
+                "-C", $repoRoot, "ls-remote", "--tags", "origin", "refs/tags/$sourceTag")
+            if ($remoteResult.ExitCode -eq 0 -and $remoteResult.Output.Count -gt 0) {
+                $remoteCommit = ([string]$remoteResult.Output[0] -split "\s+")[0]
+            }
+        }
+        $gitEvidence.Add([ordered]@{
+            TagName = $sourceTag
+            ExpectedCommit = $sourceCommit
+            LocalCommit = $localCommit
+            RemoteCommit = $remoteCommit
+            LocalVerified = $localCommit -eq $sourceCommit
+            RemoteVerified = $SkipGitTag -or $remoteCommit -eq $sourceCommit
+        })
+    }
+
+    $githubEvidence = [ordered]@{
+        Requested = -not $SkipGitHubRelease
+        Url = ""
+        TagName = [string]$report.TagName
+        Assets = [object[]]@()
+        Verified = $false
+    }
+    if ($FinalSuccess -and -not $SkipGitHubRelease) {
+        $githubResult = Invoke-ReleaseNativeCommand -Command "gh" -Arguments @(
+            "release", "view", [string]$report.TagName, "--repo", $Repository,
+            "--json", "url,tagName,assets")
+        if ($githubResult.ExitCode -eq 0) {
+            $github = ConvertFrom-Json ($githubResult.Output -join [Environment]::NewLine)
+            $githubEvidence.Url = [string]$github.url
+            $githubEvidence.TagName = [string]$github.tagName
+            $githubEvidence.Assets = [object[]]@($github.assets)
+            $githubEvidence.Verified = $true
+        }
+        else {
+            $publishWarnings.Add("Final GitHub release readback failed; inspect the GitHub child log before signoff.")
+        }
+    }
+
+    return [ordered]@{
+        Steam = [ordered]@{
+            Requested = -not $SkipSteam -and -not [bool]$report.PreflightOptions.SkipSteam
+            PublishedFileId = $steamPublishedFileId
+            VisibilityIntent = if ($report.PreflightOptions.PublishSteamVisibility) { "Publish" } else { "Unchanged" }
+            VisibilityResult = if ($FinalSuccess -and $steamOperations.Count -gt 0) {
+                if ($report.PreflightOptions.PublishSteamVisibility) { "PublishedAndVerifiedByChild" } else { "Unchanged" }
+            }
+            else {
+                "UnknownOrNotRequested"
+            }
+            FinalReadback = $steamReadback
+            FinalReadbackVerified = $null -ne $steamReadback -and
+                [string]$steamReadback.PublishedFileId -eq $steamPublishedFileId
+            Operations = [object[]]$steamOperations
+        }
+        ModIO = [ordered]@{
+            Requested = -not $SkipModIo -and -not [bool]$report.PreflightOptions.SkipModIo
+            ModId = $modIoId
+            PageVisibilityIntent = if ($report.PreflightOptions.PublishModIoPage) { "Publish" } else { "Unchanged" }
+            VisibilityResult = if ($FinalSuccess -and $modIoOperations.Count -gt 0) {
+                if ($report.PreflightOptions.PublishModIoPage) { "PublishedAndVerifiedByChild" } else { "Unchanged" }
+            }
+            else {
+                "UnknownOrNotRequested"
+            }
+            Operations = [object[]]$modIoOperations
+        }
+        Git = [ordered]@{
+            Requested = -not $SkipGitTag
+            Tags = [object[]]$gitEvidence.ToArray()
+        }
+        GitHub = $githubEvidence
+    }
+}
+
+function Add-FailedDirectOperation([string] $Name, [string] $Summary, [string] $ExternalOutcome) {
+    $publishOperations.Add([ordered]@{
+        Name = $Name
+        Script = "git"
+        Arguments = [string[]]@()
+        Status = "Failed"
+        ExitCode = [int]$LASTEXITCODE
+        StartedAtUtc = ""
+        CompletedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+        LogPath = ""
+        Summary = [string[]]@($Summary)
+        Warnings = [string[]]@($Summary)
+        ExternalMutationPossible = $true
+        ExternalOutcome = $ExternalOutcome
+        AffectsReleaseCompletion = $true
+    })
+}
+
+function Save-ReleaseSignoffArtifact([bool] $FinalSuccess, [string] $Interruption) {
+    if ($null -eq $report -or [string]::IsNullOrWhiteSpace([string]$report.ModName)) {
+        return ""
+    }
+    try {
+        if ($null -eq $report.PSObject.Properties["ReportPath"]) {
+            $report | Add-Member -NotePropertyName "ReportPath" -NotePropertyValue $reportPath
+        }
+
+        $readiness = $null
+        $readinessPath = [string]$report.Readiness.ReportPath
+        if (-not [string]::IsNullOrWhiteSpace($readinessPath) -and
+                (Test-Path -LiteralPath $readinessPath -PathType Leaf)) {
+            $readiness = Get-Content -Raw -LiteralPath $readinessPath | ConvertFrom-Json
+        }
+
+        $issueEvidence = [ordered]@{
+            Boundary = "EvidenceCandidatesOnly"
+            MutationsPerformed = $false
+            Query = "Not reached because publication did not complete."
+            Terms = [string[]]@()
+            Candidates = [object[]]@()
+            Decision = "PendingHumanReview"
+        }
+        if ($FinalSuccess) {
+            try {
+                $openIssues = Get-OpenGitHubIssues $Repository
+                $issueEvidence = Get-ReleaseIssueCandidates $report $openIssues $EvidenceTerm
+            }
+            catch {
+                $publishWarnings.Add($_.Exception.Message)
+                $issueEvidence.Query = "Collection failed; see incident inventory."
+            }
+        }
+
+        $wikiRoot = "$toolRepoRoot.wiki"
+        $wikiEvidence = Get-ReleaseWikiCandidates $report $wikiRoot $EvidenceTerm
+        if (-not $wikiEvidence.Available) {
+            $publishWarnings.Add("Wiki evidence checkout is unavailable: $wikiRoot")
+        }
+
+        $externalEvidence = Get-SignoffExternalEvidence $FinalSuccess
+        $overrides = [ordered]@{
+            CorrectiveReplacement = [bool]$CorrectiveReplacement
+            PreserveChangelogDate = [bool]$PreserveChangelogDate
+            ReplaceExistingGitHubAsset = [bool]$ReplaceExistingGitHubAsset
+            SkipSteam = [bool]$SkipSteam
+            SkipModIo = [bool]$SkipModIo
+            SkipPlatformTags = [bool]$SkipPlatformTags
+            SkipGitTag = [bool]$SkipGitTag
+            SkipGitHubRelease = [bool]$SkipGitHubRelease
+            SkipDiscordHandoff = [bool]$SkipDiscordHandoff
+        }
+        $signoff = New-ReleaseSignoffReport `
+            -Preflight $report `
+            -Readiness $readiness `
+            -Operations ([object[]]@(@($report.Steps) + @($publishOperations.ToArray()))) `
+            -IssueEvidence $issueEvidence `
+            -WikiEvidence $wikiEvidence `
+            -ExternalEvidence $externalEvidence `
+            -Overrides $overrides `
+            -Warnings ([string[]]$publishWarnings.ToArray()) `
+            -PrerequisiteInterruption $Interruption
+        $reportDirectory = Resolve-ToolPath $SignoffReportRoot
+        $lineSuffix = if ([string]::IsNullOrWhiteSpace([string]$report.ReleaseLine)) {
+            "current"
+        }
+        else {
+            [string]$report.ReleaseLine
+        }
+        $script:signoffReportPath = Join-Path $reportDirectory "$($report.ModName)-$($report.SourceModVersion)-$lineSuffix.json"
+        Write-ReleaseSignoffReport $signoff $signoffReportPath
+        return $signoff
+    }
+    catch {
+        Write-Warning "Could not write release signoff artifact: $($_.Exception.Message)"
+        return ""
+    }
+}
+
+$report = $null
+trap {
+    $failureMessage = $_.Exception.Message
+    $signoff = Save-ReleaseSignoffArtifact $false $failureMessage
+    if ($signoff -isnot [string]) {
+        Write-Host ""
+        Format-ReleaseSignoffReport $signoff | ForEach-Object { Write-Host $_ }
+        Write-Host "  Report: $signoffReportPath"
+    }
+    $ErrorActionPreference = "Continue"
+    Write-Host "Release publish failed: $failureMessage"
+    exit 1
+}
+
 $reportPath = Resolve-RepoPath $PreflightReportPath
 Assert-PathExists $reportPath "Preflight report"
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
-
 if ([int]$report.SchemaVersion -ne 5) {
     throw "Unsupported preflight report schema version: $($report.SchemaVersion)"
 }
@@ -573,6 +819,10 @@ if (-not $SkipGitTag) {
         $sourceCommit = [string]$releaseSource.Commit
         & git -C $repoRoot tag $sourceTag $sourceCommit
         if ($LASTEXITCODE -ne 0) {
+            Add-FailedDirectOperation `
+                "Git release tags" `
+                "Failed to create Git tag $sourceTag; earlier local tags in the batch may exist." `
+                "Unknown"
             if ($completedPublicSteps.Count -gt 0) {
                 Write-Warning "Partial success before failure: $($completedPublicSteps -join ', ')."
             }
@@ -584,6 +834,10 @@ if (-not $SkipGitTag) {
     $tagArguments = [string[]]$tagsToPush.ToArray()
     & git -C $repoRoot push --atomic origin @tagArguments
     if ($LASTEXITCODE -ne 0) {
+        Add-FailedDirectOperation `
+            "Git release tags" `
+            "Atomic tag push failed; read back remote tags before retrying." `
+            "Unknown"
         if ($completedPublicSteps.Count -gt 0) {
             Write-Warning "Partial success before failure: $($completedPublicSteps -join ', '), local Git tag creation."
         }
@@ -596,6 +850,23 @@ if (-not $SkipGitTag) {
         $completedPublicSteps.Add("Git release tag $sourceTag")
         Write-Host "Git tag created and pushed: $sourceTag -> $sourceCommit"
     }
+    $publishOperations.Add([ordered]@{
+        Name = "Git release tags"
+        Script = "git"
+        Arguments = [string[]]@("tag", "push --atomic")
+        Status = "Succeeded"
+        ExitCode = 0
+        StartedAtUtc = ""
+        CompletedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+        LogPath = ""
+        Summary = [string[]]@($releaseSources | ForEach-Object {
+            "Git tag created and pushed: $($_.TagName) -> $($_.Commit)"
+        })
+        Warnings = [string[]]@()
+        ExternalMutationPossible = $true
+        ExternalOutcome = "Confirmed"
+        AffectsReleaseCompletion = $true
+    })
 }
 
 if (-not $SkipGitHubRelease) {
@@ -636,6 +907,13 @@ if (-not $SkipDiscordHandoff) {
     }
 }
 
+$signoff = Save-ReleaseSignoffArtifact $true ""
+if ($signoff -is [string]) {
+    throw "Release publishing completed, but the final signoff artifact could not be written."
+}
+
 Write-Host ""
 Write-Host "Release publish completed for $sourceReleaseTitle."
-Write-Host "Discord message sending, issue closing, and Wiki handoff remain explicit follow-up steps."
+Format-ReleaseSignoffReport $signoff | ForEach-Object { Write-Host $_ }
+Write-Host "Signoff report: $signoffReportPath"
+Write-Host "Discord message sending, issue closing, Wiki decisions, and MentorOutcome remain explicit follow-up steps."

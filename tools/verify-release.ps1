@@ -19,6 +19,7 @@ param(
     [string] $ModIoConfigPath = "",
     [string] $ModIoAccessTokenPath = "",
     [string] $ReleaseCommit = "",
+    [string] $ReadinessReportPath = "",
     [string] $Repository = "ihsoft/TimberbornMods",
     [string] $ReplacementPlatforms = "",
     [ValidateSet("", "PreserveExisting", "MoveAuthorized")]
@@ -338,9 +339,36 @@ $sourceModVersion = [string](Get-ObjectPropertyValue $releaseConfig "ReleaseVers
 if ([string]::IsNullOrWhiteSpace($sourceModVersion)) {
     throw "ReleaseVersion is empty in $releaseConfigPath."
 }
+$readinessLineSuffix = if ([string]::IsNullOrWhiteSpace($ReleaseLine)) { "current" } else { $ReleaseLine }
+$resolvedReadinessReportPath = if ([string]::IsNullOrWhiteSpace($ReadinessReportPath)) {
+    Resolve-ToolPath ".tools/release-readiness/$ModName-$sourceModVersion-$readinessLineSuffix.json"
+}
+else {
+    Resolve-ToolPath $ReadinessReportPath
+}
+Assert-PathExists $resolvedReadinessReportPath "Release readiness report"
+$readinessReport = Get-Content -Raw -LiteralPath $resolvedReadinessReportPath | ConvertFrom-Json
+if ([int]$readinessReport.SchemaVersion -ne 1 -or
+        [string]$readinessReport.ArtifactType -ne "TimberbornReleaseReadiness") {
+    throw "Unsupported release readiness report: $resolvedReadinessReportPath"
+}
+if ($readinessReport.Ready -ne $true) {
+    throw "Release readiness report is blocked: $resolvedReadinessReportPath"
+}
+if ([string]$readinessReport.Candidate.ModName -ne $ModName -or
+        [string]$readinessReport.Candidate.SourceModVersion -ne $sourceModVersion -or
+        [string]$readinessReport.Candidate.ReleaseRoot -ne $repoRoot -or
+        [string]$readinessReport.Candidate.ReleaseLine -ne $ReleaseLine -or
+        [string]$readinessReport.Candidate.VersionPolicy -ne $VersionPolicy) {
+    throw "Release readiness identity does not match the requested preflight."
+}
 $previousSourceModVersion = [string](Get-ObjectPropertyValue $releaseConfig "PreviousSourceModVersion")
 $configuredPublicLane = Get-ConfiguredPublicPackageLane $releaseConfig $GameVersion $sourceModVersion
 $expectedPublicPackageVersion = [string]$configuredPublicLane.ManifestVersion
+if ([string]$readinessReport.Candidate.PublicPackageVersion -ne $expectedPublicPackageVersion -or
+        [string]$readinessReport.Candidate.GameVersion -ne $GameVersion) {
+    throw "Release readiness public package or game-lane identity changed before preflight."
+}
 $isBackportPackageUpdate = $VersionPolicy -eq "BackportPatchOnly" -and
     $expectedPublicPackageVersion -ne $sourceModVersion
 $releaseLogDirectory = New-ReleaseLogDirectory `
@@ -506,6 +534,9 @@ if (-not [string]::IsNullOrWhiteSpace($packageSourceValue)) {
 $gitSnapshot = Get-ReleaseGitSnapshot $ReleaseCommit `
     @($identityPaths | Sort-Object -Unique) `
     @($criticalPaths | Sort-Object -Unique)
+if ([string]$readinessReport.Git.ReleaseCommit -ne [string]$gitSnapshot.ReleaseCommit) {
+    throw "Release preparation commit changed after readiness discovery. Rerun compact readiness."
+}
 
 $steamPublishedFileId = [string](Get-ObjectPropertyValue $releaseConfig.Steam "PublishedFileId")
 $resolvedModIoConfigPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
@@ -948,6 +979,12 @@ if ($CorrectiveReplacement) {
 $report = [ordered]@{
     SchemaVersion = 5
     CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+    Readiness = [ordered]@{
+        ReportPath = $resolvedReadinessReportPath
+        CreatedAtUtc = [string]$readinessReport.CreatedAtUtc
+        Ready = [bool]$readinessReport.Ready
+        ReleaseCommit = [string]$readinessReport.Git.ReleaseCommit
+    }
     RepoRoot = $repoRoot
     ReleaseRoot = $repoRoot
     ReleaseBranch = $releaseBranch

@@ -7,6 +7,11 @@ Import-Module (Join-Path $PSScriptRoot "release-date.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-output.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-lines.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-unity.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-readiness.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-signoff.psm1") -Force
 
 function Assert-True([bool] $Condition, [string] $Message) {
     if (-not $Condition) {
@@ -94,6 +99,8 @@ try {
         "release-lines.json",
         "release-lines.psm1",
         "release-native-command.psm1",
+        "release-readiness.psm1",
+        "release-unity.psm1",
         "repository-paths.psm1"
     ) | ForEach-Object {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $_) -Destination (Join-Path $fixtureTools $_)
@@ -101,6 +108,42 @@ try {
 
     Write-TestFile (Join-Path $fixtureRoot "Alpha/CHANGELOG.md") "# v2.0.0 (TBD)`n"
     Write-TestFile (Join-Path $fixtureRoot "XRay/CHANGELOG.md") "# v1.1.9 (2026-08-01)`n"
+    Write-TestFile (Join-Path $fixtureRoot "ReadyMod/CHANGELOG.md") @'
+# v3.0.0 (August 24th, 2026)
+
+* [Feature #42] Add `WidgetSignal` release evidence.
+
+# v2.9.0 (August 1st, 2026)
+'@
+    Write-TestFile (Join-Path $fixtureRoot "ReadyMod/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json",
+  "ChangesPath": "ReadyMod/CHANGELOG.md",
+  "ReleaseVersion": "3.0.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/ReadyMod",
+    "OutputPath": "package/ReadyMod_v3.0.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "2.9.4",
+    "version-1.1": "3.0.0"
+  },
+  "Steam": { "PublishedFileId": "12345" }
+}
+'@
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json") `
+        '{"Name":"Ready Mod","Version":"3.0.0"}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/ProjectSettings/ProjectVersion.txt") `
+        "m_EditorVersion: 6000.5.2f1`n"
+    Write-TestFile `
+        (Join-Path $fixtureRoot "package/ReadyMod/version-1.0/manifest.json") `
+        '{"Name":"Ready Mod","Version":"2.9.4"}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "package/ReadyMod/version-1.1/manifest.json") `
+        '{"Name":"Ready Mod","Version":"3.0.0"}'
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "init", "-b", "main"))
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "config", "user.name", "Release Tooling Test"))
     [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "config", "user.email", "release-tooling@example.invalid"))
@@ -134,6 +177,148 @@ try {
             "BackportPatchOnly\s+XRay/CHANGELOG\.md\s*$")) `
         "The registered-line candidate did not render as a real table row."
     Write-Host "PASS: inventory default/JSON parity for current and registered release lines"
+
+    Write-TestFile (Join-Path $lineRoot "XRay/CHANGELOG.md") @'
+# v1.2.0 (Timberborn v1.0) (August 24th, 2026)
+
+* [Fix #77] Preserve `LegacySignal` on Update 1.0.
+
+# v1.1.9 (Timberborn v1.0) (August 1st, 2026)
+'@
+    Write-TestFile (Join-Path $lineRoot "XRay/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/XRay/manifest.json",
+  "ChangesPath": "XRay/CHANGELOG.md",
+  "ReleaseVersion": "1.2.0",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/XRay",
+    "OutputPath": "package/XRay_v1.2.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.2.0",
+    "version-1.1": "1.3.0"
+  },
+  "Steam": { "PublishedFileId": "67890" }
+}
+'@
+    Write-TestFile `
+        (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/XRay/manifest.json") `
+        '{"Name":"X-Ray","Version":"1.2.0"}'
+    Write-TestFile `
+        (Join-Path $lineRoot "ModsUnityProject/ProjectSettings/ProjectVersion.txt") `
+        "m_EditorVersion: 6000.5.2f1`n"
+    Write-TestFile `
+        (Join-Path $lineRoot "package/XRay/version-1.0/manifest.json") `
+        '{"Name":"X-Ray","Version":"1.2.0"}'
+    Write-TestFile `
+        (Join-Path $lineRoot "package/XRay/version-1.1/manifest.json") `
+        '{"Name":"X-Ray","Version":"1.3.0"}'
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "."))
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Prepare backport readiness fixture"))
+
+    $readyProbe = [pscustomobject]@{
+        Unity = [pscustomobject]@{
+            ProjectVersion = "6000.5.2f1"
+            CanonicalEditorPath = "C:\Fixture\Unity.exe"
+            Ready = $true
+            Error = ""
+        }
+        GitHub = [pscustomobject]@{ CliAvailable = $true; AuthReady = $true; Account = "fixture" }
+        Steam = [pscustomobject]@{
+            ConfigPath = "steam.local.json"
+            ConfigExists = $true
+            SteamCmdPath = "steamcmd.exe"
+            SteamCmdExists = $true
+            UserNameConfigured = $true
+            DesktopClientRunning = $true
+            UploadLoginMode = "SteamCMDConfiguredUser"
+            ExitCommand = "quit"
+            ExplicitLogoutCommand = $false
+        }
+        ModIO = [pscustomobject]@{
+            ConfigPath = "modio.local.json"
+            ConfigExists = $true
+            AccessTokenPath = "modio.token.txt"
+            AccessTokenExists = $true
+            ModId = "24680"
+            GameId = "1974"
+            ApiBaseConfigured = $true
+        }
+    }
+    $currentReadiness = Get-ReleaseReadinessReport `
+        -ToolsRoot $fixtureRoot `
+        -RepositoryRoot $fixtureRoot `
+        -ModName "ReadyMod" `
+        -ProbeOverride $readyProbe
+    Assert-True $currentReadiness.Ready "Current-line readiness fixture should be ready."
+    Assert-Equal "3.0.0" $currentReadiness.Candidate.SourceModVersion "Current source version"
+    Assert-Equal "3.0.0" $currentReadiness.Candidate.PublicPackageVersion "Current public package version"
+    Assert-Equal "CurrentLine" $currentReadiness.Candidate.VersionPolicy "Current version policy"
+    Assert-True (@($currentReadiness.Warnings | Where-Object { $_ -match "Desktop Steam" }).Count -eq 1) `
+        "Readiness must surface the concurrent desktop Steam/SteamCMD session boundary."
+
+    $backportReadiness = Get-ReleaseReadinessReport `
+        -ToolsRoot $fixtureRoot `
+        -RepositoryRoot $fixtureRoot `
+        -ModName "XRay" `
+        -ReleaseLine "update-1.0" `
+        -ProbeOverride $readyProbe
+    Assert-True $backportReadiness.Ready "Registered backport readiness fixture should be ready."
+    Assert-Equal "1.2.0" $backportReadiness.Candidate.SourceModVersion "Backport source version"
+    Assert-Equal "1.3.0" $backportReadiness.Candidate.PublicPackageVersion "Backport public package version"
+    Assert-Equal "BackportPatchOnly" $backportReadiness.Candidate.VersionPolicy "Backport version policy"
+    Assert-Equal "XRay_1.2.0_update-1.0" $backportReadiness.Git.IntendedTag "Qualified backport tag"
+
+    $humanReadiness = Format-ReleaseReadinessReport $backportReadiness | Out-String
+    $jsonReadiness = $backportReadiness | ConvertTo-Json -Depth 8 | ConvertFrom-Json
+    @(
+        $jsonReadiness.Candidate.ModName,
+        $jsonReadiness.Candidate.SourceModVersion,
+        $jsonReadiness.Candidate.PublicPackageVersion,
+        $jsonReadiness.Candidate.ReleaseRoot,
+        $jsonReadiness.Git.ReleaseCommit,
+        $jsonReadiness.Git.IntendedTag
+    ) | ForEach-Object {
+        Assert-True $humanReadiness.Contains([string]$_) "Readiness human/JSON parity omitted: $_"
+    }
+
+    $blockedProbe = [pscustomobject]@{
+        Unity = [pscustomobject]@{ ProjectVersion = "6000.5.2f1"; CanonicalEditorPath = ""; Ready = $false; Error = "missing" }
+        GitHub = [pscustomobject]@{ CliAvailable = $true; AuthReady = $false; Account = "" }
+        Steam = [pscustomobject]@{
+            ConfigPath = "missing"
+            ConfigExists = $false
+            SteamCmdPath = ""
+            SteamCmdExists = $false
+            UserNameConfigured = $false
+            DesktopClientRunning = $false
+            UploadLoginMode = "SteamCMDConfiguredUser"
+            ExitCommand = "quit"
+            ExplicitLogoutCommand = $false
+        }
+        ModIO = [pscustomobject]@{
+            ConfigPath = "missing"
+            ConfigExists = $false
+            AccessTokenPath = "secret-sentinel-must-not-leak"
+            AccessTokenExists = $false
+            ModId = ""
+            GameId = ""
+            ApiBaseConfigured = $false
+        }
+    }
+    $blockedReadiness = Get-ReleaseReadinessReport `
+        -ToolsRoot $fixtureRoot `
+        -RepositoryRoot $fixtureRoot `
+        -ModName "ReadyMod" `
+        -ProbeOverride $blockedProbe
+    $blockerCodes = @($blockedReadiness.Blockers | ForEach-Object Code)
+    @("UnityEditorMissing", "GitHubAuthMissing", "SteamConfigMissing", "ModIoConfigMissing", "ModIoCredentialMissing") |
+        ForEach-Object { Assert-True ($_ -in $blockerCodes) "Missing readiness blocker: $_" }
+    $blockedJson = $blockedReadiness | ConvertTo-Json -Depth 8
+    Assert-True (-not $blockedJson.Contains("secret-sentinel-must-not-leak")) `
+        "Readiness artifact leaked a credential path supplied only to the probe."
+    Write-Host "PASS: current/backport readiness, human/JSON parity, blockers, and secret boundary"
 
     $backportChangesPath = Join-Path $testRoot "backport-changelog.md"
     Write-TestFile $backportChangesPath @'
@@ -221,6 +406,181 @@ Write-Host "Final Mod.IO readback: mod_id=1; active_file_id=2; version=3.0.0; da
     Assert-True (-not $compactOutput.Contains("unimportant child detail")) `
         "Compact output unexpectedly exposed an unselected child detail."
     Write-Host "PASS: compact output exposes nested package mutations and final Mod.IO readback"
+
+    $wikiRoot = Join-Path $testRoot "wiki"
+    Write-TestFile `
+        (Join-Path $wikiRoot "Ready-Mod.md") `
+        "# Ready Mod`n`nWidgetSignal is part of the scripting API.`n"
+    Write-TestFile (Join-Path $wikiRoot "Unrelated.md") "# Unrelated`n"
+    $preflightFixture = [pscustomobject]@{
+        ModName = "ReadyMod"
+        SourceModVersion = "3.0.0"
+        PublicPackageVersion = "3.0.0"
+        PublicPackageGameVersion = "version-1.1"
+        ReleaseCommit = $currentReadiness.Git.ReleaseCommit
+        ReleaseLine = ""
+        ReleaseRoot = $fixtureRoot
+        VersionPolicy = "CurrentLine"
+        TagName = "ReadyMod_3.0.0"
+        Package = [pscustomobject]@{ Path = "ReadyMod.zip"; Sha256 = "package-sha"; Length = 123 }
+        Source = [pscustomobject]@{ Path = "package/ReadyMod"; Sha256 = "source-sha"; FileCount = 4 }
+        PackageLaneFingerprints = [object[]]@(
+            [pscustomobject]@{ GameVersion = "version-1.0"; ManifestVersion = "2.9.4"; Sha256 = "lane-old" },
+            [pscustomobject]@{ GameVersion = "version-1.1"; ManifestVersion = "3.0.0"; Sha256 = "lane-current" })
+        ReleaseSources = [object[]]@([pscustomobject]@{
+            ReleaseRoot = $fixtureRoot
+            Branch = "main"
+            Commit = $currentReadiness.Git.ReleaseCommit
+            GameVersion = "version-1.1"
+            SourceModVersion = "3.0.0"
+            ReleaseLine = ""
+            VersionPolicy = "CurrentLine"
+            TagName = "ReadyMod_3.0.0"
+            ChangesPath = (Join-Path $fixtureRoot "ReadyMod/CHANGELOG.md")
+            IsPrimary = $true
+        })
+        PreflightOptions = [pscustomobject]@{
+            PublishSteamVisibility = $false
+            PublishModIoPage = $false
+        }
+        ReleaseLogDirectory = "preflight-logs"
+        ReportPath = "preflight.json"
+    }
+    $readinessFixture = $currentReadiness | ConvertTo-Json -Depth 8 | ConvertFrom-Json
+    $readinessFixture | Add-Member -NotePropertyName "ReportPath" -NotePropertyValue "readiness.json"
+    $openIssues = [object[]]@(
+        [pscustomobject]@{
+            number = 42
+            title = "ReadyMod WidgetSignal"
+            url = "https://example.invalid/issues/42"
+            body = "Release candidate"
+            labels = [object[]]@([pscustomobject]@{ name = "ReadyMod" })
+        },
+        [pscustomobject]@{
+            number = 43
+            title = "ReadyMod follow-up"
+            url = "https://example.invalid/issues/43"
+            body = "Needs semantic review"
+            labels = [object[]]@([pscustomobject]@{ name = "ReadyMod" })
+        },
+        [pscustomobject]@{
+            number = 99
+            title = "Other mod"
+            url = "https://example.invalid/issues/99"
+            body = "WidgetSignal appears incidentally"
+            labels = [object[]]@([pscustomobject]@{ name = "Other" })
+        })
+    $issueEvidence = Get-ReleaseIssueCandidates $preflightFixture $openIssues
+    Assert-Equal 2 @($issueEvidence.Candidates).Count "Issue candidate boundary"
+    Assert-True (-not $issueEvidence.MutationsPerformed) "Issue evidence must never mutate issues."
+    Assert-True (@($issueEvidence.Candidates | Where-Object Number -eq 99).Count -eq 0) `
+        "Issue evidence included a term-only issue outside the mod scope."
+    $wikiEvidence = Get-ReleaseWikiCandidates $preflightFixture $wikiRoot
+    Assert-Equal 1 @($wikiEvidence.References).Count "Wiki evidence reference count"
+    Assert-True (-not $wikiEvidence.MutationsPerformed) "Wiki evidence must never mutate pages."
+
+    $modIoLog = Join-Path $testRoot "modio-final.log"
+    Write-TestFile $modIoLog (
+        "Final Mod.IO readback: mod_id=24680; active_file_id=13579; version=3.0.0; " +
+        "date_scanned=123456; virus_status=1; virus_positive=0; file_size=98765`n")
+    $successfulOperations = [object[]]@(
+        [pscustomobject]@{
+            Name = "Steam release publish"
+            Status = "Succeeded"
+            ExitCode = 0
+            Summary = [string[]]@("SteamCMD upload completed.")
+            Warnings = [string[]]@()
+            LogPath = ""
+            ExternalMutationPossible = $true
+            ExternalOutcome = "Confirmed"
+        },
+        [pscustomobject]@{
+            Name = "Mod.IO release publish"
+            Status = "Succeeded"
+            ExitCode = 0
+            Summary = [string[]]@()
+            Warnings = [string[]]@()
+            LogPath = $modIoLog
+            ExternalMutationPossible = $true
+            ExternalOutcome = "Confirmed"
+        })
+    $externalEvidence = [pscustomobject]@{
+        Steam = [pscustomobject]@{ PublishedFileId = "12345"; VisibilityResult = "Unchanged" }
+        ModIO = [pscustomobject]@{ ModId = "24680"; VisibilityResult = "Unchanged" }
+        Git = [pscustomobject]@{ Tags = [object[]]@([pscustomobject]@{ TagName = "ReadyMod_3.0.0"; RemoteVerified = $true }) }
+        GitHub = [pscustomobject]@{ Url = "https://example.invalid/release"; Verified = $true }
+    }
+    $signoff = New-ReleaseSignoffReport `
+        -Preflight $preflightFixture `
+        -Readiness $readinessFixture `
+        -Operations $successfulOperations `
+        -IssueEvidence $issueEvidence `
+        -WikiEvidence $wikiEvidence `
+        -ExternalEvidence $externalEvidence `
+        -Overrides ([pscustomobject]@{ PreserveChangelogDate = $false })
+    Assert-Equal 1 $signoff.SchemaVersion "Signoff schema version"
+    Assert-Equal "Published" $signoff.Status "Successful signoff status"
+    Assert-Equal 13579 $signoff.Platforms.ModIO.FinalReadback.ActiveFileId "Final Mod.IO active file evidence"
+    Assert-Equal "Pending" $signoff.MentorOutcome.Status "Mentor outcome gate"
+    Assert-True (-not $signoff.FullySignedOff) "A pending MentorOutcome must prevent complete signoff."
+    Assert-Equal 0 @($signoff.IncidentInventory.DiscoveryPreflightPublishDifferences.Differences).Count `
+        "Matching discovery/preflight identities should have no differences."
+
+    $signoffRoundTripPath = Join-Path $testRoot "signoff-roundtrip.json"
+    Write-ReleaseSignoffReport $signoff $signoffRoundTripPath
+    $signoffRoundTrip = Get-Content -Raw -LiteralPath $signoffRoundTripPath | ConvertFrom-Json
+    Assert-Equal "package-sha" $signoffRoundTrip.Artifacts.Package.Sha256 "Signoff package hash round trip"
+    Assert-Equal "EvidenceCandidatesOnly" $signoffRoundTrip.IssueAudit.Boundary "Issue evidence boundary round trip"
+
+    $failedOperation = [pscustomobject]@{
+        Name = "Mod.IO release publish"
+        Status = "Failed"
+        ExitCode = 7
+        Summary = [string[]]@("Uploaded to Mod.IO as file id 999.")
+        Warnings = [string[]]@("ambiguous fixture warning")
+        LogPath = "failed-modio.log"
+        ExternalMutationPossible = $true
+        ExternalOutcome = "Unknown"
+    }
+    $partialSignoff = New-ReleaseSignoffReport `
+        -Preflight $preflightFixture `
+        -Readiness $readinessFixture `
+        -Operations ([object[]]@($successfulOperations[0], $failedOperation, $failedOperation)) `
+        -IssueEvidence $issueEvidence `
+        -WikiEvidence $wikiEvidence `
+        -ExternalEvidence $externalEvidence `
+        -Overrides ([pscustomobject]@{ CorrectiveReplacement = $true }) `
+        -PrerequisiteInterruption "fixture interruption"
+    Assert-Equal "Partial" $partialSignoff.Status "Partial-success status"
+    Assert-Equal 2 @($partialSignoff.IncidentInventory.FailedOperations).Count "Failed child operation inventory"
+    Assert-Equal 1 @($partialSignoff.IncidentInventory.RetriedOperations).Count "Retried operation inventory"
+    Assert-Equal 2 @($partialSignoff.IncidentInventory.AmbiguousOrUnknownOutcomes).Count `
+        "Unknown external outcome inventory"
+    Assert-Equal "Unresolved" $partialSignoff.MentorOutcome.Status "Partial release MentorOutcome"
+    $discordFailure = [pscustomobject]@{
+        Name = "Discord release handoff"
+        Status = "Failed"
+        ExitCode = 1
+        Summary = [string[]]@()
+        Warnings = [string[]]@("Discord fixture warning")
+        LogPath = "discord.log"
+        ExternalMutationPossible = $false
+        ExternalOutcome = "NotApplicable"
+        AffectsReleaseCompletion = $false
+    }
+    $discordWarningSignoff = New-ReleaseSignoffReport `
+        -Preflight $preflightFixture `
+        -Readiness $readinessFixture `
+        -Operations ([object[]]@($successfulOperations + $discordFailure)) `
+        -IssueEvidence $issueEvidence `
+        -WikiEvidence $wikiEvidence `
+        -ExternalEvidence $externalEvidence `
+        -Overrides ([pscustomobject]@{})
+    Assert-Equal "Published" $discordWarningSignoff.Status `
+        "Discord preparation failure must remain a post-release warning"
+    Assert-Equal 1 @($discordWarningSignoff.IncidentInventory.FailedOperations).Count `
+        "Discord failure must remain visible in the incident inventory"
+    Write-Host "PASS: signoff schema/evidence, incident inventory, issue/Wiki boundaries, and local round trip"
 }
 finally {
     if (Test-Path -LiteralPath $testRoot) {
@@ -250,6 +610,10 @@ Assert-True $verifyText.Contains("SchemaVersion = 5") `
     "Preflight report schema does not record the source/public version contract."
 Assert-True $verifyText.Contains("PublicPackageVersion = `$publicPackageVersion") `
     "Preflight report is missing PublicPackageVersion."
+Assert-True $verifyText.Contains('Assert-PathExists $resolvedReadinessReportPath "Release readiness report"') `
+    "Preflight does not require the compact readiness artifact."
+Assert-True $verifyText.Contains("Readiness = [ordered]@{") `
+    "Preflight does not retain discovery/readiness evidence."
 
 $publishText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-release.ps1")
 Assert-True $publishText.Contains('[switch] $PreserveChangelogDate') `
@@ -258,6 +622,14 @@ Assert-True $publishText.Contains('Committed changelog date') `
     "Release publication does not identify the committed changelog date."
 Assert-True $publishText.Contains('current local date:') `
     "Release publication does not surface committed and current dates."
+Assert-True $publishText.Contains("Save-ReleaseSignoffArtifact `$true") `
+    "Release publication does not write a successful final signoff artifact."
+Assert-True $publishText.Contains("Save-ReleaseSignoffArtifact `$false") `
+    "Release publication does not preserve a partial/failed signoff artifact."
+Assert-True $publishText.Contains("Get-OpenGitHubIssues") `
+    "Release publication does not collect compact issue evidence candidates."
+Assert-True $publishText.Contains("Get-ReleaseWikiCandidates") `
+    "Release publication does not collect compact Wiki evidence candidates."
 
 $modIoText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-modio.ps1")
 $initialResponseIndex = $modIoText.IndexOf("Initial Mod.IO upload response", [System.StringComparison]::Ordinal)
@@ -268,6 +640,14 @@ Assert-True $modIoText.Contains('[switch] $BackportPackageUpdate') `
     "Mod.IO publishing is missing explicit backport package update mode."
 Assert-True $modIoText.Contains("Mod.IO backport upload did not create a distinct file id.") `
     "Mod.IO publishing does not require a distinct file id for a backport package update."
-Write-Host "PASS: preflight ordering, platform skip contract, rollover gate, and final readback ordering"
+
+$steamText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-steam.ps1")
+Assert-True $steamText.Contains('& $SteamCmd +login $UserName +workshop_build_item $VdfPath +quit') `
+    "Steam publication no longer uses the documented login, workshop upload, and SteamCMD quit sequence."
+Assert-True ($steamText -notmatch "(?i)\+(logout|logoff)\b") `
+    "Steam publication must not log off the configured account explicitly."
+Assert-True ($publishText -notmatch "(?i)\+(logout|logoff)\b") `
+    "Unified publication must not add an explicit Steam account logoff."
+Write-Host "PASS: preflight ordering, platform skip contract, rollover, final readback, and Steam session boundary"
 
 Write-Host "All release tooling tests passed."

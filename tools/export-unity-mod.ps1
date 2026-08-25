@@ -20,6 +20,7 @@ $ErrorActionPreference = "Stop"
 
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-unity.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $RepositoryRoot $toolRepoRoot
 $coordinationRoot = Resolve-RepositoryRoot $CoordinationRoot $toolRepoRoot
 $coordinationModule = Join-Path $PSScriptRoot "repository-coordination.psm1"
@@ -33,38 +34,6 @@ function Assert-PathExists([string] $Path, [string] $Description) {
     if (-not (Test-Path -LiteralPath $Path)) {
         throw "$Description not found: $Path"
     }
-}
-
-function Get-UnityProjectVersion([string] $ProjectRoot) {
-    $projectVersionPath = Join-Path $ProjectRoot "ProjectSettings/ProjectVersion.txt"
-    Assert-PathExists $projectVersionPath "Unity project version file"
-    $content = Get-Content -Raw -LiteralPath $projectVersionPath
-    $match = [regex]::Match($content, "(?m)^m_EditorVersion:\s*(?<version>\S+)")
-    if (-not $match.Success) {
-        throw "Cannot read Unity editor version from $projectVersionPath"
-    }
-    return $match.Groups["version"].Value
-}
-
-function Resolve-UnityPath([string] $ConfiguredPath, [string] $EditorVersion) {
-    if (-not [string]::IsNullOrWhiteSpace($ConfiguredPath)) {
-        $resolvedPath = Resolve-RepoPath $ConfiguredPath
-        Assert-PathExists $resolvedPath "Unity executable"
-        return $resolvedPath
-    }
-
-    $hubEditorPath = Join-Path "C:\Program Files\Unity\Hub\Editor" $EditorVersion
-    $hubUnityPath = Join-Path $hubEditorPath "Editor/Unity.exe"
-    if (Test-Path -LiteralPath $hubUnityPath) {
-        return $hubUnityPath
-    }
-
-    $command = Get-Command Unity.exe -ErrorAction SilentlyContinue
-    if ($null -ne $command) {
-        return $command.Source
-    }
-
-    throw "Unity.exe for editor version $EditorVersion was not found. Pass -UnityPath."
 }
 
 function Convert-GameVersionToCompatibilityVersion([string] $Version) {
@@ -125,7 +94,8 @@ Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "unity-pro
     Assert-PathExists $projectRoot "Unity project"
     Assert-UnityProjectNotOpen $projectRoot
     $editorVersion = Get-UnityProjectVersion $projectRoot
-    $unityExe = Resolve-UnityPath $UnityPath $editorVersion
+    $configuredUnityPath = if ([string]::IsNullOrWhiteSpace($UnityPath)) { "" } else { Resolve-RepoPath $UnityPath }
+    $unityExe = Resolve-CanonicalUnityPath $configuredUnityPath $editorVersion
     $compatibilityVersion = Convert-GameVersionToCompatibilityVersion $GameVersion
 
     $logRootPath = Resolve-RepoPath $LogRoot

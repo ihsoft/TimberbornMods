@@ -94,6 +94,7 @@ function Invoke-LoggedReleaseStep {
         throw "$Name script not found: $ScriptPath"
     }
 
+    $startedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     $safeName = $Name -replace "[^A-Za-z0-9._-]", "-"
     $logPath = Join-Path $LogDirectory ("{0:D2}-{1}.log" -f $StepIndex, $safeName)
     $previousErrorActionPreference = $ErrorActionPreference
@@ -108,11 +109,31 @@ function Invoke-LoggedReleaseStep {
     $lines = Get-ReleaseOutputLines $output
     $lines | Set-Content -LiteralPath $logPath -Encoding UTF8
 
+    $warnings = Get-ReleaseWarningLines $lines
+    $summaries = Get-ReleaseSummaryLines $lines
+    $operation = [ordered]@{
+        Name = $Name
+        Script = $ScriptPath
+        Arguments = [string[]]$Arguments
+        Status = if ($exitCode -eq 0) { "Succeeded" } else { "Failed" }
+        ExitCode = [int]$exitCode
+        StartedAtUtc = $startedAtUtc
+        CompletedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+        LogPath = $logPath
+        Summary = [string[]]$summaries
+        Warnings = [string[]]$warnings
+        ExternalMutationPossible = "-Publish" -in $Arguments
+        ExternalOutcome = if ($exitCode -eq 0) { "Confirmed" } elseif ("-Publish" -in $Arguments) { "Unknown" } else { "NotApplicable" }
+        AffectsReleaseCompletion = $true
+    }
+
     if ($exitCode -ne 0) {
         Write-Host "Failed: $Name (exit code $exitCode)"
         $lines | ForEach-Object { Write-Host $_ }
         Write-Host "Full log: $logPath"
-        throw "$Name failed with exit code $exitCode."
+        $exception = [System.Exception]::new("$Name failed with exit code $exitCode.")
+        $exception.Data["ReleaseOperation"] = $operation
+        throw $exception
     }
 
     Write-Host "Completed: $Name"
@@ -120,21 +141,15 @@ function Invoke-LoggedReleaseStep {
         $lines | ForEach-Object { Write-Host $_ }
     }
     else {
-        Get-ReleaseSummaryLines $lines | ForEach-Object { Write-Host "  $_" }
-        Get-ReleaseWarningLines $lines | ForEach-Object {
+        $summaries | ForEach-Object { Write-Host "  $_" }
+        $warnings | ForEach-Object {
             $message = $_ -replace "(?i)^WARNING:\s*", ""
             Write-Warning $message
         }
     }
     Write-Host "  Full log: $logPath"
 
-    return [ordered]@{
-        Name = $Name
-        Script = $ScriptPath
-        Arguments = [string[]]$Arguments
-        LogPath = $logPath
-        CompletedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
-    }
+    return $operation
 }
 
 Export-ModuleMember -Function New-ReleaseLogDirectory, Invoke-LoggedReleaseStep
