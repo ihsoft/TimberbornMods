@@ -67,9 +67,6 @@
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\enUS.txt">
         <Link>Mod\Localizations\enUS.txt</Link>
       </Content>
-      <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\frFR.txt">
-        <Link>Mod\Localizations\frFR.txt</Link>
-      </Content>
       <Content Include="..\ModsUnityProject\Assets\Mods\TimberCommons\Data\Localizations\ruRU.txt">
         <Link>Mod\Localizations\ruRU.txt</Link>
       </Content>
@@ -83,9 +80,6 @@
       </Compile>
       <Compile Include="..\TimberDev\Settings\DebugSettings.cs">
         <Link>TimberDev\Settings\DebugSettings.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\AbstractDialog.cs">
-        <Link>TimberDev\UI\AbstractDialog.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\UI\CommonFormats.cs">
         <Link>TimberDev\UI\CommonFormats.cs</Link>
@@ -107,9 +101,6 @@
       </Compile>
       <Compile Include="..\TimberDev\UI\UnitFormats.cs">
         <Link>TimberDev\UI\UnitFormats.cs</Link>
-      </Compile>
-      <Compile Include="..\TimberDev\UI\VisualElementExtensions.cs">
-        <Link>TimberDev\UI\VisualElementExtensions.cs</Link>
       </Compile>
       <Compile Include="..\TimberDev\Utils\HarmonyPatcher.cs">
         <Link>TimberDev\Utils\HarmonyPatcher.cs</Link>
@@ -141,8 +132,7 @@
     </PropertyGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying mod's DLL to the game's mods folder: $(ModScriptPath) ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts"/>
-        <Copy SourceFiles="$(TargetDir)$(ProjectName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts" Condition="Exists('$(TargetDir)$(ProjectName).xml')"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0\Scripts"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>

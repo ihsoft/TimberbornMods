@@ -11,22 +11,22 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 
 [Context("Game")]
 // ReSharper disable once UnusedType.Global
-sealed class ConfiguratorForGame : IConfigurator {
-  static readonly string PatchId = typeof(ConfiguratorForGame).AssemblyQualifiedName;
+sealed class Configurator : IConfigurator {
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
-      typeof(LoadGameBoxPatch),
       typeof(GoodConsumingBuildingDescriberPatch),
       typeof(ManufactoryInventoryFragmentPatch1),
       typeof(ManufactoryInventoryFragmentPatch2),
+      typeof(SluiceFragmentPatch1),
+      typeof(SluiceFragmentPatch2),
       typeof(GrowableToolPanelItemFactoryPatch),
       typeof(GrowableFragmentPatch),
       typeof(ManufactoryDescriberPatch1),
-      typeof(ManufactoryDescriberPatch2),
+      typeof(ManufactoryDescriberPatch2)
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
     CommonFormats.ResetCachedLocStrings();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
-    containerDefinition.Bind<GameSaveVersionLabelUpdater>().AsSingleton();
   }
 }

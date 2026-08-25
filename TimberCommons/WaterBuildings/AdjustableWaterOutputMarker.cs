@@ -13,7 +13,7 @@ namespace IgorZ.TimberCommons.WaterBuildings;
 /// <summary>This component shows an output level indicator.</summary>
 /// <remarks>
 /// It will be added to any building with <see cref="AdjustableWaterOutput"/> component with the default settings.
-/// However, if it's already in the building blueprint, it will retain the settings.
+/// However, if it's already on the prefab, it wil retain the settings.
 /// </remarks>
 sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory)
     : BaseComponent, IAwakableComponent, IUpdatableComponent, ISelectionListener {
@@ -26,13 +26,13 @@ sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory
 
   /// <inheritdoc/>
   public void OnSelect() {
-    _selected = true;
-    RefreshVisibility();
+    if (!_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker) {
+      EnableComponent();
+    }
   }
 
   /// <inheritdoc/>
   public void OnUnselect() {
-    _selected = false;
     DisableComponent();
   }
 
@@ -54,35 +54,21 @@ sealed class AdjustableWaterOutputMarker(MarkerDrawerFactory markerDrawerFactory
 
   /// <inheritdoc/>
   public void Update() {
-    RefreshVisibility();
-    if (!Enabled) {
-      return;
-    }
     var targetCoordinates = _adjustableWaterOutput.TargetCoordinates;
     var coordinates = new Vector3Int(targetCoordinates.x, targetCoordinates.y, _adjustableWaterOutput.MaxHeight); 
     var currentWaterLevel = _adjustableWaterOutput.CurrentWaterLevel;
-    var currentLevelLimit = _adjustableWaterOutput.TargetWaterLevel;
-    var markerOffset = currentLevelLimit - _adjustableWaterOutput.MaxHeight;
+    var currentLevelLimit = _adjustableWaterOutput.MaxHeight + _adjustableWaterOutput.SpillwayHeightDelta;
     var color  = currentWaterLevel < currentLevelLimit ? AboveLevelMarkerColor : BelowLevelMarkerColor;
-    _markerDrawer.DrawAtCoordinates(coordinates, markerOffset + MarkerYOffset, color);
+    _markerDrawer.DrawAtCoordinates(coordinates, _adjustableWaterOutput.SpillwayHeightDelta + MarkerYOffset, color);
   }
 
   #endregion
 
   #region Implementation
 
-  internal void RefreshVisibility() {
-    if (_selected && !_blockObject.IsPreview && _adjustableWaterOutput.ShowHeightMarker) {
-      EnableComponent();
-    } else {
-      DisableComponent();
-    }
-  }
-
   AdjustableWaterOutput _adjustableWaterOutput;
   MeshDrawer _markerDrawer;
   BlockObject _blockObject;
-  bool _selected;
 
   #endregion
 }

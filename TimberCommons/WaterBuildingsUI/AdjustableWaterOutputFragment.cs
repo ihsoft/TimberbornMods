@@ -12,20 +12,18 @@ using UnityEngine.UIElements;
 namespace IgorZ.TimberCommons.WaterBuildingsUI;
 
 sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
-  const string LimitOutputLevelLocKey = "IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel";
   const string StopAboveDownstreamDepthLocKey = "IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream";
   const float WaterLevelChangeStep = 0.05f;
 
   readonly UiFactory _uiFactory;
   
   VisualElement _root;
-  Toggle _limitOutputLevelToggle;
   Label _infoLabel;
   PreciseSliderWrapper _waterLevelSlider;
   AdjustableWaterOutput _adjustableWaterOutput;
 
-  int Range => _adjustableWaterOutput.MaxSliderTargetHeight - _adjustableWaterOutput.MinHeight;
-  float WaterLevelSliderValue => _adjustableWaterOutput.TargetWaterLevel - _adjustableWaterOutput.MinHeight;
+  int Range => _adjustableWaterOutput.MaxHeight - _adjustableWaterOutput.MinHeight;
+  float WaterLevelSliderValue => Range + _adjustableWaterOutput.SpillwayHeightDelta;
 
   AdjustableWaterOutputFragment(UiFactory uiFactory) {
     _uiFactory = uiFactory;
@@ -35,17 +33,9 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
   public VisualElement InitializeFragment() {
     //FIXME: create an asset
     _waterLevelSlider = _uiFactory.CreatePreciseSlider(
-        WaterLevelChangeStep,
-        v => _adjustableWaterOutput.SetTargetWaterLevel(_adjustableWaterOutput.MinHeight + v));
-    _limitOutputLevelToggle = _uiFactory.CreateToggle(
-        LimitOutputLevelLocKey, e => {
-          _adjustableWaterOutput.SetLimitOutputLevelEnabled(e.newValue);
-          _adjustableWaterOutput.GetComponent<AdjustableWaterOutputMarker>()?.RefreshVisibility();
-          UpdateControls();
-        });
+        WaterLevelChangeStep, v => _adjustableWaterOutput.SetSpillwayHeightDelta(v - Range));
     _infoLabel = _uiFactory.CreateLabel();
     _root = _uiFactory.CreateCenteredPanelFragment();
-    _root.Add(_limitOutputLevelToggle);
     _root.Add(_infoLabel);
     _root.Add(_waterLevelSlider);
     _root.ToggleDisplayStyle(visible: false);
@@ -60,7 +50,7 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
       return;
     }
     _root.ToggleDisplayStyle(visible: true);
-    UpdateControls();
+    _waterLevelSlider.UpdateValuesWithoutNotify(WaterLevelSliderValue, Range);
   }
 
   /// <inheritdoc/>
@@ -74,21 +64,7 @@ sealed class AdjustableWaterOutputFragment : IEntityPanelFragment {
     if (!_adjustableWaterOutput) {
       return;
     }
-    UpdateControls();
-  }
-
-  void UpdateControls() {
-    if (!_adjustableWaterOutput) {
-      return;
-    }
-    var limitEnabled = _adjustableWaterOutput.LimitOutputLevelEnabled;
-    _limitOutputLevelToggle.SetValueWithoutNotify(limitEnabled);
-    _infoLabel.ToggleDisplayStyle(visible: limitEnabled);
-    _waterLevelSlider.ToggleDisplayStyle(visible: limitEnabled);
-    if (!limitEnabled) {
-      return;
-    }
-    _waterLevelSlider.UpdateValuesWithoutNotify(WaterLevelSliderValue, Range);
     _infoLabel.text = _uiFactory.T(StopAboveDownstreamDepthLocKey, _waterLevelSlider.Value.ToString("0.00"));
+    _waterLevelSlider.UpdateValuesWithoutNotify(WaterLevelSliderValue, Range);
   }
 }

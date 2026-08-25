@@ -9,7 +9,7 @@ namespace IgorZ.TimberCommons.Settings;
 [Context("MainMenu")]
 [Context("Game")]
 sealed class Configurator : IConfigurator {
-  internal const string ModId = "Timberborn.IgorZ.TimberCommons";
+  internal static string ModId => "Timberborn.IgorZ.TimberCommons";
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<TimberCommonsDebugSettings>().AsSingleton();
@@ -17,6 +17,5 @@ sealed class Configurator : IConfigurator {
     containerDefinition.Bind<IrrigationSystemSettings>().AsSingleton();
     containerDefinition.Bind<WaterBuildingsSettings>().AsSingleton();
     containerDefinition.Bind<InjuryProbabilitySettings>().AsSingleton();
-    containerDefinition.Bind<ModUIPatchesSettings>().AsSingleton();
   }
 }

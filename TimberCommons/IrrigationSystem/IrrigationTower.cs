@@ -37,7 +37,7 @@ namespace IgorZ.TimberCommons.IrrigationSystem;
 /// Connected tiles must be immediately adjusted to each other on the left, right, top or bottom side. If the tile is
 /// blocked for irrigation (for example, via a moisture blocker), then it is not eligible for irrigation. 
 /// </remarks>
-public abstract class IrrigationTower : TickableComponent, IAwakableComponent, IBuildingWithRange, IInitializableEntity,
+public abstract class IrrigationTower : TickableComponent, IAwakableComponent, IBuildingWithRange,
                                         IFinishedStateListener, IPostPlacementChangeListener, IFinishedPausable,
                                         ILateTickable, IPersistentEntity, ISelectionListener, IPostInitializableEntity {
 
@@ -86,7 +86,7 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
   /// <seealso cref="ReachableTiles"/>
   /// <seealso cref="MaxCoveredTilesCount"/>
   /// <seealso cref="UpdateConsumptionRate"/>
-  public float Coverage { get; internal set; } // Internal setter is used by unit tests for derived tower logic.
+  public float Coverage { get; private set; }
 
   /// <summary>Tells if the building is being irrigating the tiles in range.</summary>
   /// <seealso cref="ReachableTiles"/>
@@ -154,10 +154,6 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
   /// <inheritdoc/>
   public virtual void OnExitFinishedState() {
     StopMoisturizing();
-    _terrainMap.TerrainAdded -= OnTerrainChanged;
-    _terrainMap.TerrainRemoved -= OnTerrainChanged;
-    BlockableObject.ObjectBlocked -= OnBlockedStateChanged;
-    BlockableObject.ObjectUnblocked -= OnBlockedStateChanged;
     _eventBus.Unregister(this);
     DisableComponent();
   }
@@ -182,11 +178,11 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
 
   #endregion
 
-  #region IInitializableEntity implementation
+  #region TickableComponent implementation
 
   /// <inheritdoc/>
-  public void InitializeEntity() {
-    UpdateBuildingPositioning();
+  public override void StartTickable() {
+    base.StartTickable();
     Initialize();
 
     _needsPower = GetComponent<MechanicalNode>();
@@ -197,10 +193,6 @@ public abstract class IrrigationTower : TickableComponent, IAwakableComponent, I
     UpdateState();
   }
   bool _needsPower;
-
-  #endregion
-
-  #region TickableComponent implementation
 
   /// <inheritdoc/>
   public override void Tick() {

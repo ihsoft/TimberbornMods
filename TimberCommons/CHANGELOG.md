@@ -1,33 +1,3 @@
-# v1.20.0 (July 6th, 2026)
-* [Enhancement] Show the measured flow through Throttling Valves under the flow slider.
-
-# v1.19.0 (July 2nd, 2026)
-* [Feature] Allow enabling installed disabled mods from the save-load mod incompatibility dialog.
-* [Feature] Show the saved game version on the load-game preview.
-
-# v1.18.1 (June 28th, 2026)
-* [Fix] Discharge buildings use the discharge water level settings after the Timberborn 1.1 rename.
-
-# v1.18.0 (June 22nd, 2026)
-* [Update] Support game version `1.1.0.2`, including the updated water output overflow logic.
-* [Fix] Irrigation towers no longer react to terrain or blocking changes after leaving the finished state.
-
-# v1.17.1 (June 21st, 2026)
-* [Fix] Compact Mechanical Pump no longer gets an artificial output water level limit by default.
-* [Enhancement] Limit output water level slider now uses a cached local height range by default.
-
-# v1.17.0 (June 20th, 2026)
-* [Change] Replace `PrefabNamesFilter` with `TemplateNamesFilter`. The old filed will be removed from the spec in the next version.
-* [Feature] Show irrigation tower efficiency, maximum range and effects in the building description.
-* [Fix] Irrigated ground could look only barely moist until the game was unpaused after loading a save.
-* [Fix] Irrigation tower recipe toggles did not show the currently selected mode.
-* [Fix] Game could crash when loading a save with irrigation towers.
-
-# v1.16.0 (June 6th, 2026)
-* [Update] Support game version `v1.1`.
-* [Update] Removed sluice enhancements support.
-* [Feature] Add "Show active" filter to the mods selection dialog.
-
 # v1.15.2 (March 25th, 2026)
 * [Update] Support game version `1.0.12.7`.
 * [Change] No more mod versions for the pre-1.0 game version.

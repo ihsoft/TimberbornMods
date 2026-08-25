@@ -3,21 +3,9 @@ IgorZ.TimberCommons.WaterTower.Utilization,"Используемый потен�
 IgorZ.TimberCommons.WaterTower.IrrigatedArea,"Площадь покрытия: {0}",
 IgorZ.TimberCommons.WaterTower.EffectiveRange,"Дистанция орошения: {0}",
 IgorZ.TimberCommons.WaterTower.NoTilesToIrrigate,"Нет доступных клеток для орошения",
-IgorZ.TimberCommons.IrrigationTower.Efficient,"<YellowHighlight>Эффективно: </YellowHighlight>Не тратит воду впустую.","Building description bullet. Explains that irrigation towers consume water only for tiles they can irrigate."
-IgorZ.TimberCommons.IrrigationTower.MaxRange,"Макс. дистанция: {0}","Building description bullet. Shows irrigation tower maximum range."
-IgorZ.TimberCommons.IrrigationTower.GrowthBoost,"Ускорение роста: <GreenHighlight>+{0:0.#}%</GreenHighlight>","Full standalone building description bullet for a positive growth effect."
-IgorZ.TimberCommons.IrrigationTower.GrowthSlowdown,"Замедление роста: <RedHighlight>-{0:0.#}%</RedHighlight>","Full standalone building description bullet for a negative growth effect."
-IgorZ.TimberCommons.IrrigationTower.ContaminationBlock,"Блокирует загрязнение","Building description phrase. Shows contamination blocking effect."
-IgorZ.TimberCommons.IrrigationTower.OutputRangeAmount,"{0}","Compact virtual recipe output. {0} is the maximum irrigation range in tiles."
-IgorZ.TimberCommons.IrrigationTower.OutputRangeTooltip,"Максимальная дистанция орошения","Tooltip for the virtual recipe output that represents maximum irrigation range."
-IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierAmount,"{0:+0.#;-0.#;0}%","Compact virtual recipe output. {0} is the growth rate modifier percentage."
-IgorZ.TimberCommons.IrrigationTower.OutputGrowthModifierTooltip,"Модификатор скорости роста","Tooltip for the virtual recipe output that represents a growth rate modifier."
-IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,"Блокирует загрязнение","Tooltip for the virtual recipe output that represents contamination blocking."
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Ускорение роста: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%",
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Замедление роста: <RedHighlight>🡇</RedHighlight>{0:0.#}%",
-IgorZ.TimberCommons.AdjustableWaterOutput.LimitOutputLevel,"Ограничивать уровень воды на выходе",
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Остановить при глубине на водосбросе: {0}",
-IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,"Текущий поток: {0}","Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve."
 IgorZ.TimberCommons.InjuryProbability,"Вероятность ранения: {0} каждый час",
 IgorZ.TimberCommons.InjuryProbabilityDaily,"Вероятность ранения: {0} в течение дня",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Формат времени и продолжительности",
@@ -30,27 +18,14 @@ IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowers
 IgorZ.TimberCommons.Settings.IrrigationSystem.OverrideDesertLevelsForWaterTowersTooltip,"Указывает, что такие клетки должны отображаться ярко-зелеными (хорошо увлажненные). В противном случае стандартная
 логика будет показывать их как 'едва увлаженные', так как орошающие башни дают только базовый уровень влажности.",
 IgorZ.TimberCommons.Settings.WaterBuildingsSection,"Водные сооружения",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Позволять менять максимальный уровень воды на выходе механических насосов",
-IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Позволять менять максимальный уровень воды на выходе водосбросов",
-IgorZ.TimberCommons.Settings.WaterBuildings.UseLocalOutputLevelLimitScan,"Использовать локальный диапазон высот для слайдера уровня воды на выходе",
-IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadius,"Область проверки рядом с выходом воды",
-IgorZ.TimberCommons.Settings.WaterBuildings.OutputLevelLimitScanRadiusTooltip,"Насколько далеко от выхода воды искать удобный верхний предел слайдера.
-Чем больше значение, тем больше область проверки.",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnMechanicalPumps,"Позволять менять максимальный уровень воды на водосбросе универсальных насосов",
+IgorZ.TimberCommons.Settings.WaterBuildings.AdjustWaterDepthAtSpillwayOnFluidDumps,"Позволять менять максимальный уровень воды на водосбросе сливов для жидкостей",
+IgorZ.TimberCommons.Settings.WaterBuildings.ShowCurrentStrengthInSluice,"Показывать текущую скорость потока воды в шлюзе",
 IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Вероятность ранения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показывать вероятность получения травмы на панели справа",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Показывать вероятность за целый день",
-IgorZ.TimberCommons.Settings.ModUIPatchesSection,"UI-патчи модов",
-IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Улучшать диалог несовпадения модов при загрузке",
-IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Добавляет элементы управления для включения недостающих модов прямо из предупреждения загрузки.
-Эта опция автоматически отключается, если другой мод тоже патчит этот игровой диалог.",
-=,=,"ModUIPatches"
-IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Показать активные ({0}/{1})","Button in mod manager. Shows only enabled mods."
-IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Показать все ({0})","Button in mod manager. Shows all installed mods."
-IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.RestartConfirmation,"Вы выбрали моды ({0}) для включения. Они будут загружены только после перезапуска игры. Что сделать?","Confirmation shown after the player tries to load a save while mods were selected to be enabled after restart. {0} is the number of mods."
-IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.ContinueWithoutRestart,"Продолжить","Button in save-load mod incompatibility dialog. Continues loading the save without restarting the game first."
-IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"Включить {0} после перезапуска игры.","Tooltip for the checkbox in save-load mod incompatibility dialog. {0} is the mod display name."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,
