@@ -25,6 +25,17 @@ provenance before relying on their API, data shape, or custom UI types.
 
 ## Editor Installation Path Evidence
 
+Keep every Unity Editor version used by this repository under one canonical logical Hub root:
+`%ProgramFiles%\Unity\Hub\Editor\<version>`. This is a process invariant, not a layout preference. Repository tooling,
+Publisher tasks, compatibility worktrees, and later agents must be able to resolve an exact required version without
+rediscovering machine-specific install roots.
+
+Do not install one Editor version under an ad hoc per-drive or per-task directory. If the canonical root must use
+another physical volume, redirect the whole logical Unity root once through a junction, symbolic link, or equivalent
+machine-level setup, then keep every Editor version beneath that same logical root. An explicit `-UnityPath` is a
+bounded override for diagnosis or migration; it does not make a separate install root part of the supported routine
+environment.
+
 Before changing Unity Hub's configured Editor install location or installing a duplicate Editor because of disk-space
 concerns, resolve the existing install directory through any junction, symbolic link, or other reparse point. Check
 available space on the volume that owns the resolved target. A displayed path such as `C:\Program Files\Unity` does not
@@ -32,6 +43,12 @@ prove that the Editor consumes space on the `C:` volume.
 
 Do not rewrite Hub configuration or choose a second install root from the displayed drive prefix alone. Preserve the
 standard logical path when its resolved target already satisfies the required physical location and capacity.
+
+Before downloading an Editor required by a new Timberborn or Unity project version, inspect the canonical root and
+confirm that the exact version is genuinely absent. Install the missing version there with all required build-support
+modules. If a complete Editor already exists under a nonstandard root, migrate or expose it under the canonical logical
+root, validate its executable and required modules, and complete one real import or export before removing the old
+copy. Do not leave both locations as indefinite competing sources of Editor discovery.
 
 ## Refresh Sequence
 

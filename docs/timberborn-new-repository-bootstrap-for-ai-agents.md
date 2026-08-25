@@ -61,7 +61,9 @@ Before build or release work, verify the tools required by the task:
 - Git and PowerShell.
 - A .NET SDK capable of restoring NuGet packages and building the changed projects.
 - Unity Hub signed in with a valid Editor license/entitlement, plus the Unity Editor matching
-  `ModsUnityProject/ProjectSettings/ProjectVersion.txt` or an explicit `-UnityPath` for Unity export.
+  `ModsUnityProject/ProjectSettings/ProjectVersion.txt` under the canonical logical root
+  `%ProgramFiles%\Unity\Hub\Editor\<version>`. Keep all repository-required Editor versions under that one root; use an
+  explicit `-UnityPath` only as a bounded diagnostic or migration override.
 - SteamCMD installed in a discoverable location or configured in `.tools/steam/steam.local.json`.
 - Steam account login and Steam Guard readiness for uploads.
 - GitHub CLI `gh` installed and authenticated for repository releases, issue comments, and issue closing.
@@ -83,7 +85,9 @@ Follow the current official [Unity setup](https://github.com/mechanistry/timberb
 [Asset importer](https://github.com/mechanistry/timberborn-modding/wiki/Asset-importer) instructions. At minimum:
 
 1. Install the exact Unity Editor version from `ModsUnityProject/ProjectSettings/ProjectVersion.txt` with both Windows
-   Build Support and Mac Build Support.
+   Build Support and Mac Build Support. Use the canonical logical Hub Editor root shared by the repository's other
+   installed versions. If a different physical volume is required, redirect that common root once; do not create a
+   separate install root for this version.
 2. Add `ModsUnityProject` to Unity Hub without opening it, then add `-disable-assembly-updater` to that project's Hub
    command-line arguments.
 3. Open the project interactively. If Unity offers Safe Mode, choose `Ignore` so the Timberborn Modding Tools can run.
