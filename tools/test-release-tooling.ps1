@@ -105,7 +105,8 @@ try {
         "release-readiness.psm1",
         "release-unity.psm1",
         "release-versioning.psm1",
-        "repository-paths.psm1"
+        "repository-paths.psm1",
+        "update-platform-tags.ps1"
     ) | ForEach-Object {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $_) -Destination (Join-Path $fixtureTools $_)
     }
@@ -463,6 +464,54 @@ try {
             -Algorithm SHA256).Hash `
         "Stale registered-worktree artifact must not be selected or overwritten"
     Write-Host "PASS: registered source lane materializes once into the current public package owner"
+
+    $tagCases = @(
+        [pscustomobject]@{
+            Name = "absent"
+            Json = '{"ItemId":"123","Name":"Fixture","Visibility":"Private","Nested":{"Keep":7},"UpdateVisibility":false}'
+            ExpectedTags = @("Mod", "Update 1.0", "Update 1.1")
+        },
+        [pscustomobject]@{
+            Name = "empty"
+            Json = '{"ItemId":"123","Name":"Fixture","Visibility":"Private","Nested":{"Keep":7},"UpdateVisibility":false,"Tags":[]}'
+            ExpectedTags = @("Mod", "Update 1.0", "Update 1.1")
+        },
+        [pscustomobject]@{
+            Name = "existing"
+            Json = '{"ItemId":"123","Name":"Fixture","Visibility":"Private","Nested":{"Keep":7},"UpdateVisibility":false,"Tags":["Mod","Update 0.9","Quality of life"]}'
+            ExpectedTags = @("Mod", "Update 1.0", "Update 1.1", "Quality of life")
+        }
+    )
+    foreach ($tagCase in $tagCases) {
+        $tagRoot = Join-Path $testRoot "tag-$($tagCase.Name)"
+        Write-TestFile (Join-Path $tagRoot "workshop_data.json") $tagCase.Json
+        [void](New-Item -ItemType Directory -Path (Join-Path $tagRoot "version-1.0") -Force)
+        [void](New-Item -ItemType Directory -Path (Join-Path $tagRoot "version-1.1") -Force)
+        $tagOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File (Join-Path $fixtureTools "update-platform-tags.ps1") `
+            -ModName TagFixture `
+            -ReleaseRoot $fixtureRoot `
+            -LocalModRoot $tagRoot `
+            -MaterializeLocalOnly 2>&1)
+        Assert-Equal 0 $LASTEXITCODE "Local tag materialization exit code: $($tagCase.Name)"
+        $savedTagJson = Get-Content -Raw -LiteralPath (Join-Path $tagRoot "workshop_data.json")
+        $savedTagData = $savedTagJson | ConvertFrom-Json
+        $actualTags = [string[]]@($savedTagData.Tags | ForEach-Object { [string]$_ })
+        Assert-Equal ($tagCase.ExpectedTags -join "|") ($actualTags -join "|") `
+            "Exact derived compatibility tags: $($tagCase.Name)"
+        Assert-Equal "123" $savedTagData.ItemId "Unrelated ItemId preservation: $($tagCase.Name)"
+        Assert-Equal "Fixture" $savedTagData.Name "Unrelated Name preservation: $($tagCase.Name)"
+        Assert-Equal "Private" $savedTagData.Visibility `
+            "Unrelated Visibility preservation: $($tagCase.Name)"
+        Assert-Equal 7 $savedTagData.Nested.Keep "Nested property preservation: $($tagCase.Name)"
+        Assert-Equal $false $savedTagData.UpdateVisibility `
+            "Unrelated boolean preservation: $($tagCase.Name)"
+        Assert-True ($savedTagJson -match '(?m)^\s+"Tags"\s*:\s*\[') `
+            "workshop_data.json formatting contract omitted structured Tags: $($tagCase.Name)"
+        Assert-True (-not (($tagOutput | Out-String) -match "Publish|POST|DELETE")) `
+            "Local-only tag materialization exposed a public mutation operation: $($tagCase.Name)"
+    }
+    Write-Host "PASS: local tag materialization handles absent, empty, and existing Tags with exact readback"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)

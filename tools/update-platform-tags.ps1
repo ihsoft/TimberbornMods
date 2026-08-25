@@ -93,8 +93,30 @@ function Get-LocalWorkshopData([string] $RootPath) {
     }
 }
 
-function Save-LocalWorkshopData([string] $Path, [object] $Data) {
+function Get-WorkshopDataWithoutTagsJson([object] $Data) {
+    $unrelated = [ordered]@{}
+    foreach ($property in $Data.PSObject.Properties) {
+        if ($property.Name -ne "Tags") {
+            $unrelated[$property.Name] = $property.Value
+        }
+    }
+    return ($unrelated | ConvertTo-Json -Depth 10 -Compress)
+}
+
+function Save-LocalWorkshopData([string] $Path, [object] $Data, [string[]] $ExpectedTags) {
+    $expectedUnrelatedJson = Get-WorkshopDataWithoutTagsJson $Data
     $Data | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $Path -Encoding UTF8
+    $saved = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+    $actualTags = [string[]]@($saved.Tags | ForEach-Object { [string]$_ })
+    if ($actualTags.Count -ne $ExpectedTags.Count -or
+            ($actualTags -join "`0") -ne ($ExpectedTags -join "`0")) {
+        throw (
+            "Local workshop tags did not round-trip exactly. " +
+            "Expected: $(Format-Tags $ExpectedTags); actual: $(Format-Tags $actualTags)")
+    }
+    if ((Get-WorkshopDataWithoutTagsJson $saved) -ne $expectedUnrelatedJson) {
+        throw "Local workshop tag materialization changed unrelated workshop_data.json properties."
+    }
 }
 
 function Get-VersionCompatibilityTags([string] $RootPath) {
@@ -160,7 +182,13 @@ function Get-TargetTags([string[]] $LocalTags, [string[]] $VersionTags, [string]
 }
 
 function Update-LocalSteamTags([object] $WorkshopData, [string[]] $TargetTags) {
-    $WorkshopData.Tags = @($TargetTags)
+    $tagsProperty = $WorkshopData.PSObject.Properties["Tags"]
+    if ($null -eq $tagsProperty) {
+        $WorkshopData | Add-Member -MemberType NoteProperty -Name "Tags" -Value ([string[]]$TargetTags)
+    }
+    else {
+        $tagsProperty.Value = [string[]]$TargetTags
+    }
 }
 
 function Assert-SteamTagsValid([string[]] $Tags) {
@@ -467,12 +495,12 @@ if ($MaterializeLocalOnly) {
     Assert-SteamTagsValid $targetTags
     $localAddTags = Get-AddedTags $targetTags $localTags
     $localRemoveTags = Get-RemovedTags $targetTags $localTags
+    Update-LocalSteamTags $workshopData $targetTags
+    Save-LocalWorkshopData $workshopDataInfo.Path $workshopData $targetTags
     if ($localAddTags.Count -eq 0 -and $localRemoveTags.Count -eq 0) {
-        Write-Host "Local workshop_data.json already contains all derived release tags."
+        Write-Host "Local workshop_data.json already contained all derived release tags; exact readback verified."
     }
     else {
-        Update-LocalSteamTags $workshopData $targetTags
-        Save-LocalWorkshopData $workshopDataInfo.Path $workshopData
         Write-Host "Materialized derived release tags in local workshop_data.json."
         Write-Host "  Add locally: $(Format-Tags $localAddTags)"
         Write-Host "  Remove locally: $(Format-Tags $localRemoveTags)"
@@ -562,7 +590,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
         }
         else {
             Update-LocalSteamTags $workshopData $targetTags
-            Save-LocalWorkshopData $workshopDataInfo.Path $workshopData
+            Save-LocalWorkshopData $workshopDataInfo.Path $workshopData $targetTags
             Write-Host "  Local workshop_data.json was updated for Steam."
         }
         if (-not $alreadySynced) {
