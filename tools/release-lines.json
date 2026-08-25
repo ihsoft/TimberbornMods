@@ -8,6 +8,7 @@
       "VersionPolicy": "BackportPatchOnly",
       "Mods": [
         "Automation",
+        "SmartPower",
         "XRay"
       ]
     }
