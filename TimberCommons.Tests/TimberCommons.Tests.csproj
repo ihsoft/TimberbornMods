@@ -42,14 +42,20 @@
       <Compile Include="..\TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs">
         <Link>TimberCommons\IrrigationSystemUI\IrrigationTowerSpecDescriber.cs</Link>
       </Compile>
-      <Compile Include="..\TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs">
-        <Link>TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs</Link>
+      <Compile Include="..\TimberCommons\ModUIPatches\ModListViewInitializePatch.cs">
+        <Link>TimberCommons\ModUIPatches\ModListViewInitializePatch.cs</Link>
       </Compile>
       <Compile Include="..\TimberCommons\CommonUIPatches\FactionIdSaveEntryReader.cs">
         <Link>TimberCommons\CommonUIPatches\FactionIdSaveEntryReader.cs</Link>
       </Compile>
       <Compile Include="..\TimberCommons\CommonUIPatches\GameSaveVersionFormatter.cs">
         <Link>TimberCommons\CommonUIPatches\GameSaveVersionFormatter.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\ModUIPatches\InactiveModSelector.cs">
+        <Link>TimberCommons\ModUIPatches\InactiveModSelector.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\ModUIPatches\ModUIPatchesPatchOwners.cs">
+        <Link>TimberCommons\ModUIPatches\ModUIPatchesPatchOwners.cs</Link>
       </Compile>
     </ItemGroup>
 </Project>

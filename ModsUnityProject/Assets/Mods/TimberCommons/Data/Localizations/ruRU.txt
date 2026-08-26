@@ -36,9 +36,16 @@ IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Показыва�
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Отображать индикатор на аватаре строения",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Наведите курсор на индикатор, чтобы увидеть вероятность получения травмы",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability,"Показывать вероятность за целый день",
-=,=,"CommonUIPatches"
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods,"Показать активные ({0}/{1})","Button in mod manager. Shows only enabled mods."
-IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods,"Показать все ({0})","Button in mod manager. Shows all installed mods."
+IgorZ.TimberCommons.Settings.ModUIPatchesSection,"UI-патчи модов",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,"Улучшать диалог несовпадения модов при загрузке",
+IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Добавляет элементы управления для включения недостающих модов прямо из предупреждения загрузки.
+Эта опция автоматически отключается, если другой мод тоже патчит этот игровой диалог.",
+=,=,"ModUIPatches"
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods,"Показать активные ({0}/{1})","Button in mod manager. Shows only enabled mods."
+IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods,"Показать все ({0})","Button in mod manager. Shows all installed mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.RestartConfirmation,"Вы выбрали моды ({0}) для включения. Они будут загружены только после перезапуска игры. Что сделать?","Confirmation shown after the player tries to load a save while mods were selected to be enabled after restart. {0} is the number of mods."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.ContinueWithoutRestart,"Продолжить","Button in save-load mod incompatibility dialog. Continues loading the save without restarting the game first."
+IgorZ.TimberCommons.ModUIPatches.SaveModsValidator.EnableModTooltip,"Включить {0} после перезапуска игры.","Tooltip for the checkbox in save-load mod incompatibility dialog. {0} is the mod display name."
 =,=,"TimberDev_Utils"
 TimberDev_Utils.Settings.Debug.VerboseLogging,"Детальные журналы",
 TimberDev_Utils.Settings.Debug.VerboseLoggingTooltip,"В журналы игры будет записываться больше полезной информации,

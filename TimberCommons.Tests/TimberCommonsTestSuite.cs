@@ -72,6 +72,12 @@ static class TimberCommonsTestSuite {
       ("Save preview formats saved game versions", SavePreviewTests.FormatsSavedGameVersions),
       ("Save preview reads faction ID from world entry", SavePreviewTests.ReadsFactionIdFromWorldEntry),
       ("Save preview rejects world entry without faction ID", SavePreviewTests.RejectsWorldEntryWithoutFactionId),
+      ("Mod mismatch selects exact inactive version before source",
+          ModUIPatchesTests.SelectsExactInactiveModVersionBeforeSource),
+      ("Mod mismatch selects user mod when versions match", ModUIPatchesTests.SelectsUserModWhenVersionsMatch),
+      ("Mod mismatch ignores enabled and unrelated mods", ModUIPatchesTests.IgnoresEnabledAndUnrelatedMods),
+      ("Mod mismatch distinguishes own and conflicting patch owners",
+          ModUIPatchesTests.DistinguishesOwnAndConflictingPatchOwners),
   ];
 
   public static int Run() {

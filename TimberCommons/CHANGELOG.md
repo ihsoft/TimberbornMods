@@ -1,4 +1,5 @@
 # v1.15.3 (Timberborn v1.0) (TBD)
+* [Feature] Installed disabled mods can be enabled from the save-load mod mismatch dialog.
 * [Feature] Load-game previews now show the saved game version and faction.
 * [Feature] The mod manager can filter the list to active mods, with localized button text.
 * [Feature] Irrigation tower descriptions and recipe outputs now show their range and special effects.

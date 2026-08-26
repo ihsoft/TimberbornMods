@@ -5,7 +5,7 @@
 using Timberborn.Localization;
 using Timberborn.SingletonSystem;
 
-namespace IgorZ.TimberCommons.CommonUIPatches;
+namespace IgorZ.TimberCommons.ModUIPatches;
 
 sealed class ModListViewLocInitializer : ILoadableSingleton {
   public ModListViewLocInitializer(ILoc loc) {

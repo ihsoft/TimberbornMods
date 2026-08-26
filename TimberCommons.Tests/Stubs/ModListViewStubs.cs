@@ -76,6 +76,23 @@ namespace UnityEngine.UIElements {
 
 namespace Timberborn.Modding {
   public sealed class Mod {
+    public string DisplayName { get; init; } = "";
+    public bool IsEnabled { get; init; }
+    public ModDirectory ModDirectory { get; init; } = new();
+    public ModManifest Manifest { get; init; } = new();
+  }
+
+  public sealed class ModDirectory {
+    public bool IsUserMod { get; init; }
+  }
+
+  public sealed class ModManifest {
+    public string Id { get; init; } = "";
+    public ModVersion Version { get; init; } = new();
+  }
+
+  public sealed class ModVersion {
+    public string Full { get; init; } = "";
   }
 
   public static class ModPlayerPrefsHelper {
@@ -97,6 +114,10 @@ namespace Timberborn.Modding {
       EnabledMods.Clear();
     }
   }
+}
+
+namespace Timberborn.SaveMetadataSystem {
+  public readonly record struct ModReference(string Id, string Name, string Version);
 }
 
 namespace Timberborn.ModdingUI {

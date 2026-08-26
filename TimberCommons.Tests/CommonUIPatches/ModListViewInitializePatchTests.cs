@@ -1,5 +1,5 @@
 using System.Reflection;
-using IgorZ.TimberCommons.CommonUIPatches;
+using IgorZ.TimberCommons.ModUIPatches;
 using Timberborn.Modding;
 using Timberborn.ModdingUI;
 using UnityEngine.UIElements;
@@ -13,14 +13,14 @@ static class ModListViewInitializePatchTests {
     var filterButton = root.Q<Button>("ShowActiveModsButton");
 
     Assert.Equal(
-        "IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowActiveMods:1,2",
+        "IgorZ.TimberCommons.ModUIPatches.ModListView.ShowActiveMods:1,2",
         filterButton.text);
 
     filterButton.Click();
 
     Assert.Equal(DisplayStyle.Flex, activeRoot.style.display);
     Assert.Equal(DisplayStyle.None, inactiveRoot.style.display);
-    Assert.Equal("IgorZ.TimberCommons.CommonUIPatches.ModListView.ShowAllMods:2", filterButton.text);
+    Assert.Equal("IgorZ.TimberCommons.ModUIPatches.ModListView.ShowAllMods:2", filterButton.text);
 
     filterButton.Click();
 
