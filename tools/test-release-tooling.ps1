@@ -1282,9 +1282,15 @@ exit 2
         Steam = [ordered]@{
             PublishedFileId = "3305038022"
             Result = 1
+            CreatorOwnerId = "76561198000000000"
+            CreatorAppId = "1062090"
+            ConsumerAppId = "1062090"
+            Title = "SmartPower"
             TimeUpdated = 1787714702
-            FileSize = $recoveryPackageLength
+            FileSize = $recoveryPackageLength + 4096
             Visibility = 0
+            Tags = [string[]]@("Mod", "Update 1.0", "Update 1.1", "Quality of life")
+            EvidenceSource = "SteamPublicApi.GetPublishedFileDetails"
         }
         ModIO = [ordered]@{
             ModId = 3168318
@@ -1299,6 +1305,7 @@ exit 2
     $recoveryOperations = [object[]]@(
         [ordered]@{
             Name = "Steam release publish"; Status = "Succeeded"; ExitCode = 0
+            StartedAtUtc = "2026-08-26T03:24:40Z"; CompletedAtUtc = "2026-08-26T03:24:49Z"
             Summary = [string[]]@("SteamCMD upload completed."); Warnings = [string[]]@(); LogPath = ""
             ExternalMutationPossible = $true; ExternalOutcome = "Confirmed"; AffectsReleaseCompletion = $true
         },
@@ -1364,6 +1371,47 @@ exit 2
     $env:RECOVERY_GH_LOG = $recoveryGhLog
     try {
         $recoveryPreference = $ErrorActionPreference
+        $mismatchReadbackPath = Join-Path $testRoot "recovery-platform-mismatch.json"
+        $mismatchAttemptPath = Join-Path $testRoot "recovery-attempt-mismatch.json"
+        $mismatchReadback = Get-Content -Raw -LiteralPath $recoveryReadbackPath | ConvertFrom-Json
+        $mismatchReadback.Steam.Title = "Wrong SmartPower Item"
+        Write-TestFile $mismatchReadbackPath ($mismatchReadback | ConvertTo-Json -Depth 6)
+        $ErrorActionPreference = "Continue"
+        try {
+            $mismatchOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+                -File (Join-Path $fixtureTools "recover-release.ps1") `
+                -PreflightReportPath $recoveryPreflightPath `
+                -PartialSignoffReportPath $recoverySignoffPath `
+                -PlatformReadbackFixturePath $mismatchReadbackPath `
+                -RecoveryAttemptReportPath $mismatchAttemptPath `
+                -SkipDiscordHandoff 2>&1)
+            $mismatchExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $recoveryPreference
+        }
+        Assert-True ($mismatchExitCode -ne 0) "Steam identity mismatch must stop recovery read-only"
+        Assert-True (Test-Path -LiteralPath $mismatchAttemptPath -PathType Leaf) `
+            "Steam mismatch must persist a recovery attempt report"
+        $mismatchAttempt = Get-Content -Raw -LiteralPath $mismatchAttemptPath | ConvertFrom-Json
+        Assert-Equal "Blocked" $mismatchAttempt.Status "Steam mismatch attempt status"
+        Assert-Equal "Mismatch" `
+            @($mismatchAttempt.Steam.Comparisons | Where-Object Field -eq "Title")[0].Outcome `
+            "Steam title mismatch comparison"
+        Assert-Equal ($recoveryPackageLength + 4096) $mismatchAttempt.Steam.Actual.FileSize `
+            "Steam attempt must preserve the actual non-ZIP public file size"
+        Assert-True ($mismatchAttempt.Inputs.SteamReadbackLimitation -match "not comparable") `
+            "Recovery attempt must record the Steam/ZIP artifact boundary"
+        Assert-True (($mismatchOutput | Out-String) -match
+                "Steam readback: published_file_id=3305038022.*file_size=$($recoveryPackageLength + 4096)") `
+            "Steam mismatch output must print the actual readback tuple before stopping"
+        Assert-True (($mismatchOutput | Out-String) -match
+                "Steam comparison: Title; expected=SmartPower; actual=Wrong SmartPower Item; outcome=Mismatch") `
+            "Steam mismatch output must print expected and actual field evidence"
+        Assert-True (-not (Test-Path -LiteralPath $recoveryGhState)) `
+            "Steam mismatch must stop before the missing GitHub mutation"
+
+        $successAttemptPath = Join-Path $testRoot "recovery-attempt-success.json"
         $ErrorActionPreference = "Continue"
         try {
             $firstRecoveryOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
@@ -1371,6 +1419,7 @@ exit 2
                 -PreflightReportPath $recoveryPreflightPath `
                 -PartialSignoffReportPath $recoverySignoffPath `
                 -PlatformReadbackFixturePath $recoveryReadbackPath `
+                -RecoveryAttemptReportPath $successAttemptPath `
                 -SkipDiscordHandoff 2>&1)
             $firstRecoveryExitCode = $LASTEXITCODE
         }
@@ -1383,6 +1432,13 @@ exit 2
         $firstRecovery = Get-Content -Raw -LiteralPath $recoverySignoffPath | ConvertFrom-Json
         $firstGhState = Get-Content -Raw -LiteralPath $recoveryGhState | ConvertFrom-Json
         Assert-Equal 1 $firstGhState.CreateCount "Exactly one missing GitHub Release mutation"
+        $successAttempt = Get-Content -Raw -LiteralPath $successAttemptPath | ConvertFrom-Json
+        Assert-Equal "Completed" $successAttempt.Status "Successful recovery attempt status"
+        Assert-True $successAttempt.Steam.ConclusivelyIdentified `
+            "Differing nonzero Steam content size must not be compared with immutable ZIP bytes"
+        Assert-Equal "Match" `
+            @($successAttempt.Steam.Comparisons | Where-Object Field -eq "FileSize")[0].Outcome `
+            "Steam content size comparison must require only a nonzero value"
         Assert-Equal "SmartPower_v1.18.0.zip" $firstGhState.AssetName `
             "Recovery GitHub public-owner asset name"
         Assert-Equal "sha256:$recoveryPackageHash" $firstGhState.Digest `
@@ -1423,6 +1479,7 @@ exit 2
                 -PreflightReportPath $recoveryPreflightPath `
                 -PartialSignoffReportPath $recoverySignoffPath `
                 -PlatformReadbackFixturePath $recoveryReadbackPath `
+                -RecoveryAttemptReportPath $successAttemptPath `
                 -SkipDiscordHandoff 2>&1)
             $secondRecoveryExitCode = $LASTEXITCODE
         }
@@ -1446,6 +1503,7 @@ exit 2
         $env:RECOVERY_GH_STATE = $previousGhState
         $env:RECOVERY_GH_LOG = $previousGhLog
     }
+    Write-Host "PASS: Steam recovery evidence separates staged content from ZIP bytes and persists mismatches"
     Write-Host "PASS: bounded partial recovery performs one missing GitHub mutation and is idempotent"
     Write-Host "PASS: signoff schema/evidence, incident inventory, issue/Wiki boundaries, and local round trip"
 }

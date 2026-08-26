@@ -11,6 +11,7 @@ param(
     [string] $ModIoAccessTokenPath = "",
     [string[]] $EvidenceTerm = @(),
     [string] $PlatformReadbackFixturePath = "",
+    [string] $RecoveryAttemptReportPath = "",
     [switch] $SkipDiscordHandoff,
     [switch] $DetailedOutput
 )
@@ -179,26 +180,111 @@ function Get-StringSha256([string] $Value) {
     }
 }
 
-function Get-PlatformReadbacks([object] $Preflight, [object] $PartialSignoff) {
+function Get-PlatformReadbackFixture {
     if (-not [string]::IsNullOrWhiteSpace($PlatformReadbackFixturePath)) {
         $fixturePath = Resolve-ToolPath $PlatformReadbackFixturePath
         Assert-PathExists $fixturePath "Platform readback fixture"
         return Get-Content -Raw -LiteralPath $fixturePath | ConvertFrom-Json
     }
+    return $null
+}
 
+function Get-SteamReadback([object] $PartialSignoff, [object] $Fixture) {
+    if ($null -ne $Fixture) {
+        return $Fixture.Steam
+    }
     $steamId = [string]$PartialSignoff.Platforms.Steam.PublishedFileId
     $steamResponse = Invoke-RestMethod -Method Post `
         -Uri "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/" `
         -Body @{ itemcount = "1"; "publishedfileids[0]" = $steamId }
     $steamItem = $steamResponse.response.publishedfiledetails[0]
-    $steam = [ordered]@{
+    $publicReadback = [ordered]@{
         PublishedFileId = [string]$steamItem.publishedfileid
         Result = [int]$steamItem.result
+        CreatorOwnerId = [string]$steamItem.creator
+        CreatorAppId = [string]$steamItem.creator_app_id
+        ConsumerAppId = [string]$steamItem.consumer_app_id
+        Title = [string]$steamItem.title
         TimeUpdated = [long]$steamItem.time_updated
         FileSize = [long]$steamItem.file_size
         Visibility = [int]$steamItem.visibility
+        Tags = [string[]]@($steamItem.tags | ForEach-Object { [string]$_.tag })
+        EvidenceSource = "SteamPublicApi.GetPublishedFileDetails"
     }
+    $needsOwnerReadback = [int]$publicReadback.Result -ne 1 -or
+        [string]::IsNullOrWhiteSpace([string]$publicReadback.ConsumerAppId) -or
+        [string]::IsNullOrWhiteSpace([string]$publicReadback.Title) -or
+        [long]$publicReadback.FileSize -le 0 -or [long]$publicReadback.TimeUpdated -le 0 -or
+        @($publicReadback.Tags).Count -eq 0
+    if (-not $needsOwnerReadback) {
+        return $publicReadback
+    }
+    try {
+        $ownerReadback = Get-AuthenticatedSteamReadback $steamId
+        $ownerReadback["PublicResult"] = [int]$publicReadback.Result
+        return $ownerReadback
+    }
+    catch {
+        $publicReadback["OwnerReadbackUnavailable"] = $_.Exception.Message
+        return $publicReadback
+    }
+}
 
+function Get-AuthenticatedSteamReadback([string] $PublishedFileId) {
+    $projectPath = Resolve-ToolPath "tools/SteamTagUpdater/SteamTagUpdater.csproj"
+    Assert-PathExists $projectPath "Steam authenticated readback project"
+    $build = Invoke-ReleaseNativeCommand -Command "dotnet" -Arguments @(
+        "build", $projectPath, "-c", "Release")
+    if ($build.ExitCode -ne 0) {
+        throw "Steam authenticated readback build failed."
+    }
+    $dllPath = Resolve-ToolPath "tools/SteamTagUpdater/bin/Release/net8.0/SteamTagUpdater.dll"
+    Assert-PathExists $dllPath "Steam authenticated readback executable"
+    $query = Invoke-ReleaseNativeCommand -Command "dotnet" -Arguments @(
+        $dllPath, "--query", $PublishedFileId)
+    if ($query.ExitCode -ne 0) {
+        throw "Steam authenticated owner readback failed."
+    }
+    $itemLine = @($query.Output | Where-Object { $_ -like "LIVE_ITEM_JSON=*" }) | Select-Object -Last 1
+    $tagsLine = @($query.Output | Where-Object { $_ -like "LIVE_TAGS_JSON=*" }) | Select-Object -Last 1
+    if ([string]::IsNullOrWhiteSpace($itemLine) -or [string]::IsNullOrWhiteSpace($tagsLine)) {
+        throw "Steam authenticated owner readback returned incomplete machine-readable evidence."
+    }
+    $item = $itemLine.Substring("LIVE_ITEM_JSON=".Length) | ConvertFrom-Json
+    $tags = $tagsLine.Substring("LIVE_TAGS_JSON=".Length) | ConvertFrom-Json
+    $visibilityMap = @{
+        k_ERemoteStoragePublishedFileVisibilityPublic = 0
+        k_ERemoteStoragePublishedFileVisibilityFriendsOnly = 1
+        k_ERemoteStoragePublishedFileVisibilityPrivate = 2
+        k_ERemoteStoragePublishedFileVisibilityUnlisted = 3
+        Public = 0
+        FriendsOnly = 1
+        Private = 2
+        Unlisted = 3
+    }
+    $visibility = $null
+    if ($visibilityMap.ContainsKey([string]$item.Visibility)) {
+        $visibility = [int]$visibilityMap[[string]$item.Visibility]
+    }
+    return [ordered]@{
+        PublishedFileId = [string]$item.PublishedFileId
+        Result = 1
+        CreatorOwnerId = [string]$item.OwnerSteamId
+        CreatorAppId = $null
+        ConsumerAppId = [string]$item.ConsumerAppId
+        Title = [string]$item.Title
+        TimeUpdated = [long]$item.Updated
+        FileSize = [long]$item.FileSize
+        Visibility = $visibility
+        Tags = [string[]]@($tags | ForEach-Object { [string]$_ })
+        EvidenceSource = "AuthenticatedOwner.SteamUGC.CreateQueryUGCDetailsRequest"
+    }
+}
+
+function Get-ModIoReadback([object] $Preflight, [object] $Fixture) {
+    if ($null -ne $Fixture) {
+        return $Fixture.ModIO
+    }
     $configPath = if ([string]::IsNullOrWhiteSpace($ModIoConfigPath)) {
         Resolve-ToolPath ".tools/modio/$($Preflight.ModName).local.json"
     }
@@ -227,7 +313,7 @@ function Get-PlatformReadbacks([object] $Preflight, [object] $PartialSignoff) {
     $file = Invoke-RestMethod `
         -Uri "$($base.TrimEnd('/'))/games/$gameId/mods/$modId/files/$activeFileId" `
         -Headers $headers
-    $modIo = [ordered]@{
+    return [ordered]@{
         ModId = [long]$modId
         ActiveFileId = [long]$activeFileId
         Version = [string]$mod.modfile.version
@@ -236,7 +322,78 @@ function Get-PlatformReadbacks([object] $Preflight, [object] $PartialSignoff) {
         VirusPositive = [int]$file.virus_positive
         FileSize = [long]$file.filesize
     }
-    return [ordered]@{ Steam = $steam; ModIO = $modIo }
+}
+
+function Convert-ToUnixTimeSeconds([string] $Value) {
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return $null
+    }
+    return [long]([DateTimeOffset]::Parse($Value).ToUniversalTime().ToUnixTimeSeconds())
+}
+
+function Get-NormalizedTags([object[]] $Tags) {
+    return [string[]]@($Tags | ForEach-Object { [string]$_ } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+}
+
+function New-SteamComparison(
+    [string] $Field,
+    [object] $Expected,
+    [object] $Actual,
+    [bool] $Required,
+    [string] $Outcome,
+    [string] $Note = ""
+) {
+    return [ordered]@{
+        Field = $Field
+        Expected = $Expected
+        Actual = $Actual
+        Required = $Required
+        Outcome = $Outcome
+        Note = $Note
+    }
+}
+
+function Write-RecoveryAttemptReport([object] $Report, [string] $Path) {
+    $parent = Split-Path -Parent $Path
+    [void](New-Item -ItemType Directory -Path $parent -Force)
+    $temporaryPath = "$Path.tmp-$PID"
+    $backupPath = "$Path.backup-$PID"
+    try {
+        [System.IO.File]::WriteAllText(
+            $temporaryPath,
+            ($Report | ConvertTo-Json -Depth 12),
+            [System.Text.UTF8Encoding]::new($true))
+        $roundTrip = Get-Content -Raw -LiteralPath $temporaryPath | ConvertFrom-Json
+        if ([int]$roundTrip.SchemaVersion -ne 1 -or
+                [string]$roundTrip.ArtifactType -ne "TimberbornReleaseRecoveryAttempt") {
+            throw "Temporary recovery attempt report failed schema readback: $temporaryPath"
+        }
+        if (Test-Path -LiteralPath $Path -PathType Leaf) {
+            [System.IO.File]::Replace($temporaryPath, $Path, $backupPath)
+        }
+        else {
+            Move-Item -LiteralPath $temporaryPath -Destination $Path
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryPath) {
+            Remove-Item -LiteralPath $temporaryPath -Force
+        }
+        if (Test-Path -LiteralPath $backupPath) {
+            Remove-Item -LiteralPath $backupPath -Force
+        }
+    }
+}
+
+function Format-EvidenceValue([object] $Value) {
+    if ($null -eq $Value) {
+        return "(unavailable)"
+    }
+    if ($Value -is [System.Array]) {
+        return (@($Value) -join ", ")
+    }
+    return [string]$Value
 }
 
 $preflightPath = Resolve-ToolPath $PreflightReportPath
@@ -305,22 +462,215 @@ else {
     Get-SourceReleaseNotes $primarySource
 }
 
-$platformReadbacks = Get-PlatformReadbacks $preflight $partial
-$steam = $platformReadbacks.Steam
-$modIo = $platformReadbacks.ModIO
-$expectedModIo = $partial.Platforms.ModIO.FinalReadback
-if ([string]$steam.PublishedFileId -ne [string]$partial.Platforms.Steam.PublishedFileId -or
-        [int]$steam.Result -ne 1 -or [long]$steam.FileSize -ne [long]$preflight.Package.Length) {
-    throw "Steam final readback does not match the completed immutable publication."
+$attemptPath = if ([string]::IsNullOrWhiteSpace($RecoveryAttemptReportPath)) {
+    $attemptRoot = Resolve-ToolPath ".tools/release-recovery"
+    $lineSuffix = if ([string]::IsNullOrWhiteSpace([string]$preflight.ReleaseLine)) {
+        "current"
+    }
+    else { [string]$preflight.ReleaseLine }
+    $timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmmss-fff")
+    Join-Path $attemptRoot "$($preflight.ModName)-$($preflight.SourceModVersion)-$lineSuffix-$timestamp.json"
 }
+else {
+    Resolve-ToolPath $RecoveryAttemptReportPath
+}
+$steamOperation = @($partial.Operations | Where-Object {
+    [string]$_.Name -eq "Steam release publish" -and [string]$_.Status -eq "Succeeded"
+})[0]
+$packageOwnerRoot = Resolve-RepositoryRoot ([string]$preflight.PackageOwnerRoot) $toolRepoRoot
+$packageOwnerConfigPath = [string]$preflight.PackageOwnerConfigPath
+if ([string]::IsNullOrWhiteSpace($packageOwnerConfigPath)) {
+    $packageOwnerConfigPath = Join-Path $packageOwnerRoot "$($preflight.ModName)/release.json"
+}
+Assert-PathExists $packageOwnerConfigPath "Public package owner release config"
+$packageOwnerConfig = Get-Content -Raw -LiteralPath $packageOwnerConfigPath | ConvertFrom-Json
+$stagingSourcePath = Resolve-RepositoryPath $packageOwnerRoot ([string]$packageOwnerConfig.Package.SourcePath)
+$workshopDataPath = Join-Path $stagingSourcePath "workshop_data.json"
+Assert-PathExists $workshopDataPath "Steam staging workshop metadata"
+$workshopData = Get-Content -Raw -LiteralPath $workshopDataPath | ConvertFrom-Json
+$expectedSteamId = [string]$partial.Platforms.Steam.PublishedFileId
+$expectedSteamAppId = if ([string]::IsNullOrWhiteSpace([string]$packageOwnerConfig.Steam.AppId)) {
+    "1062090"
+}
+else { [string]$packageOwnerConfig.Steam.AppId }
+$expectedSteamOwnerId = [string]$packageOwnerConfig.Steam.OwnerId
+$expectedSteamTitle = [string]$workshopData.Name
+$expectedSteamVisibility = $null
+if ($workshopData.UpdateVisibility -eq $true) {
+    $visibilityMap = @{ Public = 0; FriendsOnly = 1; Private = 2; Unlisted = 3 }
+    if (-not $visibilityMap.ContainsKey([string]$workshopData.Visibility)) {
+        throw "Unsupported intended Steam visibility: $($workshopData.Visibility)"
+    }
+    $expectedSteamVisibility = [int]$visibilityMap[[string]$workshopData.Visibility]
+}
+$expectedSteamTags = Get-NormalizedTags @($workshopData.Tags)
+$minimumSteamUpdateTime = Convert-ToUnixTimeSeconds ([string]$steamOperation.StartedAtUtc)
+$attempt = [ordered]@{
+    SchemaVersion = 1
+    ArtifactType = "TimberbornReleaseRecoveryAttempt"
+    CreatedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
+    Status = "CollectingSteamReadback"
+    Stage = "SteamReadback"
+    Identity = [ordered]@{
+        ModName = [string]$preflight.ModName
+        SourceModVersion = [string]$preflight.SourceModVersion
+        PublicPackageVersion = [string]$preflight.PublicPackageVersion
+        ReleaseCommit = [string]$preflight.ReleaseCommit
+        TagName = [string]$preflight.TagName
+    }
+    Inputs = [ordered]@{
+        PreflightReportPath = $preflightPath
+        PartialSignoffReportPath = $partialPath
+        ImmutableZip = $preflight.Package
+        SteamStagingContent = $preflight.Source
+        SteamReadbackLimitation = (
+            "Steam public file_size describes staged Workshop content and is not comparable to immutable ZIP bytes. " +
+            "The public API cannot read back the local staging-content fingerprint.")
+    }
+    Steam = [ordered]@{
+        SuccessfulPublishOperation = [ordered]@{
+            Name = [string]$steamOperation.Name
+            StartedAtUtc = [string]$steamOperation.StartedAtUtc
+            CompletedAtUtc = [string]$steamOperation.CompletedAtUtc
+            ExternalOutcome = [string]$steamOperation.ExternalOutcome
+            LogPath = [string]$steamOperation.LogPath
+        }
+        Expected = [ordered]@{
+            PublishedFileId = $expectedSteamId
+            Result = 1
+            ConsumerAppId = $expectedSteamAppId
+            CreatorOwnerId = if ([string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) { $null } else { $expectedSteamOwnerId }
+            Title = $expectedSteamTitle
+            Visibility = $expectedSteamVisibility
+            VisibilityIntent = "Unchanged"
+            MinimumFileSize = 1
+            MinimumTimeUpdated = $minimumSteamUpdateTime
+            Tags = [string[]]$expectedSteamTags
+        }
+        Actual = $null
+        Comparisons = [object[]]@()
+        ConclusivelyIdentified = $false
+    }
+    Blockers = [string[]]@()
+}
+$platformFixture = Get-PlatformReadbackFixture
+try {
+    $steam = Get-SteamReadback $partial $platformFixture
+}
+catch {
+    $attempt.Status = "Blocked"
+    $attempt.Blockers = [string[]]@("Steam readback failed: $($_.Exception.Message)")
+    Write-RecoveryAttemptReport $attempt $attemptPath
+    Write-Host "Recovery attempt report: $attemptPath"
+    throw
+}
+if ([string]::IsNullOrWhiteSpace([string]$steam.EvidenceSource)) {
+    $steam | Add-Member -NotePropertyName "EvidenceSource" `
+        -NotePropertyValue "FixtureOrAuthenticatedReadback" -Force
+}
+$actualSteamTags = Get-NormalizedTags @($steam.Tags)
+$attempt.Steam.Actual = $steam
+Write-RecoveryAttemptReport $attempt $attemptPath
+Write-Host (
+    "Steam readback: published_file_id=$($steam.PublishedFileId); result=$($steam.Result); " +
+    "owner=$($steam.CreatorOwnerId); creator_app_id=$($steam.CreatorAppId); " +
+    "consumer_app_id=$($steam.ConsumerAppId); title=$($steam.Title); visibility=$($steam.Visibility); " +
+    "file_size=$($steam.FileSize); time_updated=$($steam.TimeUpdated); " +
+    "tags=$(Format-EvidenceValue $actualSteamTags); source=$($steam.EvidenceSource)")
+Write-Host "Recovery attempt report: $attemptPath"
+$steamComparisons = New-Object System.Collections.Generic.List[object]
+$steamComparisons.Add((New-SteamComparison "PublishedFileId" $expectedSteamId `
+    ([string]$steam.PublishedFileId) $true $(if ([string]$steam.PublishedFileId -eq $expectedSteamId) {
+        "Match"
+    } else { "Mismatch" })))
+$steamComparisons.Add((New-SteamComparison "Result" 1 ([int]$steam.Result) $true `
+    $(if ([int]$steam.Result -eq 1) { "Match" } else { "Mismatch" })))
+$steamComparisons.Add((New-SteamComparison "ConsumerAppId" $expectedSteamAppId `
+    ([string]$steam.ConsumerAppId) $true $(if ([string]::IsNullOrWhiteSpace([string]$steam.ConsumerAppId)) {
+        "Unavailable"
+    } elseif ([string]$steam.ConsumerAppId -eq $expectedSteamAppId) { "Match" } else { "Mismatch" })))
+$ownerOutcome = if ([string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) {
+    "UnavailableExpected"
+}
+elseif ([string]::IsNullOrWhiteSpace([string]$steam.CreatorOwnerId)) {
+    "Unavailable"
+}
+elseif ([string]$steam.CreatorOwnerId -eq $expectedSteamOwnerId) { "Match" } else { "Mismatch" }
+$steamComparisons.Add((New-SteamComparison "CreatorOwnerId" `
+    $(if ([string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) { $null } else { $expectedSteamOwnerId }) `
+    ([string]$steam.CreatorOwnerId) (-not [string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) $ownerOutcome))
+$steamComparisons.Add((New-SteamComparison "Title" $expectedSteamTitle ([string]$steam.Title) $true `
+    $(if ([string]::IsNullOrWhiteSpace([string]$steam.Title)) { "Unavailable" }
+        elseif ([string]$steam.Title -eq $expectedSteamTitle) { "Match" } else { "Mismatch" })))
+$visibilityOutcome = if ($null -eq $expectedSteamVisibility) {
+    "UnavailableExpected"
+}
+elseif ($null -eq $steam.Visibility) {
+    "Unavailable"
+}
+elseif ([int]$steam.Visibility -eq [int]$expectedSteamVisibility) { "Match" } else { "Mismatch" }
+$steamComparisons.Add((New-SteamComparison "Visibility" $expectedSteamVisibility $steam.Visibility `
+    ($null -ne $expectedSteamVisibility) $visibilityOutcome "No visibility mutation was authorized."))
+$steamComparisons.Add((New-SteamComparison "FileSize" ">0 staged Workshop bytes" ([long]$steam.FileSize) $true `
+    $(if ([long]$steam.FileSize -gt 0) { "Match" } else { "Mismatch" }) `
+    "Not compared with immutable ZIP length $($preflight.Package.Length)."))
+$timeOutcome = if ($null -eq $minimumSteamUpdateTime) {
+    "UnavailableExpected"
+}
+elseif ([long]$steam.TimeUpdated -ge [long]$minimumSteamUpdateTime) { "Match" } else { "Mismatch" }
+$steamComparisons.Add((New-SteamComparison "TimeUpdated" ">=$minimumSteamUpdateTime" `
+    ([long]$steam.TimeUpdated) $true $timeOutcome))
+$tagsOutcome = if ($expectedSteamTags.Count -eq 0) {
+    "UnavailableExpected"
+}
+elseif ($actualSteamTags.Count -eq 0) {
+    "Unavailable"
+}
+elseif (($expectedSteamTags -join "|") -eq ($actualSteamTags -join "|")) { "Match" } else { "Mismatch" }
+$steamComparisons.Add((New-SteamComparison "Tags" ([string[]]$expectedSteamTags) `
+    ([string[]]$actualSteamTags) $true $tagsOutcome))
+$attempt.Steam.Comparisons = [object[]]$steamComparisons.ToArray()
+$blockingSteamComparisons = @($steamComparisons | Where-Object {
+    $_.Required -eq $true -and $_.Outcome -ne "Match"
+})
+$attempt.Steam.ConclusivelyIdentified = $blockingSteamComparisons.Count -eq 0
+$attempt.Status = if ($attempt.Steam.ConclusivelyIdentified) { "SteamVerified" } else { "Blocked" }
+$attempt.Blockers = [string[]]@($blockingSteamComparisons | ForEach-Object {
+    "Steam $($_.Field): expected $(Format-EvidenceValue $_.Expected); " +
+    "actual $(Format-EvidenceValue $_.Actual); outcome $($_.Outcome)."
+})
+Write-RecoveryAttemptReport $attempt $attemptPath
+foreach ($comparison in $steamComparisons) {
+    Write-Host (
+        "Steam comparison: $($comparison.Field); expected=$(Format-EvidenceValue $comparison.Expected); " +
+        "actual=$(Format-EvidenceValue $comparison.Actual); outcome=$($comparison.Outcome)")
+}
+if (-not $attempt.Steam.ConclusivelyIdentified) {
+    throw "Steam publication identity readback did not match the recorded successful publish. See $attemptPath"
+}
+
+$modIo = Get-ModIoReadback $preflight $platformFixture
+$expectedModIo = $partial.Platforms.ModIO.FinalReadback
 if ($null -eq $expectedModIo -or
         [long]$modIo.ModId -ne [long]$expectedModIo.ModId -or
         [long]$modIo.ActiveFileId -ne [long]$expectedModIo.ActiveFileId -or
         [string]$modIo.Version -ne [string]$preflight.PublicPackageVersion -or
         [long]$modIo.DateScanned -le 0 -or [int]$modIo.VirusStatus -ne 1 -or
         [int]$modIo.VirusPositive -ne 0 -or [long]$modIo.FileSize -ne [long]$preflight.Package.Length) {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "ModIOReadback"
+    $attempt["ModIO"] = [ordered]@{
+        Expected = $expectedModIo
+        Actual = $modIo
+        Verified = $false
+    }
+    $attempt.Blockers = [string[]]@("Mod.IO final readback did not match the completed immutable publication.")
+    Write-RecoveryAttemptReport $attempt $attemptPath
     throw "Mod.IO final readback does not match the completed immutable publication."
 }
+$attempt.Stage = "ModIOVerified"
+$attempt["ModIO"] = [ordered]@{ Expected = $expectedModIo; Actual = $modIo; Verified = $true }
+Write-RecoveryAttemptReport $attempt $attemptPath
 
 $tagName = [string]$preflight.TagName
 $remoteTag = Invoke-ReleaseNativeCommand -Command "git" -Arguments @(
@@ -490,6 +840,7 @@ foreach ($existingHistory in @($partial.PartialSuccess.RecoveryHistory)) {
 $history.Add([pscustomobject][ordered]@{
     RecoveredAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     SourceSignoffPath = $partialPath
+    RecoveryAttemptReportPath = $attemptPath
     PreviousStatus = [string]$partial.Status
     CompletedBeforeRecovery = [string[]]@($partial.PartialSuccess.CompletedMutations)
     Readbacks = [string[]]@("Steam", "Mod.IO", "RemoteTag", "GitHubRelease")
@@ -500,6 +851,26 @@ $history.Add([pscustomobject][ordered]@{
 $final.PartialSuccess["RecoveryHistory"] = [object[]]$history.ToArray()
 $final.PartialSuccess["RecoveredFromPartial"] = $true
 Write-ReleaseSignoffReport $final $partialPath
+$attempt.Status = "Completed"
+$attempt.Stage = "FinalSignoff"
+$attempt["ModIO"] = [ordered]@{
+    Actual = $modIo
+    Verified = $true
+}
+$attempt["RemoteTag"] = [ordered]@{
+    TagName = $tagName
+    Commit = $remoteCommit
+    Verified = $true
+}
+$attempt["GitHub"] = [ordered]@{
+    Action = $githubAction
+    Url = [string]$github.Url
+    AssetName = [string]$github.AssetName
+    AssetDigest = [string]$github.AssetDigest
+    Verified = $true
+}
+$attempt["FinalSignoffReportPath"] = $partialPath
+Write-RecoveryAttemptReport $attempt $attemptPath
 
 Format-ReleaseSignoffReport $final | ForEach-Object { Write-Host $_ }
 Write-Host "Recovery signoff report: $partialPath"
