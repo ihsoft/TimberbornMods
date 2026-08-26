@@ -14,6 +14,7 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 sealed class Configurator : IConfigurator {
   static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
   static readonly Type[] Patches = [
+      typeof(LoadGameBoxPatch),
       typeof(GoodConsumingBuildingDescriberPatch),
       typeof(ManufactoryInventoryFragmentPatch1),
       typeof(ManufactoryInventoryFragmentPatch2),
@@ -29,6 +30,7 @@ sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     CommonFormats.ResetCachedLocStrings();
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+    containerDefinition.Bind<GameSaveVersionLabelUpdater>().AsSingleton();
     containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
   }
 }

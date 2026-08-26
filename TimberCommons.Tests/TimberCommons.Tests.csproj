@@ -7,6 +7,11 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
     <ItemGroup>
+      <Reference Include="Newtonsoft.Json">
+        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup>
       <Compile Include="..\TestSupport\Testing\Assert.cs">
         <Link>TestSupport\Testing\Assert.cs</Link>
       </Compile>
@@ -39,6 +44,12 @@
       </Compile>
       <Compile Include="..\TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs">
         <Link>TimberCommons\CommonUIPatches\ModListViewInitializePatch.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\CommonUIPatches\FactionIdSaveEntryReader.cs">
+        <Link>TimberCommons\CommonUIPatches\FactionIdSaveEntryReader.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\CommonUIPatches\GameSaveVersionFormatter.cs">
+        <Link>TimberCommons\CommonUIPatches\GameSaveVersionFormatter.cs</Link>
       </Compile>
     </ItemGroup>
 </Project>

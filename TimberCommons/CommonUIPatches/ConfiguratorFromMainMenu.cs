@@ -12,11 +12,13 @@ namespace IgorZ.TimberCommons.CommonUIPatches;
 sealed class ConfiguratorFromMainMenu : IConfigurator {
   static readonly string PatchId = typeof(ConfiguratorFromMainMenu).AssemblyQualifiedName;
   static readonly Type[] Patches = [
+      typeof(LoadGameBoxPatch),
       typeof(ModListViewInitializePatch),
   ];
 
   public void Configure(IContainerDefinition containerDefinition) {
     HarmonyPatcher.ApplyPatch(PatchId, Patches);
+    containerDefinition.Bind<GameSaveVersionLabelUpdater>().AsSingleton();
     containerDefinition.Bind<ModListViewLocInitializer>().AsSingleton();
   }
 }

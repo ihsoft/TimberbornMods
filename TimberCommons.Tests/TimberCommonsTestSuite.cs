@@ -69,6 +69,9 @@ static class TimberCommonsTestSuite {
       ("ModListView filter hides inactive mods and restores the full list",
           ModListViewInitializePatchTests.FiltersInactiveModsAndRestoresFullList),
       ("ModListView adds the filter button only once", ModListViewInitializePatchTests.AddsFilterButtonOnlyOnce),
+      ("Save preview formats saved game versions", SavePreviewTests.FormatsSavedGameVersions),
+      ("Save preview reads faction ID from world entry", SavePreviewTests.ReadsFactionIdFromWorldEntry),
+      ("Save preview rejects world entry without faction ID", SavePreviewTests.RejectsWorldEntryWithoutFactionId),
   ];
 
   public static int Run() {
