@@ -69,3 +69,4 @@ else {
 if (-not $report.ReadyForGate1) {
     exit 2
 }
+exit 0

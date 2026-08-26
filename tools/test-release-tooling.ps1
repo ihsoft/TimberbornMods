@@ -1751,6 +1751,9 @@ finally {
 }
 
 $verifyText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "verify-release.ps1")
+$readinessEntryText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "get-release-readiness.ps1")
+Assert-True $readinessEntryText.TrimEnd().EndsWith("exit 0", [System.StringComparison]::Ordinal) `
+    "Ready-for-Gate-1 discovery must not leak a failed child probe through the process exit code."
 $unityStepIndex = $verifyText.IndexOf('"Unity package source export"', [System.StringComparison]::Ordinal)
 $buildStepIndex = $verifyText.IndexOf('"C# package source build"', [System.StringComparison]::Ordinal)
 $steamStepIndex = $verifyText.IndexOf('"Steam release dry run"', [System.StringComparison]::Ordinal)
