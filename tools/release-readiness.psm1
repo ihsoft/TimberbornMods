@@ -570,6 +570,60 @@ function Get-ReleaseReadinessReport {
     else {
         ""
     }
+    $publicManifestPathValue = [string](Get-ReadinessProperty $packageOwnerConfig "ManifestPath")
+    $authoritativeWorkshopDataValue = if ([string]::IsNullOrWhiteSpace($publicManifestPathValue)) {
+        ""
+    }
+    else {
+        Join-Path (Split-Path -Parent $publicManifestPathValue) "Data/workshop_data.json"
+    }
+    $authoritativeWorkshopDataPath = if ([string]::IsNullOrWhiteSpace($authoritativeWorkshopDataValue)) {
+        ""
+    }
+    else {
+        [System.IO.Path]::GetFullPath((Join-Path $packageOwnerRoot $authoritativeWorkshopDataValue))
+    }
+    $authoritativeWorkshopDataExists = -not [string]::IsNullOrWhiteSpace($authoritativeWorkshopDataPath) -and
+        (Test-Path -LiteralPath $authoritativeWorkshopDataPath -PathType Leaf)
+    $authoritativeWorkshopDataSha256 = ""
+    $authoritativeWorkshopDataTags = @()
+    $authoritativeWorkshopDataParseReady = $false
+    $authoritativeWorkshopTagIntentDeclared = $false
+    if ($authoritativeWorkshopDataExists) {
+        $authoritativeWorkshopDataSha256 = (
+            Get-FileHash -LiteralPath $authoritativeWorkshopDataPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        try {
+            $authoritativeWorkshopData = Get-Content -Raw -LiteralPath $authoritativeWorkshopDataPath |
+                ConvertFrom-Json
+            $authoritativeWorkshopTagIntentDeclared = $null -ne
+                $authoritativeWorkshopData.PSObject.Properties["Tags"]
+            $authoritativeWorkshopDataTags = [string[]]@(
+                $authoritativeWorkshopData.Tags | ForEach-Object { [string]$_ })
+            $authoritativeWorkshopDataParseReady = $true
+            if (-not $authoritativeWorkshopTagIntentDeclared) {
+                $blockers.Add([ordered]@{
+                    Code = "AuthoritativeWorkshopTagIntentMissing"
+                    Message = (
+                        "Public-owner workshop metadata does not declare Tags. An absent generated tag list " +
+                        "cannot authorize removal of public taxonomy tags.")
+                })
+            }
+        }
+        catch {
+            $blockers.Add([ordered]@{
+                Code = "AuthoritativeWorkshopMetadataInvalid"
+                Message = "Public-owner workshop metadata is not valid JSON: $authoritativeWorkshopDataPath"
+            })
+        }
+    }
+    elseif (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
+        $blockers.Add([ordered]@{
+            Code = "AuthoritativeWorkshopMetadataMissing"
+            Message = (
+                "Registered-line package materialization requires the public owner's tracked workshop metadata: " +
+                $authoritativeWorkshopDataPath)
+        })
+    }
     $packageMode = [string](Get-ReadinessProperty $packageOwnerConfig.Package "Mode")
     if ([string]::IsNullOrWhiteSpace($packageMode)) {
         $packageMode = "ExistingZip"
@@ -805,6 +859,10 @@ function Get-ReleaseReadinessReport {
     if (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
         $gate1Arguments += @("-ReleaseLine", $ReleaseLine)
     }
+    if ($authoritativeWorkshopDataExists -and $authoritativeWorkshopDataParseReady -and
+            $authoritativeWorkshopTagIntentDeclared) {
+        $gate1Arguments += @("-AuthoritativeWorkshopDataPath", $authoritativeWorkshopDataPath)
+    }
     $selectedModIoTokenArgument = [string]$probe.ModIO.AccessTokenArgument
     if ([bool]$probe.ModIO.AccessTokenExists -and
             -not [string]::IsNullOrWhiteSpace($selectedModIoTokenArgument)) {
@@ -842,6 +900,16 @@ function Get-ReleaseReadinessReport {
             OwnerRoot = $packageOwnerRoot
             OwnerConfigPath = $packageOwnerConfigPath
             OwnerConfigSha256 = $packageOwnerConfigSha256
+            AuthoritativeWorkshopData = [ordered]@{
+                Path = $authoritativeWorkshopDataPath
+                PathArgument = $authoritativeWorkshopDataValue
+                Sha256 = $authoritativeWorkshopDataSha256
+                Exists = $authoritativeWorkshopDataExists
+                ParseReady = $authoritativeWorkshopDataParseReady
+                TagIntentDeclared = $authoritativeWorkshopTagIntentDeclared
+                Tags = [string[]]$authoritativeWorkshopDataTags
+                Source = "PublicOwnerTrackedManifestSibling"
+            }
             Mode = $packageMode
             SourcePath = $packageSourcePath
             SourcePathArgument = $packageSourceValue
@@ -971,6 +1039,10 @@ function Format-ReleaseReadinessReport([object] $Report) {
     $lines.Add(
         "  Package: mode=$($Report.Package.Mode); preparation=$($Report.Package.PreparationState); " +
         "source materialized=$($Report.Package.SourceExists); artifact materialized=$($Report.Package.ArtifactExists)")
+    $lines.Add(
+        "  Workshop metadata: bound=$($Report.Package.AuthoritativeWorkshopData.ParseReady); " +
+        "tags=$($Report.Package.AuthoritativeWorkshopData.Tags -join ', '); " +
+        "sha256=$($Report.Package.AuthoritativeWorkshopData.Sha256)")
     $lines.Add(
         "  Metadata: $($Report.Gate1Plan.PreparationState); " +
         "planned changes=$(@($Report.Gate1Plan.PlannedMetadataChanges).Count)")

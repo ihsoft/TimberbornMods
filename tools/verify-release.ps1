@@ -4,6 +4,7 @@ param(
 
     [string] $ReleaseRoot = "",
     [string] $PackageOwnerRoot = "",
+    [string] $AuthoritativeWorkshopDataPath = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
     [ValidateSet("CurrentLine", "BackportPatchOnly")]
@@ -333,6 +334,30 @@ if ([string]::IsNullOrWhiteSpace($plannedReadinessReportPath) -or
 $plannedModIoAccessTokenPath = Get-Gate1Argument "-ModIoAccessTokenPath"
 if ([string]::IsNullOrWhiteSpace($plannedModIoAccessTokenPath)) {
     throw "Gate 1 plan does not bind the Mod.IO owner token validated by readiness."
+}
+$plannedAuthoritativeWorkshopDataPath = Get-Gate1Argument "-AuthoritativeWorkshopDataPath"
+$readinessWorkshopMetadata = $readinessReport.Package.AuthoritativeWorkshopData
+$readinessWorkshopDataPath = [string]$readinessWorkshopMetadata.Path
+if ([bool]$readinessWorkshopMetadata.Exists) {
+    if ([string]::IsNullOrWhiteSpace($plannedAuthoritativeWorkshopDataPath) -or
+            (Resolve-ToolPath $plannedAuthoritativeWorkshopDataPath) -ne $readinessWorkshopDataPath) {
+        throw "Gate 1 plan does not bind the public-owner workshop metadata validated by readiness."
+    }
+    if ([string]::IsNullOrWhiteSpace($AuthoritativeWorkshopDataPath)) {
+        $AuthoritativeWorkshopDataPath = $plannedAuthoritativeWorkshopDataPath
+    }
+    elseif ((Resolve-ToolPath $AuthoritativeWorkshopDataPath) -ne $readinessWorkshopDataPath) {
+        throw "Authoritative workshop metadata argument does not match compact readiness."
+    }
+    Assert-PathExists $readinessWorkshopDataPath "Authoritative public-owner workshop metadata"
+    $authoritativeWorkshopDataSha256 = (
+        Get-FileHash -LiteralPath $readinessWorkshopDataPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($authoritativeWorkshopDataSha256 -ne [string]$readinessWorkshopMetadata.Sha256) {
+        throw "Authoritative public-owner workshop metadata changed after readiness discovery. Rerun compact readiness."
+    }
+}
+elseif (-not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
+    throw "Registered-line preflight requires readiness-bound public-owner workshop metadata."
 }
 if ([string]::IsNullOrWhiteSpace($ModIoAccessTokenPath)) {
     $ModIoAccessTokenPath = $plannedModIoAccessTokenPath
@@ -711,6 +736,10 @@ if (-not $SkipPlatformTags) {
     $materializeTagArgs.Add("-ReleaseRoot")
     $materializeTagArgs.Add($resolvedPackageOwnerRoot)
     Add-OptionalArgument $materializeTagArgs "-LocalModRoot" $LocalModRoot
+    Add-OptionalArgument $materializeTagArgs `
+        "-AuthoritativeWorkshopDataPath" $AuthoritativeWorkshopDataPath
+    Add-OptionalArgument $materializeTagArgs `
+        "-ExpectedAuthoritativeWorkshopDataSha256" ([string]$readinessWorkshopMetadata.Sha256)
     $materializeTagArgs.Add("-MaterializeLocalOnly")
     $steps.Add((Invoke-ReleaseStep "Local release tag materialization" "update-platform-tags.ps1" $materializeTagArgs.ToArray()))
 }
@@ -815,6 +844,9 @@ if (-not $SkipPlatformTags) {
         $tagArgs.Add("Steam")
     }
     Add-OptionalArgument $tagArgs "-LocalModRoot" $LocalModRoot
+    Add-OptionalArgument $tagArgs "-AuthoritativeWorkshopDataPath" $AuthoritativeWorkshopDataPath
+    Add-OptionalArgument $tagArgs `
+        "-ExpectedAuthoritativeWorkshopDataSha256" ([string]$readinessWorkshopMetadata.Sha256)
     Add-OptionalArgument $tagArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $tagArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $tagArgs "-SteamUserName" $SteamUserName
@@ -1044,6 +1076,12 @@ $report = [ordered]@{
     PackageOwnerRoot = $resolvedPackageOwnerRoot
     PackageOwnerConfigPath = $packageOwnerConfigPath
     PackageOwnerConfigSha256 = $packageOwnerConfigSha256
+    AuthoritativeWorkshopData = [ordered]@{
+        Path = $readinessWorkshopDataPath
+        Sha256 = [string]$readinessWorkshopMetadata.Sha256
+        Tags = [string[]]@($readinessWorkshopMetadata.Tags)
+        Source = [string]$readinessWorkshopMetadata.Source
+    }
     ChangesPath = (Resolve-Path -LiteralPath $changesPath).Path
     ChangelogHeading = $changelogHeading
     PackageMode = $packageMode

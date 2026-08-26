@@ -208,6 +208,15 @@ try {
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json") `
         '{"Name":"Ready Mod","Version":"3.0.0"}'
     Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/SmartPower/Data/workshop_data.json") `
+        '{"ItemId":"3305038022","Name":"SmartPower","Visibility":"Private","Tags":["Quality of life"]}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/Automation/Data/workshop_data.json") `
+        '{"ItemId":"3324234282","Name":"Automation","Tags":["Quality of life"]}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/XRay/Data/workshop_data.json") `
+        '{"ItemId":"67890","Name":"XRay","Tags":["Quality of life"]}'
+    Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/ProjectSettings/ProjectVersion.txt") `
         "m_EditorVersion: 6000.5.2f1`n"
     Write-TestFile `
@@ -224,6 +233,8 @@ try {
         '{"Name":"Smart Power","Version":"1.16.4"}'
     Write-TestFile (Join-Path $fixtureRoot "package/SmartPower/version-1.1/manifest.json") `
         '{"Name":"Smart Power","Version":"1.18.0"}'
+    Write-TestFile (Join-Path $fixtureRoot "package/SmartPower/workshop_data.json") `
+        '{"ItemId":"3305038022","Name":"SmartPower","Visibility":"Private","UpdateVisibility":false}'
     Write-TestFile (Join-Path $fixtureRoot "package/Automation/version-1.0/manifest.json") `
         '{"Name":"Advanced Automation","Version":"4.0.11"}'
     Write-TestFile (Join-Path $fixtureRoot "package/Automation/version-1.1/manifest.json") `
@@ -375,6 +386,21 @@ try {
         "Registered readiness public package artifact"
     Assert-True ("-PackageOwnerRoot" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
         "Gate 1 arguments must carry public package ownership."
+    $authoritativeWorkshopDataPath = Join-Path `
+        $fixtureRoot "ModsUnityProject/Assets/Mods/SmartPower/Data/workshop_data.json"
+    $authoritativeWorkshopDataHash = (
+        Get-FileHash -LiteralPath $authoritativeWorkshopDataPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    Assert-Equal $authoritativeWorkshopDataPath `
+        $endToEndReadiness.Package.AuthoritativeWorkshopData.Path `
+        "Readiness-bound public-owner workshop metadata path"
+    Assert-Equal $authoritativeWorkshopDataHash `
+        $endToEndReadiness.Package.AuthoritativeWorkshopData.Sha256 `
+        "Readiness-bound public-owner workshop metadata hash"
+    Assert-Equal "Quality of life" `
+        (@($endToEndReadiness.Package.AuthoritativeWorkshopData.Tags) -join "|") `
+        "Readiness-bound public-owner taxonomy intent"
+    Assert-True ("-AuthoritativeWorkshopDataPath" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
+        "Gate 1 arguments must carry authoritative public-owner workshop metadata."
     Assert-Equal $endToEndReadiness.Git.HeadAtDiscovery `
         $endToEndReadiness.Gate1Plan.ExpectedHeadForPreparation `
         "Metadata preparation must use worktree HEAD rather than the prior release identity commit"
@@ -441,6 +467,46 @@ try {
         -SourceModVersion 1.16.4 `
         -Operation ImportLane `
         -ExpectedOwnerConfigSha256 $ownerConfigHash
+    $tagMaterializationArguments = @(
+        "-ModName", "SmartPower",
+        "-ReleaseRoot", $fixtureRoot,
+        "-LocalModRoot", (Join-Path $fixtureRoot "package/SmartPower"),
+        "-AuthoritativeWorkshopDataPath", $authoritativeWorkshopDataPath,
+        "-ExpectedAuthoritativeWorkshopDataSha256", $authoritativeWorkshopDataHash,
+        "-MaterializeLocalOnly")
+    $firstTagMaterializationOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $fixtureTools "update-platform-tags.ps1") @tagMaterializationArguments 2>&1)
+    Assert-Equal 0 $LASTEXITCODE "First authoritative taxonomy materialization exit code"
+    $materializedWorkshopDataPath = Join-Path $fixtureRoot "package/SmartPower/workshop_data.json"
+    $firstMaterializedWorkshopData = Get-Content -Raw -LiteralPath $materializedWorkshopDataPath |
+        ConvertFrom-Json
+    Assert-Equal "Mod|Update 1.0|Update 1.1|Quality of life" `
+        (@($firstMaterializedWorkshopData.Tags) -join "|") `
+        "First combined-package Steam taxonomy"
+    Assert-True (($firstTagMaterializationOutput | Out-String).Contains(
+            "Target Mod.IO tags: Mod, Update 1.0, Update 1.1, QoL")) `
+        "Combined-package Mod.IO taxonomy did not map Quality of life to QoL."
+
+    Write-TestFile $materializedWorkshopDataPath `
+        '{"ItemId":"3305038022","Name":"SmartPower","Visibility":"Private","UpdateVisibility":false}'
+    & (Join-Path $fixtureTools "materialize-release-package.ps1") `
+        -ModName SmartPower `
+        -PackageOwnerRoot $fixtureRoot `
+        -SourceReleaseRoot $lineRoot `
+        -GameVersion version-1.0 `
+        -SourceModVersion 1.16.4 `
+        -Operation ImportLane `
+        -ExpectedOwnerConfigSha256 $ownerConfigHash
+    $recoveryTagMaterializationOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+        -File (Join-Path $fixtureTools "update-platform-tags.ps1") @tagMaterializationArguments 2>&1)
+    Assert-Equal 0 $LASTEXITCODE "Recovery authoritative taxonomy materialization exit code"
+    $recoveredWorkshopData = Get-Content -Raw -LiteralPath $materializedWorkshopDataPath | ConvertFrom-Json
+    Assert-Equal "Mod|Update 1.0|Update 1.1|Quality of life" `
+        (@($recoveredWorkshopData.Tags) -join "|") `
+        "Recovered combined-package Steam taxonomy"
+    Assert-True (($recoveryTagMaterializationOutput | Out-String).Contains(
+            "Target Mod.IO tags: Mod, Update 1.0, Update 1.1, QoL")) `
+        "Recovery Mod.IO taxonomy mapping drifted."
     & (Join-Path $fixtureTools "materialize-release-package.ps1") `
         -ModName SmartPower `
         -PackageOwnerRoot $fixtureRoot `
@@ -463,6 +529,28 @@ try {
         (Get-FileHash -LiteralPath (Join-Path $lineRoot "package/SmartPower_v1.17.0.zip") `
             -Algorithm SHA256).Hash `
         "Stale registered-worktree artifact must not be selected or overwritten"
+    Add-Type -AssemblyName System.IO.Compression
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $combinedArchive = [System.IO.Compression.ZipFile]::OpenRead($combinedPackagePath)
+    try {
+        $workshopEntry = @($combinedArchive.Entries | Where-Object {
+            $_.FullName -eq "workshop_data.json" -or $_.FullName -like "*/workshop_data.json"
+        }) | Select-Object -First 1
+        Assert-True ($null -ne $workshopEntry) "Combined package omitted workshop_data.json."
+        $reader = [System.IO.StreamReader]::new($workshopEntry.Open())
+        try {
+            $packagedWorkshopData = $reader.ReadToEnd() | ConvertFrom-Json
+        }
+        finally {
+            $reader.Dispose()
+        }
+    }
+    finally {
+        $combinedArchive.Dispose()
+    }
+    Assert-Equal "Mod|Update 1.0|Update 1.1|Quality of life" `
+        (@($packagedWorkshopData.Tags) -join "|") `
+        "Combined artifact taxonomy after repeated materialization recovery"
     Write-Host "PASS: registered source lane materializes once into the current public package owner"
 
     $tagCases = @(
@@ -512,6 +600,38 @@ try {
             "Local-only tag materialization exposed a public mutation operation: $($tagCase.Name)"
     }
     Write-Host "PASS: local tag materialization handles absent, empty, and existing Tags with exact readback"
+
+    $ambiguousTagRoot = Join-Path $testRoot "tag-ambiguous-authority"
+    $ambiguousAuthorityPath = Join-Path $testRoot "tracked-workshop-data-without-tags.json"
+    Write-TestFile (Join-Path $ambiguousTagRoot "workshop_data.json") `
+        '{"ItemId":"123","Name":"Fixture","Tags":["Quality of life"]}'
+    Write-TestFile $ambiguousAuthorityPath '{"ItemId":"123","Name":"Fixture"}'
+    [void](New-Item -ItemType Directory -Path (Join-Path $ambiguousTagRoot "version-1.0") -Force)
+    $expectedFailurePreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $ambiguousTagOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File (Join-Path $fixtureTools "update-platform-tags.ps1") `
+            -ModName TagFixture `
+            -ReleaseRoot $fixtureRoot `
+            -LocalModRoot $ambiguousTagRoot `
+            -AuthoritativeWorkshopDataPath $ambiguousAuthorityPath `
+            -MaterializeLocalOnly 2>&1)
+        $ambiguousTagExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $expectedFailurePreference
+    }
+    Assert-True ($ambiguousTagExitCode -ne 0) `
+        "Absent authoritative Tags must stop before taxonomy materialization."
+    Assert-True (($ambiguousTagOutput | Out-String) -match "does not declare Tags") `
+        "Ambiguous authoritative tag intent did not report the taxonomy-removal boundary."
+    $unchangedAmbiguousData = Get-Content -Raw -LiteralPath (
+        Join-Path $ambiguousTagRoot "workshop_data.json") | ConvertFrom-Json
+    $unchangedAmbiguousTags = @($unchangedAmbiguousData.Tags)
+    Assert-Equal "Quality of life" ($unchangedAmbiguousTags -join "|") `
+        "Ambiguous authoritative metadata changed local taxonomy before stopping"
+    Write-Host "PASS: absent authoritative tag intent stops before taxonomy removal"
 
     $inventoryScript = Join-Path $fixtureTools "find-unpublished-releases.ps1"
     $humanOutput = (& $inventoryScript -RepositoryRoot $fixtureRoot | Out-String)
@@ -1056,6 +1176,10 @@ Assert-True $verifyText.Contains('Get-Gate1Argument "-ReadinessReportPath"') `
     "Immutable preflight does not bind the exact readiness artifact from Gate 1."
 Assert-True $verifyText.Contains('Get-Gate1Argument "-ModIoAccessTokenPath"') `
     "Immutable preflight does not consume the readiness-bound Mod.IO owner token."
+Assert-True $verifyText.Contains('Get-Gate1Argument "-AuthoritativeWorkshopDataPath"') `
+    "Immutable preflight does not consume readiness-bound public-owner workshop metadata."
+Assert-True $verifyText.Contains("AuthoritativeWorkshopData = [ordered]@{") `
+    "Immutable preflight does not retain authoritative workshop metadata path/hash evidence."
 Assert-True $verifyText.Contains('ModIoAccessTokenPath = $ModIoAccessTokenPath') `
     "Immutable preflight does not preserve the selected Mod.IO owner token for publication."
 Assert-True $verifyText.Contains("Readiness = [ordered]@{") `
@@ -1068,6 +1192,12 @@ Assert-True $publishText.Contains('Committed changelog date') `
     "Release publication does not identify the committed changelog date."
 Assert-True $publishText.Contains('current local date:') `
     "Release publication does not surface committed and current dates."
+Assert-True $publishText.Contains(
+    'throw "Authoritative public-owner workshop metadata changed after immutable preflight."') `
+    "Publication does not enforce immutable authoritative workshop metadata evidence."
+Assert-True $publishText.Contains(
+    'Add-OptionalArgument $tagArgs "-AuthoritativeWorkshopDataPath" $authoritativeWorkshopDataPath') `
+    "Publication tag synchronization does not retain authoritative public-owner taxonomy ownership."
 Assert-True $publishText.Contains("Save-ReleaseSignoffArtifact `$true") `
     "Release publication does not write a successful final signoff artifact."
 Assert-True $publishText.Contains("Save-ReleaseSignoffArtifact `$false") `

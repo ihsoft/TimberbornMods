@@ -612,6 +612,19 @@ if ($packageOwnerConfigHash -ne [string]$report.PackageOwnerConfigSha256) {
     throw "Public package owner config changed after immutable preflight."
 }
 $packageReleaseConfig = Get-Content -Raw -LiteralPath $packageOwnerConfigPath | ConvertFrom-Json
+$authoritativeWorkshopDataPath = [string]$report.AuthoritativeWorkshopData.Path
+$authoritativeWorkshopDataSha256 = [string]$report.AuthoritativeWorkshopData.Sha256
+if (-not [string]::IsNullOrWhiteSpace($authoritativeWorkshopDataPath)) {
+    Assert-PathExists $authoritativeWorkshopDataPath "Authoritative public-owner workshop metadata"
+    $currentAuthoritativeWorkshopDataSha256 = (
+        Get-FileHash -LiteralPath $authoritativeWorkshopDataPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($currentAuthoritativeWorkshopDataSha256 -ne $authoritativeWorkshopDataSha256) {
+        throw "Authoritative public-owner workshop metadata changed after immutable preflight."
+    }
+}
+elseif (-not [string]::IsNullOrWhiteSpace([string]$report.ReleaseLine)) {
+    throw "Registered-line publication requires immutable public-owner workshop metadata evidence."
+}
 
 if ($null -ne $report.Source) {
     $sourcePath = [string]$report.Source.Path
@@ -825,6 +838,9 @@ if (-not $SkipPlatformTags -and -not [bool]$report.PreflightOptions.SkipPlatform
     $tagArgs.Add("-Platform")
     $tagArgs.Add("ModIO")
     Add-OptionalArgument $tagArgs "-LocalModRoot" $LocalModRoot
+    Add-OptionalArgument $tagArgs "-AuthoritativeWorkshopDataPath" $authoritativeWorkshopDataPath
+    Add-OptionalArgument $tagArgs `
+        "-ExpectedAuthoritativeWorkshopDataSha256" $authoritativeWorkshopDataSha256
     Add-OptionalArgument $tagArgs "-SteamConfigPath" $SteamConfigPath
     Add-OptionalArgument $tagArgs "-SteamCmdPath" $SteamCmdPath
     Add-OptionalArgument $tagArgs "-SteamUserName" $SteamUserName

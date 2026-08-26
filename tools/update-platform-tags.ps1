@@ -7,6 +7,8 @@ param(
     [string] $Platform = "All",
 
     [string] $LocalModRoot = "",
+    [string] $AuthoritativeWorkshopDataPath = "",
+    [string] $ExpectedAuthoritativeWorkshopDataSha256 = "",
     [string] $SteamConfigPath = "",
     [string] $SteamCmdPath = "",
     [string] $SteamUserName = "",
@@ -469,6 +471,26 @@ Assert-PathExists $localModRootPath "Local mod root"
 $workshopDataInfo = Get-LocalWorkshopData $localModRootPath
 $workshopData = $workshopDataInfo.Data
 $localTags = Get-UniqueTags @($workshopData.Tags)
+$tagIntentSource = $workshopDataInfo.Path
+$tagIntentTags = $localTags
+if (-not [string]::IsNullOrWhiteSpace($AuthoritativeWorkshopDataPath)) {
+    $authoritativeWorkshopDataPath = Resolve-RepoPath $AuthoritativeWorkshopDataPath
+    Assert-PathExists $authoritativeWorkshopDataPath "Authoritative public-owner workshop metadata"
+    $authoritativeWorkshopDataSha256 = (
+        Get-FileHash -LiteralPath $authoritativeWorkshopDataPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if (-not [string]::IsNullOrWhiteSpace($ExpectedAuthoritativeWorkshopDataSha256) -and
+            $authoritativeWorkshopDataSha256 -ne $ExpectedAuthoritativeWorkshopDataSha256.ToLowerInvariant()) {
+        throw "Authoritative public-owner workshop metadata changed after readiness discovery."
+    }
+    $authoritativeWorkshopData = Get-Content -Raw -LiteralPath $authoritativeWorkshopDataPath | ConvertFrom-Json
+    if ($null -eq $authoritativeWorkshopData.PSObject.Properties["Tags"]) {
+        throw (
+            "Authoritative public-owner workshop metadata does not declare Tags; " +
+            "refusing to infer taxonomy removal from an absent property.")
+    }
+    $tagIntentSource = $authoritativeWorkshopDataPath
+    $tagIntentTags = Get-UniqueTags @($authoritativeWorkshopData.Tags)
+}
 $versionInfo = Get-VersionCompatibilityTags $localModRootPath
 $releaseConfigPath = Join-Path (Join-Path $repoRoot $ModName) "release.json"
 $releaseConfig = $null
@@ -484,6 +506,8 @@ Write-Host "Version folders: $(Format-Tags $versionInfo.VersionFolders)"
 Write-Host "Compatibility tags from version folders: $(Format-Tags $versionInfo.Tags)"
 Write-Host "Additional compatibility tags: $(Format-Tags $additionalCompatibilityTags)"
 Write-Host "Local tags from workshop_data.json: $(Format-Tags $localTags)"
+Write-Host "Authoritative non-version tag source: $tagIntentSource"
+Write-Host "Authoritative tag intent: $(Format-Tags $tagIntentTags)"
 Write-Host ""
 
 if ($MaterializeLocalOnly) {
@@ -491,12 +515,15 @@ if ($MaterializeLocalOnly) {
         throw "-MaterializeLocalOnly cannot be combined with -Publish."
     }
 
-    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam" $releaseConfig
+    $targetTags = Get-TargetTags $tagIntentTags $versionInfo.Tags "Steam" $releaseConfig
+    $targetModIoTags = Get-TargetTags $tagIntentTags $versionInfo.Tags "ModIO" $releaseConfig
     Assert-SteamTagsValid $targetTags
     $localAddTags = Get-AddedTags $targetTags $localTags
     $localRemoveTags = Get-RemovedTags $targetTags $localTags
     Update-LocalSteamTags $workshopData $targetTags
     Save-LocalWorkshopData $workshopDataInfo.Path $workshopData $targetTags
+    Write-Host "  Target Steam tags: $(Format-Tags $targetTags)"
+    Write-Host "  Target Mod.IO tags: $(Format-Tags $targetModIoTags)"
     if ($localAddTags.Count -eq 0 -and $localRemoveTags.Count -eq 0) {
         Write-Host "Local workshop_data.json already contained all derived release tags; exact readback verified."
     }
@@ -560,7 +587,7 @@ if ($Platform -eq "All" -or $Platform -eq "Steam") {
         throw "Steam PublishedFileId is empty."
     }
 
-    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "Steam" $releaseConfig
+    $targetTags = Get-TargetTags $tagIntentTags $versionInfo.Tags "Steam" $releaseConfig
     Assert-SteamTagsValid $targetTags
     $vdfPath = Join-Path (Resolve-ToolPath $SteamVdfRoot) "$ModName-tags.vdf"
     Write-SteamTagsVdf $vdfPath $appId $publishedFileId ([string]$workshopData.Name) $targetTags
@@ -624,7 +651,7 @@ if ($Platform -eq "All" -or $Platform -eq "ModIO") {
         throw "Mod.IO access token is empty: $accessTokenPath"
     }
 
-    $targetTags = Get-TargetTags $localTags $versionInfo.Tags "ModIO" $releaseConfig
+    $targetTags = Get-TargetTags $tagIntentTags $versionInfo.Tags "ModIO" $releaseConfig
     $game = Get-ModIoGame $config $accessToken
     $support = Assert-ModIoTagsSupported $targetTags $game
     $currentTags = Get-UniqueTags (Get-ModIoTags $config $accessToken)
