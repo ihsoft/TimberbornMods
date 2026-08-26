@@ -16,6 +16,7 @@ IgorZ.TimberCommons.IrrigationTower.OutputContaminationBlockTooltip,Blockiert Ko
 IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,Wachstumsförderung: <GreenHighlight>🡅</GreenHighlight>{0:0.#}%,Wachstumsförderung ist ein positiver Effekt.
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,Wachstumsminderung: <RedHighlight>🡇</RedHighlight>{0:0.#}%,Wachstumsminderung ist ein negativer Effekt.
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,Schließen ab Ausgangstiefe: {0},
+IgorZ.TimberCommons.WaterBuildings.ThrottlingValve.CurrentFlow,Aktueller Durchfluss: {0},Label shown under the Throttling Valve flow slider. {0} is the measured flow through the valve.
 IgorZ.TimberCommons.InjuryProbability,Verletzungsrisiko: {0} pro Stunde,
 IgorZ.TimberCommons.Injuries,"Verletzt: {0} gestern, {1} in 7 Tagen",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,Anzeige Zeit und Dauer,

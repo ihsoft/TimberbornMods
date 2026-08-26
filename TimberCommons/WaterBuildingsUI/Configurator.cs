@@ -2,17 +2,25 @@
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
+using System;
 using Bindito.Core;
+using IgorZ.TimberDev.Utils;
 using Timberborn.EntityPanelSystem;
 
 namespace IgorZ.TimberCommons.WaterBuildingsUI;
 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
+  static readonly string PatchId = typeof(Configurator).AssemblyQualifiedName;
+  static readonly Type[] Patches = [
+      typeof(ValveFragmentPatch),
+  ];
 
   /// <inheritdoc/>
   public void Configure(IContainerDefinition containerDefinition) {
+    HarmonyPatcher.ApplyPatch(PatchId, Patches);
     containerDefinition.Bind<AdjustableWaterOutputFragment>().AsSingleton();
+    containerDefinition.Bind<ValveFragmentLocInitializer>().AsSingleton();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
   }
 
@@ -20,7 +28,7 @@ sealed class Configurator : IConfigurator {
     readonly AdjustableWaterOutputFragment _adjustableWaterOutputFragment;
 
     EntityPanelModuleProvider(AdjustableWaterOutputFragment adjustableWaterOutputFragment) {
-     _adjustableWaterOutputFragment = adjustableWaterOutputFragment;
+      _adjustableWaterOutputFragment = adjustableWaterOutputFragment;
     }
 
     public EntityPanelModule Get() {

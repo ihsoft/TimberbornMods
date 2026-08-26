@@ -88,6 +88,10 @@ static class TimberCommonsTestSuite {
           DailyInjuryCounterTests.KeepsLatestTwentyEightCompletedDays),
       ("Daily injury probability calculates at least one injury",
           InjuryProbabilityCalculatorTests.CalculatesProbabilityOfAtLeastOneDailyInjury),
+      ("Valve flow projects onto every valve direction",
+          ValveFlowCalculatorTests.ProjectsFlowOntoEveryValveDirection),
+      ("Valve flow uses magnitude when direction is unrestricted",
+          ValveFlowCalculatorTests.UsesMagnitudeWhenDirectionIsUnrestricted),
   ];
 
   public static int Run() {

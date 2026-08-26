@@ -63,5 +63,8 @@
       <Compile Include="..\TimberCommons\NeedApplier\InjuryProbabilityCalculator.cs">
         <Link>TimberCommons\NeedApplier\InjuryProbabilityCalculator.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\WaterBuildingsUI\ValveFlowCalculator.cs">
+        <Link>TimberCommons\WaterBuildingsUI\ValveFlowCalculator.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>
