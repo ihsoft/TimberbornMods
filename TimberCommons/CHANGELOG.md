@@ -1,4 +1,4 @@
-# v1.15.3 (Timberborn v1.0) (TBD)
+# v1.15.3 (Timberborn v1.0) (August 25th, 2026)
 * [Feature] Throttling Valve panels now show the measured current flow.
 * [Feature] Workplace panels and avatar tooltips can show a persistent 28-day injury history.
 * [Feature] Installed disabled mods can be enabled from the save-load mod mismatch dialog.
