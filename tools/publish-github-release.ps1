@@ -3,6 +3,9 @@ param(
     [string] $ModName,
 
     [string] $ReleaseRoot = "",
+    [string] $PackageOwnerRoot = "",
+    [string] $PackagePath = "",
+    [string] $SourceModVersion = "",
     [string] $GameVersion = "version-1.1",
     [string] $OutputRoot = ".tools/release-preview",
     [string] $Repository = "ihsoft/TimberbornMods",
@@ -19,8 +22,15 @@ $ErrorActionPreference = "Stop"
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
+$packageRoot = if ([string]::IsNullOrWhiteSpace($PackageOwnerRoot)) {
+    $repoRoot
+}
+else {
+    Resolve-RepositoryRoot $PackageOwnerRoot $toolRepoRoot
+}
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
+$packageReleaseConfigPath = Join-Path $packageRoot "$ModName/release.json"
 
 function Assert-PathExists([string] $Path, [string] $Description) {
     if (-not (Test-Path -LiteralPath $Path)) {
@@ -34,6 +44,10 @@ function Resolve-RepoPath([string] $Path) {
 
 function Resolve-ToolPath([string] $Path) {
     return Resolve-RepositoryPath $toolRepoRoot $Path
+}
+
+function Resolve-PackageOwnerPath([string] $Path) {
+    return Resolve-RepositoryPath $packageRoot $Path
 }
 
 function Get-LatestChangeNotes([string] $Path, [string] $Version) {
@@ -132,25 +146,28 @@ function Test-ZipPackage(
 }
 
 function Get-PackagePath([object] $ReleaseConfig, [string] $Version) {
+    if (-not [string]::IsNullOrWhiteSpace($PackagePath)) {
+        return Resolve-PackageOwnerPath $PackagePath
+    }
     $packageMode = "Build"
     if (-not [string]::IsNullOrWhiteSpace($ReleaseConfig.Package.Mode)) {
         $packageMode = [string]$ReleaseConfig.Package.Mode
     }
 
     if ($packageMode -eq "Build") {
-        return Join-Path (Resolve-RepoPath $OutputRoot) "$($ModName)_v$Version.zip"
+        return Join-Path (Resolve-PackageOwnerPath $OutputRoot) "$($ModName)_v$Version.zip"
     }
     if ($packageMode -eq "ExistingZip") {
         if ([string]::IsNullOrWhiteSpace($ReleaseConfig.Package.Path)) {
             throw "ExistingZip package mode requires Package.Path in $releaseConfigPath"
         }
-        return Resolve-RepoPath ([string]$ReleaseConfig.Package.Path)
+        return Resolve-PackageOwnerPath ([string]$ReleaseConfig.Package.Path)
     }
     if ($packageMode -eq "LocalModFolder") {
         if ([string]::IsNullOrWhiteSpace($ReleaseConfig.Package.OutputPath)) {
             throw "LocalModFolder package mode requires Package.OutputPath in $releaseConfigPath"
         }
-        return Resolve-RepoPath ([string]$ReleaseConfig.Package.OutputPath)
+        return Resolve-PackageOwnerPath ([string]$ReleaseConfig.Package.OutputPath)
     }
 
     throw "Unsupported package mode: $packageMode"
@@ -170,6 +187,8 @@ function Assert-CommandAvailable([string] $Name) {
 
 Assert-PathExists $releaseConfigPath "Release config"
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+Assert-PathExists $packageReleaseConfigPath "Public package owner config"
+$packageReleaseConfig = Get-Content -Raw -LiteralPath $packageReleaseConfigPath | ConvertFrom-Json
 
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ManifestPath)) {
@@ -188,19 +207,22 @@ $modVersion = [string]$manifest.Version
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ReleaseVersion)) {
     $modVersion = [string]$releaseConfig.ReleaseVersion
 }
+if (-not [string]::IsNullOrWhiteSpace($SourceModVersion)) {
+    $modVersion = $SourceModVersion
+}
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Release version is empty."
 }
 
 $scriptFileBase = $ModName
-if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ScriptFileBase)) {
-    $scriptFileBase = [string]$releaseConfig.ScriptFileBase
+if (-not [string]::IsNullOrWhiteSpace($packageReleaseConfig.ScriptFileBase)) {
+    $scriptFileBase = [string]$packageReleaseConfig.ScriptFileBase
 }
 
-$zipPath = Get-PackagePath $releaseConfig $modVersion
+$zipPath = Get-PackagePath $packageReleaseConfig $modVersion
 Assert-PathExists $zipPath "Release package"
-Assert-PackageFreshEnough $zipPath $releaseConfig.Package
-$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $releaseConfig
+Assert-PackageFreshEnough $zipPath $packageReleaseConfig.Package
+$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $packageReleaseConfig
 
 $tagName = $TagName
 if ([string]::IsNullOrWhiteSpace($tagName)) {
@@ -238,6 +260,8 @@ Write-Host "Repository: $Repository"
 Write-Host "Tag: $tagName"
 Write-Host "Tag commit: $tagCommit"
 Write-Host "Title: $releaseTitle"
+Write-Host "Source release root: $repoRoot"
+Write-Host "Public package owner root: $packageRoot"
 Write-Host "Package: $zipPath"
 Write-Host "SHA256: $hash"
 Write-Host "Game version folders: $($versionFolders -join ', ')"

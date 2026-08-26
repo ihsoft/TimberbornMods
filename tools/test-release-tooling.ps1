@@ -98,11 +98,17 @@ try {
         "find-unpublished-releases.ps1",
         "get-release-readiness.ps1",
         "materialize-release-package.ps1",
+        "prepare-discord-release-message.ps1",
+        "publish-github-release.ps1",
+        "recover-release.ps1",
         "release-lines.json",
         "release-lines.psm1",
         "release-native-command.psm1",
+        "release-notes.psm1",
+        "release-output.psm1",
         "release-package-provenance.psm1",
         "release-readiness.psm1",
+        "release-signoff.psm1",
         "release-unity.psm1",
         "release-versioning.psm1",
         "repository-paths.psm1",
@@ -443,6 +449,12 @@ try {
     Assert-True (-not (($alternateTokenOutput | Out-String).Contains("fixture-known-owner-token"))) `
         "Readiness output leaked alternate owner-token contents."
     Write-Host "PASS: registered readiness carries a known alternate Mod.IO owner token without secret leakage"
+
+    $preparedPublicConfigPath = Join-Path $fixtureRoot "SmartPower/release.json"
+    $preparedPublicConfig = (Get-Content -Raw -LiteralPath $preparedPublicConfigPath).Replace(
+        '"version-1.0": "1.16.3"',
+        '"version-1.0": "1.16.4"')
+    Write-TestFile $preparedPublicConfigPath $preparedPublicConfig
 
     @(
         (Join-Path $fixtureRoot "package/SmartPower/version-1.0/Scripts/SmartPower.dll"),
@@ -1126,6 +1138,315 @@ Write-Host "Final Mod.IO readback: mod_id=1; active_file_id=2; version=3.0.0; da
         "Discord preparation failure must remain a post-release warning"
     Assert-Equal 1 @($discordWarningSignoff.IncidentInventory.FailedOperations).Count `
         "Discord failure must remain visible in the incident inventory"
+
+    $recoveryOrigin = Join-Path $testRoot "recovery-origin.git"
+    [void](Invoke-TestNative "git" @("init", "--bare", $recoveryOrigin))
+    [void](Invoke-TestNative "git" @("-C", $fixtureRoot, "remote", "add", "origin", $recoveryOrigin))
+    $recoveryTag = "SmartPower_1.16.4_update-1.0"
+    $recoveryCommit = [string]$endToEndReadiness.Git.ReleaseCommit
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "tag", $recoveryTag, $recoveryCommit))
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "push", "origin", $recoveryTag))
+
+    $recoveryBin = Join-Path $testRoot "recovery-bin"
+    [void](New-Item -ItemType Directory -Path $recoveryBin)
+    Write-TestFile (Join-Path $recoveryBin "gh.cmd") `
+        '@powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0gh.ps1" %*'
+    Write-TestFile (Join-Path $recoveryBin "gh.ps1") @'
+param([Parameter(ValueFromRemainingArguments = $true)][string[]] $CommandArguments)
+$ErrorActionPreference = "Stop"
+$statePath = $env:RECOVERY_GH_STATE
+$logPath = $env:RECOVERY_GH_LOG
+[System.IO.File]::AppendAllText($logPath, (($CommandArguments -join "|") + [Environment]::NewLine))
+if ($CommandArguments[0] -eq "api") {
+    if ($CommandArguments[1] -eq "user" -or
+            ($CommandArguments[1] -match "^repos/[^/]+/[^/]+$")) {
+        Write-Output "{}"
+        exit 0
+    }
+    if (Test-Path -LiteralPath $statePath) {
+        Get-Content -Raw -LiteralPath $statePath
+        exit 0
+    }
+    [Console]::Out.WriteLine("HTTP 404: Not Found")
+    exit 1
+}
+if ($CommandArguments[0] -eq "issue" -and $CommandArguments[1] -eq "list") {
+    Write-Output "[]"
+    exit 0
+}
+if ($CommandArguments[0] -eq "release" -and $CommandArguments[1] -eq "list") {
+    if (-not (Test-Path -LiteralPath $statePath)) {
+        Write-Output "[]"
+        exit 0
+    }
+    $state = Get-Content -Raw -LiteralPath $statePath | ConvertFrom-Json
+    @([ordered]@{ tagName = [string]$state.Tag }) | ConvertTo-Json -Compress
+    exit 0
+}
+if ($CommandArguments[0] -eq "release" -and $CommandArguments[1] -eq "view") {
+    if (-not (Test-Path -LiteralPath $statePath)) {
+        [Console]::Error.WriteLine("release not found")
+        exit 1
+    }
+    $state = Get-Content -Raw -LiteralPath $statePath | ConvertFrom-Json
+    [ordered]@{
+        url = [string]$state.Url
+        tagName = [string]$state.Tag
+        name = [string]$state.Title
+        body = [string]$state.Body
+        assets = [object[]]@([ordered]@{
+            name = [string]$state.AssetName
+            digest = [string]$state.Digest
+        })
+    } | ConvertTo-Json -Depth 5 -Compress
+    exit 0
+}
+if ($CommandArguments[0] -eq "release" -and $CommandArguments[1] -eq "create") {
+    $tag = $CommandArguments[2]
+    $packagePath = $CommandArguments[3]
+    $titleIndex = [Array]::IndexOf($CommandArguments, "--title")
+    $notesIndex = [Array]::IndexOf($CommandArguments, "--notes-file")
+    $count = 0
+    if (Test-Path -LiteralPath $statePath) {
+        $count = [int](Get-Content -Raw -LiteralPath $statePath | ConvertFrom-Json).CreateCount
+    }
+    [ordered]@{
+        CreateCount = $count + 1
+        Url = "https://example.invalid/releases/$tag"
+        Tag = $tag
+        Title = $CommandArguments[$titleIndex + 1]
+        Body = (Get-Content -Raw -LiteralPath $CommandArguments[$notesIndex + 1]).Trim()
+        AssetName = [System.IO.Path]::GetFileName($packagePath)
+        Digest = "sha256:$((Get-FileHash -LiteralPath $packagePath -Algorithm SHA256).Hash.ToLowerInvariant())"
+    } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $statePath -Encoding UTF8
+    exit 0
+}
+[Console]::Error.WriteLine("Unsupported gh fixture command: $($CommandArguments -join ' ')")
+exit 2
+'@
+    $recoveryGhState = Join-Path $testRoot "recovery-gh-state.json"
+    $recoveryGhLog = Join-Path $testRoot "recovery-gh.log"
+    Write-TestFile $recoveryGhLog ""
+
+    $recoveryPackageLength = (Get-Item -LiteralPath $combinedPackagePath).Length
+    $recoveryPackageHash = (
+        Get-FileHash -LiteralPath $combinedPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $recoveryPreflightPath = Join-Path $testRoot "recovery-preflight.json"
+    $recoverySignoffPath = Join-Path $testRoot "recovery-signoff.json"
+    $recoveryReadbackPath = Join-Path $testRoot "recovery-platform-readback.json"
+    $recoveryPreflight = [ordered]@{
+        SchemaVersion = 5
+        ReportPath = $recoveryPreflightPath
+        ReadyForPublish = $true
+        ModName = "SmartPower"
+        SourceModVersion = "1.16.4"
+        PublicPackageVersion = "1.18.0"
+        PublicPackageGameVersion = "version-1.1"
+        ReleaseCommit = $recoveryCommit
+        ReleaseRoot = $lineRoot
+        ReleaseBranch = "update-1.0"
+        ReleaseLine = "update-1.0"
+        VersionPolicy = "BackportPatchOnly"
+        GameVersion = "version-1.0"
+        TagName = $recoveryTag
+        PackageOwnerRoot = $fixtureRoot
+        Package = [ordered]@{
+            Path = $combinedPackagePath
+            Length = $recoveryPackageLength
+            Sha256 = $recoveryPackageHash
+        }
+        Source = [ordered]@{ Path = (Join-Path $fixtureRoot "package/SmartPower"); Sha256 = "source" }
+        PackageLaneFingerprints = [object[]]@($combinedLanes)
+        ReleaseSources = [object[]]@([ordered]@{
+            ReleaseRoot = $lineRoot
+            Branch = "update-1.0"
+            Commit = $recoveryCommit
+            GameVersion = "version-1.0"
+            SourceModVersion = "1.16.4"
+            ReleaseLine = "update-1.0"
+            VersionPolicy = "BackportPatchOnly"
+            TagName = $recoveryTag
+            ChangesPath = (Join-Path $lineRoot "SmartPower/CHANGELOG.md")
+            IsPrimary = $true
+        })
+        PreflightOptions = [ordered]@{
+            PublishSteamVisibility = $false
+            PublishModIoPage = $false
+            ModIoAccessTokenPath = ".tools/modio/Automation.token.txt"
+        }
+        Steps = [object[]]@()
+        ReleaseLogDirectory = ""
+    }
+    Write-TestFile $recoveryPreflightPath ($recoveryPreflight | ConvertTo-Json -Depth 8)
+    Write-TestFile $recoveryReadbackPath ([ordered]@{
+        Steam = [ordered]@{
+            PublishedFileId = "3305038022"
+            Result = 1
+            TimeUpdated = 1787714702
+            FileSize = $recoveryPackageLength
+            Visibility = 0
+        }
+        ModIO = [ordered]@{
+            ModId = 3168318
+            ActiveFileId = 8139362
+            Version = "1.18.0"
+            DateScanned = 1787714702
+            VirusStatus = 1
+            VirusPositive = 0
+            FileSize = $recoveryPackageLength
+        }
+    } | ConvertTo-Json -Depth 5)
+    $recoveryOperations = [object[]]@(
+        [ordered]@{
+            Name = "Steam release publish"; Status = "Succeeded"; ExitCode = 0
+            Summary = [string[]]@("SteamCMD upload completed."); Warnings = [string[]]@(); LogPath = ""
+            ExternalMutationPossible = $true; ExternalOutcome = "Confirmed"; AffectsReleaseCompletion = $true
+        },
+        [ordered]@{
+            Name = "Mod.IO release publish"; Status = "Succeeded"; ExitCode = 0
+            Summary = [string[]]@(
+                "Final Mod.IO readback: mod_id=3168318; active_file_id=8139362; version=1.18.0; " +
+                "date_scanned=1787714702; virus_status=1; virus_positive=0; file_size=$recoveryPackageLength")
+            Warnings = [string[]]@(); LogPath = ""; ExternalMutationPossible = $true
+            ExternalOutcome = "Confirmed"; AffectsReleaseCompletion = $true
+        },
+        [ordered]@{
+            Name = "Platform tag publish"; Status = "Succeeded"; ExitCode = 0
+            Summary = [string[]]@("Add: (none)", "Remove: (none)"); Warnings = [string[]]@(); LogPath = ""
+            ExternalMutationPossible = $true; ExternalOutcome = "Confirmed"; AffectsReleaseCompletion = $true
+        },
+        [ordered]@{
+            Name = "Git release tags"; Status = "Succeeded"; ExitCode = 0
+            Summary = [string[]]@("Git tag created and pushed: $recoveryTag -> $recoveryCommit")
+            Warnings = [string[]]@(); LogPath = ""; ExternalMutationPossible = $true
+            ExternalOutcome = "Confirmed"; AffectsReleaseCompletion = $true
+        },
+        [ordered]@{
+            Name = "GitHub release publish"; Status = "Failed"; ExitCode = 1
+            Summary = [string[]]@("Stale compatibility asset selected before any GitHub mutation.")
+            Warnings = [string[]]@(); LogPath = "github-failed.log"; ExternalMutationPossible = $true
+            ExternalOutcome = "Unknown"; AffectsReleaseCompletion = $true
+        })
+    $recoveryPartial = [ordered]@{
+        SchemaVersion = 1
+        ArtifactType = "TimberbornReleaseSignoff"
+        Status = "Partial"
+        Identity = [ordered]@{
+            ModName = "SmartPower"; SourceModVersion = "1.16.4"; PublicPackageVersion = "1.18.0"
+            ReleaseCommit = $recoveryCommit; ReleaseSources = $recoveryPreflight.ReleaseSources
+        }
+        Artifacts = [ordered]@{
+            Package = $recoveryPreflight.Package; Source = $recoveryPreflight.Source
+            LaneFingerprints = $recoveryPreflight.PackageLaneFingerprints
+        }
+        Platforms = [ordered]@{
+            Steam = [ordered]@{ PublishedFileId = "3305038022" }
+            ModIO = [ordered]@{ FinalReadback = $recoveryReadbackPath | ForEach-Object {
+                (Get-Content -Raw -LiteralPath $_ | ConvertFrom-Json).ModIO
+            } }
+        }
+        Logs = [ordered]@{ PreflightReportPath = $recoveryPreflightPath; ReadinessReportPath = "" }
+        Operations = $recoveryOperations
+        PartialSuccess = [ordered]@{
+            IsPartial = $true
+            CompletedMutations = [string[]]@(
+                "Steam release publish", "Mod.IO release publish", "Platform tag publish", "Git release tags")
+            UnknownOutcomes = [object[]]@($recoveryOperations[-1])
+        }
+    }
+    Write-TestFile $recoverySignoffPath ($recoveryPartial | ConvertTo-Json -Depth 12)
+
+    $previousPath = $env:PATH
+    $previousGhState = $env:RECOVERY_GH_STATE
+    $previousGhLog = $env:RECOVERY_GH_LOG
+    $env:PATH = "$recoveryBin;$previousPath"
+    $env:RECOVERY_GH_STATE = $recoveryGhState
+    $env:RECOVERY_GH_LOG = $recoveryGhLog
+    try {
+        $recoveryPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            $firstRecoveryOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+                -File (Join-Path $fixtureTools "recover-release.ps1") `
+                -PreflightReportPath $recoveryPreflightPath `
+                -PartialSignoffReportPath $recoverySignoffPath `
+                -PlatformReadbackFixturePath $recoveryReadbackPath `
+                -SkipDiscordHandoff 2>&1)
+            $firstRecoveryExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $recoveryPreference
+        }
+        Assert-Equal 0 $firstRecoveryExitCode (
+            "Bounded partial release recovery exit code. Output: " +
+            (($firstRecoveryOutput | Out-String).Trim()))
+        $firstRecovery = Get-Content -Raw -LiteralPath $recoverySignoffPath | ConvertFrom-Json
+        $firstGhState = Get-Content -Raw -LiteralPath $recoveryGhState | ConvertFrom-Json
+        Assert-Equal 1 $firstGhState.CreateCount "Exactly one missing GitHub Release mutation"
+        Assert-Equal "SmartPower_v1.18.0.zip" $firstGhState.AssetName `
+            "Recovery GitHub public-owner asset name"
+        Assert-Equal "sha256:$recoveryPackageHash" $firstGhState.Digest `
+            "Recovery GitHub public-owner asset digest"
+        Assert-Equal "Published" $firstRecovery.Status "Recovered signoff status"
+        Assert-Equal 8139362 $firstRecovery.Platforms.ModIO.FinalReadback.ActiveFileId `
+            "Recovered Mod.IO final tuple"
+        Assert-True $firstRecovery.Platforms.Steam.FinalReadbackVerified `
+            "Recovered Steam final readback"
+        Assert-True $firstRecovery.Platforms.Git.Tags[0].RemoteVerified `
+            "Recovered remote qualified tag evidence"
+        Assert-True $firstRecovery.Platforms.GitHub.Verified `
+            "Recovered GitHub Release evidence"
+        Assert-Equal "Pending" $firstRecovery.MentorOutcome.Status `
+            "Recovered signoff MentorOutcome"
+        Assert-Equal 1 @($firstRecovery.IncidentInventory.FailedOperations).Count `
+            "Recovered signoff must retain the original failed GitHub child"
+        Assert-Equal 0 @($firstRecovery.IncidentInventory.AmbiguousOrUnknownOutcomes).Count `
+            "Recovered GitHub outcome must no longer remain ambiguous"
+        Assert-Equal 1 @($firstRecovery.PartialSuccess.RecoveryHistory).Count `
+            "First partial-recovery history entry"
+        Assert-Equal 1 @($firstRecovery.Operations | Where-Object Name -eq "Steam release publish").Count `
+            "Recovery must not rerun Steam publication"
+        Assert-Equal 1 @($firstRecovery.Operations | Where-Object Name -eq "Mod.IO release publish").Count `
+            "Recovery must not rerun Mod.IO publication"
+        Assert-Equal 1 @($firstRecovery.Operations | Where-Object Name -eq "Platform tag publish").Count `
+            "Recovery must not rerun platform tag mutation"
+        Assert-Equal 1 @($firstRecovery.Operations | Where-Object Name -eq "Git release tags").Count `
+            "Recovery must not recreate or repush Git tags"
+        Assert-True (-not (($firstRecoveryOutput | Out-String) -match
+                "Steam release publish|Mod.IO release publish|Platform tag publish|Git release tags")) `
+            "Recovery output exposed a duplicate completed mutation step"
+
+        $ErrorActionPreference = "Continue"
+        try {
+            $secondRecoveryOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+                -File (Join-Path $fixtureTools "recover-release.ps1") `
+                -PreflightReportPath $recoveryPreflightPath `
+                -PartialSignoffReportPath $recoverySignoffPath `
+                -PlatformReadbackFixturePath $recoveryReadbackPath `
+                -SkipDiscordHandoff 2>&1)
+            $secondRecoveryExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $recoveryPreference
+        }
+        Assert-Equal 0 $secondRecoveryExitCode (
+            "Idempotent recovery rerun exit code. Output: " +
+            (($secondRecoveryOutput | Out-String).Trim()))
+        $secondRecovery = Get-Content -Raw -LiteralPath $recoverySignoffPath | ConvertFrom-Json
+        $secondGhState = Get-Content -Raw -LiteralPath $recoveryGhState | ConvertFrom-Json
+        Assert-Equal 1 $secondGhState.CreateCount `
+            "Idempotent recovery must not recreate an existing verified GitHub Release"
+        Assert-Equal 2 @($secondRecovery.PartialSuccess.RecoveryHistory).Count `
+            "Idempotent recovery history append"
+        Assert-Equal "VerifiedExisting" $secondRecovery.PartialSuccess.RecoveryHistory[-1].GitHubAction `
+            "Idempotent GitHub recovery action"
+    }
+    finally {
+        $env:PATH = $previousPath
+        $env:RECOVERY_GH_STATE = $previousGhState
+        $env:RECOVERY_GH_LOG = $previousGhLog
+    }
+    Write-Host "PASS: bounded partial recovery performs one missing GitHub mutation and is idempotent"
     Write-Host "PASS: signoff schema/evidence, incident inventory, issue/Wiki boundaries, and local round trip"
 }
 finally {

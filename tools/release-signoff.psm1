@@ -183,7 +183,9 @@ function Get-ReleaseIncidentInventory(
         [ordered]@{ Operation = $_.Name; Attempts = $_.Count }
     })
     $operationWarnings = @($Operations | ForEach-Object { @($_.Warnings) })
-    $ambiguous = @($failed | Where-Object { [string]$_.ExternalOutcome -eq "Unknown" } | ForEach-Object {
+    $ambiguous = @($failed | Where-Object {
+        [string]$_.ExternalOutcome -eq "Unknown" -and $_.Recovered -ne $true
+    } | ForEach-Object {
         [ordered]@{ Operation = $_.Name; Outcome = "Unknown"; LogPath = $_.LogPath }
     })
     $recovery = @($Operations | Where-Object {
@@ -355,7 +357,39 @@ function New-ReleaseSignoffReport {
 function Write-ReleaseSignoffReport([object] $Report, [string] $Path) {
     $parent = Split-Path -Parent $Path
     [void](New-Item -ItemType Directory -Path $parent -Force)
-    $Report | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $Path -Encoding UTF8
+    $temporaryPath = "$Path.tmp-$PID"
+    $backupPath = "$Path.backup-$PID"
+    if (Test-Path -LiteralPath $temporaryPath) {
+        throw "Temporary signoff path already exists: $temporaryPath"
+    }
+    if (Test-Path -LiteralPath $backupPath) {
+        throw "Temporary signoff backup path already exists: $backupPath"
+    }
+    try {
+        [System.IO.File]::WriteAllText(
+            $temporaryPath,
+            ($Report | ConvertTo-Json -Depth 12),
+            [System.Text.UTF8Encoding]::new($true))
+        $roundTrip = Get-Content -Raw -LiteralPath $temporaryPath | ConvertFrom-Json
+        if ([int]$roundTrip.SchemaVersion -ne 1 -or
+                [string]$roundTrip.ArtifactType -ne "TimberbornReleaseSignoff") {
+            throw "Temporary signoff report failed schema readback: $temporaryPath"
+        }
+        if (Test-Path -LiteralPath $Path -PathType Leaf) {
+            [System.IO.File]::Replace($temporaryPath, $Path, $backupPath)
+        }
+        else {
+            Move-Item -LiteralPath $temporaryPath -Destination $Path
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryPath) {
+            Remove-Item -LiteralPath $temporaryPath -Force
+        }
+        if (Test-Path -LiteralPath $backupPath) {
+            Remove-Item -LiteralPath $backupPath -Force
+        }
+    }
 }
 
 function Format-ReleaseSignoffReport([object] $Report) {
