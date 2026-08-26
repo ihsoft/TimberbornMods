@@ -78,6 +78,16 @@ static class TimberCommonsTestSuite {
       ("Mod mismatch ignores enabled and unrelated mods", ModUIPatchesTests.IgnoresEnabledAndUnrelatedMods),
       ("Mod mismatch distinguishes own and conflicting patch owners",
           ModUIPatchesTests.DistinguishesOwnAndConflictingPatchOwners),
+      ("Daily injury counter moves current injuries to yesterday",
+          DailyInjuryCounterTests.MovesCurrentInjuriesToYesterdayOnNextDay),
+      ("Daily injury counter clears yesterday after a skipped day",
+          DailyInjuryCounterTests.ClearsYesterdayAfterSkippedDay),
+      ("Daily injury counter restores and advances saved counts",
+          DailyInjuryCounterTests.RestoresSavedCountsAndAdvancesThem),
+      ("Daily injury counter keeps the latest 28 days",
+          DailyInjuryCounterTests.KeepsLatestTwentyEightCompletedDays),
+      ("Daily injury probability calculates at least one injury",
+          InjuryProbabilityCalculatorTests.CalculatesProbabilityOfAtLeastOneDailyInjury),
   ];
 
   public static int Run() {

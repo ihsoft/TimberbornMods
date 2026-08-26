@@ -30,6 +30,10 @@ sealed class InjuryProbabilitySettings(
       true,
       ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowAsDailyProbability"));
 
+  public ModSetting<bool> ShowInjuryStatistics { get; } = new(
+      true,
+      ModSettingDescriptor.CreateLocalized("IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics"));
+
   // ReSharper restore InconsistentNaming
   // ReSharper restore MemberCanBePrivate.Global
   #endregion

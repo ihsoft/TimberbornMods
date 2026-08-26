@@ -17,6 +17,7 @@ IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,"Stimulation de croissanc
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,"Ralentissement de croissance : <RedHighlight>🡇</RedHighlight>{0:0.#}%","It indicates growth penalty, it's a bad effect."
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,"Près du niveau de profondeur du déversoir : {0}",
 IgorZ.TimberCommons.InjuryProbability,"Probabilité de blessure : {0} toutes les heures",
+IgorZ.TimberCommons.Injuries,"Blessés : {0} hier, {1} en 7 jours",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,"Représentation durée et temps",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,"Afficher la « durée de l'approvisionnement » en jours/heures",
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,"Afficher le temps de croissance en jours/heures",
@@ -34,6 +35,7 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,"Probabilité de blessure"
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,"Afficher la probabilité de blessure dans le panneau de droite",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,"Afficher l'indicateur sur l'icône du bâtiment",
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Survolez l'indicateur pour connaître la probabilité de blessure.",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Afficher l'historique des blessures au travail",
 IgorZ.TimberCommons.Settings.DebugSection,"Débogage et dépannage",
 IgorZ.TimberCommons.Settings.Debug.VerboseLogging,"Journalisation verbeuse",
 IgorZ.TimberCommons.Settings.Debug.VerboseLoggingTooltip,"Les journaux contiendront plus de détails utiles, mais cela peut avoir un impact sur les performances du jeu."

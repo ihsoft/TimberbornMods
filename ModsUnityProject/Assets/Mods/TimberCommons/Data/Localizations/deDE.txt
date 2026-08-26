@@ -17,6 +17,7 @@ IgorZ.TimberCommons.GrowthRateModifier.BoostPercentile,Wachstumsförderung: <Gre
 IgorZ.TimberCommons.GrowthRateModifier.SlowdownPercentile,Wachstumsminderung: <RedHighlight>🡇</RedHighlight>{0:0.#}%,Wachstumsminderung ist ein negativer Effekt.
 IgorZ.TimberCommons.AdjustableWaterOutput.StopAboveDownstream,Schließen ab Ausgangstiefe: {0},
 IgorZ.TimberCommons.InjuryProbability,Verletzungsrisiko: {0} pro Stunde,
+IgorZ.TimberCommons.Injuries,"Verletzt: {0} gestern, {1} in 7 Tagen",
 IgorZ.TimberCommons.Settings.TimeAndDurationSection,Anzeige Zeit und Dauer,
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursSupplyLeft,Versorgungsdauer als Tage/Stunden anzeigen,
 IgorZ.TimberCommons.Settings.TimeAndDuration.DaysHoursGrowingTime,Wachstumsdauer als Tage/Stunden anzeigen,
@@ -34,6 +35,7 @@ IgorZ.TimberCommons.Settings.InjuryProbabilitySection,Verletzungsrisiko,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowInFragment,Verletzungsrisiko im Gebäudefenster anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHint,Indikator am Gebäudesymbol anzeigen,
 IgorZ.TimberCommons.Settings.InjuryProbability.ShowAvatarHintTooltip,"Bewege den Mauszeiger über den Indikator, um das Verletzungsrisiko anzuzeigen.",
+IgorZ.TimberCommons.Settings.InjuryProbability.ShowInjuryStatistics,"Verletzungsverlauf am Arbeitsplatz anzeigen",
 IgorZ.TimberCommons.Settings.ModUIPatchesSection,Mod-UI-Patches,
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialog,Dialog für Mod-Abweichungen beim Laden verbessern,
 IgorZ.TimberCommons.Settings.ModUIPatches.EnhanceSaveModsIncompatibilityDialogTooltip,"Fügt Steuerelemente hinzu, mit denen fehlende Mods direkt aus der Ladewarnung aktiviert werden können.

@@ -1,11 +1,14 @@
-﻿// Timberborn Mod: Timberborn Commons
+// Timberborn Mod: Timberborn Commons
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
 using Bindito.Core;
+using IgorZ.TimberCommons.NeedApplierUI;
 using Timberborn.EntityPanelSystem;
+using Timberborn.NeedApplication;
+using Timberborn.TemplateInstantiation;
 
-namespace IgorZ.TimberCommons.NeedApplierUI;
+namespace IgorZ.TimberCommons.NeedApplier;
 
 [Context("Game")]
 sealed class Configurator : IConfigurator {
@@ -19,6 +22,14 @@ sealed class Configurator : IConfigurator {
 
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<InjuryProbabilityFragment>().AsSingleton();
+    containerDefinition.Bind<WorkshopInjuryStatistics>().AsTransient();
     containerDefinition.MultiBind<EntityPanelModule>().ToProvider<EntityPanelModuleProvider>().AsSingleton();
+    containerDefinition.MultiBind<TemplateModule>().ToProvider(ProvideTemplateModule).AsSingleton();
+  }
+
+  static TemplateModule ProvideTemplateModule() {
+    var builder = new TemplateModule.Builder();
+    builder.AddDecorator<WorkshopRandomNeedApplierSpec, WorkshopInjuryStatistics>();
+    return builder.Build();
   }
 }

@@ -57,5 +57,11 @@
       <Compile Include="..\TimberCommons\ModUIPatches\ModUIPatchesPatchOwners.cs">
         <Link>TimberCommons\ModUIPatches\ModUIPatchesPatchOwners.cs</Link>
       </Compile>
+      <Compile Include="..\TimberCommons\NeedApplier\DailyInjuryCounter.cs">
+        <Link>TimberCommons\NeedApplier\DailyInjuryCounter.cs</Link>
+      </Compile>
+      <Compile Include="..\TimberCommons\NeedApplier\InjuryProbabilityCalculator.cs">
+        <Link>TimberCommons\NeedApplier\InjuryProbabilityCalculator.cs</Link>
+      </Compile>
     </ItemGroup>
 </Project>

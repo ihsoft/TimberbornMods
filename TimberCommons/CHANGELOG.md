@@ -1,4 +1,5 @@
 # v1.15.3 (Timberborn v1.0) (TBD)
+* [Feature] Workplace panels and avatar tooltips can show a persistent 28-day injury history.
 * [Feature] Installed disabled mods can be enabled from the save-load mod mismatch dialog.
 * [Feature] Load-game previews now show the saved game version and faction.
 * [Feature] The mod manager can filter the list to active mods, with localized button text.
@@ -7,6 +8,7 @@
 * [Fix] Irrigation tower recipe toggles did not show the currently selected mode.
 * [Fix] Good-consuming irrigation towers could keep a stale consumption rate after their coverage changed.
 * [Fix] Irrigation towers continued reacting to terrain or blocking changes after leaving the finished state.
+* [Fix] Daily injury probability was calculated incorrectly from the hourly probability.
 
 # v1.15.2 (March 25th, 2026)
 * [Update] Support game version `1.0.12.7`.
