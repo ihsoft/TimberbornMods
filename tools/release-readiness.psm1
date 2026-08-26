@@ -27,6 +27,137 @@ function Add-ReadinessPlannedChange(
     })
 }
 
+function Get-ReadinessUtf8Sha256([string] $Value) {
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($Value)
+        return ([System.BitConverter]::ToString($sha256.ComputeHash($bytes))).Replace("-", "").ToLowerInvariant()
+    }
+    finally {
+        $sha256.Dispose()
+    }
+}
+
+function New-ReadinessReleaseConfigBootstrap(
+    [object] $PublicReleaseConfig,
+    [string] $PublicPackageVersion,
+    [string] $CandidateVersion,
+    [string] $PreviousCandidateVersion,
+    [string] $CandidateGameVersion,
+    [System.Collections.Generic.List[object]] $Blockers
+) {
+    $manifestPath = [string](Get-ReadinessProperty $PublicReleaseConfig "ManifestPath")
+    $changesPath = [string](Get-ReadinessProperty $PublicReleaseConfig "ChangesPath")
+    $scriptFileBase = [string](Get-ReadinessProperty $PublicReleaseConfig "ScriptFileBase")
+    $publicPackage = Get-ReadinessProperty $PublicReleaseConfig "Package"
+    $packageMode = [string](Get-ReadinessProperty $publicPackage "Mode")
+    $packageSourcePath = [string](Get-ReadinessProperty $publicPackage "SourcePath")
+    $publicOutputPath = [string](Get-ReadinessProperty $publicPackage "OutputPath")
+    $steamPublishedFileId = [string](Get-ReadinessProperty $PublicReleaseConfig.Steam "PublishedFileId")
+
+    $requiredValues = [ordered]@{
+        ManifestPath = $manifestPath
+        ChangesPath = $changesPath
+        ScriptFileBase = $scriptFileBase
+        PublicPackageVersion = $PublicPackageVersion
+        CandidateVersion = $CandidateVersion
+        PreviousCandidateVersion = $PreviousCandidateVersion
+        SteamPublishedFileId = $steamPublishedFileId
+    }
+    foreach ($requiredValue in $requiredValues.GetEnumerator()) {
+        if ([string]::IsNullOrWhiteSpace([string]$requiredValue.Value)) {
+            $Blockers.Add([ordered]@{
+                Code = "ReleaseConfigBootstrap$($requiredValue.Key)Missing"
+                Message = "Cannot derive first registered-line release config field $($requiredValue.Key)."
+            })
+        }
+    }
+    if ($packageMode -ne "LocalModFolder") {
+        $Blockers.Add([ordered]@{
+            Code = "ReleaseConfigBootstrapPackageModeUnsupported"
+            Message = "First registered-line release config requires an evidence-backed LocalModFolder public package."
+        })
+    }
+    if ([string]::IsNullOrWhiteSpace($packageSourcePath)) {
+        $Blockers.Add([ordered]@{
+            Code = "ReleaseConfigBootstrapPackageSourceMissing"
+            Message = "Cannot derive first registered-line Package.SourcePath from the public owner config."
+        })
+    }
+    $desiredOutputPath = ""
+    if ([string]::IsNullOrWhiteSpace($publicOutputPath) -or
+            [string]::IsNullOrWhiteSpace($PublicPackageVersion) -or
+            -not $publicOutputPath.Contains($PublicPackageVersion)) {
+        $Blockers.Add([ordered]@{
+            Code = "ReleaseConfigBootstrapPackageOutputUndetermined"
+            Message = "Public Package.OutputPath does not contain the exact public package version; target output cannot be derived safely."
+        })
+    }
+    else {
+        $desiredOutputPath = $publicOutputPath.Replace($PublicPackageVersion, $CandidateVersion)
+    }
+
+    $desiredManifestVersions = Get-ReadinessDesiredManifestVersions `
+        $PublicReleaseConfig $CandidateGameVersion $CandidateVersion
+    $canCreate = @($Blockers | Where-Object {
+        [string]$_.Code -like "ReleaseConfigBootstrap*"
+    }).Count -eq 0
+    if (-not $canCreate) {
+        return [ordered]@{
+            CanCreate = $false
+            DesiredContent = $null
+            DesiredContentJson = ""
+            DesiredContentSha256 = ""
+            Evidence = [ordered]@{
+                CandidateIdentity = "TargetLineQualifiedChangelog"
+                PublicOwnership = "CurrentPublicReleaseConfig"
+                LinePolicy = "RegisteredReleaseLine"
+            }
+        }
+    }
+
+    $desiredPackage = [ordered]@{
+        Mode = "LocalModFolder"
+        SourcePath = $packageSourcePath
+        OutputPath = $desiredOutputPath
+    }
+    $maxAgeDays = Get-ReadinessProperty $publicPackage "MaxAgeDays"
+    if ($null -ne $maxAgeDays) {
+        $desiredPackage["MaxAgeDays"] = $maxAgeDays
+    }
+    $allowMissingXmlFolders = Get-ReadinessProperty $publicPackage "AllowMissingXmlFolders"
+    if ($null -ne $allowMissingXmlFolders) {
+        $desiredPackage["AllowMissingXmlFolders"] = [string[]]@($allowMissingXmlFolders)
+    }
+    $desiredContent = [ordered]@{
+        ManifestPath = $manifestPath
+        ChangesPath = $changesPath
+        ReleaseVersion = $CandidateVersion
+        PreviousSourceModVersion = $PreviousCandidateVersion
+        ScriptFileBase = $scriptFileBase
+        Package = $desiredPackage
+        ManifestVersions = $desiredManifestVersions
+    }
+    $gameCompatibility = Get-ReadinessProperty $PublicReleaseConfig "GameVersionCompatibility"
+    if ($null -ne $gameCompatibility) {
+        $desiredContent["GameVersionCompatibility"] = $gameCompatibility
+    }
+    $desiredContent["Steam"] = [ordered]@{ PublishedFileId = $steamPublishedFileId }
+    $desiredJson = ($desiredContent | ConvertTo-Json -Depth 8) + [Environment]::NewLine
+    return [ordered]@{
+        CanCreate = $true
+        DesiredContent = $desiredContent
+        DesiredContentJson = $desiredJson
+        DesiredContentSha256 = Get-ReadinessUtf8Sha256 $desiredJson
+        Evidence = [ordered]@{
+            CandidateIdentity = "TargetLineQualifiedChangelog"
+            PublicOwnership = "CurrentPublicReleaseConfig"
+            LinePolicy = "RegisteredReleaseLine"
+            PackageOutputDerivation = "ReplaceExactPublicPackageVersion"
+        }
+    }
+}
+
 function Get-ReadinessDesiredManifestVersions(
     [object] $PublicReleaseConfig,
     [string] $CandidateGameVersion,
@@ -408,20 +539,44 @@ function Get-ReleaseReadinessReport {
 
     $blockers = New-Object System.Collections.Generic.List[object]
     $warnings = New-Object System.Collections.Generic.List[string]
+    $plannedMetadataChanges = New-Object System.Collections.Generic.List[object]
     $releaseConfigPath = Join-Path $releaseRoot "$ModName/release.json"
-    if (-not (Test-Path -LiteralPath $releaseConfigPath -PathType Leaf)) {
-        throw "Release config not found: $releaseConfigPath"
-    }
-    $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
-    $configuredSourceModVersion = [string](Get-ReadinessProperty $releaseConfig "ReleaseVersion")
-    $configReadyForPublish = Get-ReadinessProperty $releaseConfig "ReadyForPublish"
+    $releaseConfigExists = Test-Path -LiteralPath $releaseConfigPath -PathType Leaf
     $publicReleaseConfigPath = Join-Path $repositoryRoot "$ModName/release.json"
     if (-not (Test-Path -LiteralPath $publicReleaseConfigPath -PathType Leaf)) {
         throw "Public release config not found: $publicReleaseConfigPath"
     }
     $publicReleaseConfig = Get-Content -Raw -LiteralPath $publicReleaseConfigPath | ConvertFrom-Json
     $publicLane = Get-ReadinessPublicPackageLane $publicReleaseConfig "version-1.1"
+    $releaseConfigBootstrap = [ordered]@{
+        Required = -not $releaseConfigExists
+        CanCreate = $false
+        Path = $releaseConfigPath
+        PathArgument = "$ModName/release.json"
+        DesiredContent = $null
+        DesiredContentJson = ""
+        DesiredContentSha256 = ""
+        Evidence = $null
+    }
+    if ($releaseConfigExists) {
+        $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+    }
+    elseif ([string]::IsNullOrWhiteSpace($ReleaseLine)) {
+        $releaseConfig = [pscustomobject]@{}
+        $blockers.Add([ordered]@{
+            Code = "ReleaseConfigMissing"
+            Message = "Current-line release config is missing: $releaseConfigPath"
+        })
+    }
+    else {
+        $releaseConfig = [pscustomobject]@{}
+    }
+    $configuredSourceModVersion = [string](Get-ReadinessProperty $releaseConfig "ReleaseVersion")
+    $configReadyForPublish = Get-ReadinessProperty $releaseConfig "ReadyForPublish"
     $changesPathValue = [string](Get-ReadinessProperty $releaseConfig "ChangesPath")
+    if (-not $releaseConfigExists -and -not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
+        $changesPathValue = [string](Get-ReadinessProperty $publicReleaseConfig "ChangesPath")
+    }
     $changesPath = if ([string]::IsNullOrWhiteSpace($changesPathValue)) {
         ""
     }
@@ -460,7 +615,23 @@ function Get-ReleaseReadinessReport {
     else {
         ""
     }
-    $plannedMetadataChanges = New-Object System.Collections.Generic.List[object]
+    if (-not $releaseConfigExists -and -not [string]::IsNullOrWhiteSpace($ReleaseLine)) {
+        $bootstrap = New-ReadinessReleaseConfigBootstrap `
+            $publicReleaseConfig ([string]$publicLane.ManifestVersion) $sourceModVersion `
+            $previousSourceModVersion $gameVersion $blockers
+        $releaseConfigBootstrap.CanCreate = [bool]$bootstrap.CanCreate
+        $releaseConfigBootstrap.DesiredContent = $bootstrap.DesiredContent
+        $releaseConfigBootstrap.DesiredContentJson = [string]$bootstrap.DesiredContentJson
+        $releaseConfigBootstrap.DesiredContentSha256 = [string]$bootstrap.DesiredContentSha256
+        $releaseConfigBootstrap.Evidence = $bootstrap.Evidence
+        if ($releaseConfigBootstrap.CanCreate) {
+            $releaseConfig = [pscustomobject]$releaseConfigBootstrap.DesiredContent
+            Add-ReadinessPlannedChange `
+                $plannedMetadataChanges "ReleaseConfig.Create" "(missing)" `
+                "$ModName/release.json (sha256 $($releaseConfigBootstrap.DesiredContentSha256))" `
+                "Gate 1 creates the first registered-line config from bound target and public-owner evidence."
+        }
+    }
 
     if ([string]::IsNullOrWhiteSpace($sourceModVersion)) {
         $blockers.Add([ordered]@{ Code = "CandidateVersionMissing"; Message = "Candidate version is unavailable." })
@@ -498,6 +669,10 @@ function Get-ReleaseReadinessReport {
     }
 
     $manifestPathValue = [string](Get-ReadinessProperty $releaseConfig "ManifestPath")
+    if (-not $releaseConfigExists -and -not [string]::IsNullOrWhiteSpace($ReleaseLine) -and
+            [string]::IsNullOrWhiteSpace($manifestPathValue)) {
+        $manifestPathValue = [string](Get-ReadinessProperty $publicReleaseConfig "ManifestPath")
+    }
     $manifestPath = if ([string]::IsNullOrWhiteSpace($manifestPathValue)) {
         ""
     }
@@ -510,13 +685,37 @@ function Get-ReleaseReadinessReport {
     elseif (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
         $blockers.Add([ordered]@{ Code = "ManifestMissing"; Message = "Release manifest is missing: $manifestPath" })
     }
+    elseif ($releaseConfigBootstrap.Required -and $releaseConfigBootstrap.CanCreate) {
+        try {
+            $targetManifestVersion = [string]((Get-Content -Raw -LiteralPath $manifestPath |
+                    ConvertFrom-Json).Version)
+            if ($targetManifestVersion -ne $sourceModVersion) {
+                $releaseConfigBootstrap.CanCreate = $false
+                $blockers.Add([ordered]@{
+                    Code = "ReleaseConfigBootstrapManifestVersionMismatch"
+                    Message = (
+                        "Target manifest version '$targetManifestVersion' does not match candidate " +
+                        "version '$sourceModVersion'.")
+                })
+            }
+        }
+        catch {
+            $releaseConfigBootstrap.CanCreate = $false
+            $blockers.Add([ordered]@{
+                Code = "ReleaseConfigBootstrapManifestInvalid"
+                Message = "Target manifest is not valid JSON: $manifestPath"
+            })
+        }
+    }
 
-    Add-ReadinessPlannedChange `
-        $plannedMetadataChanges "ReleaseVersion" $configuredSourceModVersion $sourceModVersion `
-        "Candidate identity comes from the target worktree's top changelog heading."
+    if ($releaseConfigExists) {
+        Add-ReadinessPlannedChange `
+            $plannedMetadataChanges "ReleaseVersion" $configuredSourceModVersion $sourceModVersion `
+            "Candidate identity comes from the target worktree's top changelog heading."
+    }
     $configuredPreviousSourceModVersion = [string](
         Get-ReadinessProperty $releaseConfig "PreviousSourceModVersion")
-    if ($versionPolicy -eq "BackportPatchOnly") {
+    if ($versionPolicy -eq "BackportPatchOnly" -and $releaseConfigExists) {
         Add-ReadinessPlannedChange `
             $plannedMetadataChanges "PreviousSourceModVersion" `
             $configuredPreviousSourceModVersion $previousSourceModVersion `
@@ -532,24 +731,28 @@ function Get-ReleaseReadinessReport {
         else {
             [string](Get-ReadinessProperty $configuredManifestVersions ([string]$desiredManifest.Key))
         }
-        Add-ReadinessPlannedChange `
-            $plannedMetadataChanges "ManifestVersions.$($desiredManifest.Key)" `
-            $configuredManifestVersion ([string]$desiredManifest.Value) `
-            $(if ([string]$desiredManifest.Key -eq $gameVersion) {
-                "Target compatibility lane receives the pending candidate."
-            }
-            else {
-                "Public lanes follow the current public package owner."
-            })
+        if ($releaseConfigExists) {
+            Add-ReadinessPlannedChange `
+                $plannedMetadataChanges "ManifestVersions.$($desiredManifest.Key)" `
+                $configuredManifestVersion ([string]$desiredManifest.Value) `
+                $(if ([string]$desiredManifest.Key -eq $gameVersion) {
+                    "Target compatibility lane receives the pending candidate."
+                }
+                else {
+                    "Public lanes follow the current public package owner."
+                })
+        }
     }
     $publicSteamPublishedFileId = [string](
         Get-ReadinessProperty $publicReleaseConfig.Steam "PublishedFileId")
     $configuredSteamPublishedFileId = [string](
         Get-ReadinessProperty $releaseConfig.Steam "PublishedFileId")
-    Add-ReadinessPlannedChange `
-        $plannedMetadataChanges "Steam.PublishedFileId" `
-        $configuredSteamPublishedFileId $publicSteamPublishedFileId `
-        "Public platform identity belongs to the current public package owner."
+    if ($releaseConfigExists) {
+        Add-ReadinessPlannedChange `
+            $plannedMetadataChanges "Steam.PublishedFileId" `
+            $configuredSteamPublishedFileId $publicSteamPublishedFileId `
+            "Public platform identity belongs to the current public package owner."
+    }
 
     $packageOwnerConfig = if ([string]::IsNullOrWhiteSpace($ReleaseLine)) {
         $releaseConfig
@@ -885,6 +1088,7 @@ function Get-ReleaseReadinessReport {
             PublicPackageGameVersion = [string]$publicLane.GameVersion
             PublicPackageOwnerRoot = $repositoryRoot
             ConfiguredReleaseVersion = $configuredSourceModVersion
+            ReleaseConfigExists = $releaseConfigExists
             ConfigReadyForPublish = if ($null -eq $configReadyForPublish) { "Unspecified" } else { [bool]$configReadyForPublish }
         }
         Changelog = $changelog
@@ -968,7 +1172,10 @@ function Get-ReleaseReadinessReport {
             ExpectedHeadForPreparation = $headAtDiscovery
             PreparationRequired = $preparationRequired
             PreparationState = if ($preparationRequired) { "AwaitingMetadataPreparation" } else { "Prepared" }
-            NextAction = if ($preparationRequired) {
+            NextAction = if ($releaseConfigBootstrap.Required -and $releaseConfigBootstrap.CanCreate) {
+                "RunReleaseConfigBootstrapCommitAndRerunReadiness"
+            }
+            elseif ($preparationRequired) {
                 "ApplyPlannedMetadataChangesCommitAndRerunReadiness"
             }
             elseif ($externalPrerequisiteBlockers.Count -gt 0) {
@@ -978,6 +1185,28 @@ function Get-ReleaseReadinessReport {
                 "RunImmutablePreflight"
             }
             EntryPointAvailable = $readyForPreflight
+            ReleaseConfigBootstrap = [ordered]@{
+                Required = [bool]$releaseConfigBootstrap.Required
+                CanCreate = [bool]$releaseConfigBootstrap.CanCreate
+                EntryPoint = "tools/initialize-release-config.ps1"
+                Arguments = [string[]]@()
+                Path = [string]$releaseConfigBootstrap.Path
+                PathArgument = [string]$releaseConfigBootstrap.PathArgument
+                DesiredContent = $releaseConfigBootstrap.DesiredContent
+                DesiredContentJson = [string]$releaseConfigBootstrap.DesiredContentJson
+                DesiredContentSha256 = [string]$releaseConfigBootstrap.DesiredContentSha256
+                Evidence = $releaseConfigBootstrap.Evidence
+                TargetGameVersion = $gameVersion
+                VersionPolicy = $versionPolicy
+                SourceHeadAtDiscovery = $headAtDiscovery
+                SourceReleaseCommit = $releaseCommit
+                SourceBaselineTag = $baselineTag
+                PublicOwnerConfigPath = $packageOwnerConfigPath
+                PublicOwnerConfigSha256 = $packageOwnerConfigSha256
+                RequiresExactPathCommit = [bool]$releaseConfigBootstrap.Required
+                RequiresReadinessRerun = [bool]$releaseConfigBootstrap.Required
+                MutatesPublicPlatforms = $false
+            }
             PlannedMetadataChanges = [object[]]$plannedMetadataChanges.ToArray()
             RerunReadinessCommand = @(
                 "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
@@ -1046,6 +1275,15 @@ function Format-ReleaseReadinessReport([object] $Report) {
     $lines.Add(
         "  Metadata: $($Report.Gate1Plan.PreparationState); " +
         "planned changes=$(@($Report.Gate1Plan.PlannedMetadataChanges).Count)")
+    if ($Report.Gate1Plan.ReleaseConfigBootstrap.Required) {
+        $lines.Add(
+            "  Release config bootstrap: can-create=$($Report.Gate1Plan.ReleaseConfigBootstrap.CanCreate); " +
+            "path=$($Report.Gate1Plan.ReleaseConfigBootstrap.PathArgument); " +
+            "sha256=$($Report.Gate1Plan.ReleaseConfigBootstrap.DesiredContentSha256)")
+        $lines.Add(
+            "  Bootstrap command: $($Report.Gate1Plan.ReleaseConfigBootstrap.EntryPoint) " +
+            "$($Report.Gate1Plan.ReleaseConfigBootstrap.Arguments -join ' ')")
+    }
     foreach ($change in @($Report.Gate1Plan.PlannedMetadataChanges)) {
         $lines.Add("    $($change.Field): '$($change.CurrentValue)' -> '$($change.DesiredValue)'")
     }
@@ -1081,7 +1319,7 @@ function Format-ReleaseReadinessReport([object] $Report) {
             $lines.Add("    $warning")
         }
     }
-    $lines.Add("  Gate 1: $($Report.Gate1Plan.EntryPoint) $($Report.Gate1Plan.Arguments -join ' ')")
+    $lines.Add("  Gate 1 preflight: $($Report.Gate1Plan.EntryPoint) $($Report.Gate1Plan.Arguments -join ' ')")
     return [string[]]$lines.ToArray()
 }
 

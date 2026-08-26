@@ -97,6 +97,7 @@ try {
     @(
         "find-unpublished-releases.ps1",
         "get-release-readiness.ps1",
+        "initialize-release-config.ps1",
         "materialize-release-package.ps1",
         "prepare-discord-release-message.ps1",
         "publish-github-release.ps1",
@@ -210,6 +211,45 @@ try {
   "Steam": { "PublishedFileId": "3324234282" }
 }
 '@
+    Write-TestFile (Join-Path $fixtureRoot "TimberCommons/CHANGELOG.md") @'
+# v1.23.0 (August 1st, 2026)
+
+* [Feature] Current-line fixture.
+
+# v1.15.2 (March 25th, 2026)
+
+* [Fix] Previous older-line release.
+'@
+    Write-TestFile (Join-Path $fixtureRoot "TimberCommons/release.json") @'
+{
+  "ManifestPath": "ModsUnityProject/Assets/Mods/TimberCommons/manifest.json",
+  "ChangesPath": "TimberCommons/CHANGELOG.md",
+  "ReleaseVersion": "1.23.0",
+  "ScriptFileBase": "TimberCommons",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/TimberCommons",
+    "OutputPath": "package/TimberCommons_v1.23.0.zip",
+    "MaxAgeDays": 14,
+    "AllowMissingXmlFolders": ["version-1.0"]
+  },
+  "ManifestVersions": {
+    "version-1.0": "1.15.2",
+    "version-1.1": "1.23.0"
+  },
+  "GameVersionCompatibility": {
+    "version-1.0": {
+      "MinimumGameVersion": "1.0.11.0",
+      "MaximumGameVersion": "1.0.99.99"
+    },
+    "version-1.1": {
+      "MinimumGameVersion": "1.1.0.0",
+      "MaximumGameVersion": "1.1.99.99"
+    }
+  },
+  "Steam": { "PublishedFileId": "3337906807" }
+}
+'@
     Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/ReadyMod/manifest.json") `
         '{"Name":"Ready Mod","Version":"3.0.0"}'
@@ -219,6 +259,12 @@ try {
     Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/Automation/Data/workshop_data.json") `
         '{"ItemId":"3324234282","Name":"Automation","Tags":["Quality of life"]}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/TimberCommons/manifest.json") `
+        '{"Name":"Timber Commons","Version":"1.23.0"}'
+    Write-TestFile `
+        (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/TimberCommons/Data/workshop_data.json") `
+        '{"ItemId":"3337906807","Name":"TimberCommons","Tags":["Quality of life"]}'
     Write-TestFile `
         (Join-Path $fixtureRoot "ModsUnityProject/Assets/Mods/XRay/Data/workshop_data.json") `
         '{"ItemId":"67890","Name":"XRay","Tags":["Quality of life"]}'
@@ -314,6 +360,19 @@ try {
     Write-TestFile `
         (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/Automation/manifest.json") `
         '{"Name":"Advanced Automation","Version":"4.0.11"}'
+    Remove-Item -LiteralPath (Join-Path $lineRoot "TimberCommons/release.json")
+    Write-TestFile (Join-Path $lineRoot "TimberCommons/CHANGELOG.md") @'
+# v1.15.3 (Timberborn v1.0) (TBD)
+
+* [Feature] First committed older-line candidate.
+
+# v1.15.2 (March 25th, 2026)
+
+* [Fix] Previous older-line release.
+'@
+    Write-TestFile `
+        (Join-Path $lineRoot "ModsUnityProject/Assets/Mods/TimberCommons/manifest.json") `
+        '{"Name":"Timber Commons","Version":"1.15.3"}'
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "."))
     [void](Invoke-TestNative "git" @("-C", $lineRoot, "commit", "-m", "Add unmaterialized SmartPower fixture"))
     Write-TestFile (Join-Path $lineRoot "UnrelatedLineWork.txt") "later unrelated release-line work"
@@ -323,6 +382,121 @@ try {
         '{"GameId":"3659","ModId":"3168318","ApiBase":"https://example.invalid/v1"}'
     Write-TestFile (Join-Path $fixtureRoot ".tools/modio/Automation.token.txt") `
         "fixture-known-owner-token"
+
+    $timberCommonsArtifact = Join-Path `
+        $fixtureRoot ".tools/release-readiness/TimberCommons-1.15.3-update-1.0.json"
+    Push-Location $fixtureRoot
+    try {
+        $firstBackportOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File tools/get-release-readiness.ps1 -ModName TimberCommons -ReleaseLine update-1.0 2>&1)
+        $firstBackportExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+    Assert-Equal 0 $firstBackportExitCode "First registered-line bootstrap readiness exit code"
+    Assert-True (Test-Path -LiteralPath $timberCommonsArtifact -PathType Leaf) `
+        "First registered-line readiness must emit a schema-1 artifact."
+    $firstBackportReadiness = Get-Content -Raw -LiteralPath $timberCommonsArtifact | ConvertFrom-Json
+    Assert-Equal "1.15.3" $firstBackportReadiness.Candidate.SourceModVersion `
+        "First registered-line candidate source version"
+    Assert-Equal "1.15.2" $firstBackportReadiness.Candidate.PreviousSourceModVersion `
+        "First registered-line previous source version"
+    Assert-Equal "1.23.0" $firstBackportReadiness.Candidate.PublicPackageVersion `
+        "First registered-line public package version"
+    Assert-True (-not $firstBackportReadiness.Candidate.ReleaseConfigExists) `
+        "First registered-line fixture must not have target release metadata."
+    Assert-True $firstBackportReadiness.ReadyForGate1 `
+        "Evidence-backed first registered-line metadata bootstrap must be ready for Gate 1."
+    Assert-True (-not $firstBackportReadiness.ReadyForPreflight) `
+        "A bootstrap readiness artifact must not satisfy immutable preflight."
+    Assert-Equal "RunReleaseConfigBootstrapCommitAndRerunReadiness" `
+        $firstBackportReadiness.Gate1Plan.NextAction `
+        "First registered-line readiness next action"
+    $bootstrapPlan = $firstBackportReadiness.Gate1Plan.ReleaseConfigBootstrap
+    Assert-True $bootstrapPlan.Required "First registered-line release config bootstrap requirement"
+    Assert-True $bootstrapPlan.CanCreate "First registered-line release config bootstrap derivation"
+    Assert-Equal "TimberCommons/release.json" $bootstrapPlan.PathArgument `
+        "First registered-line bootstrap exact path"
+    Assert-Equal "1.15.3" $bootstrapPlan.DesiredContent.ReleaseVersion `
+        "First registered-line bootstrap source version"
+    Assert-Equal "1.15.2" $bootstrapPlan.DesiredContent.PreviousSourceModVersion `
+        "First registered-line bootstrap previous version"
+    Assert-Equal "1.15.3" $bootstrapPlan.DesiredContent.ManifestVersions.'version-1.0' `
+        "First registered-line bootstrap target lane"
+    Assert-Equal "1.23.0" $bootstrapPlan.DesiredContent.ManifestVersions.'version-1.1' `
+        "First registered-line bootstrap public lane"
+    Assert-Equal "3337906807" $bootstrapPlan.DesiredContent.Steam.PublishedFileId `
+        "First registered-line bootstrap public Steam identity"
+    Assert-Equal "version-1.0" $bootstrapPlan.TargetGameVersion `
+        "First registered-line bootstrap target game lane"
+    Assert-Equal "BackportPatchOnly" $bootstrapPlan.VersionPolicy `
+        "First registered-line bootstrap registered policy"
+    Assert-Equal $firstBackportReadiness.Git.ReleaseCommit $bootstrapPlan.SourceReleaseCommit `
+        "First registered-line bootstrap immutable source commit"
+    Assert-Equal $firstBackportReadiness.Package.OwnerConfigSha256 $bootstrapPlan.PublicOwnerConfigSha256 `
+        "First registered-line bootstrap public-owner config binding"
+    Assert-Equal "package/TimberCommons_v1.15.3.zip" $bootstrapPlan.DesiredContent.Package.OutputPath `
+        "First registered-line bootstrap target output"
+    Assert-Equal "version-1.0" `
+        (@($bootstrapPlan.DesiredContent.Package.AllowMissingXmlFolders) -join "|") `
+        "First registered-line bootstrap package array shape"
+    Assert-Equal ".tools/release-readiness/TimberCommons-1.15.3-update-1.0.json" `
+        $bootstrapPlan.Arguments[1] "First registered-line bootstrap bound readiness artifact"
+    Assert-True (-not (($firstBackportOutput | Out-String).Contains("fixture-known-owner-token"))) `
+        "First registered-line readiness output unexpectedly exposed credential contents."
+
+    Push-Location $fixtureRoot
+    try {
+        $bootstrapOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File tools/initialize-release-config.ps1 `
+            -ReadinessReportPath .tools/release-readiness/TimberCommons-1.15.3-update-1.0.json 2>&1)
+        $bootstrapExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+    Assert-Equal 0 $bootstrapExitCode "First registered-line bootstrap entry point exit code"
+    $targetReleaseConfigPath = Join-Path $lineRoot "TimberCommons/release.json"
+    Assert-True (Test-Path -LiteralPath $targetReleaseConfigPath -PathType Leaf) `
+        "Bootstrap entry point must create only the target release config."
+    Assert-Equal $bootstrapPlan.DesiredContentSha256 `
+        (Get-FileHash -LiteralPath $targetReleaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant() `
+        "Bootstrap entry point exact content hash"
+    $targetReleaseConfig = Get-Content -Raw -LiteralPath $targetReleaseConfigPath | ConvertFrom-Json
+    Assert-Equal "1.15.3" $targetReleaseConfig.ReleaseVersion `
+        "Bootstrapped target release version"
+    Assert-Equal "1.15.2" $targetReleaseConfig.PreviousSourceModVersion `
+        "Bootstrapped target previous source version"
+    Assert-Equal "1.23.0" `
+        ((Get-Content -Raw -LiteralPath (Join-Path $fixtureRoot "TimberCommons/release.json") |
+                ConvertFrom-Json).ReleaseVersion) `
+        "Bootstrap entry point must not mutate public-owner release metadata"
+    $bootstrapStatus = @((Invoke-TestNative "git" @(
+                "-C", $lineRoot, "status", "--porcelain=v1")).Output)
+    Assert-Equal "?? TimberCommons/release.json" ($bootstrapStatus -join "|") `
+        "Bootstrap entry point exact local mutation"
+    [void](Invoke-TestNative "git" @("-C", $lineRoot, "add", "TimberCommons/release.json"))
+    [void](Invoke-TestNative "git" @(
+        "-C", $lineRoot, "commit", "-m", "Bootstrap first registered release config"))
+    Push-Location $fixtureRoot
+    try {
+        $rerunOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File tools/get-release-readiness.ps1 -ModName TimberCommons -ReleaseLine update-1.0 2>&1)
+        $rerunExitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+    Assert-Equal 0 $rerunExitCode "Committed first registered-line readiness rerun exit code"
+    $rerunReadiness = Get-Content -Raw -LiteralPath $timberCommonsArtifact | ConvertFrom-Json
+    Assert-True $rerunReadiness.Candidate.ReleaseConfigExists `
+        "Readiness rerun must consume the committed target release config."
+    Assert-True (-not $rerunReadiness.Gate1Plan.ReleaseConfigBootstrap.Required) `
+        "Committed target release config must close bootstrap preparation."
+    Assert-True (-not $rerunReadiness.ReadyForPreflight) `
+        "Remaining changelog date preparation must still require a fresh final readiness artifact."
+    Write-Host "PASS: first registered-line config bootstrap is exact, local-only, and rerun-bound"
 
     $readinessArtifact = Join-Path `
         $fixtureRoot ".tools/release-readiness/SmartPower-1.16.4-update-1.0.json"
@@ -653,11 +827,14 @@ try {
     $expectedKeys = @(
         "Alpha|2.0.0|main|||CurrentLine|Alpha/CHANGELOG.md",
         "SmartPower|1.16.4|update-1.0|update-1.0|version-1.0|BackportPatchOnly|SmartPower/CHANGELOG.md",
+        "TimberCommons|1.15.3|update-1.0|update-1.0|version-1.0|BackportPatchOnly|TimberCommons/CHANGELOG.md",
         "XRay|1.2.0|update-1.0|update-1.0|version-1.0|BackportPatchOnly|XRay/CHANGELOG.md"
     ) | Sort-Object
     Assert-Equal ($expectedKeys -join "`n") ($candidateKeys -join "`n") "Inventory JSON candidate set"
 
-    $humanRows = @($humanOutput -split "`r?`n" | Where-Object { $_ -match "^(Alpha|SmartPower|XRay)\s+\d" })
+    $humanRows = @($humanOutput -split "`r?`n" | Where-Object {
+        $_ -match "^(Alpha|SmartPower|TimberCommons|XRay)\s+\d"
+    })
     Assert-Equal $jsonCandidates.Count $humanRows.Count "Inventory default/JSON candidate count parity"
     Assert-True ($humanOutput -match "(?m)^Alpha\s+2\.0\.0\s+main\s+CurrentLine\s+Alpha/CHANGELOG\.md\s*$") `
         "The current-line candidate did not render as a real table row."

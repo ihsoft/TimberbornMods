@@ -49,6 +49,10 @@ if (-not $NoReport) {
     $report.Gate1Plan["ReadinessReportPath"] = $reportPathArgument
     $report.Gate1Plan.Arguments = [string[]]@(
         $report.Gate1Plan.Arguments + @("-ReadinessReportPath", $reportPathArgument))
+    if ($report.Gate1Plan.ReleaseConfigBootstrap.Required) {
+        $report.Gate1Plan.ReleaseConfigBootstrap.Arguments = [string[]]@(
+            "-ReadinessReportPath", $reportPathArgument)
+    }
     $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $reportPath -Encoding UTF8
 }
 
