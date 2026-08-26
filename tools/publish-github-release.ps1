@@ -23,6 +23,7 @@ $ErrorActionPreference = "Stop"
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-policy.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $packageRoot = if ([string]::IsNullOrWhiteSpace($PackageOwnerRoot)) {
     $repoRoot
@@ -85,6 +86,7 @@ function Test-ZipPackage(
     [string] $ZipPath,
     [string] $ScriptFileBase,
     [object] $ReleaseConfig,
+    [string[]] $AllowMissingXmlFolders,
     [object[]] $ExpectedLaneFingerprints = @()) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
@@ -114,7 +116,6 @@ function Test-ZipPackage(
                 throw "Package folder $versionFolder must contain Scripts/$ScriptFileBase.dll."
             }
 
-            $allowMissingXmlFolders = @($ReleaseConfig.Package.AllowMissingXmlFolders)
             $xmlEntry = $zip.Entries | Where-Object {
                 $_.FullName -match "^[^/]+/$escapedVersionFolder/Scripts/$([regex]::Escape($ScriptFileBase))\.xml$"
             } | Select-Object -First 1
@@ -237,6 +238,43 @@ if (-not [string]::IsNullOrWhiteSpace($PreflightReportPath)) {
     }
     $expectedLaneFingerprints = [object[]]@($preflight.PackageLaneFingerprints)
 }
+$sourceReleaseConfigSha256 = (
+    Get-FileHash -LiteralPath $releaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$packageReleaseConfigSha256 = (
+    Get-FileHash -LiteralPath $packageReleaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$sourceXmlExceptions = Get-ReleaseAllowMissingXmlFolders $releaseConfig "Source release config"
+$ownerXmlExceptions = Get-ReleaseAllowMissingXmlFolders $packageReleaseConfig "Public package owner config"
+if (($sourceXmlExceptions -join "|") -ne ($ownerXmlExceptions -join "|")) {
+    throw "Source and public-owner XML documentation policies differ."
+}
+$boundXmlExceptions = [string[]]$sourceXmlExceptions
+if ($null -ne $preflight) {
+    $preflightXmlPolicy = $preflight.PackageXmlDocumentationPolicy
+    if ($null -eq $preflightXmlPolicy) {
+        if ($boundXmlExceptions.Count -gt 0) {
+            throw "Immutable preflight does not bind the package XML documentation exception."
+        }
+    }
+    else {
+        if (-not [bool]$preflightXmlPolicy.XmlRequiredByDefault) {
+            throw "Immutable preflight does not preserve the default XML documentation requirement."
+        }
+        $boundXmlExceptions = ConvertTo-ReleaseFolderList $preflightXmlPolicy.AllowMissingXmlFolders
+        if ([string]$preflightXmlPolicy.SourceConfigPath -ne $releaseConfigPath -or
+                [string]$preflightXmlPolicy.SourceConfigSha256 -ne $sourceReleaseConfigSha256 -or
+                [string]$preflightXmlPolicy.OwnerConfigPath -ne $packageReleaseConfigPath -or
+                [string]$preflightXmlPolicy.OwnerConfigSha256 -ne $packageReleaseConfigSha256) {
+            throw "Immutable preflight XML documentation policy config evidence differs from current files."
+        }
+        [void](Assert-ReleaseAllowMissingXmlFolders `
+            $boundXmlExceptions $releaseConfig "Source release config")
+        [void](Assert-ReleaseAllowMissingXmlFolders `
+            $boundXmlExceptions $packageReleaseConfig "Public package owner config")
+    }
+}
+elseif ($boundXmlExceptions.Count -gt 0) {
+    throw "Package XML documentation exceptions require an immutable preflight."
+}
 
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ManifestPath)) {
@@ -274,7 +312,7 @@ $zipPath = Get-PackagePath $packageReleaseConfig $modVersion
 Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $packageReleaseConfig.Package
 $versionFolders = Test-ZipPackage `
-    $zipPath $scriptFileBase $packageReleaseConfig $expectedLaneFingerprints
+    $zipPath $scriptFileBase $packageReleaseConfig $boundXmlExceptions $expectedLaneFingerprints
 $actualLaneFingerprints = @(Get-PackageLaneFingerprints $zipPath)
 if ($null -ne $preflight) {
     if ((Resolve-Path -LiteralPath $zipPath).Path -ne (Resolve-Path -LiteralPath ([string]$preflight.Package.Path)).Path) {

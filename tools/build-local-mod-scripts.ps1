@@ -5,7 +5,10 @@ param(
     [string] $ReleaseRoot = "",
     [string] $Configuration = "Release",
     [string] $GameVersion = "version-1.1",
-    [string] $PackageSourcePath = ""
+    [string] $PackageSourcePath = "",
+    [string] $ExpectedReleaseConfigSha256 = "",
+    [string] $AllowMissingXmlFolders = "",
+    [string] $DotNetCommand = "dotnet"
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,6 +16,7 @@ $ErrorActionPreference = "Stop"
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-policy.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $modRoot = Join-Path $repoRoot $ModName
 $releaseConfigPath = Join-Path $modRoot "release.json"
@@ -30,6 +34,19 @@ Assert-PathExists $projectPath "Project file"
 Assert-PathExists $propsPath "Directory build props"
 
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
+$releaseConfigSha256 = (Get-FileHash -LiteralPath $releaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if (-not [string]::IsNullOrWhiteSpace($ExpectedReleaseConfigSha256) -and
+        $releaseConfigSha256 -ne $ExpectedReleaseConfigSha256.ToLowerInvariant()) {
+    throw "Release config changed after readiness discovery: $releaseConfigPath"
+}
+$boundAllowMissingXmlFolders = ConvertTo-ReleaseFolderList $AllowMissingXmlFolders
+[string[]]$configuredAllowMissingXmlFolders = @(
+    Assert-ReleaseAllowMissingXmlFolders `
+        $boundAllowMissingXmlFolders $releaseConfig "Source release config")
+if ($configuredAllowMissingXmlFolders.Count -gt 0 -and
+        [string]::IsNullOrWhiteSpace($ExpectedReleaseConfigSha256)) {
+    throw "Package XML exceptions require a readiness-bound source release config."
+}
 if ([string]::IsNullOrWhiteSpace($PackageSourcePath) -and
         [string]$releaseConfig.Package.Mode -ne "LocalModFolder") {
     throw "C# package-source build requires Package.Mode=LocalModFolder in $releaseConfigPath"
@@ -64,7 +81,7 @@ if ($projectVersion -ne $releaseVersion) {
 }
 
 $modPath = Split-Path -Parent $sourcePath
-$buildResult = Invoke-ReleaseNativeCommand -Command "dotnet" -Arguments @(
+$buildResult = Invoke-ReleaseNativeCommand -Command $DotNetCommand -Arguments @(
     "build",
     $projectPath,
     "-c",
@@ -85,7 +102,9 @@ $scriptsPath = Join-Path $versionPath "Scripts"
 $dllPath = Join-Path $scriptsPath "$scriptFileBase.dll"
 $xmlPath = Join-Path $scriptsPath "$scriptFileBase.xml"
 Assert-PathExists $dllPath "Built DLL copied to local mod folder"
-Assert-PathExists $xmlPath "Built XML documentation copied to local mod folder"
+if (-not (Test-ReleaseMissingXmlAllowed $boundAllowMissingXmlFolders $GameVersion)) {
+    Assert-PathExists $xmlPath "Built XML documentation copied to local mod folder"
+}
 
 $assemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($dllPath).Version
 $expectedAssemblyVersion = [version]$releaseVersion

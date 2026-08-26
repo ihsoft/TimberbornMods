@@ -1,3 +1,5 @@
+Import-Module (Join-Path $PSScriptRoot "release-package-policy.psm1") -Force
+
 function Get-ReadinessProperty([object] $Object, [string] $Name) {
     if ($null -eq $Object) {
         return $null
@@ -773,6 +775,48 @@ function Get-ReleaseReadinessReport {
     else {
         ""
     }
+    $sourceReleaseConfigSha256 = if ($releaseConfigExists) {
+        (Get-FileHash -LiteralPath $releaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    else {
+        ""
+    }
+    $sourceAllowMissingXmlFolders = [string[]]@()
+    $ownerAllowMissingXmlFolders = [string[]]@()
+    $xmlDocumentationPolicyReady = $true
+    try {
+        $sourceAllowMissingXmlFolders = Get-ReleaseAllowMissingXmlFolders `
+            $releaseConfig "Source release config"
+    }
+    catch {
+        $xmlDocumentationPolicyReady = $false
+        $blockers.Add([ordered]@{
+            Code = "SourceXmlDocumentationPolicyInvalid"
+            Message = $_.Exception.Message
+        })
+    }
+    try {
+        $ownerAllowMissingXmlFolders = Get-ReleaseAllowMissingXmlFolders `
+            $packageOwnerConfig "Public package owner config"
+    }
+    catch {
+        $xmlDocumentationPolicyReady = $false
+        $blockers.Add([ordered]@{
+            Code = "OwnerXmlDocumentationPolicyInvalid"
+            Message = $_.Exception.Message
+        })
+    }
+    if ($xmlDocumentationPolicyReady -and
+            ($sourceAllowMissingXmlFolders -join "|") -ne ($ownerAllowMissingXmlFolders -join "|")) {
+        $xmlDocumentationPolicyReady = $false
+        $blockers.Add([ordered]@{
+            Code = "XmlDocumentationPolicyMismatch"
+            Message = (
+                "Source and public-owner Package.AllowMissingXmlFolders differ. " +
+                "Source=[$($sourceAllowMissingXmlFolders -join ', ')]; " +
+                "owner=[$($ownerAllowMissingXmlFolders -join ', ')].")
+        })
+    }
     $publicManifestPathValue = [string](Get-ReadinessProperty $packageOwnerConfig "ManifestPath")
     $authoritativeWorkshopDataValue = if ([string]::IsNullOrWhiteSpace($publicManifestPathValue)) {
         ""
@@ -937,6 +981,7 @@ function Get-ReleaseReadinessReport {
         "tools/release-lines.json",
         "tools/release-lines.psm1",
         "tools/release-native-command.psm1",
+        "tools/release-package-policy.psm1",
         "tools/release-notes.psm1",
         "tools/release-output.psm1",
         "tools/release-package-provenance.psm1",
@@ -1066,6 +1111,10 @@ function Get-ReleaseReadinessReport {
             $authoritativeWorkshopTagIntentDeclared) {
         $gate1Arguments += @("-AuthoritativeWorkshopDataPath", $authoritativeWorkshopDataPath)
     }
+    if ($xmlDocumentationPolicyReady -and $sourceAllowMissingXmlFolders.Count -gt 0) {
+        $gate1Arguments += @(
+            "-AllowMissingXmlFolders", ($sourceAllowMissingXmlFolders -join ","))
+    }
     $selectedModIoTokenArgument = [string]$probe.ModIO.AccessTokenArgument
     if ([bool]$probe.ModIO.AccessTokenExists -and
             -not [string]::IsNullOrWhiteSpace($selectedModIoTokenArgument)) {
@@ -1089,6 +1138,8 @@ function Get-ReleaseReadinessReport {
             PublicPackageOwnerRoot = $repositoryRoot
             ConfiguredReleaseVersion = $configuredSourceModVersion
             ReleaseConfigExists = $releaseConfigExists
+            ReleaseConfigPath = $releaseConfigPath
+            ReleaseConfigSha256 = $sourceReleaseConfigSha256
             ConfigReadyForPublish = if ($null -eq $configReadyForPublish) { "Unspecified" } else { [bool]$configReadyForPublish }
         }
         Changelog = $changelog
@@ -1126,6 +1177,16 @@ function Get-ReleaseReadinessReport {
             ArtifactExists = $packageArtifactExists
             PreparationState = $packagePreparationState
             Gate1MaterializesSource = $packageMode -eq "LocalModFolder"
+            XmlDocumentationPolicy = [ordered]@{
+                XmlRequiredByDefault = $true
+                AllowMissingXmlFolders = [string[]]$sourceAllowMissingXmlFolders
+                SourceConfigPath = $releaseConfigPath
+                SourceConfigSha256 = $sourceReleaseConfigSha256
+                OwnerConfigPath = $packageOwnerConfigPath
+                OwnerConfigSha256 = $packageOwnerConfigSha256
+                SourceOwnerPoliciesMatch = $xmlDocumentationPolicyReady
+                Evidence = "ExactSourceAndPublicOwnerReleaseConfigs"
+            }
             Lanes = [object[]]$packageLanes
         }
         Platforms = [ordered]@{
@@ -1268,6 +1329,10 @@ function Format-ReleaseReadinessReport([object] $Report) {
     $lines.Add(
         "  Package: mode=$($Report.Package.Mode); preparation=$($Report.Package.PreparationState); " +
         "source materialized=$($Report.Package.SourceExists); artifact materialized=$($Report.Package.ArtifactExists)")
+    $lines.Add(
+        "  XML docs: required-by-default=True; exemptions=" +
+        "$($Report.Package.XmlDocumentationPolicy.AllowMissingXmlFolders -join ', '); " +
+        "source/owner bound=$($Report.Package.XmlDocumentationPolicy.SourceOwnerPoliciesMatch)")
     $lines.Add(
         "  Workshop metadata: bound=$($Report.Package.AuthoritativeWorkshopData.ParseReady); " +
         "tags=$($Report.Package.AuthoritativeWorkshopData.Tags -join ', '); " +

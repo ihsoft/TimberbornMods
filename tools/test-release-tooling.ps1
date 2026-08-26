@@ -107,6 +107,7 @@ try {
         "release-native-command.psm1",
         "release-notes.psm1",
         "release-output.psm1",
+        "release-package-policy.psm1",
         "release-package-provenance.psm1",
         "release-readiness.psm1",
         "release-signoff.psm1",
@@ -117,6 +118,230 @@ try {
     ) | ForEach-Object {
         Copy-Item -LiteralPath (Join-Path $PSScriptRoot $_) -Destination (Join-Path $fixtureTools $_)
     }
+
+    $xmlPolicyRoot = Join-Path $testRoot "xml-policy"
+    $xmlPolicyModRoot = Join-Path $xmlPolicyRoot "XmlPolicyMod"
+    $xmlPolicyPackageRoot = Join-Path $xmlPolicyRoot "package/XmlPolicyMod"
+    $fixtureAssemblyPath = Get-ChildItem `
+        -LiteralPath (Join-Path $env:ProgramFiles "dotnet/shared/Microsoft.NETCore.App") `
+        -Filter "System.Text.Json.dll" -Recurse -File |
+        Sort-Object FullName | Select-Object -Last 1 -ExpandProperty FullName
+    $fixtureAssemblyIdentity = [Reflection.AssemblyName]::GetAssemblyName($fixtureAssemblyPath).Version
+    $xmlPolicyVersion = "$($fixtureAssemblyIdentity.Major).$($fixtureAssemblyIdentity.Minor).$($fixtureAssemblyIdentity.Build)"
+    Write-TestFile (Join-Path $xmlPolicyModRoot "directory.build.props") `
+        "<Project><PropertyGroup><Version>$xmlPolicyVersion</Version></PropertyGroup></Project>"
+    Write-TestFile (Join-Path $xmlPolicyModRoot "XmlPolicyMod.cs") `
+        'public sealed class XmlPolicyMod { }'
+    Write-TestFile (Join-Path $xmlPolicyModRoot "XmlPolicyMod.csproj") "<Project />"
+    Write-TestFile (Join-Path $xmlPolicyPackageRoot "version-1.0/manifest.json") `
+        "{`"Name`":`"XML Policy Mod`",`"Version`":`"$xmlPolicyVersion`"}"
+    $xmlPolicyConfigPath = Join-Path $xmlPolicyModRoot "release.json"
+    $xmlPolicyConfigWithoutException = @"
+{
+  "ManifestPath": "package/XmlPolicyMod/version-1.0/manifest.json",
+  "ChangesPath": "XmlPolicyMod/CHANGELOG.md",
+  "ReleaseVersion": "$xmlPolicyVersion",
+  "ScriptFileBase": "XmlPolicyMod",
+  "Package": {
+    "Mode": "LocalModFolder",
+    "SourcePath": "package/XmlPolicyMod",
+    "OutputPath": "package/XmlPolicyMod_v2.0.0.zip"
+  },
+  "ManifestVersions": {
+    "version-1.0": "$xmlPolicyVersion",
+    "version-1.1": "2.0.0"
+  }
+}
+"@
+    Write-TestFile $xmlPolicyConfigPath $xmlPolicyConfigWithoutException
+    Write-TestFile (Join-Path $xmlPolicyModRoot "CHANGELOG.md") `
+        "# v$xmlPolicyVersion (2026-08-25)`n`n* [Fix] XML policy fixture.`n"
+    [void](Invoke-TestNative "git" @("-C", $xmlPolicyRoot, "init", "-b", "main"))
+    $buildScript = Join-Path $PSScriptRoot "build-local-mod-scripts.ps1"
+    $fakeDotNetCommand = Join-Path $xmlPolicyRoot "fixture-dotnet.cmd"
+    $fakeDllPath = Join-Path $xmlPolicyPackageRoot "version-1.0/Scripts/XmlPolicyMod.dll"
+    Write-TestFile $fakeDotNetCommand @"
+@echo off
+if not exist "$(Split-Path -Parent $fakeDllPath)" mkdir "$(Split-Path -Parent $fakeDllPath)"
+copy /y "$fixtureAssemblyPath" "$fakeDllPath" >nul
+echo Build succeeded.
+exit /b 0
+"@
+    $previousTestErrorPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        $defaultMissingXmlOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -GameVersion version-1.0 -PackageSourcePath package/XmlPolicyMod `
+            -DotNetCommand $fakeDotNetCommand 2>&1)
+        $defaultMissingXmlExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($defaultMissingXmlExitCode -ne 0) `
+        "Missing XML must fail without an exact release-config exception."
+    Assert-True (($defaultMissingXmlOutput | Out-String) -match "Built XML documentation") `
+        "Default missing-XML failure did not identify the required documentation file: $($defaultMissingXmlOutput -join ' | ')"
+    $xmlPolicyConfigWithException = $xmlPolicyConfigWithoutException.Replace(
+        '"OutputPath": "package/XmlPolicyMod_v2.0.0.zip"',
+        '"OutputPath": "package/XmlPolicyMod_v2.0.0.zip",' + [Environment]::NewLine +
+        '    "AllowMissingXmlFolders": ["version-1.0"]')
+    Write-TestFile $xmlPolicyConfigPath $xmlPolicyConfigWithException
+    $xmlPolicyConfigHash = (
+        Get-FileHash -LiteralPath $xmlPolicyConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    try {
+        $ErrorActionPreference = "Continue"
+        $unboundExceptionOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -GameVersion version-1.0 -PackageSourcePath package/XmlPolicyMod `
+            -AllowMissingXmlFolders version-1.0 -DotNetCommand $fakeDotNetCommand 2>&1)
+        $unboundExceptionExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($unboundExceptionExitCode -ne 0) `
+        "An XML exception without a readiness-bound config hash must fail."
+    Assert-True (($unboundExceptionOutput | Out-String) -match "readiness-bound source release config") `
+        "Unbound XML exception failure did not identify the missing config binding."
+    $exactExceptionOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+        -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+        -GameVersion version-1.0 -PackageSourcePath package/XmlPolicyMod `
+        -ExpectedReleaseConfigSha256 $xmlPolicyConfigHash `
+        -AllowMissingXmlFolders version-1.0 -DotNetCommand $fakeDotNetCommand 2>&1)
+    Assert-Equal 0 $LASTEXITCODE "Exact source-lane missing-XML exception build exit code"
+    Assert-True (Test-Path -LiteralPath (
+            Join-Path $xmlPolicyPackageRoot "version-1.0/Scripts/XmlPolicyMod.dll") -PathType Leaf) `
+        "Exact missing-XML exception must still require the built DLL."
+    try {
+        $ErrorActionPreference = "Continue"
+        $unauthorizedExceptionOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -GameVersion version-1.0 -PackageSourcePath package/XmlPolicyMod `
+            -ExpectedReleaseConfigSha256 $xmlPolicyConfigHash `
+            -AllowMissingXmlFolders version-1.1 -DotNetCommand $fakeDotNetCommand 2>&1)
+        $unauthorizedExceptionExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($unauthorizedExceptionExitCode -ne 0) "An unbound XML exception must fail."
+    Assert-True (($unauthorizedExceptionOutput | Out-String) -match "differs from the bound policy") `
+        "Unbound XML exception failure did not identify the policy mismatch."
+    Write-TestFile (Join-Path $xmlPolicyPackageRoot "version-1.1/manifest.json") `
+        '{"Name":"XML Policy Mod","Version":"2.0.0"}'
+    $sourceDllPath = Join-Path $xmlPolicyPackageRoot "version-1.0/Scripts/XmlPolicyMod.dll"
+    $otherLaneScriptsPath = Join-Path $xmlPolicyPackageRoot "version-1.1/Scripts"
+    [void](New-Item -ItemType Directory -Path $otherLaneScriptsPath -Force)
+    Copy-Item -LiteralPath $sourceDllPath -Destination (Join-Path $otherLaneScriptsPath "XmlPolicyMod.dll")
+    try {
+        $ErrorActionPreference = "Continue"
+        $otherLaneOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -GameVersion version-1.1 -PackageSourcePath package/XmlPolicyMod `
+            -ExpectedReleaseConfigSha256 $xmlPolicyConfigHash `
+            -AllowMissingXmlFolders version-1.0 -DotNetCommand $fakeDotNetCommand 2>&1)
+        $otherLaneExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($otherLaneExitCode -ne 0) "A non-exempt package lane must still require XML."
+    Assert-True (($otherLaneOutput | Out-String) -match "Built XML documentation") `
+        "Non-exempt lane failure did not retain the default XML requirement."
+    $preDriftHash = $xmlPolicyConfigHash
+    Write-TestFile $xmlPolicyConfigPath ($xmlPolicyConfigWithException + [Environment]::NewLine)
+    try {
+        $ErrorActionPreference = "Continue"
+        $driftOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $buildScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -GameVersion version-1.0 -PackageSourcePath package/XmlPolicyMod `
+            -ExpectedReleaseConfigSha256 $preDriftHash `
+            -AllowMissingXmlFolders version-1.0 -DotNetCommand $fakeDotNetCommand 2>&1)
+        $driftExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($driftExitCode -ne 0) "Release-config drift must invalidate the XML exception."
+    Assert-True (($driftOutput | Out-String) -match "changed after readiness discovery") `
+        "Release-config drift failure did not identify the bound config mismatch."
+    Write-TestFile $xmlPolicyConfigPath $xmlPolicyConfigWithException
+    Write-TestFile (Join-Path $otherLaneScriptsPath "XmlPolicyMod.xml") "<doc />"
+    $xmlPolicyConfigHash = (
+        Get-FileHash -LiteralPath $xmlPolicyConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $materializeScript = Join-Path $PSScriptRoot "materialize-release-package.ps1"
+    $materializeOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+        -File $materializeScript -ModName XmlPolicyMod `
+        -PackageOwnerRoot $xmlPolicyRoot -SourceReleaseRoot $xmlPolicyRoot `
+        -GameVersion version-1.0 -SourceModVersion $xmlPolicyVersion -Operation Package `
+        -ExpectedOwnerConfigSha256 $xmlPolicyConfigHash `
+        -ExpectedSourceConfigSha256 $xmlPolicyConfigHash `
+        -AllowMissingXmlFolders version-1.0 2>&1)
+    Assert-Equal 0 $LASTEXITCODE "Bound XML exception package materialization exit code"
+    Assert-True (Test-Path -LiteralPath (
+            Join-Path $xmlPolicyRoot "package/XmlPolicyMod_v2.0.0.zip") -PathType Leaf) `
+        "Bound XML exception package materialization output"
+    [void](Invoke-TestNative "git" @("-C", $xmlPolicyRoot, "config", "user.name", "Release Tooling Test"))
+    [void](Invoke-TestNative "git" @(
+        "-C", $xmlPolicyRoot, "config", "user.email", "release-tooling@example.invalid"))
+    [void](Invoke-TestNative "git" @("-C", $xmlPolicyRoot, "add", "XmlPolicyMod"))
+    [void](Invoke-TestNative "git" @("-C", $xmlPolicyRoot, "commit", "-m", "Add XML policy fixture"))
+    $xmlPolicyTag = "XmlPolicyMod_$xmlPolicyVersion"
+    [void](Invoke-TestNative "git" @("-C", $xmlPolicyRoot, "tag", $xmlPolicyTag))
+    $xmlPolicyPackagePath = Join-Path $xmlPolicyRoot "package/XmlPolicyMod_v2.0.0.zip"
+    $xmlPolicyPreflightPath = Join-Path $xmlPolicyRoot "xml-policy-preflight.json"
+    $xmlPolicyPreflight = [ordered]@{
+        SchemaVersion = 5
+        ReadyForPublish = $true
+        ModName = "XmlPolicyMod"
+        SourceModVersion = $xmlPolicyVersion
+        TagName = $xmlPolicyTag
+        Package = [ordered]@{
+            Path = $xmlPolicyPackagePath
+            Sha256 = (Get-FileHash -LiteralPath $xmlPolicyPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+        }
+        PackageLaneFingerprints = [object[]]@(Get-PackageLaneFingerprints $xmlPolicyPackagePath)
+        PackageXmlDocumentationPolicy = [ordered]@{
+            XmlRequiredByDefault = $true
+            AllowMissingXmlFolders = [string[]]@("version-1.0")
+            SourceConfigPath = $xmlPolicyConfigPath
+            SourceConfigSha256 = $xmlPolicyConfigHash
+            OwnerConfigPath = $xmlPolicyConfigPath
+            OwnerConfigSha256 = $xmlPolicyConfigHash
+        }
+    }
+    $xmlPolicyPreflight | ConvertTo-Json -Depth 8 | Set-Content `
+        -LiteralPath $xmlPolicyPreflightPath -Encoding UTF8
+    $githubScript = Join-Path $PSScriptRoot "publish-github-release.ps1"
+    $githubPolicyOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+        -File $githubScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+        -PackageOwnerRoot $xmlPolicyRoot -SourceModVersion $xmlPolicyVersion `
+        -GameVersion version-1.0 -TagName $xmlPolicyTag `
+        -PreflightReportPath $xmlPolicyPreflightPath 2>&1)
+    Assert-Equal 0 $LASTEXITCODE "GitHub bound XML exception package validation exit code"
+    $xmlPolicyPreflight.PackageXmlDocumentationPolicy.AllowMissingXmlFolders = `
+        [string[]]@("version-1.1")
+    $xmlPolicyPreflight | ConvertTo-Json -Depth 8 | Set-Content `
+        -LiteralPath $xmlPolicyPreflightPath -Encoding UTF8
+    try {
+        $ErrorActionPreference = "Continue"
+        $githubUnauthorizedOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            -File $githubScript -ModName XmlPolicyMod -ReleaseRoot $xmlPolicyRoot `
+            -PackageOwnerRoot $xmlPolicyRoot -SourceModVersion $xmlPolicyVersion `
+            -GameVersion version-1.0 -TagName $xmlPolicyTag `
+            -PreflightReportPath $xmlPolicyPreflightPath 2>&1)
+        $githubUnauthorizedExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousTestErrorPreference
+    }
+    Assert-True ($githubUnauthorizedExitCode -ne 0) `
+        "GitHub validation must reject an XML exception not bound by release configs."
+    Assert-True (($githubUnauthorizedOutput | Out-String) -match "differs from the bound policy") `
+        "GitHub unauthorized XML exception did not report the policy mismatch."
+    Write-Host "PASS: XML documentation exceptions are exact, lane-scoped, bound, and fail closed"
 
     Write-TestFile (Join-Path $fixtureRoot "Alpha/CHANGELOG.md") "# v2.0.0 (TBD)`n"
     Write-TestFile (Join-Path $fixtureRoot "XRay/CHANGELOG.md") "# v1.1.9 (2026-08-01)`n"
@@ -394,7 +619,8 @@ try {
     finally {
         Pop-Location
     }
-    Assert-Equal 0 $firstBackportExitCode "First registered-line bootstrap readiness exit code"
+    Assert-Equal 0 $firstBackportExitCode `
+        "First registered-line bootstrap readiness exit code: $($firstBackportOutput -join ' | ')"
     Assert-True (Test-Path -LiteralPath $timberCommonsArtifact -PathType Leaf) `
         "First registered-line readiness must emit a schema-1 artifact."
     $firstBackportReadiness = Get-Content -Raw -LiteralPath $timberCommonsArtifact | ConvertFrom-Json
@@ -428,6 +654,11 @@ try {
         "First registered-line bootstrap public lane"
     Assert-Equal "3337906807" $bootstrapPlan.DesiredContent.Steam.PublishedFileId `
         "First registered-line bootstrap public Steam identity"
+    Assert-Equal "version-1.0" `
+        (@($firstBackportReadiness.Package.XmlDocumentationPolicy.AllowMissingXmlFolders) -join "|") `
+        "First registered-line bootstrap XML documentation exception"
+    Assert-True $firstBackportReadiness.Package.XmlDocumentationPolicy.SourceOwnerPoliciesMatch `
+        "First registered-line bootstrap source/public XML policy match"
     Assert-Equal "version-1.0" $bootstrapPlan.TargetGameVersion `
         "First registered-line bootstrap target game lane"
     Assert-Equal "BackportPatchOnly" $bootstrapPlan.VersionPolicy `
@@ -566,6 +797,9 @@ try {
         "Registered readiness public package artifact"
     Assert-True ("-PackageOwnerRoot" -in @($endToEndReadiness.Gate1Plan.Arguments)) `
         "Gate 1 arguments must carry public package ownership."
+    Assert-Equal "" `
+        (@($endToEndReadiness.Package.XmlDocumentationPolicy.AllowMissingXmlFolders) -join "|") `
+        "Registered package without an XML exception must retain the default requirement"
     $authoritativeWorkshopDataPath = Join-Path `
         $fixtureRoot "ModsUnityProject/Assets/Mods/SmartPower/Data/workshop_data.json"
     $authoritativeWorkshopDataHash = (

@@ -18,13 +18,18 @@ param(
     [ValidateSet("ImportLane", "Package")]
     [string] $Operation,
 
-    [string] $ExpectedOwnerConfigSha256 = ""
+    [string] $ExpectedOwnerConfigSha256 = "",
+
+    [string] $ExpectedSourceConfigSha256 = "",
+
+    [string] $AllowMissingXmlFolders = ""
 )
 
 $ErrorActionPreference = "Stop"
 
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-policy.psm1") -Force
 $ownerRoot = Resolve-RepositoryRoot $PackageOwnerRoot $toolRepoRoot
 $sourceRoot = Resolve-RepositoryRoot $SourceReleaseRoot $toolRepoRoot
 $ownerConfigPath = Join-Path $ownerRoot "$ModName/release.json"
@@ -69,7 +74,7 @@ function Assert-PackageSource(
         }
         $scriptsPath = Join-Path $lanePath "Scripts"
         Assert-PathExists (Join-Path $scriptsPath "$scriptFileBase.dll") "Combined package DLL for $lane"
-        $allowMissingXml = @($ReleaseConfig.Package.AllowMissingXmlFolders) -contains $lane
+        $allowMissingXml = Test-ReleaseMissingXmlAllowed $script:boundAllowMissingXmlFolders $lane
         if (-not $allowMissingXml) {
             Assert-PathExists (Join-Path $scriptsPath "$scriptFileBase.xml") `
                 "Combined package XML documentation for $lane"
@@ -85,6 +90,31 @@ if (-not [string]::IsNullOrWhiteSpace($ExpectedOwnerConfigSha256) -and
 }
 
 $ownerConfig = Get-Content -Raw -LiteralPath $ownerConfigPath | ConvertFrom-Json
+$sourceConfigPath = Join-Path $sourceRoot "$ModName/release.json"
+Assert-PathExists $sourceConfigPath "Source release config"
+$sourceConfigHash = (Get-FileHash -LiteralPath $sourceConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if (-not [string]::IsNullOrWhiteSpace($ExpectedSourceConfigSha256) -and
+        $sourceConfigHash -ne $ExpectedSourceConfigSha256.ToLowerInvariant()) {
+    throw "Source release config is not bound to readiness or changed after discovery: $sourceConfigPath"
+}
+$sourceConfig = Get-Content -Raw -LiteralPath $sourceConfigPath | ConvertFrom-Json
+$script:boundAllowMissingXmlFolders = ConvertTo-ReleaseFolderList $AllowMissingXmlFolders
+[string[]]$sourceConfiguredXmlExceptions = Get-ReleaseAllowMissingXmlFolders `
+    $sourceConfig "Source release config"
+[string[]]$ownerConfiguredXmlExceptions = Get-ReleaseAllowMissingXmlFolders `
+    $ownerConfig "Public package owner config"
+if ([string]::IsNullOrWhiteSpace($ExpectedSourceConfigSha256) -and
+        ($sourceConfiguredXmlExceptions.Count -gt 0 -or $ownerConfiguredXmlExceptions.Count -gt 0)) {
+    throw "Package XML exceptions require a readiness-bound source release config."
+}
+if ([string]::IsNullOrWhiteSpace($ExpectedOwnerConfigSha256) -and
+        ($sourceConfiguredXmlExceptions.Count -gt 0 -or $ownerConfiguredXmlExceptions.Count -gt 0)) {
+    throw "Package XML exceptions require a readiness-bound public-owner release config."
+}
+[void](Assert-ReleaseAllowMissingXmlFolders `
+    $script:boundAllowMissingXmlFolders $sourceConfig "Source release config")
+[void](Assert-ReleaseAllowMissingXmlFolders `
+    $script:boundAllowMissingXmlFolders $ownerConfig "Public package owner config")
 if ([string]$ownerConfig.Package.Mode -ne "LocalModFolder") {
     throw "Combined package materialization requires Package.Mode=LocalModFolder in $ownerConfigPath"
 }

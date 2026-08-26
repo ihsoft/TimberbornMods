@@ -22,6 +22,7 @@ param(
     [string] $ModIoAccessTokenPath = "",
     [string] $ReleaseCommit = "",
     [string] $ReadinessReportPath = "",
+    [string] $AllowMissingXmlFolders = "",
     [string] $Repository = "ihsoft/TimberbornMods",
     [string] $ReplacementPlatforms = "",
     [ValidateSet("", "PreserveExisting", "MoveAuthorized")]
@@ -48,6 +49,7 @@ Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-lines.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-versioning.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "release-native-command.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-policy.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $releaseBranch = (& git -C $repoRoot branch --show-current).Trim()
 if ([string]::IsNullOrWhiteSpace($releaseBranch)) {
@@ -335,6 +337,25 @@ $plannedModIoAccessTokenPath = Get-Gate1Argument "-ModIoAccessTokenPath"
 if ([string]::IsNullOrWhiteSpace($plannedModIoAccessTokenPath)) {
     throw "Gate 1 plan does not bind the Mod.IO owner token validated by readiness."
 }
+$readinessXmlPolicy = $readinessReport.Package.XmlDocumentationPolicy
+if ($null -eq $readinessXmlPolicy -or
+        -not [bool]$readinessXmlPolicy.XmlRequiredByDefault -or
+        -not [bool]$readinessXmlPolicy.SourceOwnerPoliciesMatch) {
+    throw "Release readiness does not bind the XML documentation policy. Rerun compact readiness."
+}
+$artifactAllowMissingXmlFolders = [string[]]@(
+    ConvertTo-ReleaseFolderList $readinessXmlPolicy.AllowMissingXmlFolders)
+$artifactXmlPolicyArgument = $artifactAllowMissingXmlFolders -join ","
+$plannedXmlPolicyArgument = Get-Gate1Argument "-AllowMissingXmlFolders"
+if ($plannedXmlPolicyArgument -ne $artifactXmlPolicyArgument) {
+    throw "Gate 1 plan does not bind the XML documentation policy from readiness."
+}
+if ([string]::IsNullOrWhiteSpace($AllowMissingXmlFolders)) {
+    $AllowMissingXmlFolders = $plannedXmlPolicyArgument
+}
+elseif ($AllowMissingXmlFolders -ne $plannedXmlPolicyArgument) {
+    throw "XML documentation exception argument does not match compact readiness."
+}
 $plannedAuthoritativeWorkshopDataPath = Get-Gate1Argument "-AuthoritativeWorkshopDataPath"
 $readinessWorkshopMetadata = $readinessReport.Package.AuthoritativeWorkshopData
 $readinessWorkshopDataPath = [string]$readinessWorkshopMetadata.Path
@@ -394,6 +415,20 @@ if ($packageOwnerConfigSha256 -ne [string]$readinessReport.Package.OwnerConfigSh
     throw "Public package owner config changed after readiness discovery. Rerun compact readiness."
 }
 $packageReleaseConfig = Get-Content -Raw -LiteralPath $packageOwnerConfigPath | ConvertFrom-Json
+$sourceReleaseConfigSha256 = (
+    Get-FileHash -LiteralPath $releaseConfigPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if ([string]$readinessXmlPolicy.SourceConfigPath -ne $releaseConfigPath -or
+        [string]$readinessXmlPolicy.SourceConfigSha256 -ne $sourceReleaseConfigSha256) {
+    throw "Source release config changed after readiness discovery. Rerun compact readiness."
+}
+if ([string]$readinessXmlPolicy.OwnerConfigPath -ne $packageOwnerConfigPath -or
+        [string]$readinessXmlPolicy.OwnerConfigSha256 -ne $packageOwnerConfigSha256) {
+    throw "Public-owner XML documentation policy evidence changed after readiness discovery."
+}
+[void](Assert-ReleaseAllowMissingXmlFolders `
+    $artifactAllowMissingXmlFolders $releaseConfig "Source release config")
+[void](Assert-ReleaseAllowMissingXmlFolders `
+    $artifactAllowMissingXmlFolders $packageReleaseConfig "Public package owner config")
 $packageMode = [string](Get-ObjectPropertyValue $packageReleaseConfig.Package "Mode")
 if ([string]::IsNullOrWhiteSpace($packageMode)) {
     $packageMode = "ExistingZip"
@@ -712,7 +747,11 @@ if ($preparesLocalModSource) {
             "-ReleaseRoot", $repoRoot,
             "-Configuration", $Configuration,
             "-GameVersion", $GameVersion,
-            "-PackageSourcePath", $packageSourceArgument)
+            "-PackageSourcePath", $packageSourceArgument,
+            "-ExpectedReleaseConfigSha256", $sourceReleaseConfigSha256)
+        if ($artifactAllowMissingXmlFolders.Count -gt 0) {
+            $buildArgs += @("-AllowMissingXmlFolders", $artifactXmlPolicyArgument)
+        }
         $steps.Add((Invoke-ReleaseStep `
             "C# package source build" "build-local-mod-scripts.ps1" $buildArgs))
     }
@@ -723,7 +762,11 @@ if ($preparesLocalModSource) {
         "-SourceReleaseRoot", $repoRoot,
         "-GameVersion", $GameVersion,
         "-SourceModVersion", $sourceModVersion,
-        "-ExpectedOwnerConfigSha256", $packageOwnerConfigSha256)
+        "-ExpectedOwnerConfigSha256", $packageOwnerConfigSha256,
+        "-ExpectedSourceConfigSha256", $sourceReleaseConfigSha256)
+    if ($artifactAllowMissingXmlFolders.Count -gt 0) {
+        $materializeArgs += @("-AllowMissingXmlFolders", $artifactXmlPolicyArgument)
+    }
     $steps.Add((Invoke-ReleaseStep `
         "Combined package lane assembly" "materialize-release-package.ps1" `
         ($materializeArgs + @("-Operation", "ImportLane"))))
@@ -1076,6 +1119,14 @@ $report = [ordered]@{
     PackageOwnerRoot = $resolvedPackageOwnerRoot
     PackageOwnerConfigPath = $packageOwnerConfigPath
     PackageOwnerConfigSha256 = $packageOwnerConfigSha256
+    PackageXmlDocumentationPolicy = [ordered]@{
+        XmlRequiredByDefault = $true
+        AllowMissingXmlFolders = [string[]]$artifactAllowMissingXmlFolders
+        SourceConfigPath = $releaseConfigPath
+        SourceConfigSha256 = $sourceReleaseConfigSha256
+        OwnerConfigPath = $packageOwnerConfigPath
+        OwnerConfigSha256 = $packageOwnerConfigSha256
+    }
     AuthoritativeWorkshopData = [ordered]@{
         Path = $readinessWorkshopDataPath
         Sha256 = [string]$readinessWorkshopMetadata.Sha256
