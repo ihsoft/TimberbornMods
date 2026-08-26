@@ -336,7 +336,7 @@ function Get-NormalizedTags([object[]] $Tags) {
         Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
 }
 
-function New-SteamComparison(
+function New-EvidenceComparison(
     [string] $Field,
     [object] $Expected,
     [object] $Actual,
@@ -579,13 +579,13 @@ Write-Host (
     "tags=$(Format-EvidenceValue $actualSteamTags); source=$($steam.EvidenceSource)")
 Write-Host "Recovery attempt report: $attemptPath"
 $steamComparisons = New-Object System.Collections.Generic.List[object]
-$steamComparisons.Add((New-SteamComparison "PublishedFileId" $expectedSteamId `
+$steamComparisons.Add((New-EvidenceComparison "PublishedFileId" $expectedSteamId `
     ([string]$steam.PublishedFileId) $true $(if ([string]$steam.PublishedFileId -eq $expectedSteamId) {
         "Match"
     } else { "Mismatch" })))
-$steamComparisons.Add((New-SteamComparison "Result" 1 ([int]$steam.Result) $true `
+$steamComparisons.Add((New-EvidenceComparison "Result" 1 ([int]$steam.Result) $true `
     $(if ([int]$steam.Result -eq 1) { "Match" } else { "Mismatch" })))
-$steamComparisons.Add((New-SteamComparison "ConsumerAppId" $expectedSteamAppId `
+$steamComparisons.Add((New-EvidenceComparison "ConsumerAppId" $expectedSteamAppId `
     ([string]$steam.ConsumerAppId) $true $(if ([string]::IsNullOrWhiteSpace([string]$steam.ConsumerAppId)) {
         "Unavailable"
     } elseif ([string]$steam.ConsumerAppId -eq $expectedSteamAppId) { "Match" } else { "Mismatch" })))
@@ -596,10 +596,10 @@ elseif ([string]::IsNullOrWhiteSpace([string]$steam.CreatorOwnerId)) {
     "Unavailable"
 }
 elseif ([string]$steam.CreatorOwnerId -eq $expectedSteamOwnerId) { "Match" } else { "Mismatch" }
-$steamComparisons.Add((New-SteamComparison "CreatorOwnerId" `
+$steamComparisons.Add((New-EvidenceComparison "CreatorOwnerId" `
     $(if ([string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) { $null } else { $expectedSteamOwnerId }) `
     ([string]$steam.CreatorOwnerId) (-not [string]::IsNullOrWhiteSpace($expectedSteamOwnerId)) $ownerOutcome))
-$steamComparisons.Add((New-SteamComparison "Title" $expectedSteamTitle ([string]$steam.Title) $true `
+$steamComparisons.Add((New-EvidenceComparison "Title" $expectedSteamTitle ([string]$steam.Title) $true `
     $(if ([string]::IsNullOrWhiteSpace([string]$steam.Title)) { "Unavailable" }
         elseif ([string]$steam.Title -eq $expectedSteamTitle) { "Match" } else { "Mismatch" })))
 $visibilityOutcome = if ($null -eq $expectedSteamVisibility) {
@@ -609,16 +609,16 @@ elseif ($null -eq $steam.Visibility) {
     "Unavailable"
 }
 elseif ([int]$steam.Visibility -eq [int]$expectedSteamVisibility) { "Match" } else { "Mismatch" }
-$steamComparisons.Add((New-SteamComparison "Visibility" $expectedSteamVisibility $steam.Visibility `
+$steamComparisons.Add((New-EvidenceComparison "Visibility" $expectedSteamVisibility $steam.Visibility `
     ($null -ne $expectedSteamVisibility) $visibilityOutcome "No visibility mutation was authorized."))
-$steamComparisons.Add((New-SteamComparison "FileSize" ">0 staged Workshop bytes" ([long]$steam.FileSize) $true `
+$steamComparisons.Add((New-EvidenceComparison "FileSize" ">0 staged Workshop bytes" ([long]$steam.FileSize) $true `
     $(if ([long]$steam.FileSize -gt 0) { "Match" } else { "Mismatch" }) `
     "Not compared with immutable ZIP length $($preflight.Package.Length)."))
 $timeOutcome = if ($null -eq $minimumSteamUpdateTime) {
     "UnavailableExpected"
 }
 elseif ([long]$steam.TimeUpdated -ge [long]$minimumSteamUpdateTime) { "Match" } else { "Mismatch" }
-$steamComparisons.Add((New-SteamComparison "TimeUpdated" ">=$minimumSteamUpdateTime" `
+$steamComparisons.Add((New-EvidenceComparison "TimeUpdated" ">=$minimumSteamUpdateTime" `
     ([long]$steam.TimeUpdated) $true $timeOutcome))
 $tagsOutcome = if ($expectedSteamTags.Count -eq 0) {
     "UnavailableExpected"
@@ -627,7 +627,7 @@ elseif ($actualSteamTags.Count -eq 0) {
     "Unavailable"
 }
 elseif (($expectedSteamTags -join "|") -eq ($actualSteamTags -join "|")) { "Match" } else { "Mismatch" }
-$steamComparisons.Add((New-SteamComparison "Tags" ([string[]]$expectedSteamTags) `
+$steamComparisons.Add((New-EvidenceComparison "Tags" ([string[]]$expectedSteamTags) `
     ([string[]]$actualSteamTags) $true $tagsOutcome))
 $attempt.Steam.Comparisons = [object[]]$steamComparisons.ToArray()
 $blockingSteamComparisons = @($steamComparisons | Where-Object {
@@ -651,41 +651,125 @@ if (-not $attempt.Steam.ConclusivelyIdentified) {
 
 $modIo = Get-ModIoReadback $preflight $platformFixture
 $expectedModIo = $partial.Platforms.ModIO.FinalReadback
-if ($null -eq $expectedModIo -or
-        [long]$modIo.ModId -ne [long]$expectedModIo.ModId -or
-        [long]$modIo.ActiveFileId -ne [long]$expectedModIo.ActiveFileId -or
-        [string]$modIo.Version -ne [string]$preflight.PublicPackageVersion -or
-        [long]$modIo.DateScanned -le 0 -or [int]$modIo.VirusStatus -ne 1 -or
-        [int]$modIo.VirusPositive -ne 0 -or [long]$modIo.FileSize -ne [long]$preflight.Package.Length) {
+$modIoComparisons = [object[]]@(
+    (New-EvidenceComparison "ModId" ([long]$expectedModIo.ModId) ([long]$modIo.ModId) $true `
+        $(if ([long]$modIo.ModId -eq [long]$expectedModIo.ModId) { "Match" } else { "Mismatch" })),
+    (New-EvidenceComparison "ActiveFileId" ([long]$expectedModIo.ActiveFileId) `
+        ([long]$modIo.ActiveFileId) $true $(if ([long]$modIo.ActiveFileId -eq [long]$expectedModIo.ActiveFileId) {
+            "Match"
+        } else { "Mismatch" })),
+    (New-EvidenceComparison "Version" ([string]$preflight.PublicPackageVersion) ([string]$modIo.Version) $true `
+        $(if ([string]$modIo.Version -eq [string]$preflight.PublicPackageVersion) { "Match" } else { "Mismatch" })),
+    (New-EvidenceComparison "DateScanned" ">0" ([long]$modIo.DateScanned) $true `
+        $(if ([long]$modIo.DateScanned -gt 0) { "Match" } else { "Mismatch" })),
+    (New-EvidenceComparison "VirusStatus" 1 ([int]$modIo.VirusStatus) $true `
+        $(if ([int]$modIo.VirusStatus -eq 1) { "Match" } else { "Mismatch" })),
+    (New-EvidenceComparison "VirusPositive" 0 ([int]$modIo.VirusPositive) $true `
+        $(if ([int]$modIo.VirusPositive -eq 0) { "Match" } else { "Mismatch" })),
+    (New-EvidenceComparison "FileSize" ([long]$preflight.Package.Length) ([long]$modIo.FileSize) $true `
+        $(if ([long]$modIo.FileSize -eq [long]$preflight.Package.Length) { "Match" } else { "Mismatch" }) `
+        "Mod.IO consumes the immutable ZIP, so this size comparison stays within one artifact boundary."))
+$blockingModIoComparisons = @($modIoComparisons | Where-Object Outcome -ne "Match")
+if ($null -eq $expectedModIo -or $blockingModIoComparisons.Count -gt 0) {
     $attempt.Status = "Blocked"
     $attempt.Stage = "ModIOReadback"
     $attempt["ModIO"] = [ordered]@{
         Expected = $expectedModIo
         Actual = $modIo
+        Comparisons = $modIoComparisons
+        Outcome = "Mismatch"
         Verified = $false
     }
     $attempt.Blockers = [string[]]@("Mod.IO final readback did not match the completed immutable publication.")
     Write-RecoveryAttemptReport $attempt $attemptPath
     throw "Mod.IO final readback does not match the completed immutable publication."
 }
+$attempt.Status = "ModIOVerified"
 $attempt.Stage = "ModIOVerified"
-$attempt["ModIO"] = [ordered]@{ Expected = $expectedModIo; Actual = $modIo; Verified = $true }
+$attempt["ModIO"] = [ordered]@{
+    Expected = $expectedModIo
+    Actual = $modIo
+    Comparisons = $modIoComparisons
+    Outcome = "Match"
+    Verified = $true
+}
 Write-RecoveryAttemptReport $attempt $attemptPath
 
 $tagName = [string]$preflight.TagName
 $remoteTag = Invoke-ReleaseNativeCommand -Command "git" -Arguments @(
     "-C", $repoRoot, "ls-remote", "--tags", "origin", "refs/tags/$tagName")
 if ($remoteTag.ExitCode -ne 0 -or $remoteTag.Output.Count -ne 1) {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "RemoteTagReadback"
+    $attempt["RemoteTag"] = [ordered]@{
+        TagName = $tagName
+        ExpectedCommit = [string]$preflight.ReleaseCommit
+        ActualOutput = [string[]]$remoteTag.Output
+        Diagnostics = [string[]]$remoteTag.Diagnostics
+        Outcome = "Unavailable"
+    }
+    $attempt.Blockers = [string[]]@("Remote qualified tag readback failed for $tagName.")
+    Write-RecoveryAttemptReport $attempt $attemptPath
     throw "Remote qualified tag readback failed for $tagName."
 }
 $remoteCommit = ([string]$remoteTag.Output[0] -split "\s+")[0]
 if ($remoteCommit -ne [string]$preflight.ReleaseCommit) {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "RemoteTagReadback"
+    $attempt["RemoteTag"] = [ordered]@{
+        TagName = $tagName
+        ExpectedCommit = [string]$preflight.ReleaseCommit
+        ActualCommit = $remoteCommit
+        Outcome = "Mismatch"
+    }
+    $attempt.Blockers = [string[]]@(
+        "Remote qualified tag points to $remoteCommit, expected $($preflight.ReleaseCommit).")
+    Write-RecoveryAttemptReport $attempt $attemptPath
     throw "Remote qualified tag points to $remoteCommit, expected $($preflight.ReleaseCommit)."
 }
+$attempt.Status = "RemoteTagVerified"
+$attempt.Stage = "RemoteTagVerified"
+$attempt["RemoteTag"] = [ordered]@{
+    TagName = $tagName
+    ExpectedCommit = [string]$preflight.ReleaseCommit
+    ActualCommit = $remoteCommit
+    Outcome = "Match"
+}
+$attempt.Blockers = [string[]]@()
+Write-RecoveryAttemptReport $attempt $attemptPath
 
 $assetName = [System.IO.Path]::GetFileName($packagePath)
-$githubBefore = Get-GitHubReleaseReadback `
-    $tagName $title $notes $assetName ([string]$preflight.Package.Sha256)
+try {
+    $githubBefore = Get-GitHubReleaseReadback `
+        $tagName $title $notes $assetName ([string]$preflight.Package.Sha256)
+}
+catch {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "GitHubReadback"
+    $attempt["GitHub"] = [ordered]@{
+        ExpectedTagName = $tagName
+        ExpectedTitle = $title
+        ExpectedAssetName = $assetName
+        ExpectedAssetDigest = "sha256:$($preflight.Package.Sha256)"
+        Outcome = "Unknown"
+        Error = $_.Exception.Message
+    }
+    $attempt.Blockers = [string[]]@("GitHub Release readback failed: $($_.Exception.Message)")
+    Write-RecoveryAttemptReport $attempt $attemptPath
+    throw
+}
+$attempt.Status = if ([bool]$githubBefore.Exists) { "GitHubVerified" } else { "GitHubAbsent" }
+$attempt.Stage = $attempt.Status
+$attempt["GitHub"] = [ordered]@{
+    ExpectedTagName = $tagName
+    ExpectedTitle = $title
+    ExpectedAssetName = $assetName
+    ExpectedAssetDigest = "sha256:$($preflight.Package.Sha256)"
+    BeforeRecovery = $githubBefore
+    Outcome = if ([bool]$githubBefore.Exists) { "VerifiedExisting" } else { "ConclusiveAbsence" }
+}
+$attempt.Blockers = [string[]]@()
+Write-RecoveryAttemptReport $attempt $attemptPath
 $recoveryLogDirectory = New-ReleaseLogDirectory `
     -RepoRoot $repoRoot -ModName ([string]$preflight.ModName) `
     -Version ([string]$preflight.SourceModVersion) -Phase "recover"
@@ -708,23 +792,64 @@ if (-not [bool]$githubBefore.Exists) {
         "-PackageOwnerRoot", [string]$preflight.PackageOwnerRoot,
         "-PackagePath", $packagePath,
         "-SourceModVersion", [string]$preflight.SourceModVersion,
+        "-PreflightReportPath", $preflightPath,
         "-Repository", $Repository,
         "-TagName", $tagName,
         "-Title", $title,
         "-ExpectedPackageSha256", [string]$preflight.Package.Sha256,
         "-Publish")
-    $githubOperation = Invoke-RecoveryChild `
-        "GitHub release recovery publish" "publish-github-release.ps1" `
-        $githubArguments $recoveryLogDirectory 1
+    try {
+        $githubOperation = Invoke-RecoveryChild `
+            "GitHub release recovery publish" "publish-github-release.ps1" `
+            $githubArguments $recoveryLogDirectory 1
+    }
+    catch {
+        $attempt.Status = "Blocked"
+        $attempt.Stage = "GitHubAbsent"
+        $attempt.GitHub["ChildMutationAttempted"] = $true
+        $attempt.GitHub["ChildOutcome"] = "FailedBeforeConfirmedMutation"
+        $attempt.GitHub["Error"] = $_.Exception.Message
+        $attempt.Blockers = [string[]]@("GitHub Release child failed: $($_.Exception.Message)")
+        Write-RecoveryAttemptReport $attempt $attemptPath
+        throw
+    }
     $newOperations.Add($githubOperation)
     $githubAction = "CreatedMissingRelease"
+    $attempt.Status = "GitHubMutationAwaitingReadback"
+    $attempt.Stage = "GitHubMutationAwaitingReadback"
+    $attempt.GitHub["ChildMutationAttempted"] = $true
+    $attempt.GitHub["ChildOutcome"] = "SucceededAwaitingReadback"
+    Write-RecoveryAttemptReport $attempt $attemptPath
 }
-$github = Get-GitHubReleaseReadback `
-    $tagName $title $notes $assetName ([string]$preflight.Package.Sha256)
+try {
+    $github = Get-GitHubReleaseReadback `
+        $tagName $title $notes $assetName ([string]$preflight.Package.Sha256)
+}
+catch {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "GitHubReadback"
+    $attempt.GitHub["FinalOutcome"] = "Unknown"
+    $attempt.GitHub["Error"] = $_.Exception.Message
+    $attempt.Blockers = [string[]]@("GitHub Release final readback failed: $($_.Exception.Message)")
+    Write-RecoveryAttemptReport $attempt $attemptPath
+    throw
+}
 if (-not [bool]$github.Verified) {
+    $attempt.Status = "Blocked"
+    $attempt.Stage = "GitHubReadback"
+    $attempt.GitHub["FinalReadback"] = $github
+    $attempt.GitHub["FinalOutcome"] = "Unverified"
+    $attempt.Blockers = [string[]]@("GitHub Release recovery did not produce conclusive readback.")
+    Write-RecoveryAttemptReport $attempt $attemptPath
     throw "GitHub Release recovery did not produce conclusive readback."
 }
 $github["Requested"] = $true
+$attempt.Status = "GitHubVerified"
+$attempt.Stage = "GitHubVerified"
+$attempt.GitHub["FinalReadback"] = $github
+$attempt.GitHub["FinalOutcome"] = "Verified"
+$attempt.Blockers = [string[]]@()
+Write-RecoveryAttemptReport $attempt $attemptPath
 $newOperations.Add((New-RecoveryOperation "Recovery GitHub release readback" @(
     "GitHub release verified: $($github.Url); asset=$($github.AssetName); digest=$($github.AssetDigest)") $false))
 

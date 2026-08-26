@@ -1202,6 +1202,10 @@ if ($CommandArguments[0] -eq "release" -and $CommandArguments[1] -eq "view") {
     exit 0
 }
 if ($CommandArguments[0] -eq "release" -and $CommandArguments[1] -eq "create") {
+    if ($env:RECOVERY_GH_FORCE_CREATE_FAILURE -eq "1") {
+        [Console]::Error.WriteLine("forced fixture GitHub create failure before mutation")
+        exit 1
+    }
     $tag = $CommandArguments[2]
     $packagePath = $CommandArguments[3]
     $titleIndex = [Array]::IndexOf($CommandArguments, "--title")
@@ -1231,6 +1235,17 @@ exit 2
     $recoveryPackageLength = (Get-Item -LiteralPath $combinedPackagePath).Length
     $recoveryPackageHash = (
         Get-FileHash -LiteralPath $combinedPackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $stalePublicConfigPath = Join-Path $fixtureRoot "SmartPower/release.json"
+    $stalePublicConfig = (Get-Content -Raw -LiteralPath $stalePublicConfigPath).Replace(
+        '"version-1.0": "1.16.4"',
+        '"version-1.0": "1.16.3"')
+    Write-TestFile $stalePublicConfigPath $stalePublicConfig
+    Assert-Equal "1.16.3" `
+        (Get-Content -Raw -LiteralPath $stalePublicConfigPath | ConvertFrom-Json).ManifestVersions."version-1.0" `
+        "Recovery fixture public-owner config must retain the stale backport lane version"
+    Assert-Equal "1.16.4" `
+        @($combinedLanes | Where-Object GameVersion -eq "version-1.0")[0].ManifestVersion `
+        "Recovery fixture immutable package must contain the prepared backport lane version"
     $recoveryPreflightPath = Join-Path $testRoot "recovery-preflight.json"
     $recoverySignoffPath = Join-Path $testRoot "recovery-signoff.json"
     $recoveryReadbackPath = Join-Path $testRoot "recovery-platform-readback.json"
@@ -1366,6 +1381,7 @@ exit 2
     $previousPath = $env:PATH
     $previousGhState = $env:RECOVERY_GH_STATE
     $previousGhLog = $env:RECOVERY_GH_LOG
+    $previousGhForceFailure = $env:RECOVERY_GH_FORCE_CREATE_FAILURE
     $env:PATH = "$recoveryBin;$previousPath"
     $env:RECOVERY_GH_STATE = $recoveryGhState
     $env:RECOVERY_GH_LOG = $recoveryGhLog
@@ -1410,6 +1426,41 @@ exit 2
             "Steam mismatch output must print expected and actual field evidence"
         Assert-True (-not (Test-Path -LiteralPath $recoveryGhState)) `
             "Steam mismatch must stop before the missing GitHub mutation"
+
+        $forcedFailureAttemptPath = Join-Path $testRoot "recovery-attempt-github-child-failure.json"
+        $env:RECOVERY_GH_FORCE_CREATE_FAILURE = "1"
+        $ErrorActionPreference = "Continue"
+        try {
+            $forcedFailureOutput = @(& powershell.exe -NoProfile -ExecutionPolicy Bypass `
+                -File (Join-Path $fixtureTools "recover-release.ps1") `
+                -PreflightReportPath $recoveryPreflightPath `
+                -PartialSignoffReportPath $recoverySignoffPath `
+                -PlatformReadbackFixturePath $recoveryReadbackPath `
+                -RecoveryAttemptReportPath $forcedFailureAttemptPath `
+                -SkipDiscordHandoff 2>&1)
+            $forcedFailureExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $recoveryPreference
+            $env:RECOVERY_GH_FORCE_CREATE_FAILURE = $null
+        }
+        Assert-True ($forcedFailureExitCode -ne 0) "Forced GitHub child failure must stop recovery"
+        $forcedFailureAttempt = Get-Content -Raw -LiteralPath $forcedFailureAttemptPath | ConvertFrom-Json
+        Assert-Equal "Blocked" $forcedFailureAttempt.Status "GitHub child failure attempt status"
+        Assert-Equal "GitHubAbsent" $forcedFailureAttempt.Stage `
+            "GitHub child failure must retain the latest conclusive read-only stage"
+        Assert-True $forcedFailureAttempt.ModIO.Verified `
+            "GitHub child failure attempt must preserve conclusive Mod.IO evidence"
+        Assert-Equal "Match" $forcedFailureAttempt.ModIO.Outcome `
+            "GitHub child failure attempt must preserve the Mod.IO comparison outcome"
+        Assert-Equal "Match" $forcedFailureAttempt.RemoteTag.Outcome `
+            "GitHub child failure attempt must preserve conclusive remote tag evidence"
+        Assert-Equal "ConclusiveAbsence" $forcedFailureAttempt.GitHub.Outcome `
+            "GitHub child failure attempt must preserve conclusive absence evidence"
+        Assert-True (-not [string]::IsNullOrWhiteSpace([string]$forcedFailureAttempt.GitHub.Error)) `
+            "GitHub child failure attempt must persist the child error"
+        Assert-True (-not (Test-Path -LiteralPath $recoveryGhState)) `
+            "Forced fixture GitHub child failure must occur before mutation"
 
         $successAttemptPath = Join-Path $testRoot "recovery-attempt-success.json"
         $ErrorActionPreference = "Continue"
@@ -1502,8 +1553,10 @@ exit 2
         $env:PATH = $previousPath
         $env:RECOVERY_GH_STATE = $previousGhState
         $env:RECOVERY_GH_LOG = $previousGhLog
+        $env:RECOVERY_GH_FORCE_CREATE_FAILURE = $previousGhForceFailure
     }
     Write-Host "PASS: Steam recovery evidence separates staged content from ZIP bytes and persists mismatches"
+    Write-Host "PASS: GitHub recovery uses immutable lane fingerprints and persists every read-only stage"
     Write-Host "PASS: bounded partial recovery performs one missing GitHub mutation and is idempotent"
     Write-Host "PASS: signoff schema/evidence, incident inventory, issue/Wiki boundaries, and local round trip"
 }
@@ -1589,6 +1642,8 @@ Assert-True $publishText.Contains('$preflightModIoAccessTokenPath = [string]$rep
     "Release publication does not reuse the preflight-bound Mod.IO owner token."
 Assert-True $publishText.Contains('$commonPublishArgs.Add($packageOwnerRoot)') `
     "Release publication does not consume the preflight-bound public package owner."
+Assert-True $publishText.Contains('$githubArgs.Add("-PreflightReportPath")') `
+    "Normal GitHub publication does not bind the immutable preflight lane map."
 
 $modIoText = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "publish-modio.ps1")
 Assert-True $modIoText.Contains('$changeNotes = Get-LatestChangeNotes $changesPath $sourceVersion') `

@@ -921,6 +921,8 @@ if (-not $SkipGitHubRelease) {
     $githubArgs.Add([string]$report.Package.Path)
     $githubArgs.Add("-SourceModVersion")
     $githubArgs.Add($sourceModVersion)
+    $githubArgs.Add("-PreflightReportPath")
+    $githubArgs.Add($reportPath)
     $githubArgs.Add("-Repository")
     $githubArgs.Add($Repository)
     $githubArgs.Add("-TagName")

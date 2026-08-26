@@ -12,6 +12,7 @@ param(
     [string] $TagName = "",
     [string] $Title = "",
     [string] $ReleaseNotesPath = "",
+    [string] $PreflightReportPath = "",
     [string] $ExpectedPackageSha256 = "",
     [switch] $ReplaceExistingAsset,
     [switch] $Publish
@@ -21,6 +22,7 @@ $ErrorActionPreference = "Stop"
 
 $toolRepoRoot = Split-Path -Parent $PSScriptRoot
 Import-Module (Join-Path $PSScriptRoot "repository-paths.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "release-package-provenance.psm1") -Force
 $repoRoot = Resolve-RepositoryRoot $ReleaseRoot $toolRepoRoot
 $packageRoot = if ([string]::IsNullOrWhiteSpace($PackageOwnerRoot)) {
     $repoRoot
@@ -82,7 +84,8 @@ function Assert-PackageFreshEnough([string] $ZipPath, [object] $PackageConfig) {
 function Test-ZipPackage(
     [string] $ZipPath,
     [string] $ScriptFileBase,
-    [object] $ReleaseConfig) {
+    [object] $ReleaseConfig,
+    [object[]] $ExpectedLaneFingerprints = @()) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
     try {
@@ -132,7 +135,18 @@ function Test-ZipPackage(
                 throw "Package folder $versionFolder has an empty manifest Version."
             }
 
-            $expectedVersion = $ReleaseConfig.ManifestVersions.$versionFolder
+            $expectedLane = @($ExpectedLaneFingerprints | Where-Object {
+                [string]$_.GameVersion -eq $versionFolder
+            })
+            if ($ExpectedLaneFingerprints.Count -gt 0 -and $expectedLane.Count -ne 1) {
+                throw "Immutable preflight does not declare exactly one fingerprint for package lane $versionFolder."
+            }
+            $expectedVersion = if ($expectedLane.Count -eq 1) {
+                [string]$expectedLane[0].ManifestVersion
+            }
+            else {
+                $ReleaseConfig.ManifestVersions.$versionFolder
+            }
             if ($null -ne $expectedVersion -and $manifestVersion -ne [string]$expectedVersion) {
                 throw "Package folder $versionFolder has manifest Version=$manifestVersion, expected $expectedVersion."
             }
@@ -142,6 +156,26 @@ function Test-ZipPackage(
     }
     finally {
         $zip.Dispose()
+    }
+}
+
+function Assert-ImmutableLaneFingerprints([object[]] $Expected, [object[]] $Actual) {
+    if ($Expected.Count -eq 0) {
+        throw "Immutable preflight contains no package lane fingerprints."
+    }
+    if ($Expected.Count -ne $Actual.Count) {
+        throw "Package lane count differs from immutable preflight. Expected $($Expected.Count), actual $($Actual.Count)."
+    }
+    foreach ($expectedLane in $Expected) {
+        $actualLane = @($Actual | Where-Object {
+            [string]$_.GameVersion -eq [string]$expectedLane.GameVersion
+        })
+        if ($actualLane.Count -ne 1 -or
+                [string]$actualLane[0].ManifestVersion -ne [string]$expectedLane.ManifestVersion -or
+                [int]$actualLane[0].FileCount -ne [int]$expectedLane.FileCount -or
+                [string]$actualLane[0].Sha256 -ne [string]$expectedLane.Sha256) {
+            throw "Package lane $($expectedLane.GameVersion) differs from the immutable preflight fingerprint."
+        }
     }
 }
 
@@ -189,6 +223,20 @@ Assert-PathExists $releaseConfigPath "Release config"
 $releaseConfig = Get-Content -Raw -LiteralPath $releaseConfigPath | ConvertFrom-Json
 Assert-PathExists $packageReleaseConfigPath "Public package owner config"
 $packageReleaseConfig = Get-Content -Raw -LiteralPath $packageReleaseConfigPath | ConvertFrom-Json
+$preflight = $null
+$expectedLaneFingerprints = [object[]]@()
+if (-not [string]::IsNullOrWhiteSpace($PreflightReportPath)) {
+    $resolvedPreflightPath = Resolve-ToolPath $PreflightReportPath
+    Assert-PathExists $resolvedPreflightPath "Immutable preflight report"
+    $preflight = Get-Content -Raw -LiteralPath $resolvedPreflightPath | ConvertFrom-Json
+    if ([int]$preflight.SchemaVersion -ne 5 -or -not [bool]$preflight.ReadyForPublish) {
+        throw "GitHub release requires a ready schema-5 immutable preflight."
+    }
+    if ([string]$preflight.ModName -ne $ModName) {
+        throw "Immutable preflight mod identity differs from $ModName."
+    }
+    $expectedLaneFingerprints = [object[]]@($preflight.PackageLaneFingerprints)
+}
 
 $manifestPath = Join-Path $modRoot "Mod/manifest.json"
 if (-not [string]::IsNullOrWhiteSpace($releaseConfig.ManifestPath)) {
@@ -213,6 +261,9 @@ if (-not [string]::IsNullOrWhiteSpace($SourceModVersion)) {
 if ([string]::IsNullOrWhiteSpace($modVersion)) {
     throw "Release version is empty."
 }
+if ($null -ne $preflight -and [string]::IsNullOrWhiteSpace($TagName)) {
+    $TagName = [string]$preflight.TagName
+}
 
 $scriptFileBase = $ModName
 if (-not [string]::IsNullOrWhiteSpace($packageReleaseConfig.ScriptFileBase)) {
@@ -222,7 +273,25 @@ if (-not [string]::IsNullOrWhiteSpace($packageReleaseConfig.ScriptFileBase)) {
 $zipPath = Get-PackagePath $packageReleaseConfig $modVersion
 Assert-PathExists $zipPath "Release package"
 Assert-PackageFreshEnough $zipPath $packageReleaseConfig.Package
-$versionFolders = Test-ZipPackage $zipPath $scriptFileBase $packageReleaseConfig
+$versionFolders = Test-ZipPackage `
+    $zipPath $scriptFileBase $packageReleaseConfig $expectedLaneFingerprints
+$actualLaneFingerprints = @(Get-PackageLaneFingerprints $zipPath)
+if ($null -ne $preflight) {
+    if ((Resolve-Path -LiteralPath $zipPath).Path -ne (Resolve-Path -LiteralPath ([string]$preflight.Package.Path)).Path) {
+        throw "GitHub asset path differs from immutable preflight package path."
+    }
+    if ([string]$preflight.SourceModVersion -ne $modVersion -or
+            [string]$preflight.TagName -ne $TagName) {
+        throw "GitHub source version or qualified tag differs from immutable preflight identity."
+    }
+    Assert-ImmutableLaneFingerprints $expectedLaneFingerprints $actualLaneFingerprints
+    if ([string]::IsNullOrWhiteSpace($ExpectedPackageSha256)) {
+        $ExpectedPackageSha256 = [string]$preflight.Package.Sha256
+    }
+    elseif ($ExpectedPackageSha256 -ne [string]$preflight.Package.Sha256) {
+        throw "Expected package hash differs from immutable preflight."
+    }
+}
 
 $tagName = $TagName
 if ([string]::IsNullOrWhiteSpace($tagName)) {
