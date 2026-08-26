@@ -78,6 +78,12 @@ Backport player-visible behavior, not source text mechanically. Prefer the older
 do not preserve current-line implementation details that exist only because the newer game requires them. Keep the
 current line behavior and package output unchanged unless the user explicitly authorizes a shared refactor.
 
+Do not classify a player-facing building or object feature as non-portable merely because the current-line runtime or
+UI class name is absent from the target game. Before excluding it, trace the concept through the target-line building
+blueprints by template identity and `DisplayNameLocKey`, then identify the target-line component spec, runtime
+component, UI fragment, and APIs needed by the behavior. A renamed class is an adaptation candidate; only the absence
+of the required concept or behavior boundary is evidence that the feature cannot be ported directly.
+
 Maintain an explicit inventory of requested features and fixes with one of these outcomes for each item:
 
 - implemented and validated on the older line;
