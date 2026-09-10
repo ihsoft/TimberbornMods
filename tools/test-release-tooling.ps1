@@ -1495,6 +1495,95 @@ Write-Host "Final Mod.IO readback: mod_id=1; active_file_id=2; version=3.0.0; da
     Assert-Equal 0 @($signoff.IncidentInventory.DiscoveryPreflightPublishDifferences.Differences).Count `
         "Matching discovery/preflight identities should have no differences."
 
+    $distinctOperationNames = [string[]]@(
+        "Steam release publish",
+        "Mod.IO release publish",
+        "Platform tag synchronization",
+        "Git release tags",
+        "GitHub release publish",
+        "Discord release handoff")
+    $distinctOrderedOperations = [object[]]@($distinctOperationNames | ForEach-Object {
+        [ordered]@{
+            Name = $_
+            Status = "Succeeded"
+            Warnings = [string[]]@()
+            Summary = [string[]]@()
+            ExternalOutcome = "Confirmed"
+            Recovered = $false
+            LogPath = ""
+        }
+    })
+    $distinctInventory = Get-ReleaseIncidentInventory `
+        -Operations $distinctOrderedOperations `
+        -Warnings @() `
+        -Overrides ([ordered]@{}) `
+        -DiscoveryComparison $null `
+        -PrerequisiteInterruption ""
+    Assert-Equal 0 @($distinctInventory.RetriedOperations).Count `
+        "Distinct ordered-dictionary operations must not be reported as retries."
+
+    $repeatedOrderedOperations = [object[]]@(
+        $distinctOrderedOperations +
+        [ordered]@{
+            Name = "Mod.IO release publish"
+            Status = "Succeeded"
+            Warnings = [string[]]@()
+            Summary = [string[]]@()
+            ExternalOutcome = "Confirmed"
+            Recovered = $false
+            LogPath = ""
+        })
+    $repeatedInventory = Get-ReleaseIncidentInventory `
+        -Operations $repeatedOrderedOperations `
+        -Warnings @() `
+        -Overrides ([ordered]@{}) `
+        -DiscoveryComparison $null `
+        -PrerequisiteInterruption ""
+    Assert-Equal 1 @($repeatedInventory.RetriedOperations).Count "One repeated operation group"
+    Assert-Equal "Mod.IO release publish" $repeatedInventory.RetriedOperations[0].Operation `
+        "Repeated operation identity"
+    Assert-Equal 2 $repeatedInventory.RetriedOperations[0].Attempts "Repeated operation attempt count"
+    $serializedInventory = $repeatedInventory | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+    Assert-Equal "Mod.IO release publish" $serializedInventory.RetriedOperations[0].Operation `
+        "Serialized retry identity"
+    Assert-Equal 2 $serializedInventory.RetriedOperations[0].Attempts "Serialized retry attempt count"
+
+    $roundTripOperations = [object[]]@(
+        ($repeatedOrderedOperations | ConvertTo-Json -Depth 5 | ConvertFrom-Json) |
+            ForEach-Object { $_ })
+    $roundTripInventory = Get-ReleaseIncidentInventory `
+        -Operations $roundTripOperations `
+        -Warnings @() `
+        -Overrides ([pscustomobject]@{}) `
+        -DiscoveryComparison $null `
+        -PrerequisiteInterruption ""
+    Assert-Equal 1 @($roundTripInventory.RetriedOperations).Count "Round-trip retry group count"
+    Assert-Equal "Mod.IO release publish" $roundTripInventory.RetriedOperations[0].Operation `
+        "Round-trip retry identity"
+    Assert-Equal 2 $roundTripInventory.RetriedOperations[0].Attempts "Round-trip retry attempt count"
+
+    $missingNameOperations = [object[]]@(
+        [ordered]@{
+            Status = "Succeeded"; Warnings = [string[]]@(); Summary = [string[]]@()
+            ExternalOutcome = "Confirmed"; Recovered = $false; LogPath = ""
+        },
+        [ordered]@{
+            Name = ""; Status = "Succeeded"; Warnings = [string[]]@(); Summary = [string[]]@()
+            ExternalOutcome = "Confirmed"; Recovered = $false; LogPath = ""
+        },
+        [pscustomobject]@{
+            Name = $null; Status = "Succeeded"; Warnings = [string[]]@(); Summary = [string[]]@()
+            ExternalOutcome = "Confirmed"; Recovered = $false; LogPath = ""
+        })
+    $missingNameInventory = Get-ReleaseIncidentInventory `
+        -Operations $missingNameOperations `
+        -Warnings @() `
+        -Overrides ([ordered]@{}) `
+        -DiscoveryComparison $null `
+        -PrerequisiteInterruption ""
+    Assert-Equal 0 @($missingNameInventory.RetriedOperations).Count `
+        "Missing operation names must not be merged into an invented retry group."
+
     $signoffRoundTripPath = Join-Path $testRoot "signoff-roundtrip.json"
     Write-ReleaseSignoffReport $signoff $signoffRoundTripPath
     $signoffRoundTrip = Get-Content -Raw -LiteralPath $signoffRoundTripPath | ConvertFrom-Json

@@ -171,6 +171,24 @@ function Get-OpenGitHubIssues([string] $Repository) {
     return [object[]]@((ConvertFrom-Json $json) | ForEach-Object { $_ })
 }
 
+function Get-ReleaseOperationName([object] $Operation) {
+    if ($null -eq $Operation) {
+        return ""
+    }
+    if ($Operation -is [System.Collections.IDictionary]) {
+        if ($Operation.Contains("Name")) {
+            return [string]$Operation["Name"]
+        }
+        return ""
+    }
+
+    $nameProperty = $Operation.PSObject.Properties["Name"]
+    if ($null -eq $nameProperty) {
+        return ""
+    }
+    return [string]$nameProperty.Value
+}
+
 function Get-ReleaseIncidentInventory(
     [object[]] $Operations,
     [string[]] $Warnings,
@@ -179,20 +197,30 @@ function Get-ReleaseIncidentInventory(
     [string] $PrerequisiteInterruption
 ) {
     $failed = @($Operations | Where-Object { [string]$_.Status -eq "Failed" })
-    $retries = @($Operations | Group-Object Name | Where-Object Count -gt 1 | ForEach-Object {
+    $operationNames = @($Operations | ForEach-Object {
+        $operationName = Get-ReleaseOperationName $_
+        if (-not [string]::IsNullOrWhiteSpace($operationName)) {
+            $operationName
+        }
+    })
+    $retries = @($operationNames | Group-Object | Where-Object Count -gt 1 | ForEach-Object {
         [ordered]@{ Operation = $_.Name; Attempts = $_.Count }
     })
     $operationWarnings = @($Operations | ForEach-Object { @($_.Warnings) })
     $ambiguous = @($failed | Where-Object {
         [string]$_.ExternalOutcome -eq "Unknown" -and $_.Recovered -ne $true
     } | ForEach-Object {
-        [ordered]@{ Operation = $_.Name; Outcome = "Unknown"; LogPath = $_.LogPath }
+        [ordered]@{ Operation = Get-ReleaseOperationName $_; Outcome = "Unknown"; LogPath = $_.LogPath }
     })
     $recovery = @($Operations | Where-Object {
-        [string]$_.Name -match "(?i)recover|replace|backport" -or
+        (Get-ReleaseOperationName $_) -match "(?i)recover|replace|backport" -or
             (@($_.Summary) -join "`n") -match "(?i)recover|replace|backport"
     } | ForEach-Object {
-        [ordered]@{ Operation = $_.Name; Evidence = [string[]]$_.Summary; LogPath = $_.LogPath }
+        [ordered]@{
+            Operation = Get-ReleaseOperationName $_
+            Evidence = [string[]]$_.Summary
+            LogPath = $_.LogPath
+        }
     })
     $interruptions = if ([string]::IsNullOrWhiteSpace($PrerequisiteInterruption)) {
         [string[]]@()
