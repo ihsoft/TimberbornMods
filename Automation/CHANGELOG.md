@@ -1,5 +1,6 @@
 # v4.11.0 (TBD)
 * [Feature] Add actions to change prioritized resources on farms, foresters, and gatherers, and switch farms between planting and harvesting priority.
+* [Feature] Add readiness signals for each collected good and each planted resource alongside the total counters.
 
 # v4.10.0 (August 22nd, 2026)
 * [Feature] Add a setting to customize the order of signal modules in the rule constructor.

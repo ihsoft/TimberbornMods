@@ -1,4 +1,4 @@
-﻿// Timberborn Mod: Automation
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -27,6 +27,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSingleton, IParallelTickableSingleton {
 
   const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
+  const string ResourceReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.ResourceReady";
   const string SetPriorityActionLocKey = "IgorZ.Automation.Scriptable.Plantable.Action.SetPriority";
   const string NoPriorityLocKey = "Planting.NoPriorityOption";
   
@@ -143,45 +144,44 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     if (!plantingSpotFinder) {
       return [];
     }
-    return [SpotReadySignalName];
+    var planter = behavior.GetComponent<PlanterBuilding>();
+    return planter
+        ? [SpotReadySignalName, ..planter.AllowedPlantables.Select(x => MakeResourceSignalName(x.TemplateName))]
+        : [SpotReadySignalName];
   }
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    if (name != SpotReadySignalName) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
-    }
-    GetPlantingSpotFinder(behavior);
-    return () => HasSpotsReadySignal(behavior);
+    var templateName = ResolveSignalPlantable(name, behavior)?.TemplateName;
+    return () => ScriptValue.FromInt(behavior.GetOrCreate<PlantableTracker>().GetReadySpots(templateName));
   }
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    if (name != SpotReadySignalName) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
+    var plantable = ResolveSignalPlantable(name, behavior);
+    if (plantable == null) {
+      return SpotsReadySignalDef;
     }
-    GetPlantingSpotFinder(behavior);
-    return HasSpotsSignalDef;
+    var plantableName = Loc.T(plantable.GetSpec<LabeledEntitySpec>().DisplayNameLocKey);
+    return new SignalDef {
+        ScriptName = name,
+        DisplayName = Loc.T(ResourceReadySignalLocKey, plantableName),
+        DisplayNameLocKey = ResourceReadySignalLocKey,
+        DisplayNameArgument = plantableName,
+        Scope = SignalDef.ScopeEnum.Building,
+        Result = SpotsReadySignalDef.Result,
+    };
   }
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    if (signalOperator.SignalName != SpotReadySignalName) {
-      throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
-    }
-    GetPlantingSpotFinder(host.Behavior);
-    var tracker = host.Behavior.GetOrCreate<PlantableTracker>();
-    if (tracker.AddSignal(signalOperator, host)) {
-      _allTrackers.Add(tracker);
-    }
+    ResolveSignalPlantable(signalOperator.SignalName, host.Behavior);
+    host.Behavior.GetOrCreate<PlantableTracker>().AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    var tracker = host.Behavior.GetOrThrow<PlantableTracker>();
-    if (!tracker.RemoveSignal(signalOperator, host)) {
-      _allTrackers.Remove(tracker);
-    }
+    host.Behavior.GetOrThrow<PlantableTracker>().RemoveSignal(signalOperator, host);
   }
 
   #endregion
@@ -206,20 +206,36 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   #region Signals
 
-  SignalDef HasSpotsSignalDef => _collectableReadySignalDef ??= new SignalDef {
+  SignalDef SpotsReadySignalDef => _spotsReadySignalDef ??= new SignalDef {
       ScriptName = SpotReadySignalName,
       DisplayName = Loc.T(SpotReadySignalLocKey),
+      Scope = SignalDef.ScopeEnum.Building,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
           DisplayNumericFormatRange = (0, float.NaN),
       },
   };
-  SignalDef _collectableReadySignalDef;
+  SignalDef _spotsReadySignalDef;
 
-  static ScriptValue HasSpotsReadySignal(AutomationBehavior behavior) {
-    var tracker = behavior.GetOrCreate<PlantableTracker>();
-    return ScriptValue.FromInt(tracker.SpotsForPlanting);
+  /// <summary>Builds <c>Plantable.Ready.{encodedTemplate}</c> using <see cref="SignalNameSegment.Encode"/>.</summary>
+  /// <remarks>
+  /// Safe names remain raw; other names use the shared codec. The legacy <c>Plantable.Ready</c> total is unchanged.
+  /// </remarks>
+  static string MakeResourceSignalName(string templateName) {
+    return SpotReadySignalName + "." + SignalNameSegment.Encode(templateName);
+  }
+
+  /// <summary>Resolves a generated plant signal to its spec, or the legacy total signal to null.</summary>
+  /// <remarks>Names that do not exactly match an allowed plant's encoded signal name raise a parsing error.</remarks>
+  static PlantableSpec ResolveSignalPlantable(string name, AutomationBehavior behavior) {
+    GetPlantingSpotFinder(behavior);
+    if (name == SpotReadySignalName) {
+      return null;
+    }
+    var planter = GetComponentOrThrow<PlanterBuilding>(behavior);
+    return planter.AllowedPlantables.FirstOrDefault(x => MakeResourceSignalName(x.TemplateName) == name)
+        ?? throw new ScriptError.ParsingError("Unknown signal: " + name);
   }
 
   #endregion
@@ -228,7 +244,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
   readonly IParallelizer _parallelizer;
 
-  internal static PlantableScriptableComponent Instance;
+  static PlantableScriptableComponent Instance;
   readonly List<PlantableTracker> _allTrackers = [];
 
   PlantableScriptableComponent(IParallelizer parallelizer) {
@@ -273,15 +289,13 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
 
     #region API
 
-    /// <summary>Returns the number of tiles that offer collectable items.</summary>
-    public int SpotsForPlanting {
-      get => _spotsForPlanting;
-      private set {
-        _spotsForPlanting = value;
-        TriggerSignalUpdate(SpotReadySignalName);
-      }
+    /// <summary>Returns the total number of ready planting spots.</summary>
+    public int SpotsForPlanting { get; private set; }
+
+    /// <summary>Returns ready spots for a plantable template, or all ready spots when the name is null.</summary>
+    public int GetReadySpots(string templateName) {
+      return templateName == null ? SpotsForPlanting : _spotsByPlantable.GetValueOrDefault(templateName);
     }
-    int _spotsForPlanting;
 
     /// <summary>Prepares the state for calculation in a parallel thread.</summary>
     /// <remarks>
@@ -309,7 +323,7 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       _parallelCountedSpotsForPlanting = CalculatePlantableSpots(_threadsafePlantingSpots);
       _threadsafePlantingSpots = null;
     }
-    int _parallelCountedSpotsForPlanting;
+    Dictionary<string, int> _parallelCountedSpotsForPlanting;
 
     /// <summary>
     /// Applies the state calculated in the parallel update to the main thread and fires signals if needed.
@@ -320,7 +334,12 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     /// </remarks>
     /// <seealso cref="ParallelUpdateState"/>
     public void FinalizeParallelUpdateState() {
-      SpotsForPlanting = _parallelCountedSpotsForPlanting;
+      if (_parallelCountedSpotsForPlanting == null) {
+        return;
+      }
+      var countedSpots = _parallelCountedSpotsForPlanting;
+      _parallelCountedSpotsForPlanting = null;
+      ApplyPlantableSpots(countedSpots);
     }
 
     #endregion
@@ -333,6 +352,27 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       UpdateState();
     }
 
+    /// <inheritdoc/>
+    public override bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
+      var firstListener = base.AddSignal(signalOperator, host);
+      if (firstListener && _trackedSignals.Add(signalOperator.SignalName) && _trackedSignals.Count == 1) {
+        Instance._allTrackers.Add(this);
+      }
+      return firstListener;
+    }
+
+    /// <inheritdoc/>
+    public override bool RemoveSignal(SignalOperator signalOperator, ISignalListener host) {
+      var hasListeners = base.RemoveSignal(signalOperator, host);
+      if (!hasListeners) {
+        _trackedSignals.Remove(signalOperator.SignalName);
+        if (_trackedSignals.Count == 0) {
+          Instance._allTrackers.Remove(this);
+        }
+      }
+      return hasListeners;
+    }
+
     #endregion
 
     #region Implementation
@@ -343,6 +383,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     PlantingSpotFinder _plantingSpotFinder;
     BuildingTerrainRange _buildingTerrainRange;
     InRangePlantingCoordinates _plantingCoordinates;
+    readonly HashSet<string> _trackedSignals = [];
+    Dictionary<string, int> _spotsByPlantable = [];
 
     [Inject]
     public void InjectDependencies(EventBus eventBus, PlantingService plantingService) {
@@ -357,7 +399,15 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     }
 
     void UpdateState() {
-      SpotsForPlanting = CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray());
+      ApplyPlantableSpots(CalculatePlantableSpots(_plantingCoordinates.GetCoordinates()._set.ToArray()));
+    }
+
+    void ApplyPlantableSpots(Dictionary<string, int> spotsByPlantable) {
+      _spotsByPlantable = spotsByPlantable;
+      SpotsForPlanting = spotsByPlantable.Values.Sum();
+      foreach (var signalName in _trackedSignals) {
+        TriggerSignalUpdate(signalName);
+      }
     }
 
     void ScheduleStateUpdate() {
@@ -380,8 +430,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
       UpdateState();
     }
 
-    int CalculatePlantableSpots(Vector3Int[] plantingSpots) {
-      var plantableSpots = 0;
+    Dictionary<string, int> CalculatePlantableSpots(Vector3Int[] plantingSpots) {
+      var plantableSpots = new Dictionary<string, int>();
       foreach (var coords in plantingSpots) {
         var plantingSpot = _plantingService.GetSpotAt(coords);
         if (!plantingSpot.HasValue && _plantingService._reservedCoordinates.Contains(coords)) {
@@ -392,7 +442,8 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
           }
         }
         if (plantingSpot.HasValue && _plantingSpotFinder.CanPlantAt(plantingSpot.Value, null)) {
-          plantableSpots++;
+          var templateName = plantingSpot.Value.ResourceToPlant;
+          plantableSpots[templateName] = plantableSpots.GetValueOrDefault(templateName) + 1;
         }
       }
       return plantableSpots;

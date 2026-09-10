@@ -37,6 +37,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
   const string CollectableReadySignalLocKey = "IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady";
+  const string GoodReadySignalLocKey = "IgorZ.Automation.Scriptable.Collectable.Signal.GoodReady";
   const string SetPriorityActionLocKey = "IgorZ.Automation.Scriptable.Collectable.Action.SetPriority";
   const string NoPriorityLocKey = "Gathering.Nothing";
 
@@ -95,33 +96,35 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     if (!yieldRemovingBuilding) {
       return [];
     }
-    return [CollectableReadySignalName];
+    return [CollectableReadySignalName, ..yieldRemovingBuilding.GetAllowedGoods().Select(MakeGoodSignalName)];
   }
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior behavior) {
-    if (name != CollectableReadySignalName) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
-    }
-    GetYieldRemovingBuilding(behavior);
-    return () => CollectableReadySignal(behavior);
+    var goodId = ResolveSignalGood(name, behavior);
+    return () => ScriptValue.FromInt(behavior.GetOrCreate<GatherableTracker>().GetReadyYielders(goodId));
   }
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior behavior) {
-    if (name != CollectableReadySignalName) {
-      throw new ScriptError.ParsingError("Unknown signal: " + name);
+    var goodId = ResolveSignalGood(name, behavior);
+    if (goodId == null) {
+      return CollectableReadySignalDef;
     }
-    GetYieldRemovingBuilding(behavior);
-    return CollectableReadySignalDef;
+    var goodName = _goodService.GetGood(goodId).PluralDisplayName.Value;
+    return new SignalDef {
+        ScriptName = name,
+        DisplayName = Loc.T(GoodReadySignalLocKey, goodName),
+        DisplayNameLocKey = GoodReadySignalLocKey,
+        DisplayNameArgument = goodName,
+        Scope = SignalDef.ScopeEnum.Building,
+        Result = CollectableReadySignalDef.Result,
+    };
   }
 
   /// <inheritdoc/>
   public override void RegisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    if (signalOperator.SignalName != CollectableReadySignalName) {
-      throw new InvalidOperationException("Unknown signal: " + signalOperator.SignalName);
-    }
-    GetYieldRemovingBuilding(host.Behavior);
+    ResolveSignalGood(signalOperator.SignalName, host.Behavior);
     host.Behavior.GetOrCreate<GatherableTracker>().AddSignal(signalOperator, host);
   }
 
@@ -154,6 +157,7 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
   SignalDef CollectableReadySignalDef => _collectableReadySignalDef ??= new SignalDef {
       ScriptName = CollectableReadySignalName,
       DisplayName = Loc.T(CollectableReadySignalLocKey),
+      Scope = SignalDef.ScopeEnum.Building,
       Result = new ValueDef {
           ValueType = ScriptValue.TypeEnum.Number,
           DisplayNumericFormat = ValueDef.NumericFormatEnum.Integer,
@@ -162,9 +166,23 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
   };
   SignalDef _collectableReadySignalDef;
 
-  static ScriptValue CollectableReadySignal(AutomationBehavior behavior) {
-    var tracker = behavior.GetOrCreate<GatherableTracker>();
-    return ScriptValue.FromInt(tracker.ReadyYielders);
+  /// <summary>Builds <c>Collectable.Ready.{encodedGoodId}</c> using <see cref="SignalNameSegment.Encode"/>.</summary>
+  /// <remarks>
+  /// Safe IDs remain raw; other IDs use the shared codec. The legacy <c>Collectable.Ready</c> total is unchanged.
+  /// </remarks>
+  static string MakeGoodSignalName(string goodId) {
+    return CollectableReadySignalName + "." + SignalNameSegment.Encode(goodId);
+  }
+
+  /// <summary>Resolves a generated good signal to its ID, or the legacy total signal to null.</summary>
+  /// <remarks>Names that do not exactly match an allowed good's encoded signal name raise a parsing error.</remarks>
+  static string ResolveSignalGood(string name, AutomationBehavior behavior) {
+    var building = GetYieldRemovingBuilding(behavior);
+    if (name == CollectableReadySignalName) {
+      return null;
+    }
+    return building.GetAllowedGoods().FirstOrDefault(x => MakeGoodSignalName(x) == name)
+        ?? throw new ScriptError.ParsingError("Unknown signal: " + name);
   }
 
   #endregion
@@ -224,12 +242,33 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
       UpdateState();
     }
 
+    /// <inheritdoc/>
+    public override bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
+      var firstListener = base.AddSignal(signalOperator, host);
+      _trackedSignals.Add(signalOperator.SignalName);
+      return firstListener;
+    }
+
+    /// <inheritdoc/>
+    public override bool RemoveSignal(SignalOperator signalOperator, ISignalListener host) {
+      var hasListeners = base.RemoveSignal(signalOperator, host);
+      if (!hasListeners) {
+        _trackedSignals.Remove(signalOperator.SignalName);
+      }
+      return hasListeners;
+    }
+
     #endregion
 
     #region API
 
     /// <summary>Returns the number of tiles that offer collectable items.</summary>
     public int ReadyYielders => _activeYielders;
+
+    /// <summary>Returns ready objects yielding the given good, or all ready objects when the ID is null.</summary>
+    public int GetReadyYielders(string goodId) {
+      return goodId == null ? ReadyYielders : _readyYieldersByGood.GetValueOrDefault(goodId);
+    }
 
     #endregion
 
@@ -242,6 +281,8 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
     TreeCuttingArea _treeCuttingArea;
 
     readonly HashSet<Yielder> _yielders = [];
+    readonly HashSet<string> _trackedSignals = [];
+    readonly Dictionary<string, int> _readyYieldersByGood = [];
     int _activeYielders;
     bool _yieldersChanged;
     bool _rangeChanged;
@@ -288,10 +329,11 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
       HostedDebugLog.Fine(AutomationBehavior, "Recalculating {0} yielders", _yielders.Count);
       _activeYielders = 0;
+      _readyYieldersByGood.Clear();
       for (var i = _yielders.Count - 1; i >= 0; i--) {
         var yielder = _yielders.ElementAt(i);
         if (yielder.IsYielding && (_noAliveCheck || yielder.IsAlive())) {
-          ++_activeYielders;
+          CountReadyYielder(yielder);
           continue;
         }
         // If a good stack is created, it consumes the whole yielder content.
@@ -302,11 +344,19 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
         goodStack.GoodStackDisabled -= OnGoodStackDisabled;
         var hasGood = goodStack.Inventory.Enabled && !goodStack.Inventory.IsEmpty;
         if (hasGood) {
-          ++_activeYielders;
+          CountReadyYielder(yielder);
           goodStack.GoodStackDisabled += OnGoodStackDisabled;
         }
       }
-      TriggerSignalUpdate(CollectableReadySignalName);
+      foreach (var signalName in _trackedSignals) {
+        TriggerSignalUpdate(signalName);
+      }
+    }
+
+    void CountReadyYielder(Yielder yielder) {
+      ++_activeYielders;
+      var goodId = yielder.YielderSpec.Yield.Id;
+      _readyYieldersByGood[goodId] = _readyYieldersByGood.GetValueOrDefault(goodId) + 1;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

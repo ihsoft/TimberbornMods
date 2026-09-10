@@ -127,7 +127,6 @@ namespace Timberborn.Bots {
 }
 
 namespace Timberborn.BlockSystem {
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
 
   public sealed class BlockObject : BaseComponent {
@@ -179,9 +178,6 @@ namespace Timberborn.BlockSystem {
 }
 
 namespace Timberborn.BlockObjectTools {
-  using System.Collections.Generic;
-  using Timberborn.BlockSystem;
-
   public sealed class BlockObjectTool {
     public Template Template { get; init; } = new();
     public bool _placedAnythingThisFrame = true;
@@ -208,7 +204,6 @@ namespace Timberborn.BlockObjectTools {
 }
 
 namespace Timberborn.BuilderPrioritySystem {
-  using System;
   using Timberborn.BaseComponentSystem;
   using Timberborn.PrioritySystem;
 
@@ -246,8 +241,6 @@ namespace Timberborn.Buildings {
 }
 
 namespace Timberborn.BuildingsNavigation {
-  using System;
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
 
   public sealed class RangeChangedEventArgs : EventArgs {
@@ -274,7 +267,6 @@ namespace Timberborn.BuildingsNavigation {
 }
 
 namespace Timberborn.Cutting {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class Cuttable : BaseComponent {
@@ -362,7 +354,6 @@ namespace Timberborn.EntitySystem {
 }
 
 namespace Timberborn.Emptying {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class Emptiable : BaseComponent {
@@ -444,7 +435,6 @@ namespace Timberborn.Goods {
 }
 
 namespace Timberborn.GoodStackSystem {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class GoodStack : BaseComponent {
@@ -463,7 +453,6 @@ namespace Timberborn.GoodStackSystem {
 }
 
 namespace Timberborn.Growing {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class Growable : BaseComponent {
@@ -476,8 +465,6 @@ namespace Timberborn.Growing {
 }
 
 namespace Timberborn.GameDistricts {
-  using System;
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
   using Timberborn.EntitySystem;
 
@@ -673,8 +660,6 @@ namespace Timberborn.GameCycleSystem {
 }
 
 namespace Timberborn.TimeSystem {
-  using System;
-
   public interface IDayNightCycle {
     int DayNumber { get; }
     float HoursPassedToday { get; }
@@ -792,8 +777,6 @@ namespace Timberborn.MapIndexSystem {
 }
 
 namespace Timberborn.Multithreading {
-  using System;
-
   public readonly struct ParallelizerHandle {
   }
 
@@ -810,8 +793,7 @@ namespace Timberborn.Multithreading {
     int NumberOfThreads { get; }
 
     ParallelizerHandle Schedule<T>(in T task) where T : struct, IParallelizerSingleTask;
-    ParallelizerHandle Schedule<T>(in T task, ParallelizerHandle dependency)
-        where T : struct, IParallelizerSingleTask;
+    ParallelizerHandle Schedule<T>(in T task, ParallelizerHandle dependency) where T : struct, IParallelizerSingleTask;
     ParallelizerHandle Schedule<T>(in T task, ReadOnlySpan<ParallelizerHandle> dependencies)
         where T : struct, IParallelizerSingleTask;
     ParallelizerHandle Schedule<T>(int fromInclusive, int toExclusive, int batchSize, in T task)
@@ -831,9 +813,6 @@ namespace Timberborn.Multithreading {
 }
 
 namespace Timberborn.InventorySystem {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
   using Timberborn.BaseComponentSystem;
   using Timberborn.Goods;
 
@@ -926,7 +905,6 @@ namespace Timberborn.InventorySystem {
 }
 
 namespace Timberborn.Forestry {
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
 
   public sealed class LumberjackFlagWorkplaceBehavior : BaseComponent {
@@ -953,7 +931,6 @@ namespace Timberborn.Forestry {
 }
 
 namespace Timberborn.NaturalResourcesLifecycle {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class LivingNaturalResource : BaseComponent {
@@ -974,8 +951,6 @@ namespace Timberborn.NaturalResourcesLifecycle {
 }
 
 namespace Timberborn.Planting {
-  using System;
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
   using Timberborn.BlockSystem;
   using Timberborn.Common;
@@ -1121,7 +1096,6 @@ namespace Timberborn.StatusSystem {
 }
 
 namespace Timberborn.StockpilePrioritySystem {
-  using System;
   using Timberborn.BaseComponentSystem;
 
   public sealed class StockpilePriority : BaseComponent {
@@ -1197,8 +1171,6 @@ namespace Timberborn.TerrainSystem {
 }
 
 namespace Timberborn.ToolButtonSystem {
-  using System.Collections.Generic;
-
   public sealed class ToolButtonService {
     public List<ToolButton> ToolButtons { get; } = [];
   }
@@ -1284,7 +1256,6 @@ namespace Timberborn.Ruins {
 }
 
 namespace Timberborn.ResourceCountingSystem {
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
 
   public readonly struct ResourceCount {
@@ -1306,8 +1277,7 @@ namespace Timberborn.ResourceCountingSystem {
     public ResourceCount GetResourceCount(string goodId) {
       GetResourceCountCalls++;
       return new ResourceCount {
-          AvailableStock = _stockCounter.GetInputOutputStock(goodId)
-              + _stockCounter.GetOutputStock(goodId)
+          AvailableStock = _stockCounter.GetInputOutputStock(goodId) + _stockCounter.GetOutputStock(goodId)
               + _availableCarriedStock.GetValueOrDefault(goodId),
           InputOutputCapacity = _capacityCounter.GetInputOutputCapacity(goodId),
       };
@@ -1370,8 +1340,6 @@ namespace Timberborn.WeatherSystem {
 }
 
 namespace Timberborn.Yielding {
-  using System;
-  using System.Collections.Generic;
   using Timberborn.BaseComponentSystem;
   using Timberborn.NaturalResourcesLifecycle;
 
@@ -1380,6 +1348,11 @@ namespace Timberborn.Yielding {
 
   public sealed class YieldRemovingBuilding : BaseComponent {
     readonly HashSet<object> _disallowedSpecs = [];
+    public string[] AllowedGoods { get; set; } = ["Logs"];
+
+    public IEnumerable<string> GetAllowedGoods() {
+      return AllowedGoods.Distinct();
+    }
 
     public void Disallow(object yielderSpec) {
       _disallowedSpecs.Add(yielderSpec);
@@ -1390,10 +1363,14 @@ namespace Timberborn.Yielding {
     }
   }
 
+  public sealed class YielderSpec {
+    public Timberborn.Goods.GoodAmountSpec Yield { get; init; } = new() { Id = "Logs", Amount = 1 };
+  }
+
   public sealed class Yielder : BaseComponent {
     public event EventHandler YieldDecreased;
     public event EventHandler YieldAdded;
-    public object YielderSpec { get; init; } = new();
+    public YielderSpec YielderSpec { get; init; } = new();
     public bool IsYielding { get; private set; } = true;
 
     public void SetYielding(bool isYielding) {
@@ -1418,7 +1395,6 @@ namespace Timberborn.YielderFinding {
 }
 
 namespace Timberborn.WorkSystem {
-  using System;
   using Timberborn.PrioritySystem;
 
   public sealed class WorkerChangedEventArgs : EventArgs {

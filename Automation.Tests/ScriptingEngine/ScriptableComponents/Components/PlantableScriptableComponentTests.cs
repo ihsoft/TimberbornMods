@@ -10,6 +10,7 @@ using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
+using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.Multithreading;
 using Timberborn.Planting;
@@ -26,6 +27,10 @@ static class PlantableScriptableComponentTests {
     var signalNames = component.GetSignalNamesForBuilding(behavior);
 
     Assert.Equal("Plantable.Ready", signalNames[0]);
+    Assert.Equal(5, signalNames.Length);
+    Assert.Equal("Plantable.Ready.Pine", signalNames[1]);
+    Assert.Equal("Plantable.Ready.ModX2ETree", signalNames[4]);
+    Assert.Equal(0, component.GetSignalSource(signalNames[4], behavior)().AsInt);
   }
 
   public static void HidesSignalForMissingPlantingComponents() {
@@ -52,6 +57,10 @@ static class PlantableScriptableComponentTests {
     Assert.Equal(ScriptValue.TypeEnum.Number, signalDef.Result.ValueType);
     Assert.Equal(ValueDef.NumericFormatEnum.Integer, signalDef.Result.DisplayNumericFormat);
     Assert.Equal((0, float.NaN), signalDef.Result.DisplayNumericFormatRange);
+    var plantDef = component.GetSignalDefinition("Plantable.Ready.Pine", behavior);
+    Assert.Equal(SignalDef.ScopeEnum.Building, plantDef.Scope);
+    Assert.Equal("Plant.Pine", plantDef.DisplayNameArgument);
+    Assert.Equal("IgorZ.Automation.Scriptable.Plantable.Signal.ResourceReady", plantDef.DisplayNameLocKey);
   }
 
   public static void ReportsUnknownSignal() {
@@ -73,6 +82,8 @@ static class PlantableScriptableComponentTests {
     var blocked = new Vector3Int(2, 2, 0);
     var reserved = new Vector3Int(3, 2, 0);
     var listener = new TestSignalListener(behavior);
+    var pineListener = new TestSignalListener(behavior);
+    var birchListener = new TestSignalListener(behavior);
     coordinates.SetCoordinates(first, blocked, reserved);
     plantingService.SetSpot(first, "Pine");
     plantingService.SetSpot(blocked, "Birch");
@@ -98,6 +109,23 @@ static class PlantableScriptableComponentTests {
       Assert.Equal(2, component.GetSignalSource("Plantable.Ready", behavior)().AsInt);
       Assert.Equal(1, listener.Calls);
       Assert.Equal("Plantable.Ready", listener.LastSignalName);
+      Assert.Equal(1, component.GetSignalSource("Plantable.Ready.Pine", behavior)().AsInt);
+      Assert.Equal(0, component.GetSignalSource("Plantable.Ready.Birch", behavior)().AsInt);
+      Assert.Equal(1, component.GetSignalSource("Plantable.Ready.Oak", behavior)().AsInt);
+
+      component.RegisterSignalChangeCallback(Signal("Plantable.Ready.Pine", behavior), pineListener);
+      component.RegisterSignalChangeCallback(Signal("Plantable.Ready.Birch", behavior), birchListener);
+      plantingService.SetSpot(first, "Birch");
+      component.StartParallelTick();
+      Assert.Equal(1, parallelizer.PendingTasks);
+      parallelizer.RunScheduledTasks();
+      component.Tick();
+      Assert.Equal(2, component.GetSignalSource("Plantable.Ready", behavior)().AsInt);
+      Assert.Equal(1, listener.Calls);
+      Assert.Equal(0, component.GetSignalSource("Plantable.Ready.Pine", behavior)().AsInt);
+      Assert.Equal(1, component.GetSignalSource("Plantable.Ready.Birch", behavior)().AsInt);
+      Assert.Equal(1, pineListener.Calls);
+      Assert.Equal(1, birchListener.Calls);
     } finally {
       Time.timeScale = 1f;
     }
@@ -120,6 +148,8 @@ static class PlantableScriptableComponentTests {
       SetAutomationSystemReady(false);
 
       component.RegisterSignalChangeCallback(Signal("Plantable.Ready", behavior), listener);
+      var pineListener = new TestSignalListener(behavior);
+      component.RegisterSignalChangeCallback(Signal("Plantable.Ready.Pine", behavior), pineListener);
       behavior.OnEnterFinishedState();
       MonoBehaviour.RunQueuedCoroutines();
 
@@ -130,6 +160,8 @@ static class PlantableScriptableComponentTests {
 
       Assert.Equal(2, component.GetSignalSource("Plantable.Ready", behavior)().AsInt);
       Assert.Equal(1, listener.Calls);
+      Assert.Equal(1, component.GetSignalSource("Plantable.Ready.Pine", behavior)().AsInt);
+      Assert.Equal(1, pineListener.Calls);
     } finally {
       Time.timeScale = 1f;
       SetAutomationSystemReady(true);
@@ -179,21 +211,34 @@ static class PlantableScriptableComponentTests {
     var behavior = CreateBehavior(plantingService);
     var listener = new TestSignalListener(behavior);
     var signal = Signal("Plantable.Ready", behavior);
+    var pineSignal = Signal("Plantable.Ready.Pine", behavior);
+    var secondListener = new TestSignalListener(behavior);
 
     component.RegisterSignalChangeCallback(signal, listener);
+    component.RegisterSignalChangeCallback(pineSignal, listener);
+    component.RegisterSignalChangeCallback(pineSignal, secondListener);
     component.UnregisterSignalChangeCallback(signal, listener);
+    component.UnregisterSignalChangeCallback(pineSignal, listener);
+    component.StartParallelTick();
+    Assert.Equal(1, parallelizer.PendingTasks);
+    parallelizer.RunScheduledTasks();
+    component.Tick();
+    component.UnregisterSignalChangeCallback(pineSignal, secondListener);
     component.StartParallelTick();
 
     Assert.Equal(0, parallelizer.PendingTasks);
+    component.Tick();
+    component.RegisterSignalChangeCallback(pineSignal, listener);
+    component.StartParallelTick();
+    Assert.Equal(1, parallelizer.PendingTasks);
+    parallelizer.RunScheduledTasks();
+    component.Tick();
   }
 
   static PlantableScriptableComponent CreateComponent(PlantingService plantingService, TestParallelizer parallelizer) {
     SetDependencyContainer(CreateContainer(plantingService));
     var constructor = typeof(PlantableScriptableComponent).GetConstructor(
-        BindingFlags.Instance | BindingFlags.NonPublic,
-        null,
-        [typeof(IParallelizer)],
-        null);
+        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(IParallelizer)], null);
     var component = (PlantableScriptableComponent)constructor.Invoke([parallelizer]);
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
     component.Load();
@@ -207,6 +252,9 @@ static class PlantableScriptableComponentTests {
     behavior.SetComponent(new BuildingTerrainRange());
     behavior.SetComponent(new InRangePlantingCoordinates());
     behavior.SetComponent(new PlantingSpotFinder());
+    behavior.SetComponent(new PlanterBuilding {
+        AllowedPlantables = [Plantable("Pine"), Plantable("Birch"), Plantable("Oak"), Plantable("Mod.Tree")],
+    });
     behavior.InjectDependencies(new AutomationService());
     behavior.Awake();
     return behavior;
@@ -219,22 +267,24 @@ static class PlantableScriptableComponentTests {
     return container;
   }
 
+  static PlantableSpec Plantable(string name) {
+    var plantable = new PlantableSpec { TemplateName = name };
+    plantable.SetComponent(new LabeledEntitySpec { DisplayNameLocKey = "Plant." + name });
+    return plantable;
+  }
+
   static SignalOperator Signal(string signalName, AutomationBehavior behavior) {
     return SignalOperator.Create(new ExpressionContext { ScriptHost = behavior }, signalName);
   }
 
   static void SetDependencyContainer(IContainer container) {
     var constructor = typeof(StaticBindings).GetConstructor(
-        BindingFlags.Instance | BindingFlags.NonPublic,
-        null,
-        [typeof(IContainer)],
-        null);
+        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(IContainer)], null);
     constructor.Invoke([container]);
   }
 
   static void SetAutomationSystemReady(bool isReady) {
-    var setter = typeof(AutomationService)
-        .GetProperty(nameof(AutomationService.AutomationSystemReady))
+    var setter = typeof(AutomationService).GetProperty(nameof(AutomationService.AutomationSystemReady))
         ?.GetSetMethod(nonPublic: true);
     setter.Invoke(null, [isReady]);
   }

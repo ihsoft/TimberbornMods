@@ -9,6 +9,8 @@ using IgorZ.TimberDev.Utils;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Forestry;
+using Timberborn.Goods;
+using Timberborn.GoodStackSystem;
 using Timberborn.Localization;
 using Timberborn.NaturalResourcesLifecycle;
 using Timberborn.SingletonSystem;
@@ -21,10 +23,16 @@ static class CollectableScriptableComponentTests {
   public static void ExposesSignalForCollectingBuilding() {
     var component = CreateComponent();
     var behavior = CreateBehavior(new BlockService());
+    behavior.GetComponent<YieldRemovingBuilding>().AllowedGoods = ["Logs", "Water", "Logs", "Mod.Good"];
 
     var signalNames = component.GetSignalNamesForBuilding(behavior);
 
     Assert.Equal("Collectable.Ready", signalNames[0]);
+    Assert.Equal(4, signalNames.Length);
+    Assert.Equal("Collectable.Ready.Logs", signalNames[1]);
+    Assert.Equal("Collectable.Ready.Water", signalNames[2]);
+    Assert.Equal("Collectable.Ready.ModX2EGood", signalNames[3]);
+    Assert.Equal(0, component.GetSignalSource(signalNames[3], behavior)().AsInt);
   }
 
   public static void HidesSignalForMissingCollectingComponents() {
@@ -51,6 +59,10 @@ static class CollectableScriptableComponentTests {
     Assert.Equal(ScriptValue.TypeEnum.Number, signalDef.Result.ValueType);
     Assert.Equal(ValueDef.NumericFormatEnum.Integer, signalDef.Result.DisplayNumericFormat);
     Assert.Equal((0, float.NaN), signalDef.Result.DisplayNumericFormatRange);
+    var goodDef = component.GetSignalDefinition("Collectable.Ready.Logs", behavior);
+    Assert.Equal(SignalDef.ScopeEnum.Building, goodDef.Scope);
+    Assert.Equal("Good.Logs", goodDef.DisplayNameArgument);
+    Assert.Equal("IgorZ.Automation.Scriptable.Collectable.Signal.GoodReady", goodDef.DisplayNameLocKey);
   }
 
   public static void ReportsUnknownSignal() {
@@ -67,11 +79,14 @@ static class CollectableScriptableComponentTests {
     var behavior = CreateBehavior(blockService);
     var range = behavior.GetComponent<BuildingTerrainRange>();
     var collector = behavior.GetComponent<YieldRemovingBuilding>();
-    var readyYielder = CreateYielderBlock(new Vector3Int(1, 2, 0), out var ready);
-    var inactiveYielder = CreateYielderBlock(new Vector3Int(2, 2, 0), out var inactive);
-    var deadYielder = CreateYielderBlock(new Vector3Int(3, 2, 0), out var dead);
-    var disallowedYielder = CreateYielderBlock(new Vector3Int(4, 2, 0), out var disallowed);
+    var readyYielder = CreateYielderBlock(new Vector3Int(1, 2, 0), "Logs", out var ready);
+    var inactiveYielder = CreateYielderBlock(new Vector3Int(2, 2, 0), "Water", out var inactive);
+    var deadYielder = CreateYielderBlock(new Vector3Int(3, 2, 0), "Logs", out var dead);
+    var disallowedYielder = CreateYielderBlock(new Vector3Int(4, 2, 0), "Logs", out var disallowed);
     var listener = new TestSignalListener(behavior);
+    var logsListener = new TestSignalListener(behavior);
+    var waterListener = new TestSignalListener(behavior);
+    collector.AllowedGoods = ["Logs", "Water"];
     inactive.SetYielding(false);
     dead.SetComponent(new LivingNaturalResource());
     dead.GetComponent<LivingNaturalResource>().Die();
@@ -85,6 +100,9 @@ static class CollectableScriptableComponentTests {
     blockService.SetObjectsAt(disallowedYielder.Coordinates, disallowedYielder);
 
     component.RegisterSignalChangeCallback(Signal("Collectable.Ready", behavior), listener);
+    var logsSignal = Signal("Collectable.Ready.Logs", behavior);
+    component.RegisterSignalChangeCallback(logsSignal, logsListener);
+    component.RegisterSignalChangeCallback(Signal("Collectable.Ready.Water", behavior), waterListener);
     behavior.OnEnterFinishedState();
 
     Assert.Equal(1, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
@@ -93,10 +111,42 @@ static class CollectableScriptableComponentTests {
 
     ready.SetYielding(false);
     ready.DecreaseYield();
+    inactive.SetYielding(true);
+    inactive.AddYield();
+    MonoBehaviour.RunQueuedCoroutines();
+
+    Assert.Equal(1, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal(0, component.GetSignalSource("Collectable.Ready.Logs", behavior)().AsInt);
+    Assert.Equal(1, component.GetSignalSource("Collectable.Ready.Water", behavior)().AsInt);
+    Assert.Equal(2, logsListener.Calls);
+    Assert.Equal(1, waterListener.Calls);
+
+    inactive.SetYielding(false);
+    inactive.DecreaseYield();
     MonoBehaviour.RunQueuedCoroutines();
 
     Assert.Equal(0, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
     Assert.Equal(2, listener.Calls);
+    Assert.Equal(2, waterListener.Calls);
+
+    var stack = new GoodStack();
+    ready.SetComponent(stack);
+    ready.DecreaseYield();
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(1, component.GetSignalSource("Collectable.Ready.Logs", behavior)().AsInt);
+    Assert.Equal(3, logsListener.Calls);
+    component.UnregisterSignalChangeCallback(logsSignal, logsListener);
+    stack.Inventory.IsEmpty = true;
+    stack.DisableStack();
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(0, component.GetSignalSource("Collectable.Ready.Logs", behavior)().AsInt);
+    Assert.Equal(3, logsListener.Calls);
+    component.RegisterSignalChangeCallback(logsSignal, logsListener);
+    ready.SetYielding(true);
+    ready.AddYield();
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(4, logsListener.Calls);
   }
 
   public static void UpdatesReadyYieldersOnPostLoadActivation() {
@@ -104,13 +154,15 @@ static class CollectableScriptableComponentTests {
     var component = CreateComponent(blockService);
     var behavior = CreateBehavior(blockService);
     var range = behavior.GetComponent<BuildingTerrainRange>();
-    var readyYielder = CreateYielderBlock(new Vector3Int(1, 2, 0), out _);
+    var readyYielder = CreateYielderBlock(new Vector3Int(1, 2, 0), "Logs", out _);
     var listener = new TestSignalListener(behavior);
 
     try {
       SetAutomationSystemReady(false);
 
       component.RegisterSignalChangeCallback(Signal("Collectable.Ready", behavior), listener);
+      var goodListener = new TestSignalListener(behavior);
+      component.RegisterSignalChangeCallback(Signal("Collectable.Ready.Logs", behavior), goodListener);
       behavior.OnEnterFinishedState();
       range.SetRange(readyYielder.Coordinates);
       blockService.SetObjectsAt(readyYielder.Coordinates, readyYielder);
@@ -124,6 +176,8 @@ static class CollectableScriptableComponentTests {
 
       Assert.Equal(1, component.GetSignalSource("Collectable.Ready", behavior)().AsInt);
       Assert.Equal(1, listener.Calls);
+      Assert.Equal(1, component.GetSignalSource("Collectable.Ready.Logs", behavior)().AsInt);
+      Assert.Equal(1, goodListener.Calls);
     } finally {
       SetAutomationSystemReady(true);
       MonoBehaviour.ClearQueuedCoroutines();
@@ -136,7 +190,7 @@ static class CollectableScriptableComponentTests {
     var component = CreateComponent(blockService, treeCuttingArea);
     var behavior = CreateBehavior(blockService, treeCuttingArea);
     var range = behavior.GetComponent<BuildingTerrainRange>();
-    var yielderBlock = CreateYielderBlock(new Vector3Int(1, 2, 0), out _);
+    var yielderBlock = CreateYielderBlock(new Vector3Int(1, 2, 0), "Logs", out _);
     behavior.SetComponent(new LumberjackFlagWorkplaceBehavior());
     range.SetRange(yielderBlock.Coordinates);
     blockService.SetObjectsAt(yielderBlock.Coordinates, yielderBlock);
@@ -152,8 +206,8 @@ static class CollectableScriptableComponentTests {
       BlockService blockService = null, TreeCuttingArea treeCuttingArea = null) {
     SetDependencyContainer(CreateContainer(blockService, treeCuttingArea));
     var constructor = typeof(CollectableScriptableComponent).GetConstructor(
-        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(Timberborn.Goods.IGoodService)], null);
-    var component = (CollectableScriptableComponent)constructor.Invoke([null]);
+        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(IGoodService)], null);
+    var component = (CollectableScriptableComponent)constructor.Invoke([new TestGoods()]);
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
     component.Load();
     return component;
@@ -178,8 +232,8 @@ static class CollectableScriptableComponentTests {
     return container;
   }
 
-  static BlockObject CreateYielderBlock(Vector3Int coordinates, out Yielder yielder) {
-    yielder = new Yielder();
+  static BlockObject CreateYielderBlock(Vector3Int coordinates, string goodId, out Yielder yielder) {
+    yielder = new Yielder { YielderSpec = new YielderSpec { Yield = new GoodAmountSpec { Id = goodId, Amount = 10 } } };
     var blockObject = new BlockObject { Coordinates = coordinates };
     blockObject.SetComponent(yielder);
     return blockObject;
@@ -199,6 +253,11 @@ static class CollectableScriptableComponentTests {
     var setter = typeof(AutomationService).GetProperty(nameof(AutomationService.AutomationSystemReady))
         ?.GetSetMethod(nonPublic: true);
     setter.Invoke(null, [isReady]);
+  }
+
+  sealed class TestGoods : IGoodService {
+    public GoodSpec GetGood(string id) => new() { Id = id, PluralDisplayName = new LocalizedText("Good." + id) };
+    public GoodSpec GetGoodOrNull(string id) => GetGood(id);
   }
 
   sealed class TestLoc : ILoc {
