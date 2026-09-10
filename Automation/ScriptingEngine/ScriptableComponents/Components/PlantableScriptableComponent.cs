@@ -10,9 +10,11 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
+using Timberborn.EntitySystem;
 using Timberborn.Forestry;
 using Timberborn.Multithreading;
 using Timberborn.Planting;
@@ -25,8 +27,11 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSingleton, IParallelTickableSingleton {
 
   const string SpotReadySignalLocKey = "IgorZ.Automation.Scriptable.Plantable.Signal.SpotsReady";
+  const string SetPriorityActionLocKey = "IgorZ.Automation.Scriptable.Plantable.Action.SetPriority";
+  const string NoPriorityLocKey = "Planting.NoPriorityOption";
   
   const string SpotReadySignalName = "Plantable.Ready";
+  const string SetPriorityActionName = "Plantable.SetPriority";
 
   #region ITickableSingleton implementation
 
@@ -92,6 +97,47 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
   public override string Name => "Plantable";
 
   /// <inheritdoc/>
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    return behavior.GetComponent<PlantablePrioritizer>() && behavior.GetComponent<PlanterBuilding>()
+        ? [SetPriorityActionName] : [];
+  }
+
+  /// <inheritdoc/>
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    if (name != SetPriorityActionName) {
+      throw new UnknownActionException(name);
+    }
+    GetComponentOrThrow<PlantablePrioritizer>(behavior);
+    var planter = GetComponentOrThrow<PlanterBuilding>(behavior);
+    return new ActionDef {
+        ScriptName = name,
+        DisplayName = Loc.T(SetPriorityActionLocKey),
+        Arguments = [
+            new ValueDef {
+                ValueType = ScriptValue.TypeEnum.String,
+                Options = [
+                    new DropdownItem { Value = "", Text = Loc.T(NoPriorityLocKey) },
+                    ..planter.AllowedPlantables.Select(x => new DropdownItem {
+                        Value = x.TemplateName,
+                        Text = Loc.T(x.GetSpec<LabeledEntitySpec>().DisplayNameLocKey),
+                    }),
+                ],
+            },
+        ],
+    };
+  }
+
+  /// <inheritdoc/>
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    if (name != SetPriorityActionName) {
+      throw new UnknownActionException(name);
+    }
+    var prioritizer = GetComponentOrThrow<PlantablePrioritizer>(behavior);
+    var planter = GetComponentOrThrow<PlanterBuilding>(behavior);
+    return args => SetPriorityAction(args, prioritizer, planter);
+  }
+
+  /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
     var plantingSpotFinder = GetPlantingSpotFinder(behavior, throwIfNotFound: false);
     if (!plantingSpotFinder) {
@@ -135,6 +181,24 @@ sealed class PlantableScriptableComponent : ScriptableComponentBase, ITickableSi
     var tracker = host.Behavior.GetOrThrow<PlantableTracker>();
     if (!tracker.RemoveSignal(signalOperator, host)) {
       _allTrackers.Remove(tracker);
+    }
+  }
+
+  #endregion
+
+  #region Actions
+
+  static void SetPriorityAction(ScriptValue[] args, PlantablePrioritizer prioritizer, PlanterBuilding planter) {
+    AssertActionArgsCount(SetPriorityActionName, args, 1);
+    var templateName = args[0].AsString;
+    var plantable = templateName == ""
+        ? null : planter.AllowedPlantables.SingleOrDefault(x => x.TemplateName == templateName);
+    if (templateName != "" && plantable == null) {
+      throw new ScriptError.BadValue("Unsupported plantable: " + templateName);
+    }
+    // Farms use this same priority for both planting and harvesting.
+    if (prioritizer.PrioritizedPlantableSpec != plantable) {
+      prioritizer.PrioritizePlantable(plantable);
     }
   }
 

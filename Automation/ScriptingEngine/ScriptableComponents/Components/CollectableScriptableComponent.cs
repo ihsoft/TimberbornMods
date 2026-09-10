@@ -11,6 +11,7 @@ using Bindito.Core;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
+using IgorZ.TimberDev.UI;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
@@ -18,11 +19,14 @@ using Timberborn.Common;
 using Timberborn.Cutting;
 using Timberborn.EntitySystem;
 using Timberborn.Forestry;
+using Timberborn.Gathering;
+using Timberborn.Goods;
 using Timberborn.GoodStackSystem;
 using Timberborn.Growing;
 using Timberborn.NaturalResourcesLifecycle;
 using Timberborn.Ruins;
 using Timberborn.SingletonSystem;
+using Timberborn.TemplateSystem;
 using Timberborn.YielderFinding;
 using Timberborn.Yielding;
 using UnityDev.Utils.LogUtilsLite;
@@ -33,13 +37,57 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
   const string CollectableReadySignalLocKey = "IgorZ.Automation.Scriptable.Collectable.Signal.CollectableReady";
+  const string SetPriorityActionLocKey = "IgorZ.Automation.Scriptable.Collectable.Action.SetPriority";
+  const string NoPriorityLocKey = "Gathering.Nothing";
 
   const string CollectableReadySignalName = "Collectable.Ready";
+  const string SetPriorityActionName = "Collectable.SetPriority";
 
   #region ScriptableComponentBase implementation
 
   /// <inheritdoc/>
   public override string Name => "Collectable";
+
+  /// <inheritdoc/>
+  public override string[] GetActionNamesForBuilding(AutomationBehavior behavior) {
+    return behavior.GetComponent<GatherablePrioritizer>() && behavior.GetComponent<GathererFlag>()
+        ? [SetPriorityActionName] : [];
+  }
+
+  /// <inheritdoc/>
+  public override ActionDef GetActionDefinition(string name, AutomationBehavior behavior) {
+    if (name != SetPriorityActionName) {
+      throw new UnknownActionException(name);
+    }
+    GetComponentOrThrow<GatherablePrioritizer>(behavior);
+    var gatherer = GetComponentOrThrow<GathererFlag>(behavior);
+    return new ActionDef {
+        ScriptName = name,
+        DisplayName = Loc.T(SetPriorityActionLocKey),
+        Arguments = [
+            new ValueDef {
+                ValueType = ScriptValue.TypeEnum.String,
+                Options = [
+                    new DropdownItem { Value = "", Text = Loc.T(NoPriorityLocKey) },
+                    ..gatherer.AllowedGatherables.Select(x => new DropdownItem {
+                        Value = x.GetSpec<TemplateSpec>().TemplateName,
+                        Text = _goodService.GetGood(x.Yielder.Yield.Id).PluralDisplayName.Value,
+                    }),
+                ],
+            },
+        ],
+    };
+  }
+
+  /// <inheritdoc/>
+  public override Action<ScriptValue[]> GetActionExecutor(string name, AutomationBehavior behavior) {
+    if (name != SetPriorityActionName) {
+      throw new UnknownActionException(name);
+    }
+    var prioritizer = GetComponentOrThrow<GatherablePrioritizer>(behavior);
+    var gatherer = GetComponentOrThrow<GathererFlag>(behavior);
+    return args => SetPriorityAction(args, prioritizer, gatherer);
+  }
 
   /// <inheritdoc/>
   public override string[] GetSignalNamesForBuilding(AutomationBehavior behavior) {
@@ -84,6 +132,23 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
 
   #endregion
 
+  #region Actions
+
+  static void SetPriorityAction(ScriptValue[] args, GatherablePrioritizer prioritizer, GathererFlag gatherer) {
+    AssertActionArgsCount(SetPriorityActionName, args, 1);
+    var templateName = args[0].AsString;
+    var gatherable = templateName == "" ? null : gatherer.AllowedGatherables.SingleOrDefault(
+        x => x.GetSpec<TemplateSpec>().TemplateName == templateName);
+    if (templateName != "" && gatherable == null) {
+      throw new ScriptError.BadValue("Unsupported gatherable: " + templateName);
+    }
+    if (prioritizer.PrioritizedGatherable != gatherable) {
+      prioritizer.PrioritizeGatherable(gatherable);
+    }
+  }
+
+  #endregion
+
   #region Signals
 
   SignalDef CollectableReadySignalDef => _collectableReadySignalDef ??= new SignalDef {
@@ -105,6 +170,12 @@ sealed class CollectableScriptableComponent : ScriptableComponentBase {
   #endregion
 
   #region Implementation
+
+  readonly IGoodService _goodService;
+
+  CollectableScriptableComponent(IGoodService goodService) {
+    _goodService = goodService;
+  }
 
   static YieldRemovingBuilding GetYieldRemovingBuilding(AutomationBehavior behavior, bool throwIfNotFound = true) {
     var yieldRemovingBuilding = behavior.GetComponent<YieldRemovingBuilding>();

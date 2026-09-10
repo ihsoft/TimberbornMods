@@ -6,7 +6,6 @@ using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using IgorZ.TimberDev.Utils;
-using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BuildingsNavigation;
 using Timberborn.Forestry;
@@ -152,7 +151,9 @@ static class CollectableScriptableComponentTests {
   static CollectableScriptableComponent CreateComponent(
       BlockService blockService = null, TreeCuttingArea treeCuttingArea = null) {
     SetDependencyContainer(CreateContainer(blockService, treeCuttingArea));
-    var component = new CollectableScriptableComponent();
+    var constructor = typeof(CollectableScriptableComponent).GetConstructor(
+        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(Timberborn.Goods.IGoodService)], null);
+    var component = (CollectableScriptableComponent)constructor.Invoke([null]);
     component.InjectDependencies(new TestLoc(), TestScripting.CreateService());
     component.Load();
     return component;
@@ -190,16 +191,12 @@ static class CollectableScriptableComponentTests {
 
   static void SetDependencyContainer(IContainer container) {
     var constructor = typeof(StaticBindings).GetConstructor(
-        BindingFlags.Instance | BindingFlags.NonPublic,
-        null,
-        [typeof(IContainer)],
-        null);
+        BindingFlags.Instance | BindingFlags.NonPublic, null, [typeof(IContainer)], null);
     constructor.Invoke([container]);
   }
 
   static void SetAutomationSystemReady(bool isReady) {
-    var setter = typeof(AutomationService)
-        .GetProperty(nameof(AutomationService.AutomationSystemReady))
+    var setter = typeof(AutomationService).GetProperty(nameof(AutomationService.AutomationSystemReady))
         ?.GetSetMethod(nonPublic: true);
     setter.Invoke(null, [isReady]);
   }

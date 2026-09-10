@@ -15,6 +15,9 @@ namespace IgorZ.Automation.AutomationSystem;
 sealed class GameAutomationConflictDetector {
   const string DynamiteDetonationProperty = "Dynamite.Detonation";
   const string ClutchModeProperty = "Clutch.Mode";
+  const string GatherablePriorityProperty = "GatherablePrioritizer.PrioritizedGatherable";
+  const string PlantablePriorityProperty = "PlantablePrioritizer.PrioritizedPlantable";
+  const string FarmHouseModeProperty = "FarmHouse.PlantingPrioritized";
   const string FillValveTargetHeightProperty = "FillValve.TargetHeight";
   const string FillValveAutomationTargetHeightProperty = "FillValve.AutomationTargetHeight";
   const string FloodgateHeightProperty = "Floodgate.Height";
@@ -30,6 +33,9 @@ sealed class GameAutomationConflictDetector {
   const string WorkplacePriorityProperty = "Workplace.Priority";
 
   static readonly Dictionary<string, string[]> ActionChangedProperties = new() {
+      ["Collectable.SetPriority"] = [GatherablePriorityProperty],
+      ["Plantable.SetPriority"] = [PlantablePriorityProperty],
+      ["FarmHouse.SetMode"] = [FarmHouseModeProperty],
       ["Dynamite.Detonate"] = [DynamiteDetonationProperty],
       ["Dynamite.DetonateAndRepeat"] = [DynamiteDetonationProperty],
       ["Clutch.Engage"] = [ClutchModeProperty],

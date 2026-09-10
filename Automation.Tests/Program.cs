@@ -5,6 +5,9 @@ namespace Automation.Tests;
 
 static class Program {
   static readonly List<(string Name, Action Test)> Tests = [
+      ("Farm actions change and clear planting priority", FarmActionsTests.PlantingPriority),
+      ("Farm actions change and clear gathering priority", FarmActionsTests.GatheringPriority),
+      ("Farm actions change farm mode", FarmActionsTests.FarmMode),
       // AutomationSystem
       ("AutomationBehavior creates dynamic component only once", AutomationBehaviorTests.GetOrCreateCachesComponent),
       ("AutomationBehavior reports missing dynamic component",
