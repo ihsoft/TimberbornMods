@@ -41,6 +41,72 @@ function Invoke-Git([string[]] $Arguments) {
     return $output
 }
 
+function ConvertTo-NativeArgument([string] $Argument) {
+    if ($Argument.Length -gt 0 -and $Argument -notmatch '[\s"]') {
+        return $Argument
+    }
+
+    $builder = [System.Text.StringBuilder]::new()
+    [void]$builder.Append([char]34)
+    $backslashCount = 0
+    foreach ($character in $Argument.ToCharArray()) {
+        if ($character -eq [char]92) {
+            $backslashCount++
+            continue
+        }
+
+        if ($character -eq [char]34) {
+            [void]$builder.Append(([string][char]92) * (($backslashCount * 2) + 1))
+            [void]$builder.Append($character)
+        } else {
+            [void]$builder.Append(([string][char]92) * $backslashCount)
+            [void]$builder.Append($character)
+        }
+        $backslashCount = 0
+    }
+
+    [void]$builder.Append(([string][char]92) * ($backslashCount * 2))
+    [void]$builder.Append([char]34)
+    return $builder.ToString()
+}
+
+function Invoke-GitPathList([string[]] $Arguments) {
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = "git"
+    $startInfo.Arguments = (@($Arguments | ForEach-Object { ConvertTo-NativeArgument $_ })) -join " "
+    $startInfo.WorkingDirectory = $repoRoot
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $utf8 = [System.Text.UTF8Encoding]::new($false, $true)
+    $startInfo.StandardOutputEncoding = $utf8
+    $startInfo.StandardErrorEncoding = $utf8
+
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        [void]$process.Start()
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $process.WaitForExit()
+        $output = $stdoutTask.GetAwaiter().GetResult()
+        $errorOutput = $stderrTask.GetAwaiter().GetResult()
+        $exitCode = $process.ExitCode
+    } finally {
+        $process.Dispose()
+    }
+
+    if ($exitCode -ne 0) {
+        throw "git $($Arguments -join ' ') failed with exit code $exitCode.`n$errorOutput"
+    }
+    if ($output.Length -gt 0 -and $output[$output.Length - 1] -ne [char]0) {
+        throw "git $($Arguments -join ' ') returned a path list without a terminating NUL byte."
+    }
+
+    return @($output.Split([char]0) | Where-Object { $_.Length -gt 0 })
+}
+
 function Convert-ToRepositoryPath([string] $InputPath) {
     $absolutePath = if ([System.IO.Path]::IsPathRooted($InputPath)) {
         [System.IO.Path]::GetFullPath($InputPath)
@@ -92,7 +158,7 @@ Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "git-trans
             throw "HEAD changed before the commit transaction. Expected $ExpectedHead, actual $headBefore."
         }
 
-        $preStaged = @(Invoke-Git @("diff", "--cached", "--name-only", "--"))
+        $preStaged = @(Invoke-GitPathList @("diff", "--cached", "--name-only", "-z", "--"))
         if ($preStaged.Count -gt 0) {
             throw "The Git index already contains staged paths: $($preStaged -join ', '). Do not alter another task's staged state."
         }
@@ -106,7 +172,9 @@ Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "git-trans
 
         $stagingAttempted = $true
         Invoke-Git (@("add", "--") + $relativePaths) | Out-Null
-        $stagedByScript = @(Invoke-Git @("diff", "--cached", "--no-renames", "--name-only", "--"))
+        $stagedByScript = @(
+            Invoke-GitPathList @("diff", "--cached", "--no-renames", "--name-only", "-z", "--")
+        )
         Assert-SamePathSet $relativePaths $stagedByScript "Staged"
 
         Invoke-Git @("diff", "--cached", "--check") | Out-Null
@@ -121,11 +189,15 @@ Invoke-WithRepositoryLock -RepositoryRoot $coordinationRoot -Resource "git-trans
         }
 
         $committedPaths = @(
-            Invoke-Git @("diff-tree", "--no-renames", "--no-commit-id", "--name-only", "-r", $headAfter)
+            Invoke-GitPathList @(
+                "diff-tree", "--no-renames", "--no-commit-id", "--name-only", "-z", "-r", $headAfter
+            )
         )
         Assert-SamePathSet $stagedByScript $committedPaths "Committed"
 
-        $remainingStaged = @(Invoke-Git @("diff", "--cached", "--no-renames", "--name-only", "--"))
+        $remainingStaged = @(
+            Invoke-GitPathList @("diff", "--cached", "--no-renames", "--name-only", "-z", "--")
+        )
         if ($remainingStaged.Count -gt 0) {
             throw "The commit completed but staged paths remain: $($remainingStaged -join ', ')."
         }
