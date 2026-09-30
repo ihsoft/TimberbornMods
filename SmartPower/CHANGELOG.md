@@ -1,4 +1,4 @@
-# v1.19.0 (TBD)
+# v1.19.0 (September 29th, 2026)
 * [Feature] Add Vietnamese localization.
 
 # v1.18.0 (August 16th, 2026)
