@@ -1,3 +1,6 @@
+# v1.19.0 (TBD)
+* [Feature] Add Vietnamese localization.
+
 # v1.18.0 (August 16th, 2026)
 * [Feature] Add an option to consume only 1 hp in manufactory power saving mode.
 
