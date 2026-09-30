@@ -65,6 +65,28 @@ package-wide `PublicPackageVersion` used for the Mod.IO file.
 Do not create a GitHub Release before Steam Workshop and Mod.IO uploads and live verification succeed. If platform
 publishing fails or is only partially completed, do not create a GitHub Release unless the user explicitly asks.
 
+## Public Package Owner After A Backport
+
+An older-line-only release is not locally complete until the public package owner's current-line `release.json`
+records the newly published older lane in `ManifestVersions`. Include this reconciliation in the local release plan;
+do not defer it to the next current-line release.
+
+Perform the update only after all requested publication steps, including tags and GitHub assets, have completed and
+their readbacks are verified, with no partial or unknown outcome remaining. Finish any bounded recovery first: the
+original preflight binds the public-owner config hash, so changing that config during publication can invalidate the
+remaining steps.
+
+Compare the owner's mapping with the released package's lane manifests and immutable fingerprints, using the verified
+publication evidence rather than whichever local lane happens to exist. Update only the changed older-lane entries
+and commit the exact owner config path under repository coordination. Preserve current-line versions, changelog,
+source, and unrelated settings. If the mapping already matches, record that no change is needed; if a later release or
+concurrent edit conflicts with the captured state, resolve it before writing instead of overwriting newer state.
+
+Keep this metadata reconciliation separate from the source release commit. Record its commit and old/new lane mapping
+in the final signoff; do not move release tags, rewrite the immutable preflight, rebuild, or republish. Subsequent
+releases obtain fresh readiness from the reconciled config. If the commit is outside the user's existing authorization,
+request that authorization and report reconciliation as pending rather than declaring all local release work complete.
+
 ## Discord Release Handoff
 
 After successful publication, use `tools/prepare-discord-release-message.ps1` to prepare the mod's release announcement

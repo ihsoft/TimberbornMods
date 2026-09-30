@@ -207,3 +207,6 @@ immutable preflight proves all of the following:
 
 Do not apply this exception to a changed current lane, an unqualified source, an unchanged package, or an arbitrary
 same-version replacement. Those cases remain governed by the corrective-release rules.
+
+After an older-line-only publication, complete `Public Package Owner After A Backport` in Release Signoff Operational
+Knowledge so the current-line owner's `ManifestVersions` records the released older lane for the next release.
