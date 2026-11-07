@@ -1,3 +1,6 @@
+# v4.11.1 (TBD)
+* [Fix] Unknown weather warnings appeared even when no enabled rules used the built-in season signal.
+
 # v4.11.0 (September 9th, 2026)
 * [Feature] Add actions to change prioritized resources on farms, foresters, and gatherers, and switch farms between planting and harvesting priority.
 * [Feature] Add readiness signals for each collected good and each planted resource alongside the total counters.

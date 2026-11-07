@@ -215,7 +215,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     _currentSeason = GetCurrentSeason();
     if (oldSeason != _currentSeason) {
       DebugEx.Info("Weather season changed: {0} -> {1}", oldSeason, _currentSeason);
-      if (!_weatherSeasonIds.Contains(_currentSeason)) {
+      if (_referenceManager.Signals.Count > 0 && !_weatherSeasonIds.Contains(_currentSeason)) {
         DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
       }
       _referenceManager.TriggerSignalUpdate(SeasonSignalName);
