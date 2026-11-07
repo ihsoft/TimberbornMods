@@ -11,5 +11,7 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Extensions;
 sealed class Configurator : IConfigurator {
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<AutomationExtensionsRegistry>().AsSingleton();
+    containerDefinition.Bind<ExternalScriptableComponent>().AsSingleton();
+    containerDefinition.Bind<AutomationApiEndpoint>().AsSingleton();
   }
 }

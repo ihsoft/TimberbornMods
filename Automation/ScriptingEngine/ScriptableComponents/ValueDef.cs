@@ -73,11 +73,11 @@ sealed record ValueDef {
   /// performed for the value in percent, not for the normalized value. So, if you want to allow any percent value from
   /// 0% to 100%, you should set the range as [0, 100], not [0, 1] (as it will be stored in <see cref="ScriptValue"/>).
   /// </p>
-  /// <p>To disable range checking leave this field uninitialized (default).</p>
+  /// <p>To disable range checking leave this property null. An explicit [0, 0] range allows only zero.</p>
   /// </summary>
   /// <seealso cref="DisplayNumericFormat"/>
   /// <seealso cref="ScriptValue.AsRawNumber"/>
-  public (float min, float max) DisplayNumericFormatRange { get; init; }
+  public (float min, float max)? DisplayNumericFormatRange { get; init; }
 
   /// <summary>The type of the argument.</summary>
   public ScriptValue.TypeEnum ValueType { get; init; }

@@ -8,6 +8,12 @@
         <NoWarn>CS8524</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="..\Automation\Api\AutomationApi.cs">
+        <Link>Automation\Api\AutomationApi.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\ExternalValueDefinition.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\ExternalValueDefinition.cs</Link>
+      </Compile>
       <Compile Include="..\TestSupport\Testing\Assert.cs">
         <Link>TestSupport\Testing\Assert.cs</Link>
       </Compile>

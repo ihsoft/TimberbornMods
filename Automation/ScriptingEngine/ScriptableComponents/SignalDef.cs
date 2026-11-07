@@ -16,6 +16,9 @@ sealed record SignalDef {
   /// <summary>Unique name of the signal as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
 
+  /// <summary>Optional localized provider name, shown in the rule editor but not the entity panel.</summary>
+  public string ProviderName { get; init; }
+
   /// <summary>Human-readable and localized name of the signal.</summary>
   /// <remarks>If <see cref="DisplayNameFn"/> is set, the name is resolved dynamically on every access.</remarks>
   public string DisplayName {

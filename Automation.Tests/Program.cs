@@ -540,6 +540,7 @@ static class Program {
           InvertRuleButtonProviderTests.DoesNotSpecialInvertOtherTimeConditions),
 
       // ScriptingEngine.ScriptableComponents.Extensions
+      ..ExternalApiTests.Cases,
       ("AutomationExtensionsRegistry gets registered extension by name and type",
           AutomationExtensionsRegistryTests.GetsRegisteredExtensionByNameAndType),
       ("AutomationExtensionsRegistry ignores duplicate extension registration",

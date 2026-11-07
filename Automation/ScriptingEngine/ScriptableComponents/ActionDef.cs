@@ -9,6 +9,9 @@ record ActionDef {
   /// <summary>Unique name of the action as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
 
+  /// <summary>Optional localized provider name, shown in the rule editor but not the entity panel.</summary>
+  public string ProviderName { get; init; }
+
   /// <summary>Human-readable and localized name of the action.</summary>
   public string DisplayName { get; init; }
 

@@ -20,7 +20,8 @@ using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
-sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadableSingleton, ISaveableSingleton, IWeatherExtension {
+sealed class WeatherScriptableComponent
+    : ScriptableComponentBase, IPostLoadableSingleton, ISaveableSingleton, IWeatherExtension {
 
   const string SeasonSignalLocKey = "IgorZ.Automation.Scriptable.Weather.Signal.Season";
   const string TemperateWeatherNameLocKey = "Weather.Temperate";
@@ -29,6 +30,8 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
 
   const string SeasonSignalName = "Weather.Season";
   const string TemperateWeatherId = "TemperateWeather";
+
+  sealed class SeasonUpdateNotifier : MonoBehaviour;  // Just a MonoBehaviour to run coroutines.
 
   #region IWeatherExtension implementation
 
@@ -135,10 +138,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       ScriptName = SeasonSignalName,
       DisplayName = Loc.T(SeasonSignalLocKey),
       Scope = SignalDef.ScopeEnum.Global,
-      Result = new ValueDef {
-          ValueType = ScriptValue.TypeEnum.String,
-          Options = GetWeatherSeasonOptions(),
-      },
+      Result = new ValueDef { ValueType = ScriptValue.TypeEnum.String, Options = GetWeatherSeasonOptions() },
   };
   SignalDef _seasonSignalDef;
 
@@ -161,9 +161,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
       ("BadtideWeather", BadtideWeatherNameLocKey),
       (TemperateWeatherId, TemperateWeatherNameLocKey),
   ];
-  readonly HashSet<string> _weatherSeasonIds = [
-      TemperateWeatherId, "BadtideWeather", "DroughtWeather",
-  ];
+  readonly HashSet<string> _weatherSeasonIds = [TemperateWeatherId, "BadtideWeather", "DroughtWeather"];
   // Extensible list of functions to get the current temperate weather ID.
   readonly List<Func<string>> _weatherIdProviders = [];
 
@@ -172,23 +170,19 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
   readonly MonoBehaviour _monoBehaviour;
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService, ReferenceManager referenceManager,
-                             HazardousWeatherService hazardousWeatherService, ISingletonLoader singletonLoader,
-                             AutomationExtensionsRegistry automationExtensionsRegistry) {
+      HazardousWeatherService hazardousWeatherService, ISingletonLoader singletonLoader,
+      AutomationExtensionsRegistry automationExtensionsRegistry) {
     _eventBus = eventBus;
     _weatherService = weatherService;
     _referenceManager = referenceManager;
     _hazardousWeatherService = hazardousWeatherService;
     _singletonLoader = singletonLoader;
     _monoBehaviour = new GameObject("WeatherScriptableComponent").AddComponent<SeasonUpdateNotifier>();
-    automationExtensionsRegistry.RegisterExtension(nameof(IWeatherExtension),  this);
+    automationExtensionsRegistry.RegisterExtension(nameof(IWeatherExtension), this);
   }
-  sealed class SeasonUpdateNotifier : MonoBehaviour;  // Just a MonoBehaviour to run coroutines.
 
   DropdownItem[] GetWeatherSeasonOptions() {
-    return _weatherSeasons
-        .Select(x => new DropdownItem { Value = x.Value, Text = Loc.T(x.text) })
-        .Reverse()
-        .ToArray();
+    return _weatherSeasons.Select(x => new DropdownItem { Value = x.Value, Text = Loc.T(x.text) }).Reverse().ToArray();
   }
 
   string GetCurrentSeason() {
@@ -215,7 +209,7 @@ sealed class WeatherScriptableComponent : ScriptableComponentBase, IPostLoadable
     _currentSeason = GetCurrentSeason();
     if (oldSeason != _currentSeason) {
       DebugEx.Info("Weather season changed: {0} -> {1}", oldSeason, _currentSeason);
-      if (!_weatherSeasonIds.Contains(_currentSeason)) {
+      if (_referenceManager.Signals.Count > 0 && !_weatherSeasonIds.Contains(_currentSeason)) {
         DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
       }
       _referenceManager.TriggerSignalUpdate(SeasonSignalName);

@@ -243,7 +243,7 @@ sealed class RuleRow {
     var errorMessage = error.Message;
     if (error is ScriptError.RuntimeError runtimeError) {
       errorMessage = _uiFactory.T(runtimeError.LocKey) + "\n" + errorMessage;
-    } else if (error is ScriptError.LocParsingError locParsingError){
+    } else if (error is ScriptError.LocParsingError locParsingError) {
       errorMessage = _uiFactory.T(locParsingError.LocKey);
     }
     _notifications.Q<Label>("ErrorText").text = errorMessage;
@@ -299,7 +299,7 @@ sealed class RuleRow {
   bool _originalEnabledState;
 
   RuleRow(UiFactory uiFactory, ExpressionDescriber expressionDescriber, ParserFactory parserFactory,
-          ITooltipRegistrar tooltipRegistrar, IEnumerable<IEditorButtonProvider> editors) {
+      ITooltipRegistrar tooltipRegistrar, IEnumerable<IEditorButtonProvider> editors) {
     _uiFactory = uiFactory;
     _expressionDescriber = expressionDescriber;
     _parserFactory = parserFactory;
@@ -333,7 +333,7 @@ sealed class RuleRow {
     _ruleButtons = Root.Q("RuleButtons");
     _readOnlyView = Root.Q("ReadOnlyRuleView");
     _editView = Root.Q("EditRuleView");
-    _notifications  = Root.Q("Notifications");
+    _notifications = Root.Q("Notifications");
     _notifications.ToggleDisplayStyle(false);
     _templateFamilySection = Root.Q("TemplateFamilySection");
     _templateFamilySection.ToggleDisplayStyle(false);
@@ -374,9 +374,9 @@ sealed class RuleRow {
 
   void CheckIfModified() {
     IsModified = _originalConditionExpression != _conditionExpression
-            || _originalActionExpression != _actionExpression
-            || _originalTemplateFamily != _templateFamily
-            || _originalEnabledState != IsEnabled;
+        || _originalActionExpression != _actionExpression
+        || _originalTemplateFamily != _templateFamily
+        || _originalEnabledState != IsEnabled;
   }
 
   void SetRuleText() {
@@ -413,7 +413,8 @@ sealed class RuleRow {
     _gameAutomationConflictIcon.EnableInClassList(
         ConflictBlocksSaveStyle, conflictState == RulesEditorDialog.GameAutomationRuleConflictState.BlocksSave);
     _gameAutomationConflictIcon.EnableInClassList(
-        ConflictWillBlockStyle, conflictState == RulesEditorDialog.GameAutomationRuleConflictState.BlocksGameAutomation);
+        ConflictWillBlockStyle,
+        conflictState == RulesEditorDialog.GameAutomationRuleConflictState.BlocksGameAutomation);
   }
 
   string GetGameAutomationConflictTooltip() {
@@ -431,6 +432,20 @@ sealed class RuleRow {
     }
     try {
       var description = _expressionDescriber.DescribeExpression(expression);
+      var providers = new List<string>();
+      expression.VisitNodes(node => {
+        var provider = node switch {
+            SignalOperator signal => signal.SignalDef.ProviderName,
+            ActionOperator action => action.ActionDef.ProviderName,
+            _ => null,
+        };
+        if (provider != null && !providers.Contains(provider)) {
+          providers.Add(provider);
+        }
+      });
+      if (providers.Count > 0) {
+        description += " · " + string.Join(", ", providers);
+      }
       if (IsEnabled && expression is BooleanOperator boolOperator && boolOperator.Execute()) {
         return CommonFormats.HighlightGreen(description);
       }

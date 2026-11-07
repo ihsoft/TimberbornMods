@@ -1,3 +1,7 @@
+# v4.12.0 (TBD)
+* [Feature] Allow other mods to provide signals and actions through an optional source-only API, with their origin shown in the rule editor.
+* [Fix] Unknown weather seasons could produce warnings even when no rules used the built-in season signal.
+
 # v4.11.0 (September 9th, 2026)
 * [Feature] Add actions to change prioritized resources on farms, foresters, and gatherers, and switch farms between planting and harvesting priority.
 * [Feature] Add readiness signals for each collected good and each planted resource alongside the total counters.

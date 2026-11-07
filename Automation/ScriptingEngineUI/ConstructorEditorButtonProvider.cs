@@ -103,7 +103,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     var conditions = _scriptingService.GetSignalNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetSignalDefinition(t, behavior))
         .Select(t => new ConditionConstructor.ConditionDefinition {
-            Name = (t.ScriptName, t.DisplayName),
+            Name = (t.ScriptName, t.ProviderName == null ? t.DisplayName : t.DisplayName + " · " + t.ProviderName),
             DisplayNameLocKey = t.DisplayNameLocKey,
             DisplayNameArgument = t.DisplayNameArgument,
             Argument = new ArgumentDefinition(_uiFactory, t.Result),
@@ -113,7 +113,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
     var actions = _scriptingService.GetActionNamesForBuilding(behavior)
         .Select(t => _scriptingService.GetActionDefinition(t, behavior))
         .Select(t => new ActionConstructor.ActionDefinition {
-            Name = (t.ScriptName, t.DisplayName),
+            Name = (t.ScriptName, t.ProviderName == null ? t.DisplayName : t.DisplayName + " · " + t.ProviderName),
             Arguments = t.Arguments.Select(v => new ArgumentDefinition(_uiFactory, v)).ToArray(),
         });
     ruleConstructor.ActionConstructor.SetDefinitions(actions);
@@ -187,9 +187,7 @@ sealed class ConstructorEditorButtonProvider : IEditorButtonProvider {
           conditions = null;
           return false;
         }
-        var joinOperator = result.Count == 0 || !firstInGroup
-            ? LogicalOperator.OpType.And
-            : LogicalOperator.OpType.Or;
+        var joinOperator = result.Count == 0 || !firstInGroup ? LogicalOperator.OpType.And : LogicalOperator.OpType.Or;
         result.Add(new RuleConstructor.ConditionEntry(joinOperator, groupComparison));
         firstInGroup = false;
       }
