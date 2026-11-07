@@ -2,6 +2,11 @@
 
 This repository contains the C# projects and shared Unity project used to build Timberborn mods.
 
+## Automation API for other mods
+
+The [AutomationApi](AutomationApi/README.md) folder contains the copyable source helper, usage guide and agent
+instructions for adding optional Automation support to your mod. No Automation DLL dependency is required.
+
 ## Setup with an AI agent
 
 Point your agent at this repository and ask:

@@ -15,5 +15,5 @@ Weather.Season signal are not migrated automatically.
 3. Build with an explicit ModPath pointing to the local Timberborn Mods directory.
 4. Output is AutomationForModdableWeather/version-1.1, including its manifest and localizations.
 
-The project links only Automation/Api/AutomationApi.cs, with no Automation assembly reference.
-See [the API example](../Automation/Api/README.md) for registration and deferred update semantics.
+The project links only AutomationApi/AutomationApi.cs, with no Automation assembly reference.
+See [the API example](../AutomationApi/README.md) for registration and deferred update semantics.

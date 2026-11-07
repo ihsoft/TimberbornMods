@@ -50,7 +50,7 @@
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
     </ItemGroup>
     <ItemGroup>
-      <Compile Include="..\Automation\Api\AutomationApi.cs">
+      <Compile Include="..\AutomationApi\AutomationApi.cs">
         <Link>Api\AutomationApi.cs</Link>
       </Compile>
       <ModData Include="Mod\**\*" />
