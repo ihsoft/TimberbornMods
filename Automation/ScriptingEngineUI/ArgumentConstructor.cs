@@ -74,8 +74,7 @@ sealed class ArgumentConstructor : BaseConstructor {
     _typeSelectionDropdown.Items = options;
     _typeSelectionDropdown.SetEnabled(options.Length > 1 || options[0].Value != InputTypeName);
     _signalSelector.Items = signalOptions;
-    var valueRange = argumentDef.ValueDef.DisplayNumericFormatRange;
-    if (valueRange != default) {
+    if (argumentDef.ValueDef.DisplayNumericFormatRange is { } valueRange) {
       if (float.IsNaN(valueRange.min)) {
         _hintText.text = UIFactory.T(ArgumentMaxValueHintLocKey, FormatToArgPrecision(valueRange.max));
       } else if (float.IsNaN(valueRange.max)) {
@@ -165,6 +164,10 @@ sealed class ArgumentConstructor : BaseConstructor {
     var isTextInput = _typeSelectionDropdown.SelectedValue == InputTypeName;
     var isSignal = _typeSelectionDropdown.SelectedValue == SignalTypeName;
     _signalSelector.ToggleDisplayStyle(isSignal);
+    if (isSignal) {
+      // Items may have been measured while the selector was hidden.
+      _signalSelector.AutoResizeToOptions = true;
+    }
     _textField.ToggleDisplayStyle(isTextInput);
     _hintText.ToggleDisplayStyle(isTextInput && _hintText.text.Length > 0);
     _textField.value = "";
@@ -191,8 +194,7 @@ sealed class ArgumentConstructor : BaseConstructor {
         error = $"Value must be an integer: {strValue}";
         return ScriptValue.InvalidValue;
       }
-      var range = valueDef.DisplayNumericFormatRange;
-      if (range != default) {
+      if (valueDef.DisplayNumericFormatRange is { } range) {
         if (!float.IsNaN(range.min) && range.min > intValue) {
           error = $"Value must be greater than or equal to {range.min}, found: {intValue}";
           return ScriptValue.InvalidValue;
@@ -220,8 +222,7 @@ sealed class ArgumentConstructor : BaseConstructor {
         error = $"Value must not have more than 2 digits after the comma: {strValue}";
         return ScriptValue.InvalidValue;
       }
-      var range = valueDef.DisplayNumericFormatRange;
-      if (range != default) {
+      if (valueDef.DisplayNumericFormatRange is { } range) {
         if (!float.IsNaN(range.min) && range.min > floatValue) {
           error = $"Value must be greater than or equal to {range.min}, found: {floatValue}";
           return ScriptValue.InvalidValue;

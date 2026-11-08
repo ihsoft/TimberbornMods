@@ -52,6 +52,7 @@ blindly.
 | Diagnosing build, export, mod loading, runtime, UI, save/load, or platform behavior | `docs/agent-knowledge/Timberborn-Diagnostics-Operational-Knowledge-v1.md` |
 | Editing or reviewing GitHub Wiki pages | `docs/agent-knowledge/Wiki-Operational-Knowledge-v1.md` and `docs/timberborn-wiki-editing-rules-for-ai-agents.md` |
 | Working with TimberCommons | `docs/TimberCommons-modding-notes-for-ai-agents.md` |
+| Authoring or reviewing `AutomationHooks*.json` integrations, or modifying the Automation hooks implementation | `Automation/ScriptingEngine/ScriptableComponents/Extensions/AGENTS.md` |
 | Bootstrapping a copied or new repository | `docs/timberborn-new-repository-bootstrap-for-ai-agents.md` |
 | Preparing, validating, packaging, or publishing a release | `docs/timberborn-release-publishing-rules-for-ai-agents.md` |
 | Organizing or updating agent rules | This `AGENTS.md`, `docs/agent-knowledge/Mentor-Rule-Maintenance-Operational-Knowledge-v1.md`, relevant files under `docs/`, and any local `AGENTS.md` whose scope is being changed |

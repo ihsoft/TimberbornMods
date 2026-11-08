@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace UnityEngine {
+  public static class Object {
+    public static void Destroy(GameObject gameObject) {
+    }
+  }
+
   public sealed class Coroutine {
   }
 
@@ -22,6 +27,8 @@ namespace UnityEngine {
   }
 
   public class MonoBehaviour {
+    public static implicit operator bool(MonoBehaviour value) => value != null;
+
     static readonly List<IEnumerator> QueuedCoroutines = [];
 
     public GameObject gameObject { get; set; } = new("MonoBehaviour");

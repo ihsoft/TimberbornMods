@@ -1,4 +1,4 @@
-﻿// Timberborn Mod: Automation
+// Timberborn Mod: Automation
 // Author: igor.zavoychinskiy@gmail.com
 // License: Public Domain
 
@@ -9,7 +9,6 @@ using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.TimberDev.Utils;
-using ProtoBuf;
 using Timberborn.Persistence;
 using Timberborn.WorldPersistence;
 
@@ -17,54 +16,67 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 
 /// <summary>A base component to track the signals and actions on an automation behavior.</summary>
 abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEntity {
+  sealed record SignalSink {
+    public ScriptValue LastValue;
+    public readonly List<ISignalListener> Listeners = [];
+
+    readonly List<(SignalOperator signalOperator, ISignalListener listener)> _registrants = [];
+
+    public bool UpdateLastValue() {
+      if (_registrants.Count == 0) {
+        return false;
+      }
+      return UpdateLastValue(_registrants[0].signalOperator.ValueFn());
+    }
+
+    public bool UpdateLastValue(ScriptValue newValue) {
+      if (_registrants.Count == 0) {
+        return false;
+      }
+      var isChanged = LastValue != newValue;
+      LastValue = newValue;
+      return isChanged;
+    }
+
+    public void Register(SignalOperator signalOperator, ISignalListener listener) {
+      var item = (signalOperator, listener);
+      if (_registrants.Contains(item)) {
+        throw new InvalidOperationException($"Signal listener already registered: {item}");
+      }
+      _registrants.Add(item);
+      if (!Listeners.Contains(listener)) {
+        Listeners.Add(listener);
+      }
+    }
+
+    public void Unregister(SignalOperator signalOperator, ISignalListener listener) {
+      var item = (signalOperator, listener);
+      if (!_registrants.Remove(item)) {
+        throw new InvalidOperationException($"Signal listener not registered: {item}");
+      }
+      Listeners.Clear();
+      Listeners.AddRange(_registrants.Select(x => x.listener).Distinct());
+    }
+  }
+
 
   #region IPersistentEntity implementation
 
   static readonly PropertyKey<string> SavedSignalsKey = new("SavedSignals");
-
-  [ProtoContract]
-  sealed record SavedSignalsState {
-    [ProtoContract]
-    public sealed record SignalValue {
-      [ProtoMember(1)]
-      public string SignalName { get; init; }
-      [ProtoMember(2)]
-      public string StrValue { get; init; }
-      [ProtoMember(3)]
-      public int NumValue { get; init; }
-
-      public static SignalValue FromScriptValue(string signalName, ScriptValue value) {
-        return new SignalValue {
-            SignalName = signalName,
-            StrValue = value.ValueType == ScriptValue.TypeEnum.String ? value.AsString : null,
-            NumValue = value.ValueType == ScriptValue.TypeEnum.Number ? value.AsRawNumber : int.MinValue,
-        };
-      }
-
-      public ScriptValue ToScriptValue() {
-        return StrValue != null ? ScriptValue.FromString(StrValue) : ScriptValue.Of(NumValue);
-      }
-    }
-
-    [ProtoMember(1)]
-    public SignalValue[] SignalValues { get; init; }
-  }
 
   ComponentKey EntityComponentKey => new(GetType().FullName);
 
   /// <inheritdoc/>
   public virtual void Save(IEntitySaver entitySaver) {
     var values = _signals
-        .Where(x => x.Value.Listeners.Count > 0)
-        .Select(kvp => SavedSignalsState.SignalValue.FromScriptValue(kvp.Key, kvp.Value.LastValue))
+        .Where(x => x.Value.Listeners.Count > 0 && x.Value.LastValue.ValueType != ScriptValue.TypeEnum.Unset)
+        .Select(kvp => SavedSignalValues.SignalValue.FromScriptValue(kvp.Key, kvp.Value.LastValue))
         .ToArray();
     if (values.Length == 0) {
       return;
     }
     var component = entitySaver.GetComponent(EntityComponentKey);
-    var state = new SavedSignalsState {
-        SignalValues = values,
-    };
+    var state = new SavedSignalValues { SignalValues = values };
     component.Set(SavedSignalsKey, StringProtoSerializer.Serialize(state));
   }
 
@@ -77,7 +89,7 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
     if (savedSignals == null) {
       return;
     }
-    var state = StringProtoSerializer.Deserialize<SavedSignalsState>(savedSignals);
+    var state = StringProtoSerializer.Deserialize<SavedSignalValues>(savedSignals);
     foreach (var signalValue in state.SignalValues) {
       _signals.Add(signalValue.SignalName, new SignalSink { LastValue = signalValue.ToScriptValue() });
     }
@@ -90,14 +102,29 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
   /// <summary>True if the component has any actions.</summary>
   public bool HasActions => _actions.Count > 0;
 
+  /// <summary>Returns the last observed or restored value without evaluating the signal's source.</summary>
+  public bool TryGetSignalValue(string signalName, out ScriptValue value) {
+    if (_signals.TryGetValue(signalName, out var signalSink)) {
+      value = signalSink.LastValue;
+      return true;
+    }
+    value = ScriptValue.InvalidValue;
+    return false;
+  }
+
+  /// <summary>Seeds a precomputed value before subscription, preserving any restored baseline.</summary>
+  public void InitializeSignalValue(string signalName, ScriptValue value) {
+    if (!_signals.ContainsKey(signalName)) {
+      _signals.Add(signalName, new SignalSink { LastValue = value });
+    }
+  }
+
   /// <summary>Adds a signal to the given host. The host will be notified when the signal is scheduled.</summary>
-  /// <seealso cref="TriggerSignalUpdate"/>
+  /// <seealso cref="TriggerSignalUpdate(string)"/>
   /// <returns><c>true</c> if the first listener for the signal was added.</returns>
   public virtual bool AddSignal(SignalOperator signalOperator, ISignalListener host) {
     if (!_signals.TryGetValue(signalOperator.SignalName, out var signalSink)) {
-      signalSink = new SignalSink {
-          LastValue = signalOperator.ValueFn(),
-      };
+      signalSink = new SignalSink { LastValue = signalOperator.ValueFn() };
       _signals.Add(signalOperator.SignalName, signalSink);
     }
     var isFirstItem = signalSink.Listeners.Count == 0;
@@ -150,16 +177,27 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
   }
 
   /// <summary>Notifies all signal listeners if the supplied value has changed.</summary>
-  /// <remarks>Use this overload when the caller has already computed the current value.</remarks>
-  public void TriggerSignalUpdate(string signalName, ScriptValue currentValue) {
-    if (!_signals.TryGetValue(signalName, out var signalSink) || !signalSink.UpdateLastValue(currentValue)) {
+  /// <remarks>
+  /// Use this overload for an already computed value. Force notification when recovering from a read error,
+  /// even if the valid value equals the last one; listeners must clear their error state.
+  /// </remarks>
+  public void TriggerSignalUpdate(string signalName, ScriptValue currentValue, bool forceNotify = false) {
+    if (!_signals.TryGetValue(signalName, out var signalSink)
+        || !signalSink.UpdateLastValue(currentValue) && !forceNotify) {
       return;
     }
     NotifySignalListeners(signalName, signalSink);
   }
 
+  /// <summary>Notifies listeners of a read error without replacing the last valid value.</summary>
+  public void TriggerSignalError(string signalName) {
+    if (_signals.TryGetValue(signalName, out var signalSink)) {
+      NotifySignalListeners(signalName, signalSink);
+    }
+  }
+
   static void NotifySignalListeners(string signalName, SignalSink signalSink) {
-    foreach (var listener in signalSink.Listeners) {
+    foreach (var listener in signalSink.Listeners.ToArray()) {
       ScriptingService.Instance.NotifySignalListener(signalName, listener);
     }
   }
@@ -167,49 +205,6 @@ abstract class AbstractStatusTracker : AbstractDynamicComponent, IPersistentEnti
   #endregion
 
   #region Implementation
-
-  sealed record SignalSink {
-    public ScriptValue LastValue;
-    public readonly List<ISignalListener> Listeners = [];
-
-    readonly List<(SignalOperator signalOperator, ISignalListener listener)> _registrants = [];
-
-    public bool UpdateLastValue() {
-      if (_registrants.Count == 0) {
-        return false;
-      }
-      return UpdateLastValue(_registrants[0].signalOperator.ValueFn());
-    }
-
-    public bool UpdateLastValue(ScriptValue newValue) {
-      if (_registrants.Count == 0) {
-        return false;
-      }
-      var isChanged = LastValue != newValue;
-      LastValue = newValue;
-      return isChanged;
-    }
-
-    public void Register(SignalOperator signalOperator, ISignalListener listener) {
-      var item = (signalOperator, listener);
-      if (_registrants.Contains(item)) {
-        throw new InvalidOperationException($"Signal listener already registered: {item}");
-      }
-      _registrants.Add(item);
-      if (!Listeners.Contains(listener)) {
-        Listeners.Add(listener);
-      }
-    }
-
-    public void Unregister(SignalOperator signalOperator, ISignalListener listener) {
-      var item = (signalOperator, listener);
-      if (!_registrants.Remove(item)) {
-        throw new InvalidOperationException($"Signal listener not registered: {item}");
-      }
-      Listeners.Clear();
-      Listeners.AddRange(_registrants.Select(x => x.listener).Distinct());
-    }
-  }
 
   readonly Dictionary<string, SignalSink> _signals = new();
   readonly HashSet<ActionOperator> _actions = [];

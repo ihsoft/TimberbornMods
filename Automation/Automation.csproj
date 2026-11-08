@@ -57,6 +57,10 @@
       <Reference Include="System.Collections.Immutable">
         <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\System.Collections.Immutable.dll</HintPath>
       </Reference>
+      <Reference Include="Newtonsoft.Json">
+        <HintPath>..\Dependencies\GameRoot\Timberborn_Data\Managed\Newtonsoft.Json.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
@@ -223,9 +227,14 @@
     <PropertyGroup>
         <ModPath>..\_MODS!</ModPath>
     </PropertyGroup>
+    <ItemGroup>
+      <AutomationHook Include="AutomationHooks*.json" />
+    </ItemGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying DLL and Docs to the game's mods folder... ###" Importance="high"/>
         <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts"/>
+        <Copy SourceFiles="@(AutomationHook)"
+              DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1"/>
         <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1\Scripts"
               Condition="Exists('$(TargetDir)$(TargetName).xml')"/>
     </Target>

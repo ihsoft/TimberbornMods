@@ -11,6 +11,7 @@ namespace Timberborn.BaseComponentSystem {
     public string Name { get; set; }
     public List<object> AllComponents { get; } = [];
     public MonoBehaviour _componentCache = new();
+    public GameObject GameObject => _componentCache.gameObject;
 
     public void SetComponent<T>(T component) where T : class {
       _components[typeof(T)] = component;

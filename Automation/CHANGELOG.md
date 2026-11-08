@@ -1,4 +1,6 @@
-# v4.11.1 (TBD)
+# v4.12.0 (TBD)
+* [Feature] Allow other mods to provide signals and actions through declarative hook configuration, with their origin shown in the rule editor and support for multiple action arguments.
+* [Feature] Provide an independent Moddable Weathers season signal through built-in hooks, without a separate integration mod.
 * [Fix] Unknown weather warnings appeared even when no enabled rules used the built-in season signal.
 
 # v4.11.0 (September 9th, 2026)

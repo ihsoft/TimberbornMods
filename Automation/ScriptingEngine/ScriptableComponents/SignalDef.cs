@@ -8,13 +8,19 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents;
 
 /// <summary>Definition of a signal that can be used in the scripting engine.</summary>
 sealed record SignalDef {
+  /// <summary>Ownership used to determine whether a signal can be exported by a building.</summary>
   public enum ScopeEnum {
+    /// <summary>The source belongs to one building and can be exported from that building.</summary>
     Building,
+    /// <summary>The source is shared across the world and is not a building export.</summary>
     Global,
   }
 
   /// <summary>Unique name of the signal as it appears in the scripts.</summary>
   public string ScriptName { get; init; }
+
+  /// <summary>Optional provider label for the rule editor, not the entity panel. Hooks use the provider ID.</summary>
+  public string ProviderName { get; init; }
 
   /// <summary>Human-readable and localized name of the signal.</summary>
   /// <remarks>If <see cref="DisplayNameFn"/> is set, the name is resolved dynamically on every access.</remarks>
