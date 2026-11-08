@@ -187,6 +187,13 @@ partial finding, committed fix, or blocker, send a concise answer back to the re
 The answer should include the conclusion, the main evidence, and the next action or blocker. Do not leave the requesting
 agent waiting just because the fix or investigation was completed elsewhere.
 
+An informational observation from unfinished research or a prototype is not by itself a request for help or follow-up.
+If it remains provisional and requires no action now, evaluate it locally without sending acknowledgements, notifying
+other agents, or asking the source agent to report future validation or completion. A prototype may be abandoned;
+do not turn its observation into a tracked obligation to finish it. Follow up only when the user requests coordination
+or the message identifies a concrete blocker or shared-state risk that needs action now. This does not replace the
+notification requirements for actual finalized rule changes.
+
 ## Role learning handoff
 
 At the end of a non-trivial task, each role agent should briefly check whether it learned something durable that would
