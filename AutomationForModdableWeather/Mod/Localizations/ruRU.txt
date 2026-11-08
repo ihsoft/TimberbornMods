@@ -1,3 +1,0 @@
-ID,Text,Comment
-IgorZ.AutomationForModdableWeather.Name,"Moddable Weathers","Provider name in the Automation rule editor"
-IgorZ.AutomationForModdableWeather.Season,"сезон","Name of the condition for the current season checking"

@@ -1,19 +1,14 @@
 # Timberborn: Automation+ModdableWeather mod
 
-This mod exposes Moddable Weathers seasons through the source-only Automation API.
-It registers the independent `Mods.ModdableWeathers.Season` signal and does not extend Automation's built-in Weather.Season.
-Automation is optional; the adapter still requires Moddable Weathers. Existing rules using the old extended
-Weather.Season signal are not migrated automatically.
+This mod creates a bridge between the popular Automation mod and Moddable Weather mod to allow using the extended
+weather conditions in the automation tasks.
 
 * Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=3562952077.
 * Mod.IO: https://mod.io/g/timberborn/m/automationmoddableweather.
 
 # Building and releasing
 
-1. Set up Dependencies/GameRoot and Dependencies/Workshop for the current Timberborn 1.1 installation.
-2. Subscribe to Moddable Weathers (3630523180); the project references its version-1.1 DLL.
-3. Build with an explicit ModPath pointing to the local Timberborn Mods directory.
-4. Output is AutomationForModdableWeather/version-1.1, including its manifest and localizations.
-
-The project links only AutomationApi/AutomationApi.cs, with no Automation assembly reference.
-See [the API example](../AutomationApi/README.md) for registration and deferred update semantics.
+1. Setup path `U:\Mods` to point to your Timberborn mods folder.
+2. Subscribe to mod `ModdableWeather` and ensure it is downloaded to `..\Dependencies\Workshop\3493039008`.
+3. Build the project.
+4. The mod's release folder will be created in `U:\Mods\AutomationForModdableWeather`.

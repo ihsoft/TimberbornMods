@@ -33,11 +33,11 @@
  <PublicizeAll>true</PublicizeAll>
     </PropertyGroup>
     <PropertyGroup>
-        <ModPath>..\_MODS!</ModPath>
+        <ModPath>u:\Mods</ModPath>
     </PropertyGroup>
     <ItemGroup>
       <Reference Include="ModdableWeathers">
-        <HintPath>..\Dependencies\Workshop\3630523180\version-1.1\ModdableWeathers.dll</HintPath>
+        <HintPath>..\Dependencies\Workshop\3630523180\version-1.0\ModdableWeathers.dll</HintPath>
       </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -50,10 +50,7 @@
       <Reference Include="..\Dependencies\GameRoot\Timberborn_Data\Managed\Bindito.*.dll" Publicize="false"/>
     </ItemGroup>
     <ItemGroup>
-      <Compile Include="..\AutomationApi\AutomationApi.cs">
-        <Link>Api\AutomationApi.cs</Link>
-      </Compile>
-      <ModData Include="Mod\**\*" />
+      <ProjectReference Include="..\Automation\Automation.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Compile Include="..\UnityDevLite\DebugEx.cs">
@@ -62,10 +59,8 @@
     </ItemGroup>
     <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('$(ModPath)')">
         <Message Text="### Copying files to the game's mods folder... ###" Importance="high"/>
-        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1"/>
-        <Copy SourceFiles="$(MSBuildProjectDirectory)\manifest.json" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.1"/>
-        <Copy SourceFiles="@(ModData)"
-              DestinationFiles="@(ModData->'$(ModPath)\$(ProjectName)\version-1.1\%(RecursiveDir)%(Filename)%(Extension)')"/>
+        <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0"/>
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\manifest.json" DestinationFolder="$(ModPath)\$(ProjectName)\version-1.0"/>
     </Target>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
       <PropertyGroup>
