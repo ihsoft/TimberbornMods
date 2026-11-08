@@ -10,6 +10,20 @@ using Timberborn.WorldPersistence;
 namespace Automation.Tests;
 
 static class AbstractStatusTrackerTests {
+  sealed class TestStatusTracker : AbstractStatusTracker {
+  }
+
+  sealed class TestSignalListener : ISignalListener {
+    public AutomationBehavior Behavior { get; } = new();
+    public int Calls { get; private set; }
+    public string LastSignalName { get; private set; }
+
+    public void OnValueChanged(string signalName) {
+      Calls++;
+      LastSignalName = signalName;
+    }
+  }
+
   public static void TracksActionsAndReportsDuplicates() {
     var tracker = new TestStatusTracker();
     var action = CreateAction();
@@ -94,6 +108,9 @@ static class AbstractStatusTrackerTests {
     loader.SetComponent(componentKey, new IObjectLoader(saver.Components[componentKey.Name].Values));
     var restoredTracker = new TestStatusTracker();
     restoredTracker.Load(loader);
+    Assert.True(restoredTracker.TryGetSignalValue("Signals.Value", out var restoredValue));
+    Assert.Equal(ScriptValue.FromInt(1), restoredValue);
+    Assert.False(restoredTracker.TryGetSignalValue("Signals.Missing", out _));
     var sourceCalls = 0;
     var restoredSignal = CreateSignal(() => {
       sourceCalls++;
@@ -128,11 +145,27 @@ static class AbstractStatusTrackerTests {
   public static void LoadIgnoresComponentWithoutSavedSignals() {
     var tracker = new TestStatusTracker();
     var loader = new TestEntityLoader();
-    loader.SetComponent(
-        new ComponentKey(typeof(TestStatusTracker).FullName),
+    loader.SetComponent(new ComponentKey(typeof(TestStatusTracker).FullName),
         new IObjectLoader(new Dictionary<string, object>()));
 
     tracker.Load(loader);
+  }
+
+  public static void PreservesLastValueAcrossReadErrorsAndNotifiesRecovery() {
+    TestScripting.CreateService();
+    var tracker = new TestStatusTracker();
+    var listener = new TestSignalListener();
+    tracker.AddSignal(CreateSignal(() => ScriptValue.FromInt(1)), listener);
+
+    tracker.TriggerSignalError("Signals.Value");
+    Assert.Equal(1, listener.Calls);
+    Assert.True(tracker.TryGetSignalValue("Signals.Value", out var value));
+    Assert.Equal(ScriptValue.FromInt(1), value);
+
+    tracker.TriggerSignalUpdate("Signals.Value", ScriptValue.FromInt(1), forceNotify: true);
+    Assert.Equal(2, listener.Calls);
+    tracker.TriggerSignalUpdate("Signals.Value", ScriptValue.FromInt(1));
+    Assert.Equal(2, listener.Calls);
   }
 
   static SignalOperator CreateSignal(Func<ScriptValue> source) {
@@ -149,17 +182,4 @@ static class AbstractStatusTrackerTests {
     return ActionOperator.Create(new ExpressionContext { ScriptHost = new AutomationBehavior() }, "Actions.Do", []);
   }
 
-  sealed class TestStatusTracker : AbstractStatusTracker {
-  }
-
-  sealed class TestSignalListener : ISignalListener {
-    public AutomationBehavior Behavior { get; } = new();
-    public int Calls { get; private set; }
-    public string LastSignalName { get; private set; }
-
-    public void OnValueChanged(string signalName) {
-      Calls++;
-      LastSignalName = signalName;
-    }
-  }
 }

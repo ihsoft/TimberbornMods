@@ -6,32 +6,37 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
 using IgorZ.Automation.ScriptingEngine.ScriptableComponents.Components;
 using Timberborn.BaseComponentSystem;
+using Timberborn.Persistence;
 using Timberborn.SingletonSystem;
+using Timberborn.WorldPersistence;
 using UnityDev.Utils.LogUtilsLite;
 using UnityEngine;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Extensions;
 
-/// <summary>Adapts source-API declarations to native script definitions and deferred signal observations.</summary>
-sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableSingleton {
+/// <summary>Adapts configured capabilities to native script definitions and deferred signal observations.</summary>
+sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableSingleton, ISaveableSingleton {
+  /// <summary>Building-owned persistence and subscriptions for configured signals.</summary>
+  public sealed class SignalTracker : AbstractStatusTracker;
+
+  sealed class GlobalSignalTracker(ReferenceManager references)
+      : AbstractGlobalStatusTracker(new SingletonKey("IgorZ.Automation.ConfiguredSignals"), references);
+
   sealed class Signal {
     public SignalDef Definition;
-    public ExternalValueDefinition Value;
-    public Func<BaseComponent, object> Read;
+    public Func<BaseComponent, ScriptValue> Read;
     public Func<BaseComponent, BaseComponent> Resolve;
     public readonly Dictionary<object, Watch> Watches = new();
   }
 
   sealed class ExternalAction {
     public ActionDef Definition;
-    public ExternalValueDefinition Argument;
-    public Action<BaseComponent, object> Execute;
+    public Action<BaseComponent, ScriptValue[]> Execute;
     public Func<BaseComponent, BaseComponent> Resolve;
   }
 
@@ -39,7 +44,7 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     public Signal Signal;
     public object Key;
     public BaseComponent Source;
-    public ReferenceManager References;
+    public SignalTracker Tracker;
     public ScriptValue Value;
     public ScriptError.RuntimeError Error;
   }
@@ -52,9 +57,14 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
   /// <inheritdoc/>
   public override void Load() {
     base.Load();
+    _globalTracker = new GlobalSignalTracker(new ReferenceManager(ScriptingService));
+    _globalTracker.Load(_singletonLoader);
     _runner = new GameObject("Automation.ExternalSignals").AddComponent<UpdateRunner>();
     _active = true;
   }
+
+  /// <inheritdoc/>
+  public void Save(ISingletonSaver singletonSaver) => _globalTracker.Save(singletonSaver);
 
   /// <inheritdoc/>
   public void Unload() {
@@ -66,62 +76,44 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     _processing = null;
     _pending.Clear();
     _signals.Clear();
-    _signalIds.Clear();
     _actions.Clear();
+    _globalTracker = null;
   }
 
-  /// <summary>Registers a V1 declaration without calling provider delegates; duplicates keep the first entry.</summary>
-  public void Register(IDictionary<string, object> declaration) {
-    var modId = (string)declaration["modId"];
-    var id = (string)declaration["id"];
-    var scriptName = MakeScriptName(modId, id);
-    var kind = (string)declaration["kind"];
-    if (kind == "signal" && _signals.ContainsKey(scriptName) || kind == "action" && _actions.ContainsKey(scriptName)) {
-      DebugEx.Error("Duplicate external automation {0}: {1}. Keeping the first registration; ignoring this one.",
-          kind, scriptName);
+  /// <summary>Registers a native signal and reader. A duplicate never replaces the first registration.</summary>
+  public bool RegisterSignal(SignalDef definition, Func<BaseComponent, ScriptValue> read,
+      Func<BaseComponent, BaseComponent> resolve) {
+    if (IsRegistered("signal", definition.ScriptName)) {
+      return false;
+    }
+    _signals.Add(definition.ScriptName, new Signal { Definition = definition, Read = read, Resolve = resolve });
+    DebugEx.Info("Registered external automation signal: {0}", definition.ScriptName);
+    return true;
+  }
+
+  /// <summary>Registers a native action and executor; all CLR argument conversion belongs to the executor.</summary>
+  public void RegisterAction(ActionDef definition, Action<BaseComponent, ScriptValue[]> execute,
+      Func<BaseComponent, BaseComponent> resolve) {
+    if (IsRegistered("action", definition.ScriptName)) {
       return;
     }
-    var name = Loc.T((string)declaration["nameLocKey"]);
-    var provider = Loc.T((string)declaration["modNameLocKey"]);
-    var type = (Type)declaration["type"];
-    var resolve = (Func<BaseComponent, BaseComponent>)declaration["resolve"];
-    var optionValues = (string[])declaration["optionValues"];
-    var optionNames = (string[])declaration["optionNames"];
-    var percent = declaration.TryGetValue("percent", out var format) && (bool)format;
-    double? min = declaration.TryGetValue("min", out var lower) && lower != null ? Convert.ToDouble(lower) : null;
-    double? max = declaration.TryGetValue("max", out var upper) && upper != null ? Convert.ToDouble(upper) : null;
-    if (kind == "signal") {
-      var value = new ExternalValueDefinition(type, Loc, optionValues, optionNames, min, max, percent);
-      var signal = new Signal {
-          Definition = new SignalDef {
-              ScriptName = scriptName, DisplayName = name, ProviderName = provider,
-              Scope = resolve == null ? SignalDef.ScopeEnum.Global : SignalDef.ScopeEnum.Building,
-              Result = value.Definition,
-          },
-          Value = value, Read = (Func<BaseComponent, object>)declaration["read"], Resolve = resolve,
-      };
-      _signals.Add(scriptName, signal);
-      _signalIds.Add((modId, id), signal);
-    } else if (kind == "action") {
-      var argument = type == null ? null : new ExternalValueDefinition(
-          type, Loc, optionValues, optionNames, min, max, percent);
-      _actions.Add(scriptName, new ExternalAction {
-          Definition = new ActionDef {
-              ScriptName = scriptName, DisplayName = name, ProviderName = provider,
-              Arguments = argument == null ? [] : [argument.Definition],
-          },
-          Argument = argument,
-          Execute = (Action<BaseComponent, object>)declaration["execute"], Resolve = resolve,
-      });
-    } else {
-      throw new ArgumentException("Unknown capability kind.");
+    _actions.Add(definition.ScriptName, new ExternalAction {
+        Definition = definition, Execute = execute, Resolve = resolve,
+    });
+    DebugEx.Info("Registered external automation action: {0}", definition.ScriptName);
+  }
+
+  /// <summary>Whether a source currently has listeners; lets setter observers avoid unnecessary reads.</summary>
+  public bool HasSignalListeners(string name, BaseComponent source) {
+    if (!_active || !_signals.TryGetValue(name, out var signal)) {
+      return false;
     }
-    DebugEx.Info("Registered external automation {0}: {1}", kind, scriptName);
+    return signal.Watches.ContainsKey(signal.Resolve == null ? GlobalSource : (object)source.GameObject);
   }
 
   /// <summary>Only enqueues an existing observation; no provider delegates run in this call.</summary>
-  public void UpdateSignal(string modId, string id, BaseComponent source) {
-    if (!_active || !_signalIds.TryGetValue((modId, id), out var signal)) {
+  public void UpdateSignal(string name, BaseComponent source) {
+    if (!_active || !_signals.TryGetValue(name, out var signal)) {
       return;
     }
     if (signal.Resolve != null && !source || signal.Resolve == null && source) {
@@ -171,6 +163,13 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
         }
         return watch.Value;
       }
+      if (signal.Resolve == null && _globalTracker.TryGetSignalValue(name, out var globalValue)) {
+        return globalValue;
+      }
+      if (signal.Resolve != null && behavior.TryGetDynamicComponent<SignalTracker>(out var tracker)
+          && tracker.TryGetSignalValue(name, out var buildingValue)) {
+        return buildingValue;
+      }
       return Read(signal, source);
     };
   }
@@ -180,13 +179,12 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     var action = GetAction(name);
     var source = ResolveSource(action.Resolve, behavior);
     return args => {
-      AssertActionArgsCount(name, args, action.Argument == null ? 0 : 1);
+      AssertActionArgsCount(name, args, action.Definition.Arguments.Length);
       try {
         if (action.Resolve != null && !source) {
           throw new ScriptError.BadValue("External action source no longer exists.");
         }
-        var value = action.Argument == null ? null : action.Argument.FromScript(args[0]);
-        action.Execute(source, value);
+        action.Execute(source, args);
       } catch (ScriptError.RuntimeError) {
         throw;
       } catch (Exception e) {
@@ -203,12 +201,27 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     var key = signal.Resolve == null ? GlobalSource : (object)host.Behavior.GameObject;
     if (!signal.Watches.TryGetValue(key, out var watch)) {
       watch = new Watch {
-          Signal = signal, Source = source, Key = key, References = new ReferenceManager(ScriptingService),
+          Signal = signal, Source = source, Key = key,
+          Tracker = signal.Resolve != null ? host.Behavior.GetOrCreate<SignalTracker>() : null,
       };
-      Refresh(watch);
+      var restored = watch.Tracker != null
+          ? watch.Tracker.TryGetSignalValue(signalOperator.SignalName, out watch.Value)
+          : _globalTracker.TryGetSignalValue(signalOperator.SignalName, out watch.Value);
+      if (!restored) {
+        Refresh(watch);
+      }
+      if (watch.Tracker != null) {
+        watch.Tracker.InitializeSignalValue(signalOperator.SignalName, watch.Value);
+      } else {
+        _globalTracker.SetSignalValue(signalOperator.SignalName, watch.Value);
+      }
       signal.Watches.Add(key, watch);
     }
-    watch.References.AddSignal(signalOperator, host);
+    if (watch.Tracker != null) {
+      watch.Tracker.AddSignal(signalOperator, host);
+    } else {
+      _globalTracker.AddSignal(signalOperator, host);
+    }
   }
 
   /// <inheritdoc/>
@@ -218,33 +231,39 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     if (!signal.Watches.TryGetValue(key, out var watch)) {
       return;
     }
-    watch.References.RemoveSignal(signalOperator, host);
-    if (watch.References.Signals.Count == 0) {
+    var hasListeners = watch.Tracker != null
+        ? watch.Tracker.RemoveSignal(signalOperator, host)
+        : _globalTracker.RemoveSignal(signalOperator, host);
+    if (!hasListeners) {
       signal.Watches.Remove(key);
       _pending.Remove(watch);
+      if (watch.Tracker == null) {
+        _globalTracker.ForgetSignalValue(signalOperator.SignalName);
+      }
     }
   }
 
   static readonly object GlobalSource = new();
   readonly Dictionary<string, Signal> _signals = new();
-  readonly Dictionary<(string ModId, string Id), Signal> _signalIds = new();
   readonly Dictionary<string, ExternalAction> _actions = new();
   readonly HashSet<Watch> _pending = new();
+  readonly ISingletonLoader _singletonLoader;
+  GlobalSignalTracker _globalTracker;
   UpdateRunner _runner;
   Coroutine _processing;
   bool _active;
 
-  /// <summary>Persistent format: Mods.providerId.capabilityId, with case-sensitive IDs preserved verbatim.</summary>
-  /// <remarks>
-  /// Both IDs must match [A-Za-z][A-Za-z0-9]*. Invalid IDs are rejected; no encoding or decoding is performed.
-  /// String option values are unchanged. Persisted names must remain stable across provider updates.
-  /// </remarks>
-  static string MakeScriptName(string modId, string id) {
-    if (!Regex.IsMatch(modId ?? "", @"\A[A-Za-z][A-Za-z0-9]*\z")
-        || !Regex.IsMatch(id ?? "", @"\A[A-Za-z][A-Za-z0-9]*\z")) {
-      throw new ArgumentException("Provider and capability IDs must match [A-Za-z][A-Za-z0-9]*.");
+  ExternalScriptableComponent(ISingletonLoader singletonLoader) {
+    _singletonLoader = singletonLoader;
+  }
+
+  bool IsRegistered(string kind, string name) {
+    if (!(kind == "signal" && _signals.ContainsKey(name) || kind == "action" && _actions.ContainsKey(name))) {
+      return false;
     }
-    return "Mods." + modId + "." + id;
+    DebugEx.Error("Duplicate external automation {0}: {1}. Keeping the first registration; ignoring this one.",
+        kind, name);
+    return true;
   }
 
   Signal GetSignal(string name) {
@@ -284,7 +303,7 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
       if (signal.Resolve != null && !source) {
         throw new ScriptError.BadValue("External signal source no longer exists.");
       }
-      return signal.Value.ToScript(signal.Read(source));
+      return signal.Read(source);
     } catch (ScriptError.RuntimeError) {
       throw;
     } catch (Exception e) {
@@ -307,8 +326,8 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
 
   IEnumerator ProcessUpdates() {
     while (_active && _pending.Count > 0) {
-      // Always leave the caller's stack, including updates produced by actions in the previous pass.
-      yield return null;
+      // Let the frame's game logic settle, as with the built-in weather signal.
+      yield return new WaitForEndOfFrame();
       if (!AutomationService.AutomationSystemReady) {
         continue;
       }
@@ -323,7 +342,18 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
       // Publish only after every dirty value in this batch has been sampled.
       foreach (var watch in changed) {
         if (IsRegistered(watch)) {
-          watch.References.TriggerSignalUpdate(watch.Signal.Definition.ScriptName);
+          var name = watch.Signal.Definition.ScriptName;
+          if (watch.Tracker != null) {
+            if (watch.Error != null) {
+              watch.Tracker.TriggerSignalError(name);
+            } else {
+              watch.Tracker.TriggerSignalUpdate(name, watch.Value, forceNotify: true);
+            }
+          } else if (watch.Error != null) {
+            _globalTracker.TriggerSignalError(name);
+          } else {
+            _globalTracker.TriggerSignalUpdate(name, watch.Value, forceNotify: true);
+          }
         }
       }
     }

@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <RootNamespace>Automation.Tests</RootNamespace>
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>12</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
@@ -8,11 +9,17 @@
         <NoWarn>CS8524</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\AutomationApi\AutomationApi.cs">
-        <Link>AutomationApi\AutomationApi.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\SavedSignalValues.cs" />
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Components\AbstractGlobalStatusTracker.cs" />
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\ExternalScriptableComponent.cs" />
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\HookValueConverter.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\HookValueConverter.cs</Link>
       </Compile>
-      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\ExternalValueDefinition.cs">
-        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\ExternalValueDefinition.cs</Link>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\HookValueFactory.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\HookValueFactory.cs</Link>
+      </Compile>
+      <Compile Include="..\Automation\ScriptingEngine\ScriptableComponents\Extensions\HookConfiguration.cs">
+        <Link>Automation\ScriptingEngine\ScriptableComponents\Extensions\HookConfiguration.cs</Link>
       </Compile>
       <Compile Include="..\TestSupport\Testing\Assert.cs">
         <Link>TestSupport\Testing\Assert.cs</Link>

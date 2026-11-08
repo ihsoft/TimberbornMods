@@ -9,9 +9,12 @@ namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Extensions;
 // ReSharper disable once UnusedType.Global
 [Context("Game")]
 sealed class Configurator : IConfigurator {
+  /// <inheritdoc/>
   public void Configure(IContainerDefinition containerDefinition) {
     containerDefinition.Bind<AutomationExtensionsRegistry>().AsSingleton();
     containerDefinition.Bind<ExternalScriptableComponent>().AsSingleton();
-    containerDefinition.Bind<AutomationApiEndpoint>().AsSingleton();
+    containerDefinition.Bind<ExternalScriptableComponent.SignalTracker>().AsTransient();
+    containerDefinition.Bind<PropertySetterHooks>().AsSingleton();
+    containerDefinition.Bind<ConfiguredIntegrations>().AsSingleton();
   }
 }

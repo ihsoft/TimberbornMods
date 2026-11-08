@@ -33,6 +33,27 @@ sealed class WeatherScriptableComponent
 
   sealed class SeasonUpdateNotifier : MonoBehaviour;  // Just a MonoBehaviour to run coroutines.
 
+  // Keep the existing weather save contract while sharing value tracking with configured signals.
+  sealed class SeasonTracker(ReferenceManager references)
+      : AbstractGlobalStatusTracker(WeatherStateRestorerKey, references) {
+    /// <inheritdoc/>
+    public override void Load(ISingletonLoader loader) {
+      if (loader.TryGetSingleton(WeatherStateRestorerKey, out var component)) {
+        var season = component.Get(CurrentSeasonKey);
+        if (!string.IsNullOrEmpty(season)) {
+          SetSignalValue(SeasonSignalName, ScriptValue.FromString(season));
+        }
+      }
+    }
+
+    /// <inheritdoc/>
+    public override void Save(ISingletonSaver saver) {
+      if (TryGetSignalValue(SeasonSignalName, out var value)) {
+        saver.GetSingleton(WeatherStateRestorerKey).Set(CurrentSeasonKey, value.AsString);
+      }
+    }
+  }
+
   #region IWeatherExtension implementation
 
   /// <inheritdoc/>
@@ -66,14 +87,12 @@ sealed class WeatherScriptableComponent
   /// <inheritdoc/>
   public override void Load() {
     base.Load();
-    if (_singletonLoader.TryGetSingleton(WeatherStateRestorerKey, out var objectLoader)) {
-      _currentSeason = objectLoader.Get(CurrentSeasonKey);
-    }
+    _tracker.Load(_singletonLoader);
   }
 
   /// <inheritdoc/>
   public void Save(ISingletonSaver singletonSaver) {
-    singletonSaver.GetSingleton(WeatherStateRestorerKey).Set(CurrentSeasonKey, _currentSeason);
+    _tracker.Save(singletonSaver);
   }
 
   #endregion
@@ -90,18 +109,12 @@ sealed class WeatherScriptableComponent
 
   /// <inheritdoc/>
   public override Func<ScriptValue> GetSignalSource(string name, AutomationBehavior _) {
-    return name switch {
-        SeasonSignalName => SeasonSignal,
-        _ => throw new UnknownSignalException(name),
-    };
+    return name switch { SeasonSignalName => SeasonSignal, _ => throw new UnknownSignalException(name) };
   }
 
   /// <inheritdoc/>
   public override SignalDef GetSignalDefinition(string name, AutomationBehavior _) {
-    return name switch {
-        SeasonSignalName => SeasonSignalDef,
-        _ => throw new UnknownSignalException(name),
-    };
+    return name switch { SeasonSignalName => SeasonSignalDef, _ => throw new UnknownSignalException(name) };
   }
 
   /// <inheritdoc/>
@@ -109,12 +122,12 @@ sealed class WeatherScriptableComponent
     if (signalOperator.SignalName != SeasonSignalName) {
       throw new InvalidOperationException($"Unknown signal: {signalOperator.SignalName}");
     }
-    _referenceManager.AddSignal(signalOperator, host);
+    _tracker.AddSignal(signalOperator, host);
   }
 
   /// <inheritdoc/>
   public override void UnregisterSignalChangeCallback(SignalOperator signalOperator, ISignalListener host) {
-    _referenceManager.RemoveSignal(signalOperator, host);
+    _tracker.RemoveSignal(signalOperator, host);
   }
 
   #endregion
@@ -124,9 +137,9 @@ sealed class WeatherScriptableComponent
   /// <inheritdoc/>
   public void PostLoad() {
     _eventBus.Register(this);
-    if (string.IsNullOrEmpty(_currentSeason)) {
-      _currentSeason = GetCurrentSeason();
-      DebugEx.Info("Initialized weather season: {0}", _currentSeason);
+    if (!_tracker.TryGetSignalValue(SeasonSignalName, out _)) {
+      var season = SeasonSignal().AsString;
+      DebugEx.Info("Initialized weather season: {0}", season);
     }
   }
 
@@ -143,7 +156,7 @@ sealed class WeatherScriptableComponent
   SignalDef _seasonSignalDef;
 
   ScriptValue SeasonSignal() {
-    return ScriptValue.FromString(_currentSeason);
+    return _tracker.GetOrInitialize(SeasonSignalName, () => ScriptValue.FromString(GetCurrentSeason()));
   }
 
   #endregion
@@ -165,8 +178,7 @@ sealed class WeatherScriptableComponent
   // Extensible list of functions to get the current temperate weather ID.
   readonly List<Func<string>> _weatherIdProviders = [];
 
-  string _currentSeason;
-  readonly ReferenceManager _referenceManager;
+  readonly SeasonTracker _tracker;
   readonly MonoBehaviour _monoBehaviour;
 
   WeatherScriptableComponent(EventBus eventBus, WeatherService weatherService, ReferenceManager referenceManager,
@@ -174,7 +186,7 @@ sealed class WeatherScriptableComponent
       AutomationExtensionsRegistry automationExtensionsRegistry) {
     _eventBus = eventBus;
     _weatherService = weatherService;
-    _referenceManager = referenceManager;
+    _tracker = new SeasonTracker(referenceManager);
     _hazardousWeatherService = hazardousWeatherService;
     _singletonLoader = singletonLoader;
     _monoBehaviour = new GameObject("WeatherScriptableComponent").AddComponent<SeasonUpdateNotifier>();
@@ -205,14 +217,14 @@ sealed class WeatherScriptableComponent
 
   IEnumerator UpdateSeasonCoroutine() {
     yield return new WaitForEndOfFrame(); // Wait to let the weather service update its state.
-    var oldSeason = _currentSeason;
-    _currentSeason = GetCurrentSeason();
-    if (oldSeason != _currentSeason) {
-      DebugEx.Info("Weather season changed: {0} -> {1}", oldSeason, _currentSeason);
-      if (_referenceManager.Signals.Count > 0 && !_weatherSeasonIds.Contains(_currentSeason)) {
-        DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", _currentSeason);
+    var oldSeason = SeasonSignal().AsString;
+    var currentSeason = GetCurrentSeason();
+    if (oldSeason != currentSeason) {
+      DebugEx.Info("Weather season changed: {0} -> {1}", oldSeason, currentSeason);
+      if (_tracker.HasSignalListeners(SeasonSignalName) && !_weatherSeasonIds.Contains(currentSeason)) {
+        DebugEx.Warning("Unknown weather season ID: {0}. Automation rules won't trigger.", currentSeason);
       }
-      _referenceManager.TriggerSignalUpdate(SeasonSignalName);
+      _tracker.TriggerSignalUpdate(SeasonSignalName, ScriptValue.FromString(currentSeason));
     }
     _seasonUpdateCoroutine = null;
   }

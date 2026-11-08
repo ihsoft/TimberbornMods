@@ -1,0 +1,30 @@
+{
+  "Version": 1,
+  "Providers": [
+    {
+      "Id": "ModdableWeathers",
+      "Targets": [
+        {
+          "Assembly": "ModdableWeathers",
+          "Type": "ModdableWeathers.Cycles.WeatherCycleService",
+          "Signals": [
+            {
+              "Id": "Season",
+              "NameLocKey": "IgorZ.Automation.Scriptable.Weather.Signal.Season",
+              "Read": "CurrentStage.Stage.Weather.Id",
+              "Value": {
+                "OptionsSource": {
+                  "Assembly": "ModdableWeathers",
+                  "Type": "ModdableWeathers.Weathers.ModdableWeatherRegistry",
+                  "Read": "Weathers",
+                  "ValuePath": "Id",
+                  "NameLocKeyPath": "Spec.NameLocKey"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

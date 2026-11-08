@@ -17,7 +17,7 @@ sealed record ValueDef {
   /// <summary>Optional localized name of the value when it's an argument to an action.</summary>
   /// <remarks>
   /// It only makes sense when there are more than one argument. For the single argument actions, the name won't be
-  /// shown. If there are multiple arguments, adn the name is not provided, then the generic strings will be shown
+  /// shown. If there are multiple arguments, and the name is not provided, then the generic strings will be shown
   /// instead of the arguments names.
   /// </remarks>
   public string DisplayName { get; init; }
@@ -39,7 +39,7 @@ sealed record ValueDef {
     Boolean,
 
     /// <summary>A float value with 2 digits after the comma.</summary>
-    /// <remarks>If the number has more digits after the comme, the UI will block it.</remarks>
+    /// <remarks>If the number has more digits after the comma, the UI will block it.</remarks>
     Float,
 
     /// <summary>Percent value. Doesn't allow digits after the comma.</summary>
@@ -62,7 +62,7 @@ sealed record ValueDef {
   public NumericFormatEnum DisplayNumericFormat { get; init; }
 
   /// <summary>Defines the range of the numeric value. The values are inclusive.</summary>
-  /// <summary>
+  /// <remarks>
   /// <p>
   /// It's used by the UI to show the range of the value and to validate the input. This range is not used in runtime,
   /// and it doesn't affect expressions evaluation. Use <c>float.NaN</c> to effectively disable the range check for the
@@ -74,7 +74,7 @@ sealed record ValueDef {
   /// 0% to 100%, you should set the range as [0, 100], not [0, 1] (as it will be stored in <see cref="ScriptValue"/>).
   /// </p>
   /// <p>To disable range checking leave this property null. An explicit [0, 0] range allows only zero.</p>
-  /// </summary>
+  /// </remarks>
   /// <seealso cref="DisplayNumericFormat"/>
   /// <seealso cref="ScriptValue.AsRawNumber"/>
   public (float min, float max)? DisplayNumericFormatRange { get; init; }
