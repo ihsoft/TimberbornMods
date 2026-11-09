@@ -1,12 +1,14 @@
 # Automation hook JSON format, version 1
 
-This is the technical reference for the implementation in this directory. It describes the current implementation in this
-checkout; it does not claim that the feature is available in a published Automation release. It is source material for
-the human-facing Wiki guide and a local reference for agents authoring configurations. No web lookup is needed to
-understand the configuration contract. Examples using `ExampleMod` are illustrative, not shipped test integrations.
+This is the complete author-facing contract for integrating another mod through JSON: format, packaging, source
+requirements, observable behavior, and validation. It describes the implementation in this checkout, not a guarantee
+that a published Automation release supports it. Use the reference matching your intended Automation version.
+No knowledge of Automation's internal classes or repository rules is required. Examples using `ExampleMod` are
+illustrative, not shipped test integrations. This document is also source material for a future human-facing Wiki guide;
+it does not claim that guide has been published.
 
-For the actual schema and validation, see [HookConfiguration.cs](HookConfiguration.cs),
-[ConfiguredIntegrations.cs](ConfiguredIntegrations.cs), and [HookValueFactory.cs](HookValueFactory.cs).
+Automation maintainers changing the engine can separately read [HookImplementation.md](HookImplementation.md).
+That internal document is not required for writing configuration files.
 
 Expose existing mod properties and methods through JSON configuration, without compiling Automation code into the
 provider. Automation discovers the config, builds native signal and action definitions, observes setters and invokes
@@ -69,8 +71,8 @@ manifest ID or automatic dependency declaration.
 | `Actions` | Defaults to `[]` | Array of action objects; `null` is treated as empty. Only present on targets. |
 
 An options source uses the same `Assembly`, `Type` and `Scope` fields, with additional fields described below. It has
-neither `Signals` nor `Actions`. Automation selects the already loaded assembly by exact simple name, then calls
-`Assembly.GetType` for the exact type name. It does not enumerate all game types or load another DLL from disk.
+neither `Signals` nor `Actions`. Automation selects the already loaded assembly by exact simple name and resolves the
+exact type name within it. It does not search all game types or load another DLL from disk.
 Duplicate loaded assemblies with the requested simple name are an error, not an arbitrary choice.
 
 ### Signal
@@ -153,7 +155,7 @@ Each target specifies its assembly's simple name without `.dll`, full type name,
 
 | Scope | Source | Signal/action availability |
 | --- | --- | --- |
-| `Singleton` (default) | Resolved from the Game DI container after singleton Load calls | Global |
+| `Singleton` (default) | An existing singleton registered in the game's service container, available after its initialization | Global |
 | `Building` | A BaseComponent on the rule owner's GameObject | Only buildings with that component |
 | `Static` | Static members on the named type | Global |
 
@@ -168,7 +170,7 @@ normal script value error when evaluated. Plain fields, indexers, method argumen
 part of the path syntax. The final result must be bool, int, float, double or string. Convert enums and custom structures
 in provider-owned getters when needed. Static scope applies to the first path member; later members belong to its result.
 
-`Watch` is an optional array of property names on the target class. Automation patches their managed setters at runtime.
+`Watch` is an optional array of property names on the target class. Automation observes calls to their managed setters.
 When omitted, it watches the first property in Read. Examples:
 
 ```json
@@ -180,19 +182,23 @@ When omitted, it watches the first property in Read. Examples:
 ```
 
 Use `Watch: []` only for values that need no change notification. Get-only properties can be read, but cannot themselves
-be watched. A nested object's independent mutations require a watched setter on the target to surround that mutation;
-merely assigning the same outer value afterward will not announce a change already completed. Replacing
-the outer property is observed automatically. Multiple signals may watch the same setter, and one signal may watch
-multiple setters. Private setters are supported. Inlined calls and non-managed/native setters may prevent interception;
-validate the actual target in game. Patches are installed before singleton Load, then activated after registration.
+be watched. A nested object's independent mutations require a watched setter on the target to be called as well;
+assigning the same outer value afterward is sufficient to queue a read. Replacing the outer property also queues a read.
+Multiple signals may watch the same setter, and one signal may watch multiple setters. Private setters are supported.
+Inlined calls and non-managed/native setters may prevent interception; validate the actual target in game.
 
-The observer reads before/after only when the signal has listeners. An unchanged raw CLR result does not queue an update.
-It compares the `Read` projection, not the setter's argument. Getters must be cheap, side-effect free and safe both before
-and after every watched setter. A getter which depends on state updated after that setter may miss the eventual change;
-choose a different setter or a projection whose change is visible inside the observed call.
-Changed results enter Automation's deferred queue, processed with WaitForEndOfFrame after Automation is ready.
-Rules never execute inside the setter. Repeated notifications are coalesced, the latest value is sampled, and changes
-caused by actions wait for a subsequent pass through the same end-of-frame mechanism.
+### Deferred value-change behavior
+
+Each intercepted setter call schedules a later observation for that source instance, including same-value assignments.
+Automation does not read the configured value or execute rules inside the setter. Once Automation is ready, subscribed
+signals are sampled at the end of the frame. Repeated calls and multiple watched setters are combined: each affected
+signal on the same source instance is read once per batch. Distinct source instances remain independent even if they
+compare equal by value. The latest values are sampled before any rule in that batch is notified.
+
+The sampled result is converted to its script value and compared with the last processed or restored value. Unchanged
+values do not notify rules unless the read error state changes. Getters must be cheap, side-effect free and safe when
+sampled at the end of the frame. State updated after the setter but before that sample is included. Initial subscription
+may also read the source when no saved value exists. Changes caused by actions wait for a subsequent end-of-frame pass.
 There is no guarantee to deliver intermediate states; use a counter to represent repeated occurrences.
 All configured members must be used on the game thread. No polling fallback is installed.
 
@@ -250,9 +256,9 @@ For dynamic dropdowns, OptionsSource specifies another Singleton or Static sourc
 }
 ```
 
-Options are captured during PostLoad, after registries have loaded, and retain registry order. Entries without a name
-key are skipped. Do not specify both Options and OptionsSource. Per-building or continuously changing option lists
-are not supported by this shared editor metadata. Retained entries must satisfy the same validation as fixed options:
+Options are captured once during world initialization, after registries have loaded, and retain registry order.
+Entries without a name key are skipped. Do not specify both Options and OptionsSource. Per-building or continuously
+changing option lists are not supported by this shared editor metadata. Retained entries must satisfy the same validation as fixed options:
 non-null, unique values and at least one visible entry. A null/empty/whitespace name key hides the entry before its
 value is read. Localization is resolved at registration; existence of a translation is not a separate schema check.
 
@@ -278,11 +284,13 @@ are not supported. A setter can also be invoked by its CLR name, e.g. `set_Count
 
 This calls `void Configure(bool, double, string)` with converted values in that order. The existing rule editor renders
 one named control per argument and preserves the full list in saved scripts. Actions may modify state normally;
-configured setter observers detect resulting changes. Provider code must still own its normal state persistence.
+configured setter observations detect resulting changes. Provider code must still own its normal state persistence.
+
+## Saved signal values
 
 Automation separately saves the last processed signal values: one value per world for global signals and one per
 building for building signals. Saved values are restored before rules are bound, without reading the source or
-notifying rules. The next observed setter change queues a deferred read and comparison with that saved baseline.
+notifying rules. The next observed setter call queues a deferred read and comparison with that saved baseline.
 Signals without a saved value are initialized from their source when first observed. A read error preserves the last
 valid value; recovering on a subsequent queued read notifies rules even if that value has not changed. Error state itself
 is not persisted. Removing the last listener drops an actively tracked baseline; a later subscription initializes again.
@@ -294,16 +302,11 @@ only when no change notification is needed. Saving Automation's baseline does no
 Missing config files are normal. Missing target or options-source assemblies produce an INFO skip message without an
 exception stack. A loaded assembly with a missing type, property or method remains an ERROR: the declaration is invalid
 or incompatible with that mod version. Unsupported versions, malformed files and invalid declarations are logged; a bad
-file or entry does not abort world loading or prevent independent entries from registering. IDs, result types, bounds,
-fixed options and registry access paths are validated before installing signal patches. Actual singleton resolution,
-registry contents and registration conflicts are checked after loading. A failure at that stage removes the rejected
-signal's observer from all its setters. A setter patch is removed when no other observer needs it; valid signals sharing
-the setter remain observed. Partially installed hook groups are rolled back on installation failure.
-
-Runtime observer failures also detach the failing observer and remove unused patches, while preserving the original
-setter. Provider action/getter errors are handled by Automation's normal script error reporting. Hooks and captured
-source references are removed on unload. If Harmony itself fails to remove a patch, Automation logs that failure,
-clears its callbacks and retains the method identity to retry removal on unload.
+file or entry does not abort world loading or prevent independent entries from registering. A rejected signal does not
+remain observed through another of its watched setters; independent valid signals sharing those setters remain active.
+Provider action/getter errors use Automation's normal script error reporting. An observation-dispatch failure disables
+the affected observation without replacing the provider's original setter. Observations and source references are
+released when the world unloads; teardown failures are logged.
 
 These failure paths are different:
 
@@ -315,16 +318,17 @@ These failure paths are different:
 | JSON parse/version/unknown property error | ERROR, reject the whole file. Other files still load. | Fix the file and reload. |
 | Bad target identity/scope or unavailable singleton binding | ERROR, skip that target. | Fix identity/binding and reload. |
 | Invalid signal/action metadata or duplicate registration | ERROR, skip that capability; keep independent valid entries and the first successful duplicate. | Fix the declaration and reload. |
-| Reader/observer callback throws around a setter | ERROR, disable that observer and remove its unused patches. The signal definition remains registered. | Fix the getter/hook and reload; no automatic retry of the disabled observer. |
-| Deferred signal read or conversion fails | Script error; keep the last valid baseline. Other signals continue. | A later observed change can queue another read and recover. No periodic retry. |
+| Observation dispatch fails before a signal can be sampled | ERROR, disable that observation. The signal definition remains registered. | Fix the integration and reload; no automatic retry of the disabled observation. |
+| Deferred signal read or conversion fails | Script error; keep the last valid baseline. Other signals continue. | A later observed setter call can queue another read and recover. No periodic retry. |
 | Action throws or receives an invalid typed/option argument | Normal script runtime error; the action stays registered. | A later execution may succeed. Editor bounds are not runtime validation. |
 
 A configuration cannot make a throwing original setter safe or intercept every possible write. Setter exceptions,
 direct backing-field writes, inlined calls and background-thread writes are outside the notification contract.
 
-Registration finishes in PostLoad before Automation binds saved rules. Configs should describe state/registries ready
-after singleton Load; late registration or arbitrary delays are not used. Test fresh load, save/reload, exact target
-signatures, per-building isolation and real changes before relying on an integration.
+Registration finishes during world initialization before Automation binds saved rules. Configs should describe
+state/registries ready after their normal initialization; late registration or arbitrary delays are not supported.
+Test fresh load, save/reload, exact target signatures, per-building isolation and real changes before relying on an
+integration.
 
 ## Built-in Moddable Weathers integration
 
@@ -337,35 +341,12 @@ Enable Automation and Moddable Weathers; no separate integration mod is needed. 
 is skipped with an INFO message. Automation's built-in Weather.Season support remains unchanged. Existing rules using
 Mods.ModdableWeathers.Season keep their identity; rules using the legacy extended Weather.Season are not migrated.
 
-## Implementation and validation map
+## Integration validation checklist
 
-| Responsibility | Source |
-| --- | --- |
-| JSON properties/defaults | [HookConfiguration.cs](HookConfiguration.cs) |
-| File discovery, early validation, registration, options | [ConfiguredIntegrations.cs](ConfiguredIntegrations.cs) |
-| Assembly/type identity, DI and building ownership | [ConfiguredTarget.cs](ConfiguredTarget.cs) |
-| Compiled getters/actions and setter lookup | [HookMemberAccess.cs](HookMemberAccess.cs) |
-| Shared patches, before/after comparison, removal | [PropertySetterHooks.cs](PropertySetterHooks.cs) |
-| Native editor metadata, types, numbers and runtime validation | [HookValueFactory.cs](HookValueFactory.cs), [HookValueConverter.cs](HookValueConverter.cs) |
-| End-of-frame queue and scripting adapter | [ExternalScriptableComponent.cs](ExternalScriptableComponent.cs) |
-| World/building saved baselines | [AbstractGlobalStatusTracker.cs](../Components/AbstractGlobalStatusTracker.cs), [AbstractStatusTracker.cs](../Components/AbstractStatusTracker.cs) |
-
-Reflection and expression compilation happen during world initialization. Setter callbacks use compiled delegates;
-they do not search for types or members again. Each watched setter incurs the cheap observer/listener checks even when
-it produces no update; expensive getter projections are still expensive and should be avoided. The deferred queue
-coalesces pending observations per signal/source and reads their latest values before notifying any rule in that batch.
-
-For a new declaration, establish the exact installed target version, assembly/type identity, method signatures, DI
-binding or component ownership, and which setter encloses the observable mutation from local provider source or DLL
-metadata. Do not guess them from display names. Check the JSON against every field above and provide the referenced
-localization entries. Validate in game: config discovery and absence of registration errors; signal/action availability;
+For a new declaration, establish the exact installed target version, assembly/type identity, method signatures,
+service registration or component ownership, and which setter is called for each observable mutation from provider
+source or DLL metadata. Do not guess them from display names. Check the JSON against every field above and provide the
+referenced localization entries. Validate in game: discovery and absence of registration errors; signal/action availability;
 each argument control and its units; real changes, repeated same-value writes, and action-driven changes; save/reload
 without false transitions; independent building instances; absence of the optional target mod. A successful parse or
 compile is not evidence that a runtime setter was intercepted.
-
-For the Wiki editor: organize the human guide around choosing a source, exporting one signal, exporting an action,
-adding editor metadata, packaging the file and troubleshooting it. Keep the complete field reference available, but
-do not require the reader to understand internal tracker, DI registration or Harmony implementation classes. Explain
-the observable restrictions and deferred value-change behavior. Use the shipped weather config as the real example;
-the counter and Configure snippets above only illustrate the schema. Do not present the old source API or a separate
-weather adapter as installation requirements, and do not imply that existing native season rules are migrated.

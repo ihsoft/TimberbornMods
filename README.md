@@ -6,11 +6,13 @@ This repository contains the C# projects and shared Unity project used to build 
 
 Automation can expose other mods' signals and actions through JSON configuration, without a helper source or Automation
 DLL dependency. Player and modder guides belong in the [Automation Wiki](https://github.com/ihsoft/TimberbornMods/wiki).
-The hook integration guide is not published yet. The implementation's complete
+The hook integration guide is not published yet. The complete author-facing
 [JSON format reference](Automation/ScriptingEngine/ScriptableComponents/Extensions/HookConfiguration.md) is available
 for integration authors and the Wiki editor.
 Agents authoring or reviewing hook integrations should start with the scoped
 [integration instructions](Automation/ScriptingEngine/ScriptableComponents/Extensions/AGENTS.md).
+Only maintainers changing the hooks engine need the separate
+[implementation notes](Automation/ScriptingEngine/ScriptableComponents/Extensions/HookImplementation.md).
 
 ## Setup with an AI agent
 

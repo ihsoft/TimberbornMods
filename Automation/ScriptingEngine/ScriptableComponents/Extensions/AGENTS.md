@@ -6,7 +6,7 @@ Read these instructions when authoring or reviewing `AutomationHooks*.json` inte
 implementation in this directory. Unrelated mod work does not need this integration guide.
 
 Read the adjacent [HookConfiguration.md](HookConfiguration.md) before editing a declaration. It owns the complete JSON
-contract, packaging rules, lifecycle, limitations, examples, and implementation map; do not invent fields or reconstruct
+contract, packaging rules, observable lifecycle, limitations, and examples; do not invent fields or reconstruct
 the contract from an older source API. Use the reference matching the intended Automation implementation/version.
 The contract in this checkout is not proof that a published Automation version supports it.
 
@@ -22,11 +22,11 @@ instead of guessing. The final Automation-maintainer section does not apply to e
 1. Establish the intended game, Automation, and provider versions. Inspect provider source or DLL metadata for exact
    assembly/type names, member signatures, and singleton/component/static ownership. Display names are not CLR identity.
 2. Use the reference to select the source scope, read projection, watched setters, actions, and value metadata. For each
-   changing signal, establish which setter encloses the observable change. A readable property alone does not establish
-   notification support; do not substitute `Watch: []` for a missing mutation hook or assume a polling fallback.
-3. Keep read projections cheap, side-effect free, and safe before and after the watched call. Respect the documented
-   game-thread, deferred-notification, and source-lifecycle boundaries. If the provider cannot meet them, report the
-   integration limitation rather than silently adding a new hooks mechanism.
+   changing signal, establish which setter is called when its value may have changed. A readable property alone does
+   not establish notification support; do not substitute `Watch: []` for a missing hook or assume a polling fallback.
+3. Keep read projections cheap, side-effect free, and safe at deferred sampling and initial subscription. Respect the
+   documented game-thread, deferred-notification, and source-lifecycle boundaries. If the provider cannot meet them,
+   report the integration limitation rather than silently adding a new hooks mechanism.
 4. Preserve provider/capability IDs and stored option values used by existing rules. Supply localization keys and
    translations through the owning mod's normal localization resources. Check units, numeric precision, argument order,
    and option lifetime against the reference, not merely JSON syntax.
@@ -48,6 +48,9 @@ actually checked and what remains unverified; do not label illustrative examples
 
 This section applies when maintaining the hooks implementation inside TimberbornMods, not when supplying JSON from
 another mod repository. Read the repository root `AGENTS.md`, `Automation/AGENTS.md`, and their applicable task routes.
+Read [HookImplementation.md](HookImplementation.md) for class ownership, DI/patch lifecycle and deferred processing.
+External JSON authors do not need that document. Keep schema and observable behavior in `HookConfiguration.md`, and
+implementation mechanisms in `HookImplementation.md`; do not make the external contract depend on reading both.
 In TimberbornMods, user real-game confirmation precedes new regression tests and commit unless explicitly waived.
 
 When changing the hooks implementation, keep the technical reference and focused regression coverage aligned with the
