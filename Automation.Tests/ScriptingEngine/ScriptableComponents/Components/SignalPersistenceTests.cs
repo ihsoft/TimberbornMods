@@ -22,6 +22,9 @@ static class SignalPersistenceTests {
       ("Global signals retain valid saved values across errors and notify recovery", PreservesValuesAcrossErrors),
       ("Building hook signals restore independent baselines without reading", RestoresBuildingSignals),
       ("Global tracker round-trips strings, booleans and exact numeric values", RoundTripsGlobalValues),
+      ("Setter calls coalesce before dispatch and sample the latest value once", CoalescesHookCalls),
+      ("Hook queue keeps separate hook and source identities without provider equality", PreservesHookIdentities),
+      ("Hook queue skips unobserved signals and discards work on unload", SkipsUnobservedAndUnloadedHooks),
   ];
 
   sealed class Store : ISingletonLoader, ISingletonSaver {
@@ -44,6 +47,11 @@ static class SignalPersistenceTests {
     public AutomationBehavior Behavior { get; } = new();
     public int Calls;
     public void OnValueChanged(string name) => Calls++;
+  }
+
+  sealed class IdentityOnlySource {
+    public override bool Equals(object obj) => throw new InvalidOperationException("Provider equality must not run");
+    public override int GetHashCode() => throw new InvalidOperationException("Provider hashing must not run");
   }
 
   sealed class GlobalTracker(ReferenceManager references)
@@ -169,6 +177,101 @@ static class SignalPersistenceTests {
     for (var i = 0; i < values.Length; i++) {
       Assert.Equal(values[i], restored.GetOrInitialize("Signal" + i, () => throw new Exception("Unexpected read")));
     }
+  }
+
+  static void CoalescesHookCalls() {
+    var value = 1;
+    var reads = 0;
+    var dispatches = 0;
+    var component = CreateComponent(new Store(), _ => {
+      reads++;
+      return ScriptValue.FromInt(value);
+    });
+    var listener = new Listener();
+    Subscribe(component, listener);
+    Action<object> firstHook = _ => {
+      dispatches++;
+      component.UpdateSignal("Mods.Test.Value", null);
+    };
+    Action<object> secondHook = _ => {
+      dispatches++;
+      component.UpdateSignal("Mods.Test.Value", null);
+      value = 3;
+    };
+    for (var i = 0; i < 100; i++) {
+      component.ScheduleHook(firstHook, null);
+      component.ScheduleHook(secondHook, null);
+    }
+    Assert.Equal(0, dispatches);
+    Assert.Equal(1, reads);
+    Assert.Equal(0, listener.Calls);
+    Assert.Equal(1, MonoBehaviour.QueuedCoroutineCount);
+    value = 2;
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(2, dispatches);
+    Assert.Equal(2, reads);
+    Assert.Equal(1, listener.Calls);
+    Assert.Equal(ScriptValue.FromInt(3), component.GetSignalSource("Mods.Test.Value", listener.Behavior)());
+
+    for (var i = 0; i < 100; i++) {
+      component.ScheduleHook(firstHook, null);
+    }
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(3, dispatches);
+    Assert.Equal(3, reads);
+    Assert.Equal(1, listener.Calls);
+    component.Unload();
+  }
+
+  static void PreservesHookIdentities() {
+    var component = CreateComponent(new Store(), _ => throw new Exception("Unexpected signal read"));
+    var firstSource = new IdentityOnlySource();
+    var secondSource = new IdentityOnlySource();
+    var firstCalls = new List<object>();
+    var secondCalls = new List<object>();
+    Action<object> firstHook = firstCalls.Add;
+    Action<object> secondHook = secondCalls.Add;
+    for (var i = 0; i < 100; i++) {
+      component.ScheduleHook(firstHook, firstSource);
+      component.ScheduleHook(firstHook, secondSource);
+      component.ScheduleHook(firstHook, null);
+      component.ScheduleHook(secondHook, firstSource);
+    }
+    Assert.Equal(0, firstCalls.Count);
+    Assert.Equal(0, secondCalls.Count);
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(3, firstCalls.Count);
+    Assert.Equal(1, firstCalls.FindAll(source => ReferenceEquals(source, firstSource)).Count);
+    Assert.Equal(1, firstCalls.FindAll(source => ReferenceEquals(source, secondSource)).Count);
+    Assert.Equal(1, firstCalls.FindAll(source => source == null).Count);
+    Assert.Equal(1, secondCalls.Count);
+    Assert.Same(firstSource, secondCalls[0]);
+    component.Unload();
+  }
+
+  static void SkipsUnobservedAndUnloadedHooks() {
+    var reads = 0;
+    var dispatches = 0;
+    var component = CreateComponent(new Store(), _ => {
+      reads++;
+      return ScriptValue.FromInt(1);
+    });
+    Action<object> hook = _ => {
+      dispatches++;
+      component.UpdateSignal("Mods.Test.Value", null);
+    };
+    component.ScheduleHook(hook, null);
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(1, dispatches);
+    Assert.Equal(0, reads);
+    Subscribe(component, new Listener());
+    component.ScheduleHook(hook, null);
+    component.Unload();
+    MonoBehaviour.RunQueuedCoroutines();
+    Assert.Equal(1, dispatches);
+    Assert.Equal(1, reads);
+    component.ScheduleHook(hook, null);
+    Assert.Equal(0, MonoBehaviour.QueuedCoroutineCount);
   }
 
   static ExternalScriptableComponent CreateComponent(

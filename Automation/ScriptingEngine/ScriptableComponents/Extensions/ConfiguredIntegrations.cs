@@ -134,7 +134,7 @@ sealed class ConfiguredIntegrations : IPostLoadableSingleton {
           var createValue = PrepareValue(signal.Value, reader.Type);
           var setters = (signal.Watch ?? [signal.Read.Split('.')[0]])
               .Select(name => HookMemberAccess.FindSetter(target, name)).ToArray();
-          observer = new PropertySetterHooks.Observer { Name = name, Read = reader.Read };
+          observer = new PropertySetterHooks.Observer { Name = name };
           _hooks.Add(setters, observer);
           signals.Add(new PendingSignal(signal, reader, createValue, observer));
         } catch (Exception e) {
@@ -164,12 +164,12 @@ sealed class ConfiguredIntegrations : IPostLoadableSingleton {
       _hooks.Remove(signal.Observer);
       return;
     }
-    signal.Observer.IsObserved = source => target.Matches(source)
-        && _component.HasSignalListeners(native.ScriptName, GetBuilding(source));
-    signal.Observer.Notify = source => _component.UpdateSignal(native.ScriptName, GetBuilding(source));
+    signal.Observer.Notify = source => {
+      if (target.Matches(source)) {
+        _component.UpdateSignal(native.ScriptName, target.ResolveBuilding == null ? null : (BaseComponent)source);
+      }
+    };
     signal.Observer.Active = true;
-
-    BaseComponent GetBuilding(object source) => target.ResolveBuilding == null ? null : (BaseComponent)source;
 
     ScriptValue Read(BaseComponent source) {
       var result = HookValueConverter.ToScript(signal.Reader.Type, signal.Reader.Read(target.GetSource(source)));

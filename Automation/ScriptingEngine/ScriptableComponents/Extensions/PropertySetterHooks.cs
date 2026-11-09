@@ -12,38 +12,58 @@ using UnityDev.Utils.LogUtilsLite;
 
 namespace IgorZ.Automation.ScriptingEngine.ScriptableComponents.Extensions;
 
-/// <summary>Owns runtime setter patches and compares values without executing rules on the setter's stack.</summary>
+/// <summary>Owns runtime setter patches that queue signal updates without reading values or executing rules.</summary>
 sealed class PropertySetterHooks : IUnloadableSingleton {
   const string PatchId = "IgorZ.Automation.ConfiguredSetters";
 
-  /// <summary>One signal's projection and callbacks, shared by all setters that can change it.</summary>
+  /// <summary>One signal's notification callback, shared by all setters that can change it.</summary>
   public sealed class Observer {
     /// <summary>Provider-qualified identifier for diagnostics.</summary>
     public string Name;
-    /// <summary>Pure getter; evaluated synchronously around an observed setter.</summary>
-    public Func<object, object> Read;
-    /// <summary>Filters other worlds, dead components and sources without listeners.</summary>
-    public Func<object, bool> IsObserved;
-    /// <summary>Queues a deferred signal update after an actual value change.</summary>
+    /// <summary>Filters the source and queues its signal for sampling in the current end-of-frame batch.</summary>
     public Action<object> Notify;
     /// <summary>Set only after registration; cleared on failure and unload.</summary>
     public bool Active;
   }
 
-  readonly record struct Snapshot(Observer Observer, object Value);
+  sealed class Hook {
+    /// <summary>Signal bindings sharing this setter, including inactive registrations.</summary>
+    public readonly List<Observer> Observers = [];
+    /// <summary>Stable callback identity used to coalesce calls for this hook and source.</summary>
+    public readonly Action<object> Dispatch;
+
+    /// <summary>Creates the callback once, without allocating a delegate on each setter call.</summary>
+    public Hook() {
+      Dispatch = Process;
+    }
+
+    void Process(object instance) {
+      // A failing callback can detach itself. Reverse traversal keeps the other observers intact.
+      for (var i = Observers.Count - 1; i >= 0; i--) {
+        var observer = Observers[i];
+        if (!observer.Active) {
+          continue;
+        }
+        try {
+          observer.Notify(instance);
+        } catch (Exception e) {
+          Disable(observer, e);
+        }
+      }
+    }
+  }
 
   /// <summary>Install before game services Load; an observer remains inactive until its signal is registered.</summary>
   public void Add(MethodInfo[] setters, Observer observer) {
     try {
       foreach (var setter in setters.Distinct()) {
-        if (!Watches.TryGetValue(setter, out var observers)) {
-          observers = [];
-          Watches.Add(setter, observers);
-          Patcher.Patch(setter, prefix: new HarmonyMethod(typeof(PropertySetterHooks), nameof(Prefix)),
-              postfix: new HarmonyMethod(typeof(PropertySetterHooks), nameof(Postfix)));
+        if (!Watches.TryGetValue(setter, out var hook)) {
+          hook = new Hook();
+          Watches.Add(setter, hook);
+          Patcher.Patch(setter, postfix: new HarmonyMethod(typeof(PropertySetterHooks), nameof(Postfix)));
           DebugEx.Info("[Automation Hooks] Installed {0}.{1}", setter.DeclaringType?.FullName, setter.Name);
         }
-        observers.Add(observer);
+        hook.Observers.Add(observer);
       }
     } catch {
       RemoveObserver(observer);
@@ -58,8 +78,9 @@ sealed class PropertySetterHooks : IUnloadableSingleton {
 
   /// <inheritdoc/>
   public void Unload() {
-    foreach (var observers in Watches.Values) {
-      foreach (var observer in observers) {
+    _component = null;
+    foreach (var hook in Watches.Values) {
+      foreach (var observer in hook.Observers) {
         observer.Active = false;
       }
     }
@@ -69,14 +90,16 @@ sealed class PropertySetterHooks : IUnloadableSingleton {
   }
 
   static readonly Harmony Patcher = new(PatchId);
-  static readonly Dictionary<MethodBase, List<Observer>> Watches = new();
+  static readonly Dictionary<MethodBase, Hook> Watches = new();
+  static ExternalScriptableComponent _component;
 
-  PropertySetterHooks() {
+  PropertySetterHooks(ExternalScriptableComponent component) {
     Unload();
+    _component = component;
   }
 
   static void RemovePatch(MethodBase method) {
-    Watches[method].Clear();
+    Watches[method].Observers.Clear();
     try {
       Patcher.Unpatch(method, HarmonyPatchType.All, PatchId);
       Watches.Remove(method);
@@ -90,7 +113,7 @@ sealed class PropertySetterHooks : IUnloadableSingleton {
   static void RemoveObserver(Observer observer) {
     observer.Active = false;
     foreach (var method in Watches.Keys.ToArray()) {
-      var observers = Watches[method];
+      var observers = Watches[method].Observers;
       observers.Remove(observer);
       if (observers.Count == 0) {
         RemovePatch(method);
@@ -98,45 +121,9 @@ sealed class PropertySetterHooks : IUnloadableSingleton {
     }
   }
 
-  static void Prefix(object __instance, MethodBase __originalMethod, out List<Snapshot> __state) {
-    __state = null;
-    if (!Watches.TryGetValue(__originalMethod, out var observers)) {
-      return;
-    }
-    // A failing reader can detach itself from this list. Reverse traversal keeps the other observers intact.
-    for (var i = observers.Count - 1; i >= 0; i--) {
-      var observer = observers[i];
-      if (!observer.Active) {
-        continue;
-      }
-      try {
-        if (observer.IsObserved(__instance)) {
-          var value = observer.Read(__instance);
-          __state ??= [];
-          __state.Add(new Snapshot(observer, value));
-        }
-      } catch (Exception e) {
-        Disable(observer, e);
-      }
-    }
-  }
-
-  static void Postfix(object __instance, List<Snapshot> __state) {
-    if (__state == null) {
-      return;
-    }
-    foreach (var snapshot in __state) {
-      var observer = snapshot.Observer;
-      if (!observer.Active) {
-        continue;
-      }
-      try {
-        if (!Equals(snapshot.Value, observer.Read(__instance))) {
-          observer.Notify(__instance);
-        }
-      } catch (Exception e) {
-        Disable(observer, e);
-      }
+  static void Postfix(object __instance, MethodBase __originalMethod) {
+    if (_component != null && Watches.TryGetValue(__originalMethod, out var hook) && hook.Observers.Count > 0) {
+      _component.ScheduleHook(hook.Dispatch, __instance);
     }
   }
 

@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using IgorZ.Automation.AutomationSystem;
 using IgorZ.Automation.ScriptingEngine.Core;
 using IgorZ.Automation.ScriptingEngine.Expressions;
@@ -49,6 +50,19 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     public ScriptError.RuntimeError Error;
   }
 
+  readonly record struct PendingHook(Action<object> Dispatch, object Source) {
+    /// <summary>Compares identities without invoking provider-defined equality on the setter's stack.</summary>
+    public bool Equals(PendingHook other) {
+      return ReferenceEquals(Dispatch, other.Dispatch) && ReferenceEquals(Source, other.Source);
+    }
+
+    /// <summary>Hashes identities without invoking provider-defined hashing.</summary>
+    public override int GetHashCode() {
+      return HashCode.Combine(
+          RuntimeHelpers.GetHashCode(Dispatch), Source == null ? 0 : RuntimeHelpers.GetHashCode(Source));
+    }
+  }
+
   sealed class UpdateRunner : MonoBehaviour;
 
   /// <inheritdoc/>
@@ -75,6 +89,7 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     _runner = null;
     _processing = null;
     _pending.Clear();
+    _pendingHooks.Clear();
     _signals.Clear();
     _actions.Clear();
     _globalTracker = null;
@@ -103,12 +118,15 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
     DebugEx.Info("Registered external automation action: {0}", definition.ScriptName);
   }
 
-  /// <summary>Whether a source currently has listeners; lets setter observers avoid unnecessary reads.</summary>
-  public bool HasSignalListeners(string name, BaseComponent source) {
-    if (!_active || !_signals.TryGetValue(name, out var signal)) {
-      return false;
+  /// <summary>Coalesces a hook/source pair for end-of-frame dispatch; no signal callbacks run here.</summary>
+  /// <param name="dispatch">The hook's stable callback, allocated once when the patch is installed.</param>
+  /// <param name="source">The setter instance, or null for a static setter; compared by reference identity.</param>
+  public void ScheduleHook(Action<object> dispatch, object source) {
+    if (!_active) {
+      return;
     }
-    return signal.Watches.ContainsKey(signal.Resolve == null ? GlobalSource : (object)source.GameObject);
+    _pendingHooks.Add(new PendingHook(dispatch, source));
+    _processing ??= _runner.StartCoroutine(ProcessUpdates());
   }
 
   /// <summary>Only enqueues an existing observation; no provider delegates run in this call.</summary>
@@ -247,6 +265,7 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
   readonly Dictionary<string, Signal> _signals = new();
   readonly Dictionary<string, ExternalAction> _actions = new();
   readonly HashSet<Watch> _pending = new();
+  readonly HashSet<PendingHook> _pendingHooks = new();
   readonly ISingletonLoader _singletonLoader;
   GlobalSignalTracker _globalTracker;
   UpdateRunner _runner;
@@ -325,11 +344,16 @@ sealed class ExternalScriptableComponent : ScriptableComponentBase, IUnloadableS
   }
 
   IEnumerator ProcessUpdates() {
-    while (_active && _pending.Count > 0) {
+    while (_active && (_pendingHooks.Count > 0 || _pending.Count > 0)) {
       // Let the frame's game logic settle, as with the built-in weather signal.
       yield return new WaitForEndOfFrame();
       if (!AutomationService.AutomationSystemReady) {
         continue;
+      }
+      var hooks = _pendingHooks.ToArray();
+      _pendingHooks.Clear();
+      foreach (var hook in hooks) {
+        hook.Dispatch(hook.Source);
       }
       var batch = _pending.ToArray();
       _pending.Clear();
