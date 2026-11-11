@@ -81,11 +81,10 @@ The floodgate group template demonstrates how the custom signals system can be u
 [img]https://raw.githubusercontent.com/ihsoft/TimberbornMods/refs/heads/main/Automation/workshop/Slideshow/SignalsMenuDemo.jpg[/img]
 
 [h1]Other mods support[/h1]
-Mods that significantly alter gameplay may affect Automation behavior. You can suggest mods for support in Discord or the Discussions threads — they might be added in the future.
+Compatible mods can add their own signals and actions to the rule editor. Their origin is shown alongside the available options.
 
-Here’s the full list of what is supported as of now:
 [list] 
-[*] [url=https://steamcommunity.com/workshop/filedetails/?id=3493039008]ModdedWeather[/url]. You need to install [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3562952077]Automation+ModdableWeather[/url] mod.
+[*] [url=https://steamcommunity.com/workshop/filedetails/?id=3493039008]Moddable Weathers[/url] has a dedicated season signal that can be used in automation rules.
 [/list]
 
 [h1]Questions and discussions[/h1]
