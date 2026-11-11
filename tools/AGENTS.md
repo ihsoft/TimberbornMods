@@ -49,6 +49,30 @@ worktree. Keep these ownership boundaries separate:
 Validate that every configured target is an exact Git worktree root. Do not infer it from the process working directory,
 copy modern scripts into an older branch, or let an older-game generation overwrite another worktree's cache.
 
+## Release Evidence Runtime And Serialization
+
+When changing release tools, state which PowerShell editions/versions the change supports and record which were
+actually tested. Do not infer cross-runtime compatibility from a passing suite in only one host.
+
+- Keep evidence producers and verifiers on the same PowerShell runtime unless their cross-runtime contract is explicitly
+  tested. Logged child scripts must use the parent runtime's executable from `$PSHOME`, not a hardcoded alternate host
+  or an executable rediscovered from `PATH`. Recovery must also respect the original evidence producer's runtime.
+- Runtime consistency does not prove portable fingerprints. Sorting, culture, path normalization and text encoding can
+  change a lane fingerprint without changing the ZIP. Test evidence ordering with representative paths containing case
+  differences and punctuation. Treat canonical hash serialization as a separate, versioned format change; do not silently
+  change the algorithm or rewrite immutable reports to make a mismatch disappear.
+- Preserve timestamp type and timezone through JSON evidence conversion. Handle parsed `DateTime`/`DateTimeOffset`
+  values directly; do not cast them to a display string and reparse it as local time. Test actual JSON round trips for
+  UTC and explicit-offset strings as well as typed dates, including execution in a non-UTC timezone. Comparisons must
+  preserve the same instant, not merely similar-looking clock text.
+- Changelog candidate discovery must accept both LF and CRLF without requiring source-file rewrites. Test equivalent
+  current-line and line-qualified backport headings under both endings, including the final line without a newline.
+
+Exercise the producer-to-child-verifier path, not only isolated helper fixtures. If cross-runtime or cross-culture
+portability is claimed, compare the same artifact under every claimed environment. On a mismatch, preserve the original
+artifact and report, distinguish content drift from evidence interpretation, and follow the existing release recovery
+gates; a serialization fix does not authorize repeating completed public mutations.
+
 ## Authenticated Standalone Steamworks.NET Tools
 
 For a standalone Steamworks.NET CLI that uses the logged-in Steam client, treat the CLI as a repository tool, not as
