@@ -34,7 +34,7 @@ function Get-UnpublishedSections(
         $content = Get-Content -Raw -LiteralPath $changesPath
         $matches = [regex]::Matches(
             $content,
-            "(?m)^#\s+v?(?<version>\d+\.\d+(?:\.\d+)?)[^\r\n]*\(TBD\)[^\r\n]*$")
+            "(?m)^#\s+v?(?<version>\d+\.\d+(?:\.\d+)?)[^\r\n]*\(TBD\)[^\r\n]*(?=\r?$)")
         foreach ($match in $matches) {
             [pscustomobject]@{
                 ModName = ($relativePath -replace "\\", "/").Split('/')[0]
