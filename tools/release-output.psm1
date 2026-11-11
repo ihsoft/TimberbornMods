@@ -97,10 +97,13 @@ function Invoke-LoggedReleaseStep {
     $startedAtUtc = (Get-Date).ToUniversalTime().ToString("o")
     $safeName = $Name -replace "[^A-Za-z0-9._-]", "-"
     $logPath = Join-Path $LogDirectory ("{0:D2}-{1}.log" -f $StepIndex, $safeName)
+    # Keep fingerprint ordering and other runtime behavior consistent with the parent preflight.
+    $shellName = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh.exe" } else { "powershell.exe" }
+    $shellPath = Join-Path $PSHOME $shellName
     $previousErrorActionPreference = $ErrorActionPreference
     try {
         $ErrorActionPreference = "Continue"
-        $output = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $ScriptPath @Arguments 2>&1)
+        $output = @(& $shellPath -NoProfile -ExecutionPolicy Bypass -File $ScriptPath @Arguments 2>&1)
         $exitCode = $LASTEXITCODE
     }
     finally {
