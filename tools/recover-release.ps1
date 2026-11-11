@@ -324,7 +324,10 @@ function Get-ModIoReadback([object] $Preflight, [object] $Fixture) {
     }
 }
 
-function Convert-ToUnixTimeSeconds([string] $Value) {
+function Convert-ToUnixTimeSeconds([object] $Value) {
+    if ($Value -is [DateTime] -or $Value -is [DateTimeOffset]) {
+        return ([DateTimeOffset]$Value).ToUnixTimeSeconds()
+    }
     if ([string]::IsNullOrWhiteSpace($Value)) {
         return $null
     }
@@ -504,7 +507,7 @@ if ($workshopData.UpdateVisibility -eq $true) {
     $expectedSteamVisibility = [int]$visibilityMap[[string]$workshopData.Visibility]
 }
 $expectedSteamTags = Get-NormalizedTags @($workshopData.Tags)
-$minimumSteamUpdateTime = Convert-ToUnixTimeSeconds ([string]$steamOperation.StartedAtUtc)
+$minimumSteamUpdateTime = Convert-ToUnixTimeSeconds $steamOperation.StartedAtUtc
 $attempt = [ordered]@{
     SchemaVersion = 1
     ArtifactType = "TimberbornReleaseRecoveryAttempt"
@@ -530,8 +533,8 @@ $attempt = [ordered]@{
     Steam = [ordered]@{
         SuccessfulPublishOperation = [ordered]@{
             Name = [string]$steamOperation.Name
-            StartedAtUtc = [string]$steamOperation.StartedAtUtc
-            CompletedAtUtc = [string]$steamOperation.CompletedAtUtc
+            StartedAtUtc = $steamOperation.StartedAtUtc
+            CompletedAtUtc = $steamOperation.CompletedAtUtc
             ExternalOutcome = [string]$steamOperation.ExternalOutcome
             LogPath = [string]$steamOperation.LogPath
         }
