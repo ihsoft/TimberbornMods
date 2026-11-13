@@ -1,4 +1,4 @@
-# v4.12.1 (TBD)
+# v4.12.1 (November 12th, 2026)
 * [Fix] Loading a save could fail when Automation had saved an empty set of global signals.
 
 # v4.12.0 (November 10th, 2026)
