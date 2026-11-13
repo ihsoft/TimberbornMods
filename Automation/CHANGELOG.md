@@ -1,3 +1,6 @@
+# v4.12.1 (TBD)
+* [Fix] Loading a save could fail when Automation had saved an empty set of global signals.
+
 # v4.12.0 (November 10th, 2026)
 * [Feature] Allow other mods to provide signals and actions through declarative hook configuration, with their origin shown in the rule editor and support for multiple action arguments.
 * [Feature] Provide an independent Moddable Weathers season signal through built-in hooks, without a separate integration mod.

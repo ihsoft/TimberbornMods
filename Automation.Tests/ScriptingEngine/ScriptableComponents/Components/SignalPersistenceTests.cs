@@ -22,6 +22,8 @@ static class SignalPersistenceTests {
       ("Global signals retain valid saved values across errors and notify recovery", PreservesValuesAcrossErrors),
       ("Building hook signals restore independent baselines without reading", RestoresBuildingSignals),
       ("Global tracker round-trips strings, booleans and exact numeric values", RoundTripsGlobalValues),
+      ("Global tracker omits empty and unset-only saves while preserving zero", OmitsEmptyGlobalSaves),
+      ("Global signal component loads legacy null and empty saved collections", LoadsEmptyGlobalSaves),
       ("Setter calls coalesce before dispatch and sample the latest value once", CoalescesHookCalls),
       ("Hook queue keeps separate hook and source identities without provider equality", PreservesHookIdentities),
       ("Hook queue skips unobserved signals and discards work on unload", SkipsUnobservedAndUnloadedHooks),
@@ -176,6 +178,58 @@ static class SignalPersistenceTests {
     restored.Load(store);
     for (var i = 0; i < values.Length; i++) {
       Assert.Equal(values[i], restored.GetOrInitialize("Signal" + i, () => throw new Exception("Unexpected read")));
+    }
+  }
+
+  static void OmitsEmptyGlobalSaves() {
+    var service = TestScripting.CreateService();
+    var tracker = new GlobalTracker(new ReferenceManager(service));
+    var emptySave = new Store();
+    tracker.Save(emptySave);
+    Assert.Equal(0, emptySave.Values.Count);
+
+    tracker.SetSignalValue("Unavailable", ScriptValue.InvalidValue);
+    var unsetSave = new Store();
+    tracker.Save(unsetSave);
+    Assert.Equal(0, unsetSave.Values.Count);
+
+    tracker.SetSignalValue("Zero", ScriptValue.FromInt(0));
+    var validSave = new Store();
+    tracker.Save(validSave);
+    Assert.Equal(1, validSave.Values.Count);
+    var restored = new GlobalTracker(new ReferenceManager(service));
+    restored.Load(validSave);
+    Assert.False(restored.TryGetSignalValue("Unavailable", out _));
+    Assert.True(restored.TryGetSignalValue("Zero", out var value));
+    Assert.Equal(ScriptValue.FromInt(0), value);
+  }
+
+  static void LoadsEmptyGlobalSaves() {
+    SavedSignalValues[] states = [null, new(), new() { SignalValues = [] }];
+    foreach (var state in states) {
+      var store = new Store();
+      // The serializer stub supplies the deserialized shape, including the legacy null array.
+      store.GetSingleton(new SingletonKey("IgorZ.Automation.ConfiguredSignals"))
+          .Set(new PropertyKey<string>("SavedSignals"), StringProtoSerializer.Serialize(state));
+      var reads = 0;
+      var component = CreateComponent(store, _ => {
+        reads++;
+        return ScriptValue.FromInt(7);
+      });
+      Assert.Equal(0, reads);
+      var emptySave = new Store();
+      component.Save(emptySave);
+      Assert.Equal(0, emptySave.Values.Count);
+
+      var listener = new Listener();
+      Subscribe(component, listener);
+      Assert.Equal(1, reads);
+      Assert.Equal(0, listener.Calls);
+      Assert.Equal(ScriptValue.FromInt(7), component.GetSignalSource("Mods.Test.Value", listener.Behavior)());
+      var validSave = new Store();
+      component.Save(validSave);
+      Assert.Equal(1, validSave.Values.Count);
+      component.Unload();
     }
   }
 

@@ -27,17 +27,24 @@ abstract class AbstractGlobalStatusTracker(SingletonKey stateKey, ReferenceManag
     if (saved == null) {
       return;
     }
-    foreach (var item in StringProtoSerializer.Deserialize<SavedSignalValues>(saved).SignalValues) {
+    var state = StringProtoSerializer.Deserialize<SavedSignalValues>(saved);
+    // Previously saved empty collections can deserialize without a SignalValues array.
+    if (state?.SignalValues == null) {
+      return;
+    }
+    foreach (var item in state.SignalValues) {
       _values.Add(item.SignalName, item.ToScriptValue());
     }
   }
 
   /// <summary>Saves last valid values, including values temporarily unavailable from their sources.</summary>
   public virtual void Save(ISingletonSaver saver) {
-    var state = new SavedSignalValues {
-        SignalValues = _values.Where(x => x.Value.ValueType != ScriptValue.TypeEnum.Unset)
-            .Select(x => SavedSignalValues.SignalValue.FromScriptValue(x.Key, x.Value)).ToArray(),
-    };
+    var values = _values.Where(x => x.Value.ValueType != ScriptValue.TypeEnum.Unset)
+        .Select(x => SavedSignalValues.SignalValue.FromScriptValue(x.Key, x.Value)).ToArray();
+    if (values.Length == 0) {
+      return;
+    }
+    var state = new SavedSignalValues { SignalValues = values };
     saver.GetSingleton(stateKey).Set(SavedSignalsKey, StringProtoSerializer.Serialize(state));
   }
 
